@@ -1,23 +1,15 @@
 import { registerEnumType } from '@nestjs/graphql';
+import {
+  ParentRelation,
+  Role,
+  UserStatus,
+} from '../../../../../generated/prisma/enums';
 
-export enum Role {
-  ADMIN = 'ADMIN',
-  TEACHER = 'TEACHER',
-  STUDENT = 'STUDENT',
-  PARENT = 'PARENT',
-}
-
-registerEnumType(Role, {
-  name: 'Role',
-});
-
+// One source of truth: the enums are defined in prisma/schema.prisma.
+// Here they are only registered for GraphQL (Nestar declared them by hand next to the Mongoose schema).
+registerEnumType(Role, { name: 'Role' });
 // No hard deletes: a user is blocked or archived, never removed
-export enum UserStatus {
-  ACTIVE = 'ACTIVE',
-  BLOCKED = 'BLOCKED',
-  ARCHIVED = 'ARCHIVED',
-}
+registerEnumType(UserStatus, { name: 'UserStatus' });
+registerEnumType(ParentRelation, { name: 'ParentRelation' });
 
-registerEnumType(UserStatus, {
-  name: 'UserStatus',
-});
+export { ParentRelation, Role, UserStatus };

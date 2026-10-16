@@ -1,4 +1,7 @@
-// Campusly database schema. Models are added on day 2 (see docs/DECISIONS.md §5).
+// Campusly database schema (rules: docs/DECISIONS.md §5).
+// - PK: UUID v7. Instants: Timestamptz(3) in UTC. Calendar dates: Date. Scores: Decimal(6,2).
+// - No hard deletes: `status` / `revokedAt` + AuditLog.
+// - Tables are mapped to snake_case names; columns stay camelCase like the Prisma models.
 // The DB connection URL lives in prisma7.config.ts (Prisma 7).
 
 generator client {
@@ -10,4 +13,851 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ─────────────────────────────── Identity ───────────────────────────────
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  ARCHIVED
+}
+
+enum ParentRelation {
+  MOTHER
+  FATHER
+  GUARDIAN
+  OTHER
+}
+
+enum OneTimeTokenPurpose {
+  PASSWORD_RESET
+  TELEGRAM_LINK
+}
+
+/// Every person who can sign in. Role-specific data lives in the profile tables (1:1).
+model User {
+  id      String     @id @default(uuid(7)) @db.Uuid
+  /// What people type to sign in: 26100042 (student/teacher) or the last 9 phone digits (parent)
+  loginId String     @unique
+  role    Role
+  status  UserStatus @default(ACTIVE)
+
+  passwordHash          String
+  /// Temporary password: valid for 3 sign-ins or 14 days (DECISIONS §6)
+  tempPasswordUsesLeft  Int?
+  tempPasswordExpiresAt DateTime? @db.Timestamptz(3)
+  /// true only when the temporary password limit is reached
+  mustChangePassword    Boolean   @default(false)
+
+  firstName      String
+  lastName       String
+  locale         String  @default("en")
+  timezone       String?
+  isDemo         Boolean @default(false)
+  telegramChatId String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  studentProfile StudentProfile?
+  teacherProfile TeacherProfile?
+  parentProfile  ParentProfile?
+
+  children      ParentStudent[] @relation("ParentLinks")
+  parents       ParentStudent[] @relation("StudentLinks")
+  linksCreated  ParentStudent[] @relation("LinkCreatedBy")
+  refreshTokens RefreshToken[]
+  oneTimeTokens OneTimeToken[]
+
+  groupMemberships      GroupMember[]       @relation("GroupMemberships")
+  teachingCourses       CourseTeacher[]     @relation("TeachingCourses")
+  enrollments           Enrollment[]        @relation("Enrollments")
+  uploadedAssets        MediaAsset[]        @relation("UploadedAssets")
+  lessonProgress        LessonProgress[]    @relation("LessonProgress")
+  assignmentsCreated    Assignment[]        @relation("AssignmentsCreated")
+  submissions           Submission[]        @relation("Submissions")
+  submissionsGraded     Submission[]        @relation("SubmissionsGraded")
+  submissionComments    SubmissionComment[] @relation("SubmissionComments")
+  periodGrades          PeriodGrade[]       @relation("PeriodGrades")
+  periodGradesPublished PeriodGrade[]       @relation("PeriodGradesPublished")
+  sessionsCreated       ClassSession[]      @relation("SessionsCreated")
+  attendanceRecords     AttendanceRecord[]  @relation("AttendanceRecords")
+  attendanceMarked      AttendanceRecord[]  @relation("AttendanceMarked")
+  announcementsAuthored Announcement[]      @relation("AnnouncementsAuthored")
+  announcementReads     AnnouncementRead[]  @relation("AnnouncementReads")
+  notifications         Notification[]      @relation("Notifications")
+  auditLogs             AuditLog[]          @relation("AuditActor")
+
+  @@index([role, status])
+  @@map("users")
+}
+
+model StudentProfile {
+  userId        String    @id @db.Uuid
+  birthDate     DateTime? @db.Date
+  admissionYear Int
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("student_profiles")
+}
+
+model TeacherProfile {
+  userId String  @id @db.Uuid
+  title  String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("teacher_profiles")
+}
+
+model ParentProfile {
+  userId String @id @db.Uuid
+  /// Full phone in E.164 (+998901234567); the login ID is its last 9 digits
+  phone  String @unique
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("parent_profiles")
+}
+
+/// Parent ↔ student is many-to-many: one parent can have several children, a child can have two parents.
+model ParentStudent {
+  id          String         @id @default(uuid(7)) @db.Uuid
+  parentId    String         @db.Uuid
+  studentId   String         @db.Uuid
+  relation    ParentRelation
+  createdById String         @db.Uuid
+  createdAt   DateTime       @default(now()) @db.Timestamptz(3)
+  /// Unlinking keeps the row (history); access checks require revokedAt = null
+  revokedAt   DateTime?      @db.Timestamptz(3)
+
+  parent    User @relation("ParentLinks", fields: [parentId], references: [id])
+  student   User @relation("StudentLinks", fields: [studentId], references: [id])
+  createdBy User @relation("LinkCreatedBy", fields: [createdById], references: [id])
+
+  @@unique([parentId, studentId])
+  @@index([studentId])
+  @@map("parent_students")
+}
+
+/// Refresh tokens are random strings stored as sha256 hashes. One sign-in = one family (rotation + reuse detection).
+model RefreshToken {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  userId     String    @db.Uuid
+  familyId   String    @db.Uuid
+  tokenHash  String    @unique
+  expiresAt  DateTime  @db.Timestamptz(3)
+  revokedAt  DateTime? @db.Timestamptz(3)
+  /// The token that replaced this one on rotation
+  replacedBy String?   @db.Uuid
+  userAgent  String?
+  ip         String?
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+/// Single-use tokens (password reset via Telegram, Telegram linking), stored as hashes
+model OneTimeToken {
+  id        String              @id @default(uuid(7)) @db.Uuid
+  userId    String              @db.Uuid
+  purpose   OneTimeTokenPurpose
+  tokenHash String              @unique
+  expiresAt DateTime            @db.Timestamptz(3)
+  usedAt    DateTime?           @db.Timestamptz(3)
+  createdAt DateTime            @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("one_time_tokens")
+}
+
+/// Login ID sequence per year and role: INSERT ... ON CONFLICT DO UPDATE SET lastValue = lastValue + 1 (never MAX() + 1)
+model IdCounter {
+  year      Int
+  /// 1 = student, 2 = teacher
+  roleCode  Int
+  lastValue Int @default(0)
+
+  @@id([year, roleCode])
+  @@map("id_counters")
+}
+
+// ──────────────────────────────── School ────────────────────────────────
+
+enum PeriodKind {
+  SEMESTER
+  QUARTER
+  MONTH
+  CUSTOM
+}
+
+/// Single row (id = 1), edited on the admin Settings page
+model SchoolSetting {
+  id            Int    @id @default(1)
+  schoolName    String
+  /// Drives business rules: deadlines, attendance date, daily limits
+  timezone      String @default("Asia/Tashkent")
+  defaultLocale String @default("en")
+
+  /// 5-point mark thresholds in % (5 ≥ 86, 4 ≥ 71, 3 ≥ 56, else 2)
+  mark5MinPercent Int @default(86)
+  mark4MinPercent Int @default(71)
+  mark3MinPercent Int @default(56)
+
+  /// Default GradeCategory weights for every new course (must add up to 100)
+  defaultHomeworkWeight Int @default(30)
+  defaultQuizWeight     Int @default(30)
+  defaultExamWeight     Int @default(40)
+
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@map("school_settings")
+}
+
+model AcademicYear {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  /// e.g. "2026–27"
+  name      String   @unique
+  startsAt  DateTime @db.Date
+  endsAt    DateTime @db.Date
+  /// Exactly one current year (checked in the service)
+  isCurrent Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  periods Period[]
+  groups  Group[]
+  courses Course[]
+
+  @@map("academic_years")
+}
+
+/// Quarter, semester, month or custom term. Can be nested: a semester contains two quarters.
+model Period {
+  id             String     @id @default(uuid(7)) @db.Uuid
+  academicYearId String     @db.Uuid
+  parentId       String?    @db.Uuid
+  kind           PeriodKind
+  name           String
+  order          Int
+  startsAt       DateTime   @db.Date
+  endsAt         DateTime   @db.Date
+
+  academicYear AcademicYear  @relation(fields: [academicYearId], references: [id])
+  parent       Period?       @relation("PeriodTree", fields: [parentId], references: [id])
+  children     Period[]      @relation("PeriodTree")
+  courses      Course[]
+  periodGrades PeriodGrade[]
+
+  @@unique([academicYearId, name])
+  @@index([parentId])
+  @@map("periods")
+}
+
+// ──────────────────────────────── Courses ────────────────────────────────
+
+/// Simple lifecycle for reference data (subjects, classes)
+enum RecordStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum CourseStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum CourseTeacherRole {
+  OWNER
+  ASSISTANT
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  DROPPED
+}
+
+enum LessonType {
+  VIDEO
+  READING
+  FILE
+  LINK
+}
+
+enum CompletionType {
+  /// done when opened
+  VIEW
+  /// done at 90% watched
+  VIDEO_WATCHED
+  /// student presses "Mark as done"
+  MANUAL
+}
+
+enum MediaKind {
+  VIDEO
+  DOCUMENT
+  IMAGE
+  OTHER
+}
+
+enum MediaProvider {
+  S3
+  VIMEO
+}
+
+enum MediaStatus {
+  UPLOADING
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+/// Managed by the admin ("Manage subjects"), so names are not typed differently in every course
+model Subject {
+  id        String       @id @default(uuid(7)) @db.Uuid
+  /// e.g. "Algebra"
+  name      String       @unique
+  status    RecordStatus @default(ACTIVE)
+  createdAt DateTime     @default(now()) @db.Timestamptz(3)
+
+  courses Course[]
+
+  @@map("subjects")
+}
+
+/// A class in one academic year (9A of 2026–27 and 9A of 2027–28 are different rows)
+model Group {
+  id             String       @id @default(uuid(7)) @db.Uuid
+  academicYearId String       @db.Uuid
+  /// e.g. "9A"
+  name           String
+  status         RecordStatus @default(ACTIVE)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+
+  academicYear AcademicYear  @relation(fields: [academicYearId], references: [id])
+  members      GroupMember[]
+  courses      Course[]
+
+  @@unique([academicYearId, name])
+  @@map("groups")
+}
+
+model GroupMember {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  groupId   String    @db.Uuid
+  studentId String    @db.Uuid
+  joinedAt  DateTime  @default(now()) @db.Timestamptz(3)
+  /// Moved to another class: the row stays for history
+  leftAt    DateTime? @db.Timestamptz(3)
+
+  group   Group @relation(fields: [groupId], references: [id])
+  student User  @relation("GroupMemberships", fields: [studentId], references: [id])
+
+  @@unique([groupId, studentId])
+  @@index([studentId])
+  @@map("group_members")
+}
+
+/// Course = subject × class, e.g. "Algebra · 9A"
+model Course {
+  id             String       @id @default(uuid(7)) @db.Uuid
+  academicYearId String       @db.Uuid
+  /// Optional: a course that runs only in one semester/quarter
+  periodId       String?      @db.Uuid
+  groupId        String       @db.Uuid
+  subjectId      String       @db.Uuid
+  title          String
+  status         CourseStatus @default(DRAFT)
+  /// Split group (e.g. Korean group 1/2): students are picked by hand instead of the whole class
+  isSplitGroup   Boolean      @default(false)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
+  period       Period?      @relation(fields: [periodId], references: [id])
+  group        Group        @relation(fields: [groupId], references: [id])
+  subject      Subject      @relation(fields: [subjectId], references: [id])
+
+  teachers        CourseTeacher[]
+  enrollments     Enrollment[]
+  modules         Module[]
+  gradeCategories GradeCategory[]
+  assignments     Assignment[]
+  periodGrades    PeriodGrade[]
+  sessions        ClassSession[]
+  announcements   Announcement[]
+
+  @@index([groupId])
+  @@index([subjectId])
+  @@index([academicYearId, status])
+  @@map("courses")
+}
+
+model CourseTeacher {
+  courseId  String            @db.Uuid
+  teacherId String            @db.Uuid
+  role      CourseTeacherRole @default(OWNER)
+  createdAt DateTime          @default(now()) @db.Timestamptz(3)
+
+  course  Course @relation(fields: [courseId], references: [id])
+  teacher User   @relation("TeachingCourses", fields: [teacherId], references: [id])
+
+  @@id([courseId, teacherId])
+  @@index([teacherId])
+  @@map("course_teachers")
+}
+
+/// Who can see a course. Whole-class courses enroll the class automatically; split groups pick students.
+model Enrollment {
+  id         String           @id @default(uuid(7)) @db.Uuid
+  courseId   String           @db.Uuid
+  studentId  String           @db.Uuid
+  status     EnrollmentStatus @default(ACTIVE)
+  enrolledAt DateTime         @default(now()) @db.Timestamptz(3)
+  droppedAt  DateTime?        @db.Timestamptz(3)
+
+  course  Course @relation(fields: [courseId], references: [id])
+  student User   @relation("Enrollments", fields: [studentId], references: [id])
+
+  @@unique([courseId, studentId])
+  @@index([studentId, status])
+  @@map("enrollments")
+}
+
+/// A week of the course
+model Module {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  courseId    String    @db.Uuid
+  title       String
+  order       Int
+  startsAt    DateTime? @db.Date
+  endsAt      DateTime? @db.Date
+  isHidden    Boolean   @default(false)
+  publishedAt DateTime? @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+
+  course  Course   @relation(fields: [courseId], references: [id])
+  lessons Lesson[]
+
+  @@index([courseId, order])
+  @@map("modules")
+}
+
+model Lesson {
+  id             String         @id @default(uuid(7)) @db.Uuid
+  moduleId       String         @db.Uuid
+  title          String
+  type           LessonType
+  body           String?
+  videoAssetId   String?        @db.Uuid
+  dueAt          DateTime?      @db.Timestamptz(3)
+  completionType CompletionType @default(VIEW)
+  /// Context for the AI tutor (later phase); never shown to students
+  tutorNotes     String?
+  order          Int
+  publishedAt    DateTime?      @db.Timestamptz(3)
+  createdAt      DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(3)
+
+  module      Module           @relation(fields: [moduleId], references: [id])
+  videoAsset  MediaAsset?      @relation("LessonVideo", fields: [videoAssetId], references: [id])
+  resources   LessonResource[]
+  progress    LessonProgress[]
+  assignments Assignment[]
+  sessions    ClassSession[]
+
+  @@index([moduleId, order])
+  @@map("lessons")
+}
+
+/// Extra files or links attached to a lesson
+model LessonResource {
+  id       String  @id @default(uuid(7)) @db.Uuid
+  lessonId String  @db.Uuid
+  title    String
+  assetId  String? @db.Uuid
+  url      String?
+  order    Int
+
+  lesson Lesson      @relation(fields: [lessonId], references: [id])
+  asset  MediaAsset? @relation("ResourceFile", fields: [assetId], references: [id])
+
+  @@index([lessonId])
+  @@map("lesson_resources")
+}
+
+/// Every uploaded file. The browser uploads straight to S3; the server only stores metadata (DECISIONS §11).
+model MediaAsset {
+  id           String        @id @default(uuid(7)) @db.Uuid
+  ownerId      String        @db.Uuid
+  kind         MediaKind
+  provider     MediaProvider @default(S3)
+  /// Server-generated key, e.g. raw/{courseId}/{assetId}.mp4 (never the original file name)
+  s3Key        String?       @unique
+  originalName String
+  mimeType     String
+  /// BigInt: a long video can be larger than 2 GB (Int max)
+  size         BigInt
+  status       MediaStatus   @default(UPLOADING)
+  durationSec  Int?
+  hlsKey       String?
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
+
+  owner           User             @relation("UploadedAssets", fields: [ownerId], references: [id])
+  lessonVideos    Lesson[]         @relation("LessonVideo")
+  lessonResources LessonResource[] @relation("ResourceFile")
+  submissionFiles SubmissionFile[]
+
+  @@index([ownerId])
+  @@index([status, createdAt])
+  @@map("media_assets")
+}
+
+model LessonProgress {
+  id              String         @id @default(uuid(7)) @db.Uuid
+  studentId       String         @db.Uuid
+  lessonId        String         @db.Uuid
+  status          ProgressStatus @default(NOT_STARTED)
+  watchedSeconds  Int            @default(0)
+  /// Resume point
+  lastPositionSec Int            @default(0)
+  /// Furthest point reached (90% rule)
+  maxPositionSec  Int            @default(0)
+  completedAt     DateTime?      @db.Timestamptz(3)
+  updatedAt       DateTime       @updatedAt @db.Timestamptz(3)
+
+  student User   @relation("LessonProgress", fields: [studentId], references: [id])
+  lesson  Lesson @relation(fields: [lessonId], references: [id])
+
+  @@unique([studentId, lessonId])
+  @@index([lessonId])
+  @@map("lesson_progress")
+}
+
+// ────────────────────────────── Assessment ──────────────────────────────
+
+enum AssignmentType {
+  HOMEWORK
+  QUIZ
+  /// Offline exam: grade only, no submission
+  EXAM
+}
+
+enum TutorMode {
+  HINTS
+  CHECK_ONLY
+  OFF
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  LATE
+  GRADED
+  RETURNED
+  MISSING
+}
+
+/// Weighted part of the quarter grade (school default: Homework 30 / Quizzes 30 / Exams 40)
+model GradeCategory {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  courseId  String   @db.Uuid
+  name      String
+  /// Percent; the weights of one course add up to 100
+  weight    Int
+  order     Int      @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  course      Course       @relation(fields: [courseId], references: [id])
+  assignments Assignment[]
+
+  @@unique([courseId, name])
+  @@map("grade_categories")
+}
+
+model Assignment {
+  id                String         @id @default(uuid(7)) @db.Uuid
+  courseId          String         @db.Uuid
+  /// The lesson (week) it belongs to, if any
+  lessonId          String?        @db.Uuid
+  categoryId        String         @db.Uuid
+  type              AssignmentType
+  title             String
+  instructions      String?
+  /// Raw points, e.g. 20 (5-point marks are presentation only)
+  maxScore          Decimal        @db.Decimal(6, 2)
+  /// Also decides the period (quarter) the grade belongs to
+  dueAt             DateTime?      @db.Timestamptz(3)
+  allowLate         Boolean        @default(true)
+  maxAttempts       Int            @default(1)
+  /// e.g. ["pdf", "docx", "jpg"]
+  acceptedFileTypes String[]
+  tutorMode         TutorMode      @default(HINTS)
+  /// Only for the AI tutor's CHECK_ONLY mode; never sent to students
+  finalAnswer       String?
+  publishedAt       DateTime?      @db.Timestamptz(3)
+  /// null = students and parents do not see scores or feedback yet
+  gradesPublishedAt DateTime?      @db.Timestamptz(3)
+  createdById       String         @db.Uuid
+  createdAt         DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime       @updatedAt @db.Timestamptz(3)
+
+  course      Course        @relation(fields: [courseId], references: [id])
+  lesson      Lesson?       @relation(fields: [lessonId], references: [id])
+  category    GradeCategory @relation(fields: [categoryId], references: [id])
+  createdBy   User          @relation("AssignmentsCreated", fields: [createdById], references: [id])
+  submissions Submission[]
+
+  @@index([courseId, dueAt])
+  @@index([categoryId])
+  @@index([lessonId])
+  @@map("assignments")
+}
+
+/// One per student per assignment; attempts are kept separately
+model Submission {
+  id           String           @id @default(uuid(7)) @db.Uuid
+  assignmentId String           @db.Uuid
+  studentId    String           @db.Uuid
+  status       SubmissionStatus @default(DRAFT)
+  score        Decimal?         @db.Decimal(6, 2)
+  feedback     String?
+  gradedById   String?          @db.Uuid
+  gradedAt     DateTime?        @db.Timestamptz(3)
+  submittedAt  DateTime?        @db.Timestamptz(3)
+  createdAt    DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime         @updatedAt @db.Timestamptz(3)
+
+  assignment Assignment          @relation(fields: [assignmentId], references: [id])
+  student    User                @relation("Submissions", fields: [studentId], references: [id])
+  gradedBy   User?               @relation("SubmissionsGraded", fields: [gradedById], references: [id])
+  attempts   SubmissionAttempt[]
+  comments   SubmissionComment[]
+
+  @@unique([assignmentId, studentId])
+  @@index([studentId])
+  @@map("submissions")
+}
+
+model SubmissionAttempt {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  submissionId String   @db.Uuid
+  /// 1, 2, 3 ... up to Assignment.maxAttempts
+  number       Int
+  text         String?
+  isLate       Boolean  @default(false)
+  submittedAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  submission Submission       @relation(fields: [submissionId], references: [id])
+  files      SubmissionFile[]
+
+  @@unique([submissionId, number])
+  @@map("submission_attempts")
+}
+
+model SubmissionFile {
+  id        String @id @default(uuid(7)) @db.Uuid
+  attemptId String @db.Uuid
+  /// Must belong to the submitting student (checked in the service)
+  assetId   String @db.Uuid
+
+  attempt SubmissionAttempt @relation(fields: [attemptId], references: [id])
+  asset   MediaAsset        @relation(fields: [assetId], references: [id])
+
+  @@unique([attemptId, assetId])
+  @@map("submission_files")
+}
+
+model SubmissionComment {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  submissionId String   @db.Uuid
+  authorId     String   @db.Uuid
+  body         String
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  submission Submission @relation(fields: [submissionId], references: [id])
+  author     User       @relation("SubmissionComments", fields: [authorId], references: [id])
+
+  @@index([submissionId])
+  @@map("submission_comments")
+}
+
+/// Quarter (or annual, periodId = null) grade. Computed live until the teacher publishes a snapshot.
+model PeriodGrade {
+  id            String    @id @default(uuid(7)) @db.Uuid
+  studentId     String    @db.Uuid
+  courseId      String    @db.Uuid
+  /// null = annual grade
+  periodId      String?   @db.Uuid
+  /// Weighted % at publish time
+  computedScore Decimal?  @db.Decimal(6, 2)
+  /// Manual override by the teacher
+  finalScore    Decimal?  @db.Decimal(6, 2)
+  publishedAt   DateTime? @db.Timestamptz(3)
+  publishedById String?   @db.Uuid
+  updatedAt     DateTime  @updatedAt @db.Timestamptz(3)
+
+  student     User    @relation("PeriodGrades", fields: [studentId], references: [id])
+  course      Course  @relation(fields: [courseId], references: [id])
+  period      Period? @relation(fields: [periodId], references: [id])
+  publishedBy User?   @relation("PeriodGradesPublished", fields: [publishedById], references: [id])
+
+  /// NULLS NOT DISTINCT is added in the migration SQL: only one annual grade (periodId = null) per student and course
+  @@unique([studentId, courseId, periodId])
+  @@index([courseId, periodId])
+  @@map("period_grades")
+}
+
+// ────────────────────────────── Attendance ──────────────────────────────
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+/// One lesson of a course on a date (attendance is per course session, not per school day)
+model ClassSession {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  courseId    String   @db.Uuid
+  date        DateTime @db.Date
+  lessonId    String?  @db.Uuid
+  title       String?
+  createdById String   @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  course    Course             @relation(fields: [courseId], references: [id])
+  lesson    Lesson?            @relation(fields: [lessonId], references: [id])
+  createdBy User               @relation("SessionsCreated", fields: [createdById], references: [id])
+  records   AttendanceRecord[]
+
+  @@unique([courseId, date])
+  @@map("class_sessions")
+}
+
+model AttendanceRecord {
+  id         String           @id @default(uuid(7)) @db.Uuid
+  sessionId  String           @db.Uuid
+  studentId  String           @db.Uuid
+  /// Default PRESENT: teachers mark only the exceptions
+  status     AttendanceStatus @default(PRESENT)
+  note       String?
+  markedById String           @db.Uuid
+  markedAt   DateTime         @default(now()) @db.Timestamptz(3)
+
+  session  ClassSession @relation(fields: [sessionId], references: [id])
+  student  User         @relation("AttendanceRecords", fields: [studentId], references: [id])
+  markedBy User         @relation("AttendanceMarked", fields: [markedById], references: [id])
+
+  @@unique([sessionId, studentId])
+  @@index([studentId])
+  @@map("attendance_records")
+}
+
+// ──────────────────────────── Communication ─────────────────────────────
+
+enum NotificationType {
+  ANNOUNCEMENT
+  ASSIGNMENT_DUE
+  GRADE_PUBLISHED
+  ATTENDANCE
+  SYSTEM
+}
+
+/// courseId = null → school-wide announcement
+model Announcement {
+  id          String    @id @default(uuid(7)) @db.Uuid
+  courseId    String?   @db.Uuid
+  authorId    String    @db.Uuid
+  title       String
+  body        String
+  isPinned    Boolean   @default(false)
+  /// Optional event day shown on the calendar
+  eventDate   DateTime? @db.Date
+  publishedAt DateTime  @default(now()) @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
+
+  course Course?            @relation(fields: [courseId], references: [id])
+  author User               @relation("AnnouncementsAuthored", fields: [authorId], references: [id])
+  reads  AnnouncementRead[]
+
+  @@index([courseId, publishedAt])
+  @@map("announcements")
+}
+
+model AnnouncementRead {
+  announcementId String   @db.Uuid
+  userId         String   @db.Uuid
+  readAt         DateTime @default(now()) @db.Timestamptz(3)
+
+  announcement Announcement @relation(fields: [announcementId], references: [id])
+  user         User         @relation("AnnouncementReads", fields: [userId], references: [id])
+
+  @@id([announcementId, userId])
+  @@index([userId])
+  @@map("announcement_reads")
+}
+
+model Notification {
+  id        String           @id @default(uuid(7)) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  title     String
+  body      String?
+  /// Frontend route to open, e.g. /student/courses/{id}
+  link      String?
+  readAt    DateTime?        @db.Timestamptz(3)
+  createdAt DateTime         @default(now()) @db.Timestamptz(3)
+
+  user User @relation("Notifications", fields: [userId], references: [id])
+
+  @@index([userId, readAt])
+  @@map("notifications")
+}
+
+// ──────────────────────────────── Audit ─────────────────────────────────
+
+/// Who changed what (replaces hard deletes as the safety net). Written by every admin mutation.
+model AuditLog {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  /// null = system / batch job
+  actorId    String?  @db.Uuid
+  /// e.g. "user.resetPassword", "grade.publish"
+  action     String
+  entityType String
+  entityId   String?
+  before     Json?
+  after      Json?
+  ip         String?
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+  @@map("audit_logs")
 }
