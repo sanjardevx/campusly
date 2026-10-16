@@ -44,18 +44,18 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 - [x] GitHub repo `campusly` (private), `develop` + `master` branches, `.gitignore`, README.
 - [x] `backend/`: Nest monorepo with `apps/campusly-api` + `apps/campusly-batch` (like `nestar-api` + `nestar-batch`).
-- [ ] `frontend/`: Next.js, Pages Router, TypeScript, no Tailwind, no `src/`, port 3001, `"packageManager": "pnpm@12.11.2"`.
-- [ ] Root `docker-compose.yml`: `postgres` (`pgvector/pgvector:pg17`, 5432, named volume) and `redis` (`redis:7-alpine`, 6379). `docker compose up -d`; connect with DBeaver and Redis Insight.
-- [ ] Backend packages: `@nestjs/graphql @nestjs/apollo @apollo/server @as-integrations/express5 graphql @nestjs/config @nestjs/jwt prisma @prisma/client class-validator class-transformer bcryptjs cookie-parser helmet ioredis @nestjs/bullmq bullmq dayjs uuid zod`; dev: `@types/bcryptjs @types/cookie-parser`. (AWS SDK, csv-parse, dataloader, pino, Sentry are added on the day they are needed.)
-- [ ] `prisma init`; `.env` + `.env.example` (`DATABASE_URL`, `REDIS_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `FRONTEND_URL`, `PORT_API`); config validated with `zod`.
-- [ ] Port the Nestar base and fix its problems:
+- [x] `frontend/`: Next.js, Pages Router, TypeScript, no Tailwind, no `src/`, port 3001, `"packageManager": "pnpm@12.11.2"`.
+- [x] Root `docker-compose.yml`: `postgres` (`pgvector/pgvector:pg17`, 5432, named volume) and `redis` (`redis:7-alpine`, 6379). `docker compose up -d`; connect with DBeaver and Redis Insight.
+- [x] Backend packages (NestJS 11 majors, Prisma 7.10.0 + `@prisma/adapter-pg`): `@nestjs/graphql @nestjs/apollo @apollo/server @as-integrations/express5 graphql @nestjs/config @nestjs/jwt prisma @prisma/client class-validator class-transformer bcryptjs cookie-parser helmet ioredis @nestjs/bullmq bullmq dayjs uuid zod`; dev: `@types/bcryptjs @types/cookie-parser`. (AWS SDK, csv-parse, dataloader, pino, Sentry are added on the day they are needed.)
+- [x] `prisma init`; `.env` + `.env.example` (`DATABASE_URL`, `REDIS_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `FRONTEND_URL`, `PORT_API`); config validated with `zod`.
+- [x] Port the Nestar base and fix its problems:
   - `main.ts`: `ValidationPipe({ whitelist: true })`, CORS only for `FRONTEND_URL` with credentials, `helmet`, `cookie-parser`; **no** `graphql-upload`, **no** `uploads/` static folder.
   - `app.module.ts`: GraphQL (Apollo, `autoSchemaFile`), `formatError` returns `extensions.code`.
   - `libs/`: `enums` (Role, UserStatus + `registerEnumType`), `types/common.ts`, `config.ts`, `interceptor/Logging.interceptor.ts` with redaction.
   - `health` query: `SELECT 1` on Postgres + `PING` on Redis.
-- [ ] Frontend packages: `@mui/material @emotion/react @emotion/styled @mui/icons-material @apollo/client graphql next-i18next i18next react-i18next jwt-decode dayjs sweetalert2`. One page that renders the `health` result.
-- [ ] `.github/workflows/ci.yml`: install → lint → typecheck for backend and frontend.
-- [ ] `docs/journal/day-1.md`.
+- [x] Frontend packages: `@mui/material @emotion/react @emotion/styled @mui/icons-material @apollo/client graphql next-i18next i18next react-i18next jwt-decode dayjs sweetalert2`. One page that renders the `health` result.
+- [x] `.github/workflows/ci.yml`: install → lint → typecheck for backend and frontend.
+- [x] `docs/journal/day-1.md`.
 
 **Interview:** Why Docker for local dev? Why Postgres instead of Mongo? Why validate env at startup?
 

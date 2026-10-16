@@ -27,10 +27,10 @@ When a decision changes, update it here **and** add a line to the [Decision log]
 
 | Layer | Choice |
 |---|---|
-| Backend | NestJS 11, GraphQL (Apollo, code-first). REST only for `/auth/*` (later also uploads, webhooks, SSE) |
-| ORM / DB | Prisma + PostgreSQL 17 (`pgvector/pgvector:pg17` image) |
+| Backend | NestJS 11 (packages pinned to Nest 11 majors, like Nestar), GraphQL (Apollo, code-first, `graphql` 16). REST only for `/auth/*` (later also uploads, webhooks, SSE) |
+| ORM / DB | Prisma 7 (driver adapter `@prisma/adapter-pg`) + PostgreSQL 17 (`pgvector/pgvector:pg17` image) |
 | Cache / queue | Redis 7 + BullMQ |
-| Frontend | Next.js (Pages Router), MUI, Apollo Client, GraphQL Codegen |
+| Frontend | Next.js 16 (Pages Router) + React 19, MUI 9, Apollo Client 4, GraphQL Codegen. Latest majors, not Nestar's (MUI 5, Apollo 3): Nestar code is ported with small API changes |
 | i18n | `next-i18next`; locales `en`, `uz`, `ru`, `ko`; **default `en`**. Korean code is `ko` (Nestar used `kr`, which is a country code) |
 | Files / video | AWS S3 (private) + CloudFront signed URLs; MP4 in phase 1, MediaConvert HLS later |
 | AI tutor (later) | Amazon Bedrock → Claude Haiku 4.5 behind an `LlmProvider` interface; embeddings via Bedrock + pgvector |
@@ -186,3 +186,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-14 | UUID v7, UTC + viewer timezone, AcademicYear + Period instead of Term |
 | 2026-10-15 | 4 languages (en default); Docker Desktop; pnpm; CMS, quiz and enquiries approved for later phases; timetable/rooms/homeroom removed; final temp-password rule (3 sign-ins / 14 days, no forced first change); parent login = last 9 phone digits |
 | 2026-10-15 | 2-week MVP time box; single repo with `backend/` + `frontend/` (no Turborepo); Nestar code style |
+| 2026-10-16 | Backend stays on NestJS 11 (Nest 12 exists); Prisma 7.10.0 (pnpm release-age policy); frontend uses latest majors: Next 16, React 19, MUI 9, Apollo Client 4 |
