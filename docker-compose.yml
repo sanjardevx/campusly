@@ -1,0 +1,42 @@
+# Local development only: Postgres + Redis.
+# Nest and Next run on the Mac with `pnpm dev`.
+# The credentials below are for the local Docker DB and are not used anywhere else.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17 # Postgres 17 + pgvector (needed later for the AI tutor)
+    container_name: campusly-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: campusly
+      POSTGRES_PASSWORD: campusly
+      POSTGRES_DB: campusly
+      TZ: UTC
+    ports:
+      - "127.0.0.1:5432:5432" # host:container, only reachable from this Mac
+    volumes:
+      - pg_data:/var/lib/postgresql/data # data survives `docker compose down`
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campusly -d campusly"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: campusly-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"] # persist queue data to disk
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pg_data:
+  redis_data:
