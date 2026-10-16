@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "packageManager": "pnpm@12.11.2",
   "scripts": {
+    "postinstall": "prisma generate",
     "build": "nest build",
     "build:batch": "nest build campusly-batch",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
@@ -21,7 +22,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./apps/campusly-api/test/jest-e2e.json"
+    "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --config ./apps/campusly-api/test/jest-e2e.json"
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",
@@ -34,6 +35,7 @@
     "@nestjs/graphql": "^13.4.5",
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/platform-express": "^11.0.1",
+    "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
     "bcryptjs": "^3.0.3",
     "bullmq": "^6.3.15",

@@ -1,11 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Campusly database schema. Models are added on day 2 (see docs/DECISIONS.md §5).
+// The DB connection URL lives in prisma7.config.ts (Prisma 7).
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider            = "prisma-client"
+  output              = "../generated/prisma"
+  moduleFormat        = "cjs" // Nest compiles to CommonJS
+  importFileExtension = "" // extensionless imports, so webpack can resolve the .ts files
 }
 
 datasource db {

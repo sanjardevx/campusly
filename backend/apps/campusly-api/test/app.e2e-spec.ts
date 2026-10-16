@@ -4,10 +4,11 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
-describe('AppController (e2e)', () => {
+// Needs the Docker Postgres + Redis (docker compose up -d)
+describe('AppResolver (e2e)', () => {
   let app: INestApplication<App>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -16,14 +17,29 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  afterAll(async () => {
+    await app.close();
   });
 
-  afterEach(async () => {
-    await app.close();
+  it('health reports Postgres and Redis as up', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query: '{ health { status postgres redis } }' })
+      .expect(200);
+
+    expect(res.body).toEqual({
+      data: { health: { status: 'ok', postgres: true, redis: true } },
+    });
+  });
+
+  it('returns an error code, not only a message', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query: '{ unknownField }' });
+    const body = res.body as { errors: { extensions: unknown }[] };
+
+    expect(body.errors[0].extensions).toEqual({
+      code: 'GRAPHQL_VALIDATION_FAILED',
+    });
   });
 });
