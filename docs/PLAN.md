@@ -65,11 +65,11 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 **Goal:** the whole MVP schema migrated and filled with realistic demo data.
 
-- [ ] `schema.prisma` with all MVP tables from DECISIONS.md §5 (UUID v7, `Timestamptz`, `Decimal`, `@@unique`, indexes on FKs, `@@map` to snake_case).
-- [ ] `prisma migrate dev --name init`.
-- [ ] `database/prisma.service.ts` + `database.module.ts` (replaces Nestar's Mongoose `database.module`). Global `omit` for sensitive fields.
-- [ ] `prisma/seed.ts`: settings + academic year 2026–27 with 4 quarters; 1 admin, 3 teachers, 2 classes (9A, 9B), 20 students, their parents (incl. one parent with 2 children), 4 courses with weeks, lessons, assignments, some submissions, grades and attendance. Use the same demo names as the Stitch design (e.g. Aziz Karimov `26100042`, Nilufar Karimova).
-- [ ] `health` now also reports the migration state.
+- [x] `schema.prisma` with all MVP tables from DECISIONS.md §5 (UUID v7, `Timestamptz`, `Decimal`, `@@unique`, indexes on FKs, `@@map` to snake_case).
+- [x] `prisma migrate dev --name init`.
+- [x] `database/prisma.service.ts` + `database.module.ts` (replaces Nestar's Mongoose `database.module`). Global `omit` for sensitive fields.
+- [x] `prisma/seed.ts` (password from `SEED_PASSWORD`, admin login `simon`, Nilufar Karimova is the Algebra teacher): settings + academic year 2026–27 with 4 quarters; 1 admin, 3 teachers, 2 classes (9A, 9B), 20 students, their parents (incl. one parent with 2 children), 4 courses with weeks, lessons, assignments, some submissions, grades and attendance. Use the same demo names as the Stitch design (e.g. Aziz Karimov `26100042`, Nilufar Karimova).
+- [x] `health` now also reports the migration state.
 
 **Done when:** tables and seed data are visible in DBeaver; `pnpm prisma db seed` is repeatable.
 **Interview:** Why is `ParentStudent` many-to-many? Why no hard deletes? Why is `loginId` not the primary key?

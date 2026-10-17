@@ -21,14 +21,21 @@ describe('AppResolver (e2e)', () => {
     await app.close();
   });
 
-  it('health reports Postgres and Redis as up', async () => {
+  it('health reports Postgres, Redis and the latest migration', async () => {
     const res = await request(app.getHttpServer())
       .post('/graphql')
-      .send({ query: '{ health { status postgres redis } }' })
+      .send({ query: '{ health { status postgres redis migration } }' })
       .expect(200);
 
     expect(res.body).toEqual({
-      data: { health: { status: 'ok', postgres: true, redis: true } },
+      data: {
+        health: {
+          status: 'ok',
+          postgres: true,
+          redis: true,
+          migration: expect.stringMatching(/_init$/) as string,
+        },
+      },
     });
   });
 

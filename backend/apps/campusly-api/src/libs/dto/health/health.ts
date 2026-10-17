@@ -10,4 +10,8 @@ export class Health {
 
   @Field(() => Boolean)
   redis: boolean;
+
+  /** Latest applied Prisma migration, e.g. "20261016143736_init" (null if none or DB down) */
+  @Field(() => String, { nullable: true })
+  migration: string | null;
 }
