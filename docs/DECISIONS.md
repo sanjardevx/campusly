@@ -95,7 +95,7 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 
 ## 7. Authentication
 
-- **Access token:** JWT, 15 min, payload only `{ sub, role }` (+ `pwc` flag when a password change is required). The frontend keeps it **in memory**, never in localStorage.
+- **Access token:** JWT, 15 min, payload only `{ sub, role, sid }` (+ `pwc` flag when a password change is required). `sid` = the refresh-token family of this sign-in, so `changePassword` can revoke the *other* sessions (the refresh cookie is not sent to `/graphql`). The frontend keeps it **in memory**, never in localStorage.
 - **Refresh token:** random 32-byte string (not a JWT), stored in the DB as a sha256 hash.
   - Cookie: `httpOnly; Secure; SameSite=Lax; Path=/auth`, **no `Domain` attribute** (sent only to the API host).
   - Lifetime by role: parent 30 days, student/teacher 14 days, admin 1 day.
@@ -190,3 +190,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-16 | Backend stays on NestJS 11 (Nest 12 exists); Prisma 7.10.0 (pnpm release-age policy); frontend uses latest majors: Next 16, React 19, MUI 9, Apollo Client 4 |
 | 2026-10-16 | `Subject` is a table (no "Algebra" / "algebra" duplicates, filters, translations), `Course.subjectId` FK; `Group` belongs to an academic year (moving classes to the next year is a later admin action); day 2 schema ships as one `init` migration, every later change gets its own small migration |
 | 2026-10-18 | `ACCOUNT_BLOCKED` (403) after a correct password for blocked users; constant-time login for unknown IDs |
+| 2026-10-19 | Access token carries `sid` (session = refresh-token family); `changePassword` stays GraphQL and revokes all other sessions |

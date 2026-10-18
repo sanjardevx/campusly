@@ -54,8 +54,8 @@ describe('JwtAuthGuard', () => {
   });
 
   it('rejects a missing, forged or expired token with UNAUTHENTICATED', async () => {
-    const forged = `Bearer ${new JwtService({ secret: 'another-secret-xxxxxxxxxxxxxxxxxx' }).sign({ sub: 'u1', role: 'ADMIN' })}`;
-    const expired = bearer({ sub: 'u1', role: 'STUDENT' }, -10);
+    const forged = `Bearer ${new JwtService({ secret: 'another-secret-xxxxxxxxxxxxxxxxxx' }).sign({ sub: 'u1', role: 'ADMIN', sid: 's1' })}`;
+    const expired = bearer({ sub: 'u1', role: 'STUDENT', sid: 's1' }, -10);
 
     for (const header of [undefined, 'Bearer', 'Basic abc', forged, expired]) {
       const { context } = fakeContext(controller.closed, header);
@@ -68,18 +68,19 @@ describe('JwtAuthGuard', () => {
   it('puts the user on req.user (not req.body like Nestar)', async () => {
     const { context, request } = fakeContext(
       controller.closed,
-      bearer({ sub: 'u1', role: 'STUDENT' }),
+      bearer({ sub: 'u1', role: 'STUDENT', sid: 's1' }),
     );
     await expect(guard.canActivate(context)).resolves.toBe(true);
     expect(request.user).toEqual({
       id: 'u1',
       role: 'STUDENT',
+      sessionId: 's1',
       mustChangePassword: false,
     });
   });
 
   it('with a pending password change allows only @AllowPasswordChange() endpoints', async () => {
-    const token = bearer({ sub: 'u1', role: 'STUDENT', pwc: true });
+    const token = bearer({ sub: 'u1', role: 'STUDENT', sid: 's1', pwc: true });
 
     const closed = fakeContext(controller.closed, token);
     expect(await errorCode(() => guard.canActivate(closed.context))).toBe(
@@ -95,7 +96,12 @@ describe('RolesGuard', () => {
   const guard = new RolesGuard(new Reflector());
   const withUser = (handler: () => void, role: JwtPayload['role']) => {
     const { context, request } = fakeContext(handler);
-    request.user = { id: 'u1', role, mustChangePassword: false };
+    request.user = {
+      id: 'u1',
+      role,
+      sessionId: 's1',
+      mustChangePassword: false,
+    };
     return context;
   };
 

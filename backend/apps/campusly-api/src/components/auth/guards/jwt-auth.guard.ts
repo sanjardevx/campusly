@@ -47,6 +47,7 @@ export class JwtAuthGuard implements CanActivate {
     request.user = {
       id: payload.sub,
       role: payload.role,
+      sessionId: payload.sid,
       mustChangePassword: payload.pwc === true,
     };
 

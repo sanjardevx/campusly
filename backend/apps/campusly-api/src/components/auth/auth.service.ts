@@ -101,16 +101,21 @@ export class AuthService {
     if (user.status !== 'ACTIVE') throw this.accountBlocked();
 
     const temp = await this.applyTempPasswordRule(user);
+    const sessionId = uuidv7(); // a new sign-in starts a new token family = session
     const refresh = await this.createRefreshToken(
       this.prismaService,
       user.id,
       user.role,
-      uuidv7(), // a new sign-in starts a new token family
+      sessionId,
       client,
     );
 
     return {
-      result: await this.buildResult({ ...user, ...temp.user }, temp.warning),
+      result: await this.buildResult(
+        { ...user, ...temp.user },
+        sessionId,
+        temp.warning,
+      ),
       refresh,
     };
   }
@@ -141,7 +146,7 @@ export class AuthService {
       const ageMs = Date.now() - token.revokedAt.getTime();
       if (token.replacedBy && ageMs < REFRESH_GRACE_SEC * 1000) {
         // Second tab, same moment: give an access token, keep the cookie the first tab received
-        return { result: await this.buildResult(token.user) };
+        return { result: await this.buildResult(token.user, token.familyId) };
       }
       await this.revokeFamily(token.familyId);
       this.logger.warn(
@@ -173,10 +178,13 @@ export class AuthService {
         if (count === 0) throw new LostRotationRace(); // rolls back the new token
         return { token: next.token, expiresAt: next.expiresAt };
       });
-      return { result: await this.buildResult(token.user), refresh };
+      return {
+        result: await this.buildResult(token.user, token.familyId),
+        refresh,
+      };
     } catch (err) {
       if (err instanceof LostRotationRace) {
-        return { result: await this.buildResult(token.user) };
+        return { result: await this.buildResult(token.user, token.familyId) };
       }
       throw err;
     }
@@ -194,10 +202,19 @@ export class AuthService {
     if (token) await this.revokeFamily(token.familyId);
   }
 
+  /** After a password change: every session except the current one has to sign in again */
+  public async revokeOtherSessions(userId: string, sessionId: string) {
+    await this.prismaService.refreshToken.updateMany({
+      where: { userId, familyId: { not: sessionId }, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+  }
+
   // ─────────────────────────── tokens ───────────────────────────
 
   private async buildResult(
     user: SessionUser,
+    sessionId: string,
     warning?: AuthResult['tempPasswordWarning'],
   ): Promise<AuthResult> {
     // On refresh the warning is rebuilt from the user row (no sign-in is used up)
@@ -213,11 +230,12 @@ export class AuthService {
         : undefined);
 
     return {
-      accessToken: await this.signAccessToken(
-        user.id,
-        user.role,
-        user.mustChangePassword,
-      ),
+      accessToken: await this.signAccessToken({
+        userId: user.id,
+        role: user.role,
+        sessionId,
+        mustChangePassword: user.mustChangePassword,
+      }),
       user: {
         id: user.id,
         loginId: user.loginId,
@@ -230,15 +248,18 @@ export class AuthService {
     };
   }
 
-  private signAccessToken(
-    userId: string,
-    role: Role,
-    mustChangePassword: boolean,
-  ): Promise<string> {
+  /** Also used after a password change, to replace a token that still has the `pwc` flag */
+  public signAccessToken(session: {
+    userId: string;
+    role: Role;
+    sessionId: string;
+    mustChangePassword: boolean;
+  }): Promise<string> {
     const payload: JwtPayload = {
-      sub: userId,
-      role,
-      ...(mustChangePassword && { pwc: true as const }),
+      sub: session.userId,
+      role: session.role,
+      sid: session.sessionId,
+      ...(session.mustChangePassword && { pwc: true as const }),
     };
     return this.jwtService.signAsync(payload);
   }

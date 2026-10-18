@@ -5,6 +5,8 @@ export interface JwtPayload {
   /** user id */
   sub: string;
   role: Role;
+  /** session id = refresh-token family of this sign-in */
+  sid: string;
   /** "password change required": only me / changePassword / logout are allowed */
   pwc?: true;
 }
@@ -13,6 +15,7 @@ export interface JwtPayload {
 export interface AuthUser {
   id: string;
   role: Role;
+  sessionId: string;
   mustChangePassword: boolean;
 }
 
