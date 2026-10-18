@@ -5,7 +5,7 @@ It is a learning platform, **not** a school-management system (no timetable, roo
 
 - **Decisions:** [docs/DECISIONS.md](docs/DECISIONS.md) — read before designing anything. Do not contradict it silently.
 - **Plan:** [docs/PLAN.md](docs/PLAN.md) — 14-day MVP. "Start day N" means: read PLAN.md + DECISIONS.md, then work through that day.
-- **Journal:** `docs/journal/day-N.md` — written at the end of each day.
+- **Journal:** `docs/journal/day-N.md` — written at the end of each day. **Local only** (git-ignored): never stage or commit it.
 
 ## Who you are working with
 
@@ -104,9 +104,16 @@ Process:
 - Do not install Turborepo, `graphql-upload`, or add school-management features (timetable, rooms).
 - If a needed decision is not in DECISIONS.md, ask the developer, then record the answer there (with a Decision log line).
 
+## Before the repo goes public
+
+The repo is private while it is being built. When the developer makes it public (end of the project):
+- Rewrite `docs/PLAN.md` and `docs/DECISIONS.md` as clean project docs: remove the "Nestar did X" comparisons and the time box (14 days, day-by-day deadlines).
+- Purge `docs/journal/` from the git history (it was tracked until 2026-10-19).
+- `CLAUDE.md` and `.claude/` stay.
+
 ## End of day checklist
 
 1. Everything from the day runs; tests pass; `pnpm typecheck` is clean.
 2. Tick the day's boxes in `docs/PLAN.md`.
-3. Write `docs/journal/day-N.md`: done (3–5 lines), deferred, 3 interview questions with short answers.
+3. Write `docs/journal/day-N.md` (local only, git-ignored): done (3–5 lines), deferred, 3 interview questions with short answers.
 4. Propose the commit (commit skill), commit and push to `develop` only after the developer approves.

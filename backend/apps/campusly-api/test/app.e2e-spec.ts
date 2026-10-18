@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
+import { setupApp } from './../src/app.setup';
 
 // Needs the Docker Postgres + Redis (docker compose up -d)
 describe('AppResolver (e2e)', () => {
@@ -14,6 +15,7 @@ describe('AppResolver (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    setupApp(app);
     await app.init();
   });
 

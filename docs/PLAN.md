@@ -8,7 +8,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 **End of every day:**
 1. Everything from the day runs locally (and its tests pass).
 2. Commit + push to `develop` via the `commit` skill — always after the developer approves the message.
-3. Write `docs/journal/day-N.md`: what was done (3–5 lines), what was deferred, and 3 interview questions with short answers.
+3. Write `docs/journal/day-N.md` (local only, git-ignored): what was done (3–5 lines), what was deferred, and 3 interview questions with short answers.
 4. Tick the checkboxes below.
 
 **No buffer.** If behind schedule, cut in this order: CSV import → announcement read receipts → mobile polish → PeriodGrade publish.
@@ -80,14 +80,14 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 **Goal:** secure login for all 4 roles.
 
-- [ ] `components/auth/`: `AuthController` (REST) `POST /auth/login | /auth/refresh | /auth/logout`, `AuthService`.
-- [ ] Access JWT (15 min, `{ sub, role }`), refresh token (random, sha256 in DB, httpOnly cookie `Path=/auth`), rotation + reuse detection + 10 s grace, role-based refresh lifetime.
-- [ ] Redis rate limit on login; uniform `INVALID_CREDENTIALS`.
-- [ ] Temp-password rule: decrement `tempPasswordUsesLeft` on each sign-in, check `tempPasswordExpiresAt`, set `mustChangePassword` when the limit is reached; return a `tempPasswordWarning` in the login response.
-- [ ] Global `JwtAuthGuard` + `RolesGuard`; decorators `@Public`, `@Roles`, `@CurrentUser` (port of Nestar's guards; user goes to `req.user`, not `req.body`).
-- [ ] `PASSWORD_CHANGE_REQUIRED`: only `me`, `changePassword`, `logout` work while `mustChangePassword` is true.
-- [ ] GraphQL `me` query and `changePassword` mutation (revokes other sessions).
-- [ ] e2e tests: login success / wrong password / rate limit / refresh rotation / reuse detection.
+- [x] `components/auth/`: `AuthController` (REST) `POST /auth/login | /auth/refresh | /auth/logout`, `AuthService`.
+- [x] Access JWT (15 min, `{ sub, role, sid }`), refresh token (random, sha256 in DB, httpOnly cookie `Path=/auth`), rotation + reuse detection + 10 s grace, role-based refresh lifetime.
+- [x] Redis rate limit on login; uniform `INVALID_CREDENTIALS`.
+- [x] Temp-password rule: decrement `tempPasswordUsesLeft` on each sign-in, check `tempPasswordExpiresAt`, set `mustChangePassword` when the limit is reached; return a `tempPasswordWarning` in the login response.
+- [x] Global `JwtAuthGuard` + `RolesGuard`; decorators `@Public`, `@Roles`, `@CurrentUser` (port of Nestar's guards; user goes to `req.user`, not `req.body`).
+- [x] `PASSWORD_CHANGE_REQUIRED`: only `me`, `changePassword`, `logout` work while `mustChangePassword` is true.
+- [x] GraphQL `me` query and `changePassword` mutation (revokes other sessions via `sid`, returns a new access token).
+- [x] e2e tests: login success / wrong password / rate limit / refresh rotation / reuse detection (+ blocked, logout, temp password); CI runs them with Postgres + Redis services.
 
 **Done when:** login → refresh → logout works in Postman; e2e tests pass.
 **Interview:** Access vs refresh token? What happens if a refresh token is stolen? Why is the access token not in localStorage?

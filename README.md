@@ -44,4 +44,3 @@ The seed has 20 students in 9A/9B, 20 parents, 4 courses with 8 weeks each, assi
 
 - [docs/PLAN.md](docs/PLAN.md) — 14-day plan
 - [docs/DECISIONS.md](docs/DECISIONS.md) — architecture decisions
-- [docs/journal/](docs/journal/) — daily journal

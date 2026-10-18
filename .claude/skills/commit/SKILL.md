@@ -49,7 +49,7 @@ feat: create JwtAuthGuard and RolesGuard
 feat: develop login, refresh and logout REST apis
 feat: develop createStudent GraphQL api
 feat: add isolation e2e tests for course resolver
-feat: add day-3 journal
+fix: update day-3 plan checkboxes
 fix: modify temp password counter logic
 fix: update project plan
 ```
@@ -69,7 +69,7 @@ Rules:
 
 - One commit = one finished working step from `docs/PLAN.md` (one API, one module, one page, one config). Nestar had one commit per API — same idea.
 - Do not bundle a whole day into one commit. Do not commit half-finished code.
-- End of day: journal + ticked PLAN.md boxes → `feat: add day-N journal`.
+- End of day: ticked PLAN.md boxes → `fix: update day-N plan` (the journal in `docs/journal/` is git-ignored: never commit it).
 
 ## 5. Checks before showing the message
 

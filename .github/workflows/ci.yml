@@ -11,6 +11,33 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    # Same Postgres + Redis images as the local docker-compose.yml, for the e2e tests
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: campusly
+          POSTGRES_PASSWORD: campusly
+          POSTGRES_DB: campusly
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U campusly -d campusly"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    # CI-only values (not secrets): the app validates them with zod at startup
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://campusly:campusly@localhost:5432/campusly?schema=public
+      REDIS_URL: redis://localhost:6379
+      JWT_ACCESS_SECRET: ci-access-secret-0123456789abcdef0123456789
+      JWT_REFRESH_SECRET: ci-refresh-secret-0123456789abcdef012345678
+      FRONTEND_URL: http://localhost:3001
+      PORT_API: "3000"
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -25,7 +52,8 @@ jobs:
       - run: pnpm lint:check
       - run: pnpm typecheck
       - run: pnpm test
-      # e2e tests need Postgres + Redis: added on day 3 with service containers
+      - run: pnpm prisma migrate deploy # create the tables in the empty CI database
+      - run: pnpm test:e2e
 
   frontend:
     runs-on: ubuntu-latest
