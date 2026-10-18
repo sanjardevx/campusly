@@ -39,6 +39,22 @@ describe('AppResolver (e2e)', () => {
     });
   });
 
+  it('protected query without a token returns UNAUTHENTICATED (global guard + our error code)', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query: '{ me { id } }' });
+    const body = res.body as {
+      data: unknown;
+      errors: { message: string; extensions: unknown }[];
+    };
+
+    expect(body.data).toBeNull();
+    expect(body.errors[0]).toMatchObject({
+      message: 'Please sign in',
+      extensions: { code: 'UNAUTHENTICATED' },
+    });
+  });
+
   it('returns an error code, not only a message', async () => {
     const res = await request(app.getHttpServer())
       .post('/graphql')
