@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AppResolver } from './app.resolver';
+import { ComponentsModule } from './components/components.module';
 import { DatabaseModule } from './database/database.module';
 import { Env, validateEnv } from './libs/config';
 import { LoggingInterceptor } from './libs/interceptor/Logging.interceptor';
@@ -28,6 +29,7 @@ import { formatGraphqlError } from './libs/utils/graphql-error';
       },
     }),
     DatabaseModule,
+    ComponentsModule,
   ],
   providers: [
     AppResolver,

@@ -91,6 +91,7 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - New password rules: 8–128 chars. Hash with `bcryptjs`.
 - Login rate limit in Redis: 5 attempts per loginId per 15 min, 30 per IP per 15 min.
 - Wrong credentials always return the same `INVALID_CREDENTIALS` (401) — never reveal whether the ID exists.
+- A blocked (or archived) account gets `ACCOUNT_BLOCKED` (403) only after the correct password, so the code still does not reveal which IDs exist. An unknown ID is compared against a dummy bcrypt hash, so the response time does not reveal it either.
 
 ## 7. Authentication
 
@@ -188,3 +189,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-15 | 2-week MVP time box; single repo with `backend/` + `frontend/` (no Turborepo); Nestar code style |
 | 2026-10-16 | Backend stays on NestJS 11 (Nest 12 exists); Prisma 7.10.0 (pnpm release-age policy); frontend uses latest majors: Next 16, React 19, MUI 9, Apollo Client 4 |
 | 2026-10-16 | `Subject` is a table (no "Algebra" / "algebra" duplicates, filters, translations), `Course.subjectId` FK; `Group` belongs to an academic year (moving classes to the next year is a later admin action); day 2 schema ships as one `init` migration, every later change gets its own small migration |
+| 2026-10-18 | `ACCOUNT_BLOCKED` (403) after a correct password for blocked users; constant-time login for unknown IDs |

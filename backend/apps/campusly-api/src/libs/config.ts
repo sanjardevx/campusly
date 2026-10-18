@@ -31,3 +31,18 @@ export function validateEnv(config: Record<string, unknown>): Env {
   }
   return result.data;
 }
+
+// ───────────────────────────── auth ─────────────────────────────
+// DECISIONS §6–7. Nestar used one 30-day JWT; here the access token is short and the refresh token rotates.
+
+export const ACCESS_TOKEN_TTL = '15m';
+export const REFRESH_COOKIE = 'campusly_rt';
+/** Refresh token lifetime in days, by role (admins sign in every day) */
+export const REFRESH_TTL_DAYS = {
+  ADMIN: 1,
+  TEACHER: 14,
+  STUDENT: 14,
+  PARENT: 30,
+} as const;
+/** Login rate limit: failed attempts per window */
+export const LOGIN_LIMIT = { perLoginId: 5, perIp: 30, windowSec: 15 * 60 };
