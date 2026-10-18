@@ -8,12 +8,12 @@ import {
   Res,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Request, Response } from 'express';
+import type { CookieOptions, Request, Response } from 'express';
 import { Env, REFRESH_COOKIE } from '../../libs/config';
 import { LoginInput } from '../../libs/dto/auth/login.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import type { AuthResult } from '../../libs/types/auth';
-import { AuthService } from './auth.service';
+import { AuthService, ClientInfo, SignInResult } from './auth.service';
 
 // REST, not GraphQL: these endpoints read and write the httpOnly refresh cookie (DECISIONS §7).
 // The controller only handles HTTP details (origin, cookie); the logic lives in AuthService.
@@ -32,24 +32,66 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResult> {
     this.assertTrustedOrigin(req);
-    const { result, refreshToken, refreshExpiresAt } =
-      await this.authService.login(input, {
-        ip: req.ip ?? '',
-        userAgent: req.headers['user-agent'],
+    const signIn = await this.authService.login(input, this.client(req));
+    return this.respond(res, signIn);
+  }
+
+  /** Called by the frontend on page load and when the access token expires */
+  @Post('refresh')
+  @HttpCode(200)
+  public async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResult> {
+    this.assertTrustedOrigin(req);
+    const signIn = await this.authService.refresh(
+      this.readCookie(req),
+      this.client(req),
+    );
+    return this.respond(res, signIn);
+  }
+
+  @Post('logout')
+  @HttpCode(204)
+  public async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<void> {
+    this.assertTrustedOrigin(req);
+    await this.authService.logout(this.readCookie(req));
+    res.clearCookie(REFRESH_COOKIE, this.cookieOptions());
+  }
+
+  // ───────────────────────── helpers ─────────────────────────
+
+  private respond(res: Response, { result, refresh }: SignInResult) {
+    // No new token in the grace case: the browser already has the cookie from the parallel request
+    if (refresh) {
+      res.cookie(REFRESH_COOKIE, refresh.token, {
+        ...this.cookieOptions(),
+        expires: refresh.expiresAt,
       });
-    this.setRefreshCookie(res, refreshToken, refreshExpiresAt);
+    }
     return result;
   }
 
   /** httpOnly: JavaScript cannot read it (XSS). Path=/auth: sent only to these endpoints. No Domain: API host only. */
-  private setRefreshCookie(res: Response, token: string, expires: Date) {
-    res.cookie(REFRESH_COOKIE, token, {
+  private cookieOptions(): CookieOptions {
+    return {
       httpOnly: true,
       secure: this.config.get('NODE_ENV', { infer: true }) === 'production',
       sameSite: 'lax',
       path: '/auth',
-      expires,
-    });
+    };
+  }
+
+  private readCookie(req: Request): string | undefined {
+    const cookies = req.cookies as Record<string, string> | undefined;
+    return cookies?.[REFRESH_COOKIE];
+  }
+
+  private client(req: Request): ClientInfo {
+    return { ip: req.ip ?? '', userAgent: req.headers['user-agent'] };
   }
 
   /** CSRF guard for cookie endpoints: a browser request must come from our frontend (Postman sends no Origin) */

@@ -3,15 +3,21 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcryptjs';
 import { createHash, randomBytes } from 'node:crypto';
 import { v7 as uuidv7 } from 'uuid';
+import type { Prisma } from '../../../../../generated/prisma/client';
 import { PrismaService } from '../../database/prisma.service';
 import { RedisService } from '../../database/redis.service';
-import { LOGIN_LIMIT, REFRESH_TTL_DAYS } from '../../libs/config';
+import {
+  LOGIN_LIMIT,
+  REFRESH_GRACE_SEC,
+  REFRESH_TTL_DAYS,
+} from '../../libs/config';
 import { LoginInput } from '../../libs/dto/auth/login.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import { Role } from '../../libs/enums/user.enum';
@@ -29,20 +35,38 @@ export interface ClientInfo {
   userAgent?: string;
 }
 
-/** login() result: JSON for the client + the refresh token the controller puts in a cookie */
+/** JSON for the client + (optionally) a new refresh token for the controller to put in the cookie */
 export interface SignInResult {
   result: AuthResult;
-  refreshToken: string;
-  refreshExpiresAt: Date;
+  refresh?: { token: string; expiresAt: Date };
 }
+
+/** The user fields needed to build the auth response */
+interface SessionUser {
+  id: string;
+  loginId: string;
+  role: Role;
+  firstName: string;
+  lastName: string;
+  mustChangePassword: boolean;
+  tempPasswordUsesLeft: number | null;
+  tempPasswordExpiresAt: Date | null;
+}
+
+/** Another request rotated the same token a moment earlier (two tabs) */
+class LostRotationRace extends Error {}
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly prismaService: PrismaService,
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
   ) {}
+
+  // ─────────────────────────── login ───────────────────────────
 
   public async login(
     input: LoginInput,
@@ -74,44 +98,137 @@ export class AuthService {
     }
     await this.redisService.del(this.failKey('id', input.loginId));
 
-    if (user.status !== 'ACTIVE') {
-      throw new ForbiddenException({
-        code: ErrorCode.ACCOUNT_BLOCKED,
-        message: 'This account is blocked. Please contact the school.',
-      });
-    }
+    if (user.status !== 'ACTIVE') throw this.accountBlocked();
 
     const temp = await this.applyTempPasswordRule(user);
-    const { refreshToken, expiresAt } = await this.createRefreshToken(
+    const refresh = await this.createRefreshToken(
+      this.prismaService,
       user.id,
       user.role,
-      uuidv7(),
+      uuidv7(), // a new sign-in starts a new token family
       client,
     );
 
     return {
-      result: {
-        accessToken: await this.signAccessToken(
-          user.id,
-          user.role,
-          temp.mustChangePassword,
-        ),
-        user: {
-          id: user.id,
-          loginId: user.loginId,
-          role: user.role,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          mustChangePassword: temp.mustChangePassword,
-        },
-        ...(temp.warning && { tempPasswordWarning: temp.warning }),
-      },
-      refreshToken,
-      refreshExpiresAt: expiresAt,
+      result: await this.buildResult({ ...user, ...temp.user }, temp.warning),
+      refresh,
     };
   }
 
+  // ────────────────────────── refresh ──────────────────────────
+
+  /**
+   * Rotation: every refresh revokes the old token and issues a new one in the same family.
+   * A revoked token used again (after the grace window) means it was stolen → revoke the whole family.
+   */
+  public async refresh(
+    rawToken: string | undefined,
+    client: ClientInfo,
+  ): Promise<SignInResult> {
+    if (!rawToken) throw this.notSignedIn();
+
+    const token = await this.prismaService.refreshToken.findUnique({
+      where: { tokenHash: sha256(rawToken) },
+      include: {
+        user: {
+          omit: { tempPasswordUsesLeft: false, tempPasswordExpiresAt: false },
+        },
+      },
+    });
+    if (!token || token.expiresAt <= new Date()) throw this.notSignedIn();
+
+    if (token.revokedAt) {
+      const ageMs = Date.now() - token.revokedAt.getTime();
+      if (token.replacedBy && ageMs < REFRESH_GRACE_SEC * 1000) {
+        // Second tab, same moment: give an access token, keep the cookie the first tab received
+        return { result: await this.buildResult(token.user) };
+      }
+      await this.revokeFamily(token.familyId);
+      this.logger.warn(
+        `Refresh token reuse: family ${token.familyId} of user ${token.userId} revoked`,
+      );
+      throw this.notSignedIn();
+    }
+
+    // Checked on every refresh, so a blocked user is out within 15 minutes
+    if (token.user.status !== 'ACTIVE') {
+      await this.revokeFamily(token.familyId);
+      throw this.accountBlocked();
+    }
+
+    try {
+      const refresh = await this.prismaService.$transaction(async (tx) => {
+        const next = await this.createRefreshToken(
+          tx,
+          token.userId,
+          token.user.role,
+          token.familyId,
+          client,
+        );
+        // Conditional update: only one of two parallel requests can revoke the old token
+        const { count } = await tx.refreshToken.updateMany({
+          where: { id: token.id, revokedAt: null },
+          data: { revokedAt: new Date(), replacedBy: next.id },
+        });
+        if (count === 0) throw new LostRotationRace(); // rolls back the new token
+        return { token: next.token, expiresAt: next.expiresAt };
+      });
+      return { result: await this.buildResult(token.user), refresh };
+    } catch (err) {
+      if (err instanceof LostRotationRace) {
+        return { result: await this.buildResult(token.user) };
+      }
+      throw err;
+    }
+  }
+
+  // ────────────────────────── logout ──────────────────────────
+
+  /** Signs out this device: its token family is revoked (other devices stay signed in) */
+  public async logout(rawToken: string | undefined): Promise<void> {
+    if (!rawToken) return;
+    const token = await this.prismaService.refreshToken.findUnique({
+      where: { tokenHash: sha256(rawToken) },
+      select: { familyId: true },
+    });
+    if (token) await this.revokeFamily(token.familyId);
+  }
+
   // ─────────────────────────── tokens ───────────────────────────
+
+  private async buildResult(
+    user: SessionUser,
+    warning?: AuthResult['tempPasswordWarning'],
+  ): Promise<AuthResult> {
+    // On refresh the warning is rebuilt from the user row (no sign-in is used up)
+    const tempPasswordWarning =
+      warning ??
+      (!user.mustChangePassword &&
+      user.tempPasswordUsesLeft !== null &&
+      user.tempPasswordExpiresAt
+        ? {
+            usesLeft: user.tempPasswordUsesLeft,
+            expiresAt: user.tempPasswordExpiresAt.toISOString(),
+          }
+        : undefined);
+
+    return {
+      accessToken: await this.signAccessToken(
+        user.id,
+        user.role,
+        user.mustChangePassword,
+      ),
+      user: {
+        id: user.id,
+        loginId: user.loginId,
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        mustChangePassword: user.mustChangePassword,
+      },
+      ...(tempPasswordWarning && { tempPasswordWarning }),
+    };
+  }
 
   private signAccessToken(
     userId: string,
@@ -128,26 +245,49 @@ export class AuthService {
 
   /** Random 32-byte token for the cookie; only its sha256 hash is stored (a DB leak gives no usable tokens) */
   private async createRefreshToken(
+    db: Prisma.TransactionClient | PrismaService,
     userId: string,
     role: Role,
     familyId: string,
     client: ClientInfo,
   ) {
-    const refreshToken = randomBytes(32).toString('base64url');
+    const token = randomBytes(32).toString('base64url');
     const expiresAt = new Date(
       Date.now() + REFRESH_TTL_DAYS[role] * 24 * 60 * 60 * 1000,
     );
-    await this.prismaService.refreshToken.create({
+    const row = await db.refreshToken.create({
       data: {
         userId,
         familyId,
-        tokenHash: sha256(refreshToken),
+        tokenHash: sha256(token),
         expiresAt,
         ip: client.ip,
         userAgent: client.userAgent?.slice(0, 255),
       },
+      select: { id: true },
     });
-    return { refreshToken, expiresAt };
+    return { id: row.id, token, expiresAt };
+  }
+
+  private async revokeFamily(familyId: string) {
+    await this.prismaService.refreshToken.updateMany({
+      where: { familyId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+  }
+
+  private notSignedIn() {
+    return new UnauthorizedException({
+      code: ErrorCode.UNAUTHENTICATED,
+      message: 'Please sign in again',
+    });
+  }
+
+  private accountBlocked() {
+    return new ForbiddenException({
+      code: ErrorCode.ACCOUNT_BLOCKED,
+      message: 'This account is blocked. Please contact the school.',
+    });
   }
 
   // ───────────────────── temporary password ─────────────────────
@@ -156,18 +296,17 @@ export class AuthService {
    * DECISIONS §6: a temporary password works for 3 sign-ins or 14 days. Each sign-in uses one;
    * after the limit only "Set a new password" is allowed (mustChangePassword).
    */
-  private async applyTempPasswordRule(user: {
-    id: string;
-    mustChangePassword: boolean;
-    tempPasswordUsesLeft: number | null;
-    tempPasswordExpiresAt: Date | null;
-  }): Promise<{
-    mustChangePassword: boolean;
+  private async applyTempPasswordRule(user: SessionUser): Promise<{
+    user: Pick<SessionUser, 'mustChangePassword' | 'tempPasswordUsesLeft'>;
     warning?: AuthResult['tempPasswordWarning'];
   }> {
-    if (user.mustChangePassword) return { mustChangePassword: true };
-    if (user.tempPasswordUsesLeft === null)
-      return { mustChangePassword: false };
+    const unchanged = {
+      mustChangePassword: user.mustChangePassword,
+      tempPasswordUsesLeft: user.tempPasswordUsesLeft,
+    };
+    if (user.mustChangePassword || user.tempPasswordUsesLeft === null) {
+      return { user: unchanged };
+    }
 
     const isExpired =
       !user.tempPasswordExpiresAt || user.tempPasswordExpiresAt <= new Date();
@@ -176,18 +315,19 @@ export class AuthService {
         where: { id: user.id },
         data: { mustChangePassword: true },
       });
-      return { mustChangePassword: true };
+      return { user: { ...unchanged, mustChangePassword: true } };
     }
 
     const updated = await this.prismaService.user.update({
       where: { id: user.id },
       data: { tempPasswordUsesLeft: { decrement: 1 } },
-      select: { tempPasswordUsesLeft: true, tempPasswordExpiresAt: true },
+      select: { tempPasswordUsesLeft: true },
     });
+    const usesLeft = updated.tempPasswordUsesLeft ?? 0;
     return {
-      mustChangePassword: false,
+      user: { ...unchanged, tempPasswordUsesLeft: usesLeft },
       warning: {
-        usesLeft: updated.tempPasswordUsesLeft ?? 0,
+        usesLeft,
         expiresAt: user.tempPasswordExpiresAt!.toISOString(),
       },
     };

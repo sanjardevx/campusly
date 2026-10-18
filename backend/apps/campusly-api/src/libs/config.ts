@@ -46,3 +46,5 @@ export const REFRESH_TTL_DAYS = {
 } as const;
 /** Login rate limit: failed attempts per window */
 export const LOGIN_LIMIT = { perLoginId: 5, perIp: 30, windowSec: 15 * 60 };
+/** A just-rotated refresh token still works this long (two tabs refreshing at the same time) */
+export const REFRESH_GRACE_SEC = 10;
