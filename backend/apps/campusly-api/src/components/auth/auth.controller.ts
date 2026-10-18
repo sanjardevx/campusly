@@ -14,9 +14,12 @@ import { LoginInput } from '../../libs/dto/auth/login.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import type { AuthResult } from '../../libs/types/auth';
 import { AuthService, ClientInfo, SignInResult } from './auth.service';
+import { Public } from './decorators/auth.decorators';
 
 // REST, not GraphQL: these endpoints read and write the httpOnly refresh cookie (DECISIONS §7).
 // The controller only handles HTTP details (origin, cookie); the logic lives in AuthService.
+// Public: these endpoints work with the cookie, not with an access token
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(

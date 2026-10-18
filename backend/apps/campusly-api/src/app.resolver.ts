@@ -1,4 +1,5 @@
 import { Query, Resolver } from '@nestjs/graphql';
+import { Public } from './components/auth/decorators/auth.decorators';
 import { PrismaService } from './database/prisma.service';
 import { RedisService } from './database/redis.service';
 import { Health } from './libs/dto/health/health';
@@ -10,7 +11,8 @@ export class AppResolver {
     private readonly redisService: RedisService,
   ) {}
 
-  // Used by monitoring, deploy checks and the frontend skeleton page. Public (guards come on day 3).
+  // Used by monitoring, deploy checks and the frontend skeleton page, so it is public.
+  @Public()
   @Query(() => Health)
   public async health(): Promise<Health> {
     const [migration, redis] = await Promise.all([
