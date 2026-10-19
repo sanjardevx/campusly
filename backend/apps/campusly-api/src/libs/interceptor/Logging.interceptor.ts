@@ -53,9 +53,16 @@ export class LoggingInterceptor implements NestInterceptor {
   }
 }
 
+/** Only plain objects are walked: Date, Decimal, Buffer ... are kept as they are */
+function isPlainObject(value: unknown): value is T {
+  if (!value || typeof value !== 'object') return false;
+  const proto = Object.getPrototypeOf(value) as unknown;
+  return proto === Object.prototype || proto === null;
+}
+
 export function redact(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(redact);
-  if (value && typeof value === 'object') {
+  if (isPlainObject(value)) {
     const result: T = {};
     for (const [key, item] of Object.entries(value)) {
       result[key] = SECRET_KEY.test(key) ? '***' : redact(item);

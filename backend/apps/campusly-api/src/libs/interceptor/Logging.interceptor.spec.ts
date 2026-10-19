@@ -15,6 +15,14 @@ describe('redact', () => {
     });
   });
 
+  it('keeps Dates and other class instances as they are', () => {
+    const createdAt = new Date('2026-10-19T10:00:00Z');
+    expect(redact({ createdAt, password: 'x' })).toEqual({
+      createdAt,
+      password: '***',
+    });
+  });
+
   it('keeps plain values unchanged', () => {
     expect(redact('hello')).toBe('hello');
     expect(redact(null)).toBe(null);
