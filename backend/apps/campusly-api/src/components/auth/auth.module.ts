@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { AccessPolicy } from './policies/access.policy';
 
 @Module({
   imports: [
@@ -22,10 +23,11 @@ import { RolesGuard } from './guards/roles.guard';
   controllers: [AuthController],
   providers: [
     AuthService,
+    AccessPolicy,
     // Global guards, in this order: who are you (JWT) → is your role allowed
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
-  exports: [AuthService],
+  exports: [AuthService, AccessPolicy],
 })
 export class AuthModule {}

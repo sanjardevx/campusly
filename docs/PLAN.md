@@ -96,13 +96,13 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 4 (L) — Admin: users and school setup
 
-- [ ] ID generator (atomic upsert on `id_counters`) — unit test with parallel calls.
-- [ ] `createStudent` (generate ID + temp password; find-or-create parent by phone; link `ParentStudent`), `createTeacher`, `createOrLinkParent`, `unlinkParent` (sets `revokedAt`).
-- [ ] User lists with filters + pagination (Nestar "Inquiry" input style): students / teachers / parents.
-- [ ] `resetPassword`, `blockUser` / `unblockUser` (revokes tokens).
-- [ ] CSV import (`csv-parse`): validate rows, preview (ready / link parent / errors), import in a transaction, return login-slip data.
-- [ ] `SchoolSetting` get/update; `AcademicYear` and `Period` CRUD.
-- [ ] `AccessPolicy` skeleton; `AuditLog` helper used by every admin mutation.
+- [x] ID generator (atomic upsert on `id_counters`) — unit test with parallel calls.
+- [x] `createStudent` (generate ID + temp password; find-or-create parent by phone; link `ParentStudent`), `createTeacher`, `linkParent` (find-or-create by phone, re-activates an unlinked row), `unlinkParent` (sets `revokedAt`).
+- [x] User lists with filters + pagination (Nestar "Inquiry" input style): students / teachers / parents.
+- [x] `resetPassword`, `blockUser` / `unblockUser` (revokes tokens).
+- [x] CSV import (`csv-parse`): validate rows, preview (ready / link parent / errors), import in a transaction, return login-slip data.
+- [x] `SchoolSetting` get/update; `AcademicYear` and `Period` CRUD.
+- [x] `AccessPolicy` (scope + assert methods, table-driven isolation test); `AuditLog` helper used by every admin mutation.
 
 **Done when:** an admin can create a student with a parent, and both can log in with the printed temp passwords.
 **Prerequisite:** AWS account ready by tonight.
