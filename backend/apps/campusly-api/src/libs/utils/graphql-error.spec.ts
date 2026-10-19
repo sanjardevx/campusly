@@ -5,7 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type { GraphQLFormattedError } from 'graphql';
-import { formatGraphqlError } from './graphql-error';
+import { Prisma } from '../../../../../generated/prisma/client';
+import { formatGraphqlError, uniqueFields } from './graphql-error';
 
 // The real shape (checked against a running server): Apollo passes a GraphQLError whose
 // `originalError` is the exception our code threw; `formatted.extensions.code` is INTERNAL_SERVER_ERROR.
@@ -107,5 +108,38 @@ describe('formatGraphqlError', () => {
       message: 'boom',
       extensions: { code: 'INTERNAL_SERVER_ERROR' },
     });
+  });
+
+  it('turns a Prisma unique violation into CONFLICT with the field names', () => {
+    // The real shape from Prisma 7 + @prisma/adapter-pg (checked against the database)
+    const thrown = new Prisma.PrismaClientKnownRequestError(
+      'Unique constraint failed',
+      {
+        code: 'P2002',
+        clientVersion: '7.10.0',
+        meta: {
+          modelName: 'Period',
+          driverAdapterError: {
+            cause: {
+              kind: 'UniqueConstraintViolation',
+              table: 'periods',
+              constraint: { index: 'periods_academicYearId_name_key' },
+            },
+          },
+        },
+      },
+    );
+    const { formatted, error } = apolloError(thrown, 'createPeriod');
+
+    expect(formatGraphqlError(formatted, error, true)).toEqual({
+      message: 'Already exists: academicYearId, name',
+      extensions: { code: 'CONFLICT' },
+    });
+    expect(errorLog).not.toHaveBeenCalled();
+  });
+
+  it('reads the unique fields from meta.target when Prisma provides it', () => {
+    expect(uniqueFields({ target: ['loginId'] })).toEqual(['loginId']);
+    expect(uniqueFields(undefined)).toEqual([]);
   });
 });

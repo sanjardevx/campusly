@@ -1,5 +1,6 @@
 import { HttpException, Logger } from '@nestjs/common';
 import type { GraphQLFormattedError } from 'graphql';
+import { Prisma } from '../../../../../generated/prisma/client';
 import { ErrorCode } from '../enums/common.enum';
 import { HttpErrorBody } from '../types/common';
 
@@ -45,6 +46,9 @@ export function formatGraphqlError(
         ? bodyMessage.join(', ')
         : bodyMessage;
     }
+  } else if (thrown instanceof Prisma.PrismaClientKnownRequestError) {
+    // DB rules caught at the database level, so no service needs its own try/catch for them
+    ({ code, message } = fromPrismaError(thrown, message));
   } else {
     // GraphQL's own errors keep their code (e.g. GRAPHQL_VALIDATION_FAILED); anything else is a bug
     code =
@@ -67,4 +71,45 @@ export function formatGraphqlError(
 
 function stackOf(error: unknown): string | undefined {
   return error instanceof Error ? error.stack : undefined;
+}
+
+/**
+ * P2002 unique constraint (e.g. an academic year "2026–27" that already exists) → CONFLICT,
+ * P2025 record to update not found → NOT_FOUND. Any other Prisma error stays an internal error.
+ */
+function fromPrismaError(
+  err: Prisma.PrismaClientKnownRequestError,
+  fallback: string,
+): { code: string; message: string } {
+  if (err.code === 'P2002') {
+    return {
+      code: ErrorCode.CONFLICT,
+      message: `Already exists: ${uniqueFields(err.meta).join(', ') || 'a unique value'}`,
+    };
+  }
+  if (err.code === 'P2025') {
+    return { code: ErrorCode.NOT_FOUND, message: 'Record not found' };
+  }
+  return { code: ErrorCode.INTERNAL_SERVER_ERROR, message: fallback };
+}
+
+/**
+ * Prisma 7 with a driver adapter gives no `meta.target`; the fields are only in the index name:
+ * "periods_academicYearId_name_key" on table "periods" → ["academicYearId", "name"]
+ */
+export function uniqueFields(
+  meta: Record<string, unknown> | undefined,
+): string[] {
+  if (Array.isArray(meta?.target)) return meta.target as string[];
+  const cause = (
+    meta?.driverAdapterError as
+      | { cause?: { table?: string; constraint?: { index?: string } } }
+      | undefined
+  )?.cause;
+  const index = cause?.constraint?.index;
+  if (!index || !cause?.table) return [];
+  return index
+    .replace(new RegExp(`^${cause.table}_`), '')
+    .replace(/_key$/, '')
+    .split('_');
 }
