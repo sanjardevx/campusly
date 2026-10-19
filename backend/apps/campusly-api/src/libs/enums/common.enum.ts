@@ -9,6 +9,8 @@ export enum ErrorCode {
   PASSWORD_CHANGE_REQUIRED = 'PASSWORD_CHANGE_REQUIRED',
   FORBIDDEN = 'FORBIDDEN',
   NOT_FOUND = 'NOT_FOUND',
+  /** Unique value already used (e.g. a phone or login ID) */
+  CONFLICT = 'CONFLICT',
   RATE_LIMITED = 'RATE_LIMITED',
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
 }

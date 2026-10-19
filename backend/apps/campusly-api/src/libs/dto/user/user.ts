@@ -39,3 +39,38 @@ export class AccessToken {
   @Field(() => String)
   accessToken: string;
 }
+
+/**
+ * What the admin prints and hands out. tempPassword is shown ONLY in this response:
+ * the DB keeps just the hash. null = an existing parent who keeps their own password.
+ */
+@ObjectType()
+export class LoginSlip {
+  @Field(() => String)
+  userId: string;
+
+  @Field(() => String)
+  loginId: string;
+
+  @Field(() => Role)
+  role: Role;
+
+  @Field(() => String)
+  fullName: string;
+
+  @Field(() => String, { nullable: true })
+  tempPassword: string | null;
+
+  /** false = an existing account was linked, not created */
+  @Field(() => Boolean)
+  isNew: boolean;
+}
+
+@ObjectType()
+export class CreateStudentResult {
+  @Field(() => LoginSlip)
+  student: LoginSlip;
+
+  @Field(() => LoginSlip, { nullable: true })
+  parent: LoginSlip | null;
+}
