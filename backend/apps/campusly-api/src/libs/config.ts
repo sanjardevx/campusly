@@ -57,3 +57,8 @@ export const TEMP_PASSWORD = { uses: 3, days: 14 };
 export const USER_SORTS = ['createdAt', 'lastName', 'loginId'] as const;
 /** Page size limit for every list (Nestar had none: limit=1000000 returned the whole collection) */
 export const MAX_PAGE_SIZE = 100;
+
+// ───────────────────────────── school ─────────────────────────────
+
+/** UI languages (DECISIONS §3): Korean is "ko", not Nestar's "kr" (a country code) */
+export const LOCALES = ['en', 'uz', 'ru', 'ko'] as const;
