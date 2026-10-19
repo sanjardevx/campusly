@@ -62,3 +62,15 @@ export const MAX_PAGE_SIZE = 100;
 
 /** UI languages (DECISIONS §3): Korean is "ko", not Nestar's "kr" (a country code) */
 export const LOCALES = ['en', 'uz', 'ru', 'ko'] as const;
+
+// ───────────────────────────── import ─────────────────────────────
+
+/**
+ * Student CSV import: every row needs a bcrypt hash (~70 ms), so 300 rows ≈ 20 s.
+ * Bigger imports will move to the batch worker (BullMQ) later.
+ */
+export const IMPORT_LIMIT = {
+  maxRows: 300,
+  maxChars: 100_000,
+  txTimeoutMs: 60_000,
+};

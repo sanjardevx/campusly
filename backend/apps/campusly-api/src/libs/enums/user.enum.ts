@@ -26,3 +26,12 @@ export enum PasswordState {
   MUST_CHANGE = 'MUST_CHANGE',
 }
 registerEnumType(PasswordState, { name: 'PasswordState' });
+
+/** CSV import check result of one row (the design's "Check data" step) */
+export enum ImportRowStatus {
+  READY = 'READY',
+  /** The parent already exists (or appears in an earlier row): only a link is created */
+  LINK_PARENT = 'LINK_PARENT',
+  ERROR = 'ERROR',
+}
+registerEnumType(ImportRowStatus, { name: 'ImportRowStatus' });

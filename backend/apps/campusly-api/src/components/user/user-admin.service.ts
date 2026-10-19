@@ -37,7 +37,7 @@ import { LoginIdService } from './login-id.service';
 type Tx = Prisma.TransactionClient;
 
 /** A generated temporary password and the DB fields for it (hashed BEFORE the transaction) */
-interface PreparedPassword {
+export interface PreparedPassword {
   plain: string;
   data: {
     passwordHash: string;
@@ -74,70 +74,84 @@ export class UserAdminService {
       ? await this.preparePassword(generateParentPassword())
       : null;
 
-    return this.prismaService.$transaction(async (tx) => {
-      const group = await tx.group.findUnique({
-        where: { id: input.groupId },
-        select: { status: true },
-      });
-      if (!group || group.status !== 'ACTIVE') {
-        throw this.notFound('Class not found');
-      }
+    return this.prismaService.$transaction((tx) =>
+      this.createStudentTx(tx, admin, input, studentPassword, parentPassword),
+    );
+  }
 
-      const loginId = await this.loginIdService.next('STUDENT', tx);
-      const student = await tx.user.create({
-        data: {
-          loginId,
-          role: 'STUDENT',
-          ...studentPassword.data,
-          firstName: input.firstName,
-          lastName: input.lastName,
-          studentProfile: {
-            create: {
-              birthDate: input.birthDate,
-              admissionYear: input.admissionYear ?? new Date().getUTCFullYear(),
-            },
-          },
-          groupMemberships: { create: { groupId: input.groupId } },
-        },
-      });
-
-      // A whole-class course (e.g. "Algebra · 9A") includes every student of the class
-      const courses = await tx.course.findMany({
-        where: {
-          groupId: input.groupId,
-          isSplitGroup: false,
-          status: { not: 'ARCHIVED' },
-        },
-        select: { id: true },
-      });
-      await tx.enrollment.createMany({
-        data: courses.map((c) => ({ courseId: c.id, studentId: student.id })),
-      });
-
-      await this.auditService.log(tx, {
-        actor: admin,
-        action: AuditAction.USER_CREATE,
-        entityType: 'User',
-        entityId: student.id,
-        after: student,
-      });
-
-      const parent =
-        input.parent && parentPassword
-          ? await this.linkParentTx(
-              tx,
-              admin,
-              student.id,
-              input.parent,
-              parentPassword,
-            )
-          : null;
-
-      return {
-        student: this.slip(student, studentPassword.plain, true),
-        parent,
-      };
+  /**
+   * Creates one student (ID, class, its whole-class courses, parent, audit) inside the caller's
+   * transaction. Used by createStudent and by the CSV import, so both follow the same rules.
+   */
+  public async createStudentTx(
+    tx: Tx,
+    admin: AuthUser,
+    input: CreateStudentInput,
+    studentPassword: PreparedPassword,
+    parentPassword: PreparedPassword | null,
+  ): Promise<CreateStudentResult> {
+    const group = await tx.group.findUnique({
+      where: { id: input.groupId },
+      select: { status: true },
     });
+    if (!group || group.status !== 'ACTIVE') {
+      throw this.notFound('Class not found');
+    }
+
+    const loginId = await this.loginIdService.next('STUDENT', tx);
+    const student = await tx.user.create({
+      data: {
+        loginId,
+        role: 'STUDENT',
+        ...studentPassword.data,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        studentProfile: {
+          create: {
+            birthDate: input.birthDate,
+            admissionYear: input.admissionYear ?? new Date().getUTCFullYear(),
+          },
+        },
+        groupMemberships: { create: { groupId: input.groupId } },
+      },
+    });
+
+    // A whole-class course (e.g. "Algebra · 9A") includes every student of the class
+    const courses = await tx.course.findMany({
+      where: {
+        groupId: input.groupId,
+        isSplitGroup: false,
+        status: { not: 'ARCHIVED' },
+      },
+      select: { id: true },
+    });
+    await tx.enrollment.createMany({
+      data: courses.map((c) => ({ courseId: c.id, studentId: student.id })),
+    });
+
+    await this.auditService.log(tx, {
+      actor: admin,
+      action: AuditAction.USER_CREATE,
+      entityType: 'User',
+      entityId: student.id,
+      after: student,
+    });
+
+    const parent =
+      input.parent && parentPassword
+        ? await this.linkParentTx(
+            tx,
+            admin,
+            student.id,
+            input.parent,
+            parentPassword,
+          )
+        : null;
+
+    return {
+      student: this.slip(student, studentPassword.plain, true),
+      parent,
+    };
   }
 
   // ───────────────────────── teachers ─────────────────────────
@@ -470,7 +484,7 @@ export class UserAdminService {
 
   // ───────────────────────── helpers ─────────────────────────
 
-  private async preparePassword(plain: string): Promise<PreparedPassword> {
+  public async preparePassword(plain: string): Promise<PreparedPassword> {
     return {
       plain,
       data: {

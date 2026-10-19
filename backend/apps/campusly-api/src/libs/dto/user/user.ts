@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import {
+  ImportRowStatus,
   ParentRelation,
   PasswordState,
   Role,
@@ -162,4 +163,76 @@ export class Users {
 
   @Field(() => TotalCounter)
   metaCounter: TotalCounter;
+}
+
+// ───────────────────────────── CSV import ─────────────────────────────
+
+@ObjectType()
+export class ImportRowPreview {
+  /** Line in the file (header = 1) */
+  @Field(() => Int)
+  line: number;
+
+  @Field(() => String)
+  firstName: string;
+
+  @Field(() => String)
+  lastName: string;
+
+  @Field(() => String)
+  className: string;
+
+  @Field(() => Int, { nullable: true })
+  admissionYear: number | null;
+
+  @Field(() => String, { nullable: true })
+  parentName: string | null;
+
+  @Field(() => String, { nullable: true })
+  parentPhone: string | null;
+
+  @Field(() => ImportRowStatus)
+  status: ImportRowStatus;
+
+  @Field(() => [String])
+  errors: string[];
+}
+
+@ObjectType()
+export class ImportSummary {
+  @Field(() => Int)
+  ready: number;
+
+  @Field(() => Int)
+  linkParent: number;
+
+  @Field(() => Int)
+  errors: number;
+}
+
+@ObjectType()
+export class ImportPreview {
+  @Field(() => [ImportRowPreview])
+  rows: ImportRowPreview[];
+
+  @Field(() => ImportSummary)
+  summary: ImportSummary;
+}
+
+@ObjectType()
+export class ImportResult {
+  @Field(() => Int)
+  created: number;
+
+  /** Students linked to a parent who already had an account */
+  @Field(() => Int)
+  linkedParents: number;
+
+  /** Rows with errors left out (only with skipErrors) */
+  @Field(() => Int)
+  skipped: number;
+
+  /** Login slips to print: shown only in this response */
+  @Field(() => [CreateStudentResult])
+  slips: CreateStudentResult[];
 }

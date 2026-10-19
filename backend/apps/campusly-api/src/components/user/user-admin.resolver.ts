@@ -2,6 +2,8 @@ import { ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   CreateStudentResult,
+  ImportPreview,
+  ImportResult,
   LoginSlip,
   Users,
 } from '../../libs/dto/user/user';
@@ -14,13 +16,17 @@ import {
 import { Role } from '../../libs/enums/user.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { CurrentUser, Roles } from '../auth/decorators/auth.decorators';
+import { StudentImportService } from './student-import.service';
 import { UserAdminService } from './user-admin.service';
 
 // @Roles on the class: every operation here is admin-only, a new one cannot "forget" it
 @Roles(Role.ADMIN)
 @Resolver()
 export class UserAdminResolver {
-  constructor(private readonly userAdminService: UserAdminService) {}
+  constructor(
+    private readonly userAdminService: UserAdminService,
+    private readonly studentImportService: StudentImportService,
+  ) {}
 
   /** Users page: Students / Teachers / Parents tabs with filters and paging */
   @Query(() => Users)
@@ -85,5 +91,23 @@ export class UserAdminResolver {
     @Args('parentId', ParseUUIDPipe) parentId: string,
   ): Promise<boolean> {
     return this.userAdminService.unlinkParent(admin, studentId, parentId);
+  }
+
+  /** "Check data" step: READY / LINK_PARENT / ERROR per row; writes nothing */
+  @Mutation(() => ImportPreview)
+  public previewStudentImport(
+    @Args('csv') csv: string,
+  ): Promise<ImportPreview> {
+    return this.studentImportService.preview(csv);
+  }
+
+  /** "Import & login slips": all rows in one transaction; returns the slips to print */
+  @Mutation(() => ImportResult)
+  public importStudents(
+    @CurrentUser() admin: AuthUser,
+    @Args('csv') csv: string,
+    @Args('skipErrors', { defaultValue: false }) skipErrors: boolean,
+  ): Promise<ImportResult> {
+    return this.studentImportService.import(admin, csv, skipErrors);
   }
 }
