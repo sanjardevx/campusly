@@ -53,6 +53,31 @@ export class UserAdminResolver {
     return this.userAdminService.linkParent(admin, studentId, input);
   }
 
+  /** New temporary password; the user is signed out everywhere */
+  @Mutation(() => LoginSlip)
+  public resetPassword(
+    @CurrentUser() admin: AuthUser,
+    @Args('userId', ParseUUIDPipe) userId: string,
+  ): Promise<LoginSlip> {
+    return this.userAdminService.resetPassword(admin, userId);
+  }
+
+  @Mutation(() => Boolean)
+  public blockUser(
+    @CurrentUser() admin: AuthUser,
+    @Args('userId', ParseUUIDPipe) userId: string,
+  ): Promise<boolean> {
+    return this.userAdminService.blockUser(admin, userId);
+  }
+
+  @Mutation(() => Boolean)
+  public unblockUser(
+    @CurrentUser() admin: AuthUser,
+    @Args('userId', ParseUUIDPipe) userId: string,
+  ): Promise<boolean> {
+    return this.userAdminService.unblockUser(admin, userId);
+  }
+
   @Mutation(() => Boolean)
   public unlinkParent(
     @CurrentUser() admin: AuthUser,

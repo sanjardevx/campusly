@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -30,6 +31,7 @@ import {
   generateStudentPassword,
 } from '../../libs/utils/temp-password';
 import { AuditService } from '../audit/audit.service';
+import { AuthService } from '../auth/auth.service';
 import { LoginIdService } from './login-id.service';
 
 type Tx = Prisma.TransactionClient;
@@ -55,6 +57,7 @@ export class UserAdminService {
     private readonly prismaService: PrismaService,
     private readonly loginIdService: LoginIdService,
     private readonly auditService: AuditService,
+    private readonly authService: AuthService,
   ) {}
 
   // ───────────────────────── students ─────────────────────────
@@ -290,6 +293,97 @@ export class UserAdminService {
     return this.slip(parent, isNew ? password.plain : null, isNew);
   }
 
+  // ─────────────────── reset password, block ───────────────────
+
+  /**
+   * New temporary password (3 sign-ins / 14 days). Every session is revoked: changing only the
+   * password would leave a thief who is already signed in with a working refresh token.
+   */
+  public async resetPassword(
+    admin: AuthUser,
+    userId: string,
+  ): Promise<LoginSlip> {
+    const target = await this.findManagedUser(userId);
+    const password = await this.preparePassword(
+      target.role === 'PARENT'
+        ? generateParentPassword()
+        : generateStudentPassword(),
+    );
+
+    const user = await this.prismaService.$transaction(async (tx) => {
+      const updated = await tx.user.update({
+        where: { id: userId },
+        data: password.data,
+      });
+      await this.authService.revokeAllSessions(userId, tx);
+      await this.auditService.log(tx, {
+        actor: admin,
+        action: AuditAction.USER_RESET_PASSWORD,
+        entityType: 'User',
+        entityId: userId,
+        // The hash is redacted to "***" in the audit row
+        before: { mustChangePassword: target.mustChangePassword },
+        after: { tempPasswordUsesLeft: password.data.tempPasswordUsesLeft },
+      });
+      return updated;
+    });
+    // A user locked out by 5 wrong passwords can sign in again right away
+    await this.authService.clearLoginFailures(user.loginId);
+
+    return this.slip(user, password.plain, false);
+  }
+
+  /** Blocked users cannot sign in or refresh; all their sessions end now */
+  public async blockUser(admin: AuthUser, userId: string): Promise<boolean> {
+    if (userId === admin.id) {
+      // Otherwise the last admin could lock everyone out
+      throw this.forbidden('You cannot block yourself');
+    }
+    return this.setStatus(admin, userId, 'BLOCKED', AuditAction.USER_BLOCK);
+  }
+
+  public async unblockUser(admin: AuthUser, userId: string): Promise<boolean> {
+    return this.setStatus(admin, userId, 'ACTIVE', AuditAction.USER_UNBLOCK);
+  }
+
+  private async setStatus(
+    admin: AuthUser,
+    userId: string,
+    status: 'ACTIVE' | 'BLOCKED',
+    action: AuditAction,
+  ): Promise<boolean> {
+    const target = await this.findManagedUser(userId);
+    if (target.status === status) return true; // nothing to change
+
+    await this.prismaService.$transaction(async (tx) => {
+      await tx.user.update({ where: { id: userId }, data: { status } });
+      if (status === 'BLOCKED') {
+        await this.authService.revokeAllSessions(userId, tx);
+      }
+      await this.auditService.log(tx, {
+        actor: admin,
+        action,
+        entityType: 'User',
+        entityId: userId,
+        before: { status: target.status },
+        after: { status },
+      });
+    });
+    return true;
+  }
+
+  /** Students, teachers and parents can be managed here; other admins cannot */
+  private async findManagedUser(userId: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw this.notFound('User not found');
+    if (user.role === 'ADMIN') {
+      throw this.forbidden('Admin accounts cannot be changed here');
+    }
+    return user;
+  }
+
   // ───────────────────────── lists ─────────────────────────
 
   /** Admin Users page: one role per tab, filters, paging (Nestar "Inquiry" style) */
@@ -413,6 +507,10 @@ export class UserAdminService {
 
   private notFound(message: string) {
     return new NotFoundException({ code: ErrorCode.NOT_FOUND, message });
+  }
+
+  private forbidden(message: string) {
+    return new ForbiddenException({ code: ErrorCode.FORBIDDEN, message });
   }
 }
 

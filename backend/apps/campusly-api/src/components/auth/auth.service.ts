@@ -203,6 +203,22 @@ export class AuthService {
   }
 
   /** After a password change: every session except the current one has to sign in again */
+  /** Password reset and blocking: the user is signed out on every device */
+  public async revokeAllSessions(
+    userId: string,
+    tx: Prisma.TransactionClient | PrismaService = this.prismaService,
+  ) {
+    await tx.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+  }
+
+  /** After a reset the login ID may be rate-limited from earlier failures: unlock it */
+  public async clearLoginFailures(loginId: string) {
+    await this.redisService.del(this.failKey('id', loginId));
+  }
+
   public async revokeOtherSessions(userId: string, sessionId: string) {
     await this.prismaService.refreshToken.updateMany({
       where: { userId, familyId: { not: sessionId }, revokedAt: null },

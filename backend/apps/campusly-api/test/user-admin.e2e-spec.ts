@@ -7,6 +7,7 @@ import { AppModule } from '../src/app.module';
 import { setupApp } from '../src/app.setup';
 import { PrismaService } from '../src/database/prisma.service';
 import { RedisService } from '../src/database/redis.service';
+import { REFRESH_COOKIE } from '../src/libs/config';
 
 // Needs Docker Postgres + Redis. Creates its own admin, school year, class and course (all named
 // "E2E ...") and removes everything afterwards, so it works on the empty CI database.
@@ -381,6 +382,100 @@ describe('User admin (e2e)', () => {
       const res = await gql<UsersResult>(USERS, inquiry({ text: '(a+)+$' }));
       expect(res.errors).toBeUndefined();
       expect(res.data!.users).toEqual({ list: [], metaCounter: { total: 0 } });
+    });
+  });
+
+  describe('reset password, block, unblock', () => {
+    const RESET =
+      'mutation($u: String!) { resetPassword(userId: $u) { loginId tempPassword isNew } }';
+    const BLOCK = 'mutation($u: String!) { blockUser(userId: $u) }';
+    const UNBLOCK = 'mutation($u: String!) { unblockUser(userId: $u) }';
+    let student: { id: string; loginId: string };
+
+    const cookieOf = (res: request.Response) =>
+      (res.headers['set-cookie'] as unknown as string[])
+        .find((c) => c.startsWith(`${REFRESH_COOKIE}=`))!
+        .split(';')[0];
+    const refresh = (cookie: string) =>
+      request(app.getHttpServer()).post('/auth/refresh').set('Cookie', cookie);
+    const reset = async () =>
+      (
+        await gql<{ resetPassword: { loginId: string; tempPassword: string } }>(
+          RESET,
+          { u: student.id },
+        )
+      ).data!.resetPassword.tempPassword;
+
+    beforeAll(async () => {
+      student = await prisma.user.findFirstOrThrow({
+        where: { firstName: 'First', lastName: 'E2e' },
+        select: { id: true, loginId: true },
+      });
+    });
+
+    it('resetPassword: new temp password, every session revoked, lockout cleared', async () => {
+      const first = await reset();
+      const session = cookieOf(await login(student.loginId, first).expect(200));
+      for (let i = 0; i < 5; i++)
+        await login(student.loginId, 'wrong').expect(401);
+      await login(student.loginId, first).expect(429); // locked out
+
+      const second = await reset();
+      expect(second).not.toBe(first);
+
+      await refresh(session).expect(401); // the signed-in device is out
+      const signIn = await login(student.loginId, second).expect(200); // lockout cleared
+      expect(
+        (signIn.body as { tempPasswordWarning: { usesLeft: number } })
+          .tempPasswordWarning.usesLeft,
+      ).toBe(2);
+      await login(student.loginId, first).expect(401); // the old password is gone
+
+      const audit = await prisma.auditLog.findMany({
+        where: { entityId: student.id, action: 'user.resetPassword' },
+      });
+      expect(audit).toHaveLength(2);
+      expect(JSON.stringify(audit)).not.toContain(second);
+    });
+
+    it('blockUser ends the sessions and stops sign-in; unblockUser lets the user back in', async () => {
+      const password = await reset();
+      const session = cookieOf(
+        await login(student.loginId, password).expect(200),
+      );
+
+      expect((await gql(BLOCK, { u: student.id })).data).toEqual({
+        blockUser: true,
+      });
+      await refresh(session).expect(401);
+      const blocked = await login(student.loginId, password).expect(403);
+      expect((blocked.body as { code: string }).code).toBe('ACCOUNT_BLOCKED');
+
+      expect((await gql(UNBLOCK, { u: student.id })).data).toEqual({
+        unblockUser: true,
+      });
+      await login(student.loginId, password).expect(200);
+    });
+
+    it('an admin cannot block themselves or change another admin', async () => {
+      const self = await prisma.user.findUniqueOrThrow({
+        where: { loginId: ADMIN.loginId },
+      });
+      expect(
+        (await gql(BLOCK, { u: self.id })).errors?.[0].extensions.code,
+      ).toBe('FORBIDDEN');
+      expect(
+        (await gql(RESET, { u: self.id })).errors?.[0].extensions.code,
+      ).toBe('FORBIDDEN');
+    });
+
+    it('an unknown or malformed id is rejected', async () => {
+      const unknown = await gql(BLOCK, {
+        u: '01a00000-0000-7000-8000-000000000000',
+      });
+      expect(unknown.errors?.[0].extensions.code).toBe('NOT_FOUND');
+      const malformed = await gql(BLOCK, { u: 'not-a-uuid' });
+      expect(malformed.errors?.[0].extensions.code).toBe('BAD_REQUEST');
     });
   });
 });
