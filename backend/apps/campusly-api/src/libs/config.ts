@@ -50,3 +50,10 @@ export const LOGIN_LIMIT = { perLoginId: 5, perIp: 30, windowSec: 15 * 60 };
 export const REFRESH_GRACE_SEC = 10;
 /** New accounts and password resets: the temporary password works for 3 sign-ins or 14 days */
 export const TEMP_PASSWORD = { uses: 3, days: 14 };
+
+// ───────────────────────────── lists ─────────────────────────────
+
+/** Columns a user list may be sorted by (like Nestar's availableMemberSorts): nothing else is accepted */
+export const USER_SORTS = ['createdAt', 'lastName', 'loginId'] as const;
+/** Page size limit for every list (Nestar had none: limit=1000000 returned the whole collection) */
+export const MAX_PAGE_SIZE = 100;

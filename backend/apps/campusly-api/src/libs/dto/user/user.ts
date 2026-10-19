@@ -1,5 +1,10 @@
-import { Field, ObjectType } from '@nestjs/graphql';
-import { Role, UserStatus } from '../../enums/user.enum';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+import {
+  ParentRelation,
+  PasswordState,
+  Role,
+  UserStatus,
+} from '../../enums/user.enum';
 
 /** What a user may see about themselves. No password or temp-password fields (they are omitted globally). */
 @ObjectType()
@@ -73,4 +78,88 @@ export class CreateStudentResult {
 
   @Field(() => LoginSlip, { nullable: true })
   parent: LoginSlip | null;
+}
+
+/** A parent of a student, or a child of a parent (active links only) */
+@ObjectType()
+export class LinkedUser {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => String)
+  loginId: string;
+
+  @Field(() => String)
+  fullName: string;
+
+  @Field(() => ParentRelation)
+  relation: ParentRelation;
+}
+
+/** One row of the admin Users page */
+@ObjectType()
+export class UserListItem {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => String)
+  loginId: string;
+
+  @Field(() => Role)
+  role: Role;
+
+  @Field(() => UserStatus)
+  status: UserStatus;
+
+  @Field(() => String)
+  firstName: string;
+
+  @Field(() => String)
+  lastName: string;
+
+  @Field(() => PasswordState)
+  passwordState: PasswordState;
+
+  /** Only for TEMPORARY: "Temporary · 2 sign-ins left" */
+  @Field(() => Int, { nullable: true })
+  tempPasswordUsesLeft: number | null;
+
+  /** Latest sign-in or token refresh */
+  @Field(() => Date, { nullable: true })
+  lastActiveAt: Date | null;
+
+  /** Students: current class, e.g. "9A" */
+  @Field(() => String, { nullable: true })
+  className: string | null;
+
+  /** Teachers: e.g. "Mathematics" */
+  @Field(() => String, { nullable: true })
+  title: string | null;
+
+  /** Parents: +998... */
+  @Field(() => String, { nullable: true })
+  phone: string | null;
+
+  /** Students → their parents; parents → their children */
+  @Field(() => [LinkedUser])
+  links: LinkedUser[];
+
+  @Field(() => Date)
+  createdAt: Date;
+}
+
+@ObjectType()
+export class TotalCounter {
+  @Field(() => Int)
+  total: number;
+}
+
+/** Same shape as Nestar's list results: { list, metaCounter } */
+@ObjectType()
+export class Users {
+  @Field(() => [UserListItem])
+  list: UserListItem[];
+
+  @Field(() => TotalCounter)
+  metaCounter: TotalCounter;
 }

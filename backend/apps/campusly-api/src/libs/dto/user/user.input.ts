@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -14,7 +15,14 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { ParentRelation } from '../../enums/user.enum';
+import { MAX_PAGE_SIZE, USER_SORTS } from '../../config';
+import { Direction } from '../../enums/common.enum';
+import {
+  ParentRelation,
+  PasswordState,
+  Role,
+  UserStatus,
+} from '../../enums/user.enum';
 
 @InputType()
 export class ChangePasswordInput {
@@ -111,4 +119,65 @@ export class CreateTeacherInput {
   @IsString()
   @MaxLength(100)
   title?: string;
+}
+
+@InputType()
+export class UsersSearch {
+  /** Students / Teachers / Parents tab */
+  @Field(() => Role)
+  @IsEnum(Role)
+  role: Role;
+
+  @Field(() => UserStatus, { nullable: true })
+  @IsOptional()
+  @IsEnum(UserStatus)
+  status?: UserStatus;
+
+  /** Students of one class */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  groupId?: string;
+
+  @Field(() => PasswordState, { nullable: true })
+  @IsOptional()
+  @IsEnum(PasswordState)
+  passwordState?: PasswordState;
+
+  /** Name, login ID or (parents) phone. Plain text, never turned into a regex (Nestar did) */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  text?: string;
+}
+
+/** Same shape as Nestar's *Inquiry inputs: page + limit + sort + direction + search */
+@InputType()
+export class UsersInquiry {
+  @Field(() => Int)
+  @IsInt()
+  @Min(1)
+  page: number;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(1)
+  @Max(MAX_PAGE_SIZE)
+  limit: number;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsIn(USER_SORTS)
+  sort?: (typeof USER_SORTS)[number];
+
+  @Field(() => Direction, { nullable: true })
+  @IsOptional()
+  @IsEnum(Direction)
+  direction?: Direction;
+
+  @Field(() => UsersSearch)
+  @ValidateNested()
+  @Type(() => UsersSearch)
+  search: UsersSearch;
 }

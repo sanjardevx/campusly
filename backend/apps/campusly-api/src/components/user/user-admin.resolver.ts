@@ -1,10 +1,15 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { CreateStudentResult, LoginSlip } from '../../libs/dto/user/user';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  CreateStudentResult,
+  LoginSlip,
+  Users,
+} from '../../libs/dto/user/user';
 import {
   CreateStudentInput,
   CreateTeacherInput,
   ParentInput,
+  UsersInquiry,
 } from '../../libs/dto/user/user.input';
 import { Role } from '../../libs/enums/user.enum';
 import type { AuthUser } from '../../libs/types/auth';
@@ -16,6 +21,12 @@ import { UserAdminService } from './user-admin.service';
 @Resolver()
 export class UserAdminResolver {
   constructor(private readonly userAdminService: UserAdminService) {}
+
+  /** Users page: Students / Teachers / Parents tabs with filters and paging */
+  @Query(() => Users)
+  public users(@Args('input') input: UsersInquiry): Promise<Users> {
+    return this.userAdminService.getUsers(input);
+  }
 
   @Mutation(() => CreateStudentResult)
   public createStudent(

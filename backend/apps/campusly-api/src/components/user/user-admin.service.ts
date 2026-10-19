@@ -9,12 +9,19 @@ import type { Prisma } from '../../../../../generated/prisma/client';
 import { PrismaService } from '../../database/prisma.service';
 import { TEMP_PASSWORD } from '../../libs/config';
 import { AuditAction } from '../../libs/enums/audit.enum';
-import { ErrorCode } from '../../libs/enums/common.enum';
-import { CreateStudentResult, LoginSlip } from '../../libs/dto/user/user';
+import { Direction, ErrorCode } from '../../libs/enums/common.enum';
+import { PasswordState } from '../../libs/enums/user.enum';
+import {
+  CreateStudentResult,
+  LoginSlip,
+  UserListItem,
+  Users,
+} from '../../libs/dto/user/user';
 import {
   CreateStudentInput,
   CreateTeacherInput,
   ParentInput,
+  UsersInquiry,
 } from '../../libs/dto/user/user.input';
 import type { AuthUser } from '../../libs/types/auth';
 import { normalizeUzPhone, parentLoginId } from '../../libs/utils/phone';
@@ -283,6 +290,90 @@ export class UserAdminService {
     return this.slip(parent, isNew ? password.plain : null, isNew);
   }
 
+  // ───────────────────────── lists ─────────────────────────
+
+  /** Admin Users page: one role per tab, filters, paging (Nestar "Inquiry" style) */
+  public async getUsers(input: UsersInquiry): Promise<Users> {
+    const now = new Date();
+    const { role, status, groupId, passwordState, text } = input.search;
+
+    // Every filter is its own AND item (CLAUDE.md): later a role scope is added the same way,
+    // and a client filter can never overwrite it the way `{ ...scope, ...filters }` could
+    const where: Prisma.UserWhereInput = {
+      AND: [
+        { role },
+        status ? { status } : {},
+        groupId
+          ? { groupMemberships: { some: { groupId, leftAt: null } } }
+          : {},
+        passwordState ? passwordStateWhere(passwordState, now) : {},
+        text ? textWhere(text) : {},
+      ],
+    };
+
+    const [total, users] = await this.prismaService.$transaction([
+      this.prismaService.user.count({ where }),
+      this.prismaService.user.findMany({
+        where,
+        // id as a tie-breaker: rows with the same name never jump between pages
+        orderBy: [
+          { [input.sort ?? 'createdAt']: input.direction ?? Direction.DESC },
+          { id: 'asc' },
+        ],
+        skip: (input.page - 1) * input.limit,
+        take: input.limit,
+        // Admin view: the temp-password fields are needed for the "Password" column
+        omit: { tempPasswordUsesLeft: false, tempPasswordExpiresAt: false },
+        include: {
+          teacherProfile: { select: { title: true } },
+          parentProfile: { select: { phone: true } },
+          groupMemberships: {
+            where: { leftAt: null },
+            select: { group: { select: { name: true } } },
+          },
+          parents: {
+            where: { revokedAt: null },
+            select: { relation: true, parent: { select: LINKED_USER } },
+          },
+          children: {
+            where: { revokedAt: null },
+            select: { relation: true, student: { select: LINKED_USER } },
+          },
+          refreshTokens: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            select: { createdAt: true },
+          },
+        },
+      }),
+    ]);
+
+    const list: UserListItem[] = users.map((u) => ({
+      id: u.id,
+      loginId: u.loginId,
+      role: u.role,
+      status: u.status,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      createdAt: u.createdAt,
+      passwordState: passwordStateOf(u, now),
+      tempPasswordUsesLeft:
+        passwordStateOf(u, now) === PasswordState.TEMPORARY
+          ? u.tempPasswordUsesLeft
+          : null,
+      lastActiveAt: u.refreshTokens[0]?.createdAt ?? null,
+      className: u.groupMemberships[0]?.group.name ?? null,
+      title: u.teacherProfile?.title ?? null,
+      phone: u.parentProfile?.phone ?? null,
+      links: [
+        ...u.parents.map((l) => linked(l.parent, l.relation)),
+        ...u.children.map((l) => linked(l.student, l.relation)),
+      ],
+    }));
+
+    return { list, metaCounter: { total } };
+  }
+
   // ───────────────────────── helpers ─────────────────────────
 
   private async preparePassword(plain: string): Promise<PreparedPassword> {
@@ -322,5 +413,87 @@ export class UserAdminService {
 
   private notFound(message: string) {
     return new NotFoundException({ code: ErrorCode.NOT_FOUND, message });
+  }
+}
+
+// ───────────────────────── list helpers ─────────────────────────
+
+const LINKED_USER = {
+  id: true,
+  loginId: true,
+  firstName: true,
+  lastName: true,
+} as const;
+
+function linked(
+  user: { id: string; loginId: string; firstName: string; lastName: string },
+  relation: UserListItem['links'][number]['relation'],
+) {
+  return {
+    id: user.id,
+    loginId: user.loginId,
+    fullName: `${user.firstName} ${user.lastName}`.trim(),
+    relation,
+  };
+}
+
+/** Plain-text search: name, login ID, parent phone. `contains` is a parameter, never a regex */
+function textWhere(text: string): Prisma.UserWhereInput {
+  const term = text.trim();
+  const digits = term.replace(/\D/g, '');
+  return {
+    OR: [
+      { firstName: { contains: term, mode: 'insensitive' } },
+      { lastName: { contains: term, mode: 'insensitive' } },
+      { loginId: { startsWith: term } },
+      ...(digits.length >= 3
+        ? [{ parentProfile: { phone: { contains: digits } } }]
+        : []),
+    ],
+  };
+}
+
+/** The same rules as login (DECISIONS §6), so the list shows what will happen at the next sign-in */
+function passwordStateOf(
+  user: {
+    mustChangePassword: boolean;
+    tempPasswordUsesLeft: number | null;
+    tempPasswordExpiresAt: Date | null;
+  },
+  now: Date,
+): PasswordState {
+  if (user.mustChangePassword) return PasswordState.MUST_CHANGE;
+  if (user.tempPasswordUsesLeft === null) return PasswordState.SET;
+  const isOver =
+    user.tempPasswordUsesLeft <= 0 ||
+    !user.tempPasswordExpiresAt ||
+    user.tempPasswordExpiresAt <= now;
+  return isOver ? PasswordState.EXPIRED : PasswordState.TEMPORARY;
+}
+
+function passwordStateWhere(
+  state: PasswordState,
+  now: Date,
+): Prisma.UserWhereInput {
+  switch (state) {
+    case PasswordState.MUST_CHANGE:
+      return { mustChangePassword: true };
+    case PasswordState.SET:
+      return { mustChangePassword: false, tempPasswordUsesLeft: null };
+    case PasswordState.TEMPORARY:
+      return {
+        mustChangePassword: false,
+        tempPasswordUsesLeft: { gt: 0 },
+        tempPasswordExpiresAt: { gt: now },
+      };
+    case PasswordState.EXPIRED:
+      return {
+        mustChangePassword: false,
+        tempPasswordUsesLeft: { not: null },
+        OR: [
+          { tempPasswordUsesLeft: { lte: 0 } },
+          { tempPasswordExpiresAt: { lte: now } },
+        ],
+      };
   }
 }

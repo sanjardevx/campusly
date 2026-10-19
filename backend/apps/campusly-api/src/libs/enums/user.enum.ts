@@ -13,3 +13,16 @@ registerEnumType(UserStatus, { name: 'UserStatus' });
 registerEnumType(ParentRelation, { name: 'ParentRelation' });
 
 export { ParentRelation, Role, UserStatus };
+
+/** The "Password" column on the admin Users page (computed, not stored) */
+export enum PasswordState {
+  /** Permanent password set by the user */
+  SET = 'SET',
+  /** Temporary password, sign-ins left */
+  TEMPORARY = 'TEMPORARY',
+  /** Temporary password, 14 days passed */
+  EXPIRED = 'EXPIRED',
+  /** Limit reached: only "Set a new password" is allowed */
+  MUST_CHANGE = 'MUST_CHANGE',
+}
+registerEnumType(PasswordState, { name: 'PasswordState' });

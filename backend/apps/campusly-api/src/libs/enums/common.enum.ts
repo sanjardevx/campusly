@@ -1,3 +1,5 @@
+import { registerEnumType } from '@nestjs/graphql';
+
 // Error codes sent to the client in `extensions.code`.
 // The frontend translates codes into 4 languages, so it never compares message text.
 export enum ErrorCode {
@@ -14,3 +16,10 @@ export enum ErrorCode {
   RATE_LIMITED = 'RATE_LIMITED',
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
 }
+
+/** Sort direction for every list (Nestar used 1 / -1 for Mongo) */
+export enum Direction {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+registerEnumType(Direction, { name: 'Direction' });

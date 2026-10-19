@@ -308,4 +308,79 @@ describe('User admin (e2e)', () => {
     });
     expect(again.revokedAt).toBeNull(); // the same row, active again
   });
+
+  describe('users list (Inquiry)', () => {
+    const USERS = `query($i: UsersInquiry!) {
+      users(input: $i) {
+        metaCounter { total }
+        list { id loginId firstName className passwordState tempPasswordUsesLeft links { loginId } }
+      }
+    }`;
+    interface UsersResult {
+      users: {
+        metaCounter: { total: number };
+        list: {
+          id: string;
+          loginId: string;
+          firstName: string;
+          className: string;
+          passwordState: string;
+          tempPasswordUsesLeft: number | null;
+          links: { loginId: string }[];
+        }[];
+      };
+    }
+    const inquiry = (search: object, extra: object = {}) => ({
+      i: {
+        page: 1,
+        limit: 10,
+        ...extra,
+        search: { role: 'STUDENT', groupId, ...search },
+      },
+    });
+
+    it('lists the students of a class with class name, parents and password state', async () => {
+      const res = await gql<UsersResult>(
+        USERS,
+        inquiry({}, { sort: 'loginId', direction: 'ASC' }),
+      );
+      const { list, metaCounter } = res.data!.users;
+
+      expect(metaCounter.total).toBe(2); // "First" and "Second"
+      expect(list.map((u) => u.firstName)).toEqual(['First', 'Second']);
+      for (const student of list) {
+        expect(student.className).toBe('E2E-9A');
+        expect(student.links.map((l) => l.loginId)).toEqual(['990001122']);
+        expect(student.passwordState).toBe('TEMPORARY');
+        expect(student.tempPasswordUsesLeft).toBeGreaterThan(0);
+      }
+    });
+
+    it('pages do not overlap and the total stays the same', async () => {
+      const page1 = (
+        await gql<UsersResult>(USERS, inquiry({}, { limit: 1, page: 1 }))
+      ).data!.users;
+      const page2 = (
+        await gql<UsersResult>(USERS, inquiry({}, { limit: 1, page: 2 }))
+      ).data!.users;
+
+      expect(page1.metaCounter.total).toBe(2);
+      expect(page2.metaCounter.total).toBe(2);
+      expect(page1.list[0].id).not.toBe(page2.list[0].id);
+    });
+
+    it('rejects a huge page size and an unknown sort column', async () => {
+      const big = await gql(USERS, inquiry({}, { limit: 1_000_000 }));
+      expect(big.errors?.[0].extensions.code).toBe('BAD_REQUEST');
+
+      const sort = await gql(USERS, inquiry({}, { sort: 'passwordHash' }));
+      expect(sort.errors?.[0].extensions.code).toBe('BAD_REQUEST');
+    });
+
+    it('treats search text as plain text (no regex), an empty result is not an error', async () => {
+      const res = await gql<UsersResult>(USERS, inquiry({ text: '(a+)+$' }));
+      expect(res.errors).toBeUndefined();
+      expect(res.data!.users).toEqual({ list: [], metaCounter: { total: 0 } });
+    });
+  });
 });
