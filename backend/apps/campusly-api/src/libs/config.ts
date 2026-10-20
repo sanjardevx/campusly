@@ -142,6 +142,20 @@ export const UPLOAD_RULES = {
     maxBytes: 10 * 1024 ** 2,
   },
 } as const;
+/** File extension in the S3 key, by MIME type (the user's file name is never used) */
+export const MIME_EXTENSIONS: Record<string, string> = {
+  'video/mp4': 'mp4',
+  'application/pdf': 'pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    'docx',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+    'pptx',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+};
+/** Unfinished uploads one user may have at a time (stops filling the bucket with junk) */
+export const MAX_PENDING_UPLOADS = 20;
 /** A presigned upload URL works this long */
 export const UPLOAD_URL_TTL_SEC = 15 * 60;
 /** A CloudFront video link works this long (DECISIONS §11: ~3 h) */
