@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { CourseStatus, CourseTeacherRole } from '../../enums/course.enum';
+import { Module } from './content';
 
 @ObjectType()
 export class CourseTeacher {
@@ -75,4 +76,17 @@ export class Course {
   /** Active enrollments */
   @Field(() => Int)
   studentCount: number;
+}
+
+/**
+ * One course page. Teachers and admins get everything; students and parents only published,
+ * not hidden weeks and lessons, and never the tutor notes.
+ */
+@ObjectType()
+export class CourseDetail extends Course {
+  @Field(() => [Module])
+  modules: Module[];
+
+  @Field(() => [GradeCategory])
+  gradeCategories: GradeCategory[];
 }

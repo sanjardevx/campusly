@@ -5,8 +5,9 @@ import {
 } from '@nestjs/common';
 import type { Prisma } from '../../../../../generated/prisma/client';
 import { PrismaService } from '../../database/prisma.service';
-import { Course } from '../../libs/dto/course/course';
+import { Course, CourseDetail } from '../../libs/dto/course/course';
 import {
+  CoursesFilter,
   CreateCourseInput,
   SetCourseStudentsInput,
   SetCourseTeachersInput,
@@ -19,6 +20,7 @@ import { AuditService } from '../audit/audit.service';
 import { AccessPolicy } from '../auth/policies/access.policy';
 import { EnrollmentService } from '../group/enrollment.service';
 import { SchoolService } from '../school/school.service';
+import { toModule } from './content.service';
 
 const COURSE_INCLUDE = {
   group: { select: { name: true } },
@@ -55,6 +57,104 @@ export class CourseService {
     });
     if (!course) throw notFound('Course not found');
     return toCourse(course);
+  }
+
+  // ───────────────────────── reading ─────────────────────────
+
+  /** Active courses of one student: the student, a parent's child, or any student for the admin */
+  public async getMyCourses(
+    user: AuthUser,
+    studentId?: string,
+  ): Promise<Course[]> {
+    // A student always gets their own id here, whatever the client sends
+    const id = await this.accessPolicy.resolveStudentScope(user, studentId);
+    return this.list({
+      AND: [
+        { enrollments: { some: { studentId: id, status: 'ACTIVE' } } },
+        { status: 'ACTIVE' },
+      ],
+    });
+  }
+
+  /** A teacher's own courses, drafts included */
+  public async getTeachingCourses(user: AuthUser): Promise<Course[]> {
+    return this.list({
+      AND: [
+        this.accessPolicy.courseScope(user),
+        { status: { not: 'ARCHIVED' } },
+      ],
+    });
+  }
+
+  /** Admin list: one academic year (default: current), optional filters */
+  public async getCourses(filter: CoursesFilter = {}): Promise<Course[]> {
+    let yearId = filter.academicYearId;
+    if (!yearId) {
+      const current = await this.schoolService.getCurrentAcademicYear();
+      if (!current) throw badRequest('Set the current academic year first');
+      yearId = current.id;
+    }
+    return this.list({
+      AND: [
+        { academicYearId: yearId },
+        filter.groupId ? { groupId: filter.groupId } : {},
+        filter.subjectId ? { subjectId: filter.subjectId } : {},
+        filter.teacherId
+          ? { teachers: { some: { teacherId: filter.teacherId } } }
+          : {},
+        filter.status ? { status: filter.status } : {},
+      ],
+    });
+  }
+
+  /**
+   * The course page. Teachers and admins see drafts and tutor notes; students and parents see only
+   * an ACTIVE/ARCHIVED course with its published, not hidden weeks and lessons.
+   */
+  public async getCourseDetail(
+    user: AuthUser,
+    courseId: string,
+  ): Promise<CourseDetail> {
+    await this.accessPolicy.assertCanViewCourse(user, courseId);
+    const learner = user.role === 'STUDENT' || user.role === 'PARENT';
+    const now = new Date();
+
+    const course = await this.prismaService.course.findUniqueOrThrow({
+      where: { id: courseId },
+      include: {
+        ...COURSE_INCLUDE,
+        gradeCategories: {
+          orderBy: { order: 'asc' },
+          select: { id: true, name: true, weight: true, order: true },
+        },
+        modules: {
+          // publishedAt null (draft) or in the future (scheduled) does not match `lte: now`
+          where: learner ? { isHidden: false, publishedAt: { lte: now } } : {},
+          orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+          include: {
+            lessons: {
+              where: learner ? { publishedAt: { lte: now } } : {},
+              orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+            },
+          },
+        },
+      },
+    });
+    // A draft course does not exist for its students yet
+    if (learner && course.status === 'DRAFT')
+      throw notFound('Course not found');
+
+    const modules = course.modules.map(toModule);
+    if (learner) {
+      for (const lesson of modules.flatMap((m) => m.lessons)) {
+        lesson.tutorNotes = null;
+      }
+    }
+    return {
+      ...toCourse(course),
+      modules,
+      gradeCategories: course.gradeCategories,
+    };
   }
 
   /**
@@ -243,6 +343,15 @@ export class CourseService {
   }
 
   // ───────────────────────── checks ─────────────────────────
+
+  private async list(where: Prisma.CourseWhereInput): Promise<Course[]> {
+    const courses = await this.prismaService.course.findMany({
+      where,
+      orderBy: [{ group: { name: 'asc' } }, { title: 'asc' }],
+      include: COURSE_INCLUDE,
+    });
+    return courses.map(toCourse);
+  }
 
   private async assertTeachers(teacherIds: string[]) {
     const found = await this.prismaService.user.count({

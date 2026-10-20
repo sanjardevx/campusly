@@ -112,11 +112,11 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 5 (S) — Courses
 
-- [ ] `Group` (class) + members; `Course` = subject × class with automatic enrollment of the class's students; split-group courses choose students.
-- [ ] `CourseTeacher`, `Enrollment` sync when a student joins/leaves a class.
-- [ ] `GradeCategory` created with school default weights for each new course.
-- [ ] `Module` (week) and `Lesson` CRUD with publish/hide.
-- [ ] Queries: `myCourses` (student), `teachingCourses` (teacher), `courseDetail` — all scoped through `AccessPolicy`.
+- [x] `Group` (class) + members; `Course` = subject × class with automatic enrollment of the class's students; split-group courses choose students.
+- [x] `CourseTeacher`, `Enrollment` sync when a student joins/leaves a class.
+- [x] `GradeCategory` created with school default weights for each new course.
+- [x] `Module` (week) and `Lesson` CRUD with publish/hide.
+- [x] Queries: `myCourses` (student), `teachingCourses` (teacher), `courseDetail` — all scoped through `AccessPolicy`.
 
 **Interview:** What happens if a student sends another course's ID?
 

@@ -111,3 +111,32 @@ export class SetCourseStudentsInput {
   @ArrayUnique()
   studentIds: string[];
 }
+
+/** Admin course list. Default year: the current one. */
+@InputType()
+export class CoursesFilter {
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  academicYearId?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  groupId?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  subjectId?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  teacherId?: string;
+
+  @Field(() => CourseStatus, { nullable: true })
+  @IsOptional()
+  @IsEnum(CourseStatus)
+  status?: CourseStatus;
+}

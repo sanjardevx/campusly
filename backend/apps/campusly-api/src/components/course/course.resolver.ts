@@ -1,6 +1,8 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { Course } from '../../libs/dto/course/course';
+import { ParseUUIDPipe } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Course, CourseDetail } from '../../libs/dto/course/course';
 import {
+  CoursesFilter,
   CreateCourseInput,
   SetCourseStudentsInput,
   SetCourseTeachersInput,
@@ -14,6 +16,46 @@ import { CourseService } from './course.service';
 @Resolver()
 export class CourseResolver {
   constructor(private readonly courseService: CourseService) {}
+
+  // ───────────────────────── reading ─────────────────────────
+
+  /** Student: own courses. Parent: a child's (studentId optional with one child). Admin: any student. */
+  @Roles(Role.STUDENT, Role.PARENT, Role.ADMIN)
+  @Query(() => [Course])
+  public myCourses(
+    @CurrentUser() user: AuthUser,
+    @Args(
+      'studentId',
+      { nullable: true },
+      new ParseUUIDPipe({ optional: true }),
+    )
+    studentId?: string,
+  ): Promise<Course[]> {
+    return this.courseService.getMyCourses(user, studentId);
+  }
+
+  @Roles(Role.TEACHER)
+  @Query(() => [Course])
+  public teachingCourses(@CurrentUser() user: AuthUser): Promise<Course[]> {
+    return this.courseService.getTeachingCourses(user);
+  }
+
+  @Roles(Role.ADMIN)
+  @Query(() => [Course])
+  public courses(
+    @Args('filter', { nullable: true }) filter?: CoursesFilter,
+  ): Promise<Course[]> {
+    return this.courseService.getCourses(filter);
+  }
+
+  /** Every role; AccessPolicy decides (no relation → NOT_FOUND) */
+  @Query(() => CourseDetail)
+  public courseDetail(
+    @CurrentUser() user: AuthUser,
+    @Args('courseId', ParseUUIDPipe) courseId: string,
+  ): Promise<CourseDetail> {
+    return this.courseService.getCourseDetail(user, courseId);
+  }
 
   // ───────────────────── setup (admin) ─────────────────────
 
