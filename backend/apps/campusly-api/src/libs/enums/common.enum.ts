@@ -14,6 +14,8 @@ export enum ErrorCode {
   /** Unique value already used (e.g. a phone or login ID) */
   CONFLICT = 'CONFLICT',
   RATE_LIMITED = 'RATE_LIMITED',
+  /** S3 / CloudFront are not configured on this server (local run without AWS, CI) */
+  MEDIA_DISABLED = 'MEDIA_DISABLED',
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
 }
 

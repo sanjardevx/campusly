@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+/** `KEY=` (empty, as in .env.example) counts as not set */
+const optional = (schema: z.ZodString) =>
+  z.preprocess((v) => (v === '' ? undefined : v), schema.optional());
+
 // Every env variable the API needs. ConfigModule runs validateEnv() once at startup:
 // if anything is missing or wrong, the app stops with a clear message (fail fast).
 const envSchema = z
@@ -13,10 +17,54 @@ const envSchema = z
     JWT_REFRESH_SECRET: z.string().min(32),
     FRONTEND_URL: z.url(),
     PORT_API: z.coerce.number().int().positive().default(3000),
+
+    // Media (S3 + CloudFront). All or nothing: without them uploads and videos are off (CI, tests).
+    AWS_REGION: z.string().default('eu-central-1'),
+    S3_BUCKET: optional(z.string().min(3)),
+    // Local only: in production the EC2 IAM role gives the credentials
+    AWS_ACCESS_KEY_ID: optional(z.string().min(16)),
+    AWS_SECRET_ACCESS_KEY: optional(z.string().min(16)),
+    CLOUDFRONT_DOMAIN: optional(z.string().min(3)),
+    CLOUDFRONT_KEY_PAIR_ID: optional(z.string().min(3)),
+    // The key that signs video links: a file outside the repo (local) or the PEM text (production)
+    CLOUDFRONT_PRIVATE_KEY_PATH: optional(z.string()),
+    CLOUDFRONT_PRIVATE_KEY: optional(z.string()),
   })
   .refine((env) => env.JWT_ACCESS_SECRET !== env.JWT_REFRESH_SECRET, {
     path: ['JWT_REFRESH_SECRET'],
     message: 'must be different from JWT_ACCESS_SECRET',
+  })
+  .superRefine((env, ctx) => {
+    const media = {
+      S3_BUCKET: env.S3_BUCKET,
+      CLOUDFRONT_DOMAIN: env.CLOUDFRONT_DOMAIN,
+      CLOUDFRONT_KEY_PAIR_ID: env.CLOUDFRONT_KEY_PAIR_ID,
+      CLOUDFRONT_PRIVATE_KEY_PATH:
+        env.CLOUDFRONT_PRIVATE_KEY_PATH ?? env.CLOUDFRONT_PRIVATE_KEY,
+    };
+    const missing = Object.entries(media).filter(([, v]) => !v);
+    const someSet = missing.length < Object.keys(media).length;
+    // Half-configured media fails at startup, not at the first upload
+    if (someSet || env.NODE_ENV === 'production') {
+      for (const [key] of missing) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [key],
+          message:
+            key === 'CLOUDFRONT_PRIVATE_KEY_PATH'
+              ? 'set CLOUDFRONT_PRIVATE_KEY_PATH or CLOUDFRONT_PRIVATE_KEY'
+              : 'required for media (S3 + CloudFront)',
+        });
+      }
+    }
+    if (!!env.AWS_ACCESS_KEY_ID !== !!env.AWS_SECRET_ACCESS_KEY) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['AWS_SECRET_ACCESS_KEY'],
+        message:
+          'set both AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, or none',
+      });
+    }
   });
 
 export type Env = z.infer<typeof envSchema>;
@@ -74,3 +122,27 @@ export const IMPORT_LIMIT = {
   maxChars: 100_000,
   txTimeoutMs: 60_000,
 };
+
+// ───────────────────────────── media ─────────────────────────────
+// DECISIONS §11. Nestar saved uploads on the server disk; here the browser uploads straight to S3.
+
+/** What may be uploaded, by kind: MIME types and the size limit */
+export const UPLOAD_RULES = {
+  VIDEO: { mimeTypes: ['video/mp4'], maxBytes: 2 * 1024 ** 3 },
+  DOCUMENT: {
+    mimeTypes: [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    ],
+    maxBytes: 50 * 1024 ** 2,
+  },
+  IMAGE: {
+    mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    maxBytes: 10 * 1024 ** 2,
+  },
+} as const;
+/** A presigned upload URL works this long */
+export const UPLOAD_URL_TTL_SEC = 15 * 60;
+/** A CloudFront video link works this long (DECISIONS §11: ~3 h) */
+export const VIDEO_URL_TTL_SEC = 3 * 60 * 60;
