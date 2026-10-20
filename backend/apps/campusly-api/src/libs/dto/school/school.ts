@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { RecordStatus } from '../../enums/course.enum';
 import { PeriodKind } from '../../enums/school.enum';
 
 /** Nothing secret here: the logged-out landing page also shows the school name */
@@ -81,4 +82,17 @@ export class Period {
 
   @Field(() => String)
   endsAt: string;
+}
+
+/** "Manage subjects": one row per subject, so courses never spell it differently */
+@ObjectType()
+export class Subject {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => String)
+  name: string;
+
+  @Field(() => RecordStatus)
+  status: RecordStatus;
 }

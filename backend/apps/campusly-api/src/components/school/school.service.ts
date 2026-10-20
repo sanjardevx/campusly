@@ -11,13 +11,16 @@ import {
   AcademicYear,
   Period,
   SchoolSettings,
+  Subject,
 } from '../../libs/dto/school/school';
 import {
   CreateAcademicYearInput,
   CreatePeriodInput,
+  CreateSubjectInput,
   UpdateAcademicYearInput,
   UpdatePeriodInput,
   UpdateSchoolSettingsInput,
+  UpdateSubjectInput,
 } from '../../libs/dto/school/school.input';
 import type { AuthUser } from '../../libs/types/auth';
 import { fromDbDate, isValidTimeZone, toDbDate } from '../../libs/utils/date';
@@ -364,6 +367,67 @@ export class SchoolService {
       select: { name: true },
     });
     if (overlap) throw badRequest(`Dates overlap ${overlap.name}`);
+  }
+
+  // ───────────────────────── subjects ─────────────────────────
+
+  /** Signed-in users get active subjects (filters); the admin page also shows archived ones */
+  public async getSubjects(includeArchived = false): Promise<Subject[]> {
+    return this.prismaService.subject.findMany({
+      where: includeArchived ? {} : { status: 'ACTIVE' },
+      orderBy: { name: 'asc' },
+      select: { id: true, name: true, status: true },
+    });
+  }
+
+  public async createSubject(
+    admin: AuthUser,
+    input: CreateSubjectInput,
+  ): Promise<Subject> {
+    // "Algebra" twice → unique index → CONFLICT
+    return this.prismaService.$transaction(async (tx) => {
+      const subject = await tx.subject.create({
+        data: { name: input.name.trim() },
+        select: { id: true, name: true, status: true },
+      });
+      await this.auditService.log(tx, {
+        actor: admin,
+        action: AuditAction.SUBJECT_CREATE,
+        entityType: 'Subject',
+        entityId: subject.id,
+        after: subject,
+      });
+      return subject;
+    });
+  }
+
+  /** Rename or archive (archived subjects cannot be picked for new courses) */
+  public async updateSubject(
+    admin: AuthUser,
+    input: UpdateSubjectInput,
+  ): Promise<Subject> {
+    const before = await this.prismaService.subject.findUnique({
+      where: { id: input.id },
+      select: { id: true, name: true, status: true },
+    });
+    if (!before) throw notFound('Subject not found');
+
+    return this.prismaService.$transaction(async (tx) => {
+      const subject = await tx.subject.update({
+        where: { id: input.id },
+        data: { name: input.name?.trim(), status: input.status },
+        select: { id: true, name: true, status: true },
+      });
+      await this.auditService.log(tx, {
+        actor: admin,
+        action: AuditAction.SUBJECT_UPDATE,
+        entityType: 'Subject',
+        entityId: subject.id,
+        before,
+        after: subject,
+      });
+      return subject;
+    });
   }
 }
 

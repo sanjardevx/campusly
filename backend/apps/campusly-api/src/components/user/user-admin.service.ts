@@ -32,6 +32,7 @@ import {
 } from '../../libs/utils/temp-password';
 import { AuditService } from '../audit/audit.service';
 import { AuthService } from '../auth/auth.service';
+import { EnrollmentService } from '../group/enrollment.service';
 import { LoginIdService } from './login-id.service';
 
 type Tx = Prisma.TransactionClient;
@@ -58,6 +59,7 @@ export class UserAdminService {
     private readonly loginIdService: LoginIdService,
     private readonly auditService: AuditService,
     private readonly authService: AuthService,
+    private readonly enrollmentService: EnrollmentService,
   ) {}
 
   // ───────────────────────── students ─────────────────────────
@@ -112,22 +114,10 @@ export class UserAdminService {
             admissionYear: input.admissionYear ?? new Date().getUTCFullYear(),
           },
         },
-        groupMemberships: { create: { groupId: input.groupId } },
       },
     });
-
-    // A whole-class course (e.g. "Algebra · 9A") includes every student of the class
-    const courses = await tx.course.findMany({
-      where: {
-        groupId: input.groupId,
-        isSplitGroup: false,
-        status: { not: 'ARCHIVED' },
-      },
-      select: { id: true },
-    });
-    await tx.enrollment.createMany({
-      data: courses.map((c) => ({ courseId: c.id, studentId: student.id })),
-    });
+    // The class and its whole-class courses (e.g. "Algebra · 9A")
+    await this.enrollmentService.joinClass(tx, student.id, input.groupId);
 
     await this.auditService.log(tx, {
       actor: admin,

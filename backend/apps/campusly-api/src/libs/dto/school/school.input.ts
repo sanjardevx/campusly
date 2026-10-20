@@ -14,6 +14,7 @@ import {
   Min,
 } from 'class-validator';
 import { LOCALES } from '../../config';
+import { RecordStatus } from '../../enums/course.enum';
 import { PeriodKind } from '../../enums/school.enum';
 import { DATE_ONLY } from '../../utils/date';
 
@@ -193,4 +194,30 @@ export class UpdatePeriodInput {
   @IsOptional()
   @Matches(DATE_ONLY, DATE_MESSAGE)
   endsAt?: string;
+}
+
+@InputType()
+export class CreateSubjectInput {
+  @Field(() => String)
+  @IsString()
+  @Length(2, 50)
+  name: string;
+}
+
+@InputType()
+export class UpdateSubjectInput {
+  @Field(() => String)
+  @IsUUID()
+  id: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @Length(2, 50)
+  name?: string;
+
+  @Field(() => RecordStatus, { nullable: true })
+  @IsOptional()
+  @IsEnum(RecordStatus)
+  status?: RecordStatus;
 }

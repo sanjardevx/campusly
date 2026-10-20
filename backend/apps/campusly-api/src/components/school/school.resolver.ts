@@ -4,20 +4,23 @@ import {
   AcademicYear,
   Period,
   SchoolSettings,
+  Subject,
 } from '../../libs/dto/school/school';
 import {
   CreateAcademicYearInput,
   CreatePeriodInput,
+  CreateSubjectInput,
   UpdateAcademicYearInput,
   UpdatePeriodInput,
   UpdateSchoolSettingsInput,
+  UpdateSubjectInput,
 } from '../../libs/dto/school/school.input';
 import { Role } from '../../libs/enums/user.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { CurrentUser, Public, Roles } from '../auth/decorators/auth.decorators';
 import { SchoolService } from './school.service';
 
-// Reading is open (settings: to everyone, years/periods: to every signed-in user);
+// Reading is open (settings: to everyone, years/periods/subjects: to every signed-in user);
 // every change is admin-only and audited.
 @Resolver()
 export class SchoolResolver {
@@ -105,5 +108,36 @@ export class SchoolResolver {
     @Args('input') input: UpdatePeriodInput,
   ): Promise<Period> {
     return this.schoolService.updatePeriod(admin, input);
+  }
+
+  // ───────────────────────── subjects ─────────────────────────
+
+  /** Archived subjects are listed only for the admin */
+  @Query(() => [Subject])
+  public subjects(
+    @CurrentUser() user: AuthUser,
+    @Args('includeArchived', { nullable: true }) includeArchived?: boolean,
+  ): Promise<Subject[]> {
+    return this.schoolService.getSubjects(
+      user.role === Role.ADMIN && !!includeArchived,
+    );
+  }
+
+  @Roles(Role.ADMIN)
+  @Mutation(() => Subject)
+  public createSubject(
+    @CurrentUser() admin: AuthUser,
+    @Args('input') input: CreateSubjectInput,
+  ): Promise<Subject> {
+    return this.schoolService.createSubject(admin, input);
+  }
+
+  @Roles(Role.ADMIN)
+  @Mutation(() => Subject)
+  public updateSubject(
+    @CurrentUser() admin: AuthUser,
+    @Args('input') input: UpdateSubjectInput,
+  ): Promise<Subject> {
+    return this.schoolService.updateSubject(admin, input);
   }
 }

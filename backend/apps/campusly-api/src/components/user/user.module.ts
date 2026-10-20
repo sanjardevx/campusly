@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
+import { GroupModule } from '../group/group.module';
 import { LoginIdService } from './login-id.service';
 import { StudentImportService } from './student-import.service';
 import { UserAdminResolver } from './user-admin.resolver';
@@ -8,7 +9,7 @@ import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, GroupModule],
   providers: [
     UserResolver,
     UserService,

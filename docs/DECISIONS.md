@@ -162,6 +162,7 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - `campusly.uz` — web app (Vercel; apex A record, `www` redirects). Logged-out home = mini landing + login + per-role "Demo login" buttons (only when `DEMO_MODE=true`).
 - `api.campusly.uz` — API (EC2). `media.campusly.uz` — CloudFront. `no-reply@campusly.uz` — SES.
 - Domains live only in env (`FRONTEND_URL`, `CORS_ORIGINS`, ...).
+- AWS region: **`eu-central-1` (Frankfurt)** for every resource (S3, CloudFront origin, EC2, RDS, SES, Bedrock) — the closest full-service region to Tashkent. Account: root has MFA and no access keys; daily work uses an IAM admin user with MFA; budgets: zero-spend alert + monthly $35.
 - Demo: seed data only, `noindex`, demo accounts flagged `isDemo` (cannot change password, create users or upload), nightly reset by the batch app.
 - School timezone `Asia/Tashkent` drives business rules (deadlines, attendance date, daily limits). The UI shows the viewer's timezone, with Tashkent time next to deadlines.
 
@@ -191,3 +192,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-16 | `Subject` is a table (no "Algebra" / "algebra" duplicates, filters, translations), `Course.subjectId` FK; `Group` belongs to an academic year (moving classes to the next year is a later admin action); day 2 schema ships as one `init` migration, every later change gets its own small migration |
 | 2026-10-18 | `ACCOUNT_BLOCKED` (403) after a correct password for blocked users; constant-time login for unknown IDs |
 | 2026-10-19 | Access token carries `sid` (session = refresh-token family); `changePassword` stays GraphQL and revokes all other sessions |
+| 2026-10-20 | AWS region `eu-central-1` (Frankfurt) for all resources; IAM admin user with MFA, root only for billing/account tasks |

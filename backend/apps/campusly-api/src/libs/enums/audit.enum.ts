@@ -13,4 +13,9 @@ export enum AuditAction {
   ACADEMIC_YEAR_UPDATE = 'academicYear.update',
   PERIOD_CREATE = 'period.create',
   PERIOD_UPDATE = 'period.update',
+  SUBJECT_CREATE = 'subject.create',
+  SUBJECT_UPDATE = 'subject.update',
+  GROUP_CREATE = 'group.create',
+  GROUP_UPDATE = 'group.update',
+  STUDENT_MOVE = 'student.moveClass',
 }
