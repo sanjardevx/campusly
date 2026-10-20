@@ -83,6 +83,7 @@ export class MediaService {
           originalName: cleanFileName(input.fileName),
           mimeType: input.mimeType,
           size: BigInt(input.size),
+          durationSec: input.kind === 'VIDEO' ? input.durationSec : undefined,
         },
       });
       const ext = MIME_EXTENSIONS[input.mimeType];
@@ -168,16 +169,27 @@ export class MediaService {
       user.role === 'STUDENT'
         ? this.prismaService.lessonProgress.findUnique({
             where: { studentId_lessonId: { studentId: user.id, lessonId } },
-            select: { lastPositionSec: true },
+            select: {
+              lastPositionSec: true,
+              maxPositionSec: true,
+              status: true,
+            },
           })
         : null,
     ]);
+    // Only a student's first watch of a "watch to complete" lesson is locked
+    const isLocked =
+      user.role === 'STUDENT' &&
+      lesson.completionType === 'VIDEO_WATCHED' &&
+      progress?.status !== 'COMPLETED';
 
     return {
       url: this.storageService.signedUrl(asset.s3Key, VIDEO_URL_TTL_SEC),
       expiresAt: new Date(Date.now() + VIDEO_URL_TTL_SEC * 1000),
       resumeAt: progress?.lastPositionSec ?? 0,
       watermark: viewer.loginId,
+      isLocked,
+      maxSeekSec: isLocked ? (progress?.maxPositionSec ?? 0) : null,
     };
   }
 }

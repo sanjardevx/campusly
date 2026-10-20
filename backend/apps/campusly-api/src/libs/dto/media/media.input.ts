@@ -1,11 +1,13 @@
-import { Field, Float, InputType } from '@nestjs/graphql';
+import { Field, Float, InputType, Int } from '@nestjs/graphql';
 import {
   IsEnum,
   IsInt,
+  IsOptional,
   IsPositive,
   IsString,
   IsUUID,
   Length,
+  Max,
 } from 'class-validator';
 import { MediaKind } from '../../enums/media.enum';
 
@@ -36,4 +38,15 @@ export class CreateUploadInput {
   @IsInt()
   @IsPositive()
   size: number;
+
+  /**
+   * VIDEO: length in seconds, read by the teacher's browser before the upload. The 90% rule uses
+   * this value, never the one a student's player reports.
+   */
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  @Max(6 * 60 * 60)
+  durationSec?: number;
 }

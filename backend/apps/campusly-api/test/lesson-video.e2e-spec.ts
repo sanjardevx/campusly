@@ -26,6 +26,8 @@ interface Video {
     expiresAt: string;
     resumeAt: number;
     watermark: string;
+    isLocked: boolean;
+    maxSeekSec: number | null;
   };
 }
 
@@ -53,7 +55,7 @@ describe('Lesson video: setLessonVideo and lessonVideo (e2e)', () => {
   const outcome = (body: GqlBody<unknown>): Outcome =>
     (body.errors?.[0].extensions.code as Outcome | undefined) ?? 'OK';
 
-  const VIDEO = `query($id: String!) { lessonVideo(lessonId: $id) { url expiresAt resumeAt watermark } }`;
+  const VIDEO = `query($id: String!) { lessonVideo(lessonId: $id) { url expiresAt resumeAt watermark isLocked maxSeekSec } }`;
   const SET = `mutation($i: SetLessonVideoInput!) { setLessonVideo(input: $i) { id videoAssetId } }`;
   const attach = (lessonId: string, assetId: string | null, as: Key = 'tA') =>
     gql<{ setLessonVideo: { videoAssetId: string | null } }>(
@@ -197,7 +199,14 @@ describe('Lesson video: setLessonVideo and lessonVideo (e2e)', () => {
     ) =>
       (
         await prisma.lesson.create({
-          data: { moduleId: week.id, title, type, publishedAt, order },
+          data: {
+            moduleId: week.id,
+            title,
+            type,
+            publishedAt,
+            order,
+            completionType: type === 'VIDEO' ? 'VIDEO_WATCHED' : 'VIEW',
+          },
         })
       ).id;
     lesson.video = await make('Intro', 'VIDEO', past, 1);
@@ -294,11 +303,31 @@ describe('Lesson video: setLessonVideo and lessonVideo (e2e)', () => {
     expect(hours).toBeGreaterThan(2.9);
     expect(hours).toBeLessThanOrEqual(3);
 
-    // A parent watching does not continue the child's position
+    // A parent watching does not continue the child's position and is never locked
     const parent = await gql<Video>(VIDEO, { id: lesson.video }, 'pA');
     expect(parent.data!.lessonVideo).toMatchObject({
       resumeAt: 0,
       watermark: 'e2e-video-pA',
+      isLocked: false,
+      maxSeekSec: null,
+    });
+  });
+
+  it('sequential rule: locked until completed (no seeking past the furthest point), then free', async () => {
+    const locked = await gql<Video>(VIDEO, { id: lesson.video }, 'sA');
+    expect(locked.data!.lessonVideo).toMatchObject({
+      isLocked: true,
+      maxSeekSec: 125,
+    });
+
+    await prisma.lessonProgress.updateMany({
+      where: { studentId: id.sA, lessonId: lesson.video },
+      data: { status: 'COMPLETED', completedAt: new Date() },
+    });
+    const free = await gql<Video>(VIDEO, { id: lesson.video }, 'sA');
+    expect(free.data!.lessonVideo).toMatchObject({
+      isLocked: false,
+      maxSeekSec: null,
     });
   });
 });

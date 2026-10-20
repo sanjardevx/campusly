@@ -58,4 +58,15 @@ export class LessonVideo {
   /** The viewer's login ID, shown over the player: a screen recording shows who shared it */
   @Field(() => String)
   watermark: string;
+
+  /**
+   * Sequential watch rule (DECISIONS §11): true until the student completes the lesson.
+   * The player then allows only ≤ 1× speed and no seeking past maxSeekSec.
+   */
+  @Field(() => Boolean)
+  isLocked: boolean;
+
+  /** Locked only: the furthest point reached; seeking beyond it is not allowed */
+  @Field(() => Int, { nullable: true })
+  maxSeekSec: number | null;
 }

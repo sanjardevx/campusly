@@ -174,7 +174,7 @@ describe('Uploads: createUpload → confirmUpload (e2e)', () => {
   it('createUpload: UPLOADING asset, server-made key, user file name only as metadata', async () => {
     const res = await gql<Ticket>(
       CREATE,
-      video({ fileName: 'C:\\fakepath\\Week 1\n.mp4' }),
+      video({ fileName: 'C:\\fakepath\\Week 1\n.mp4', durationSec: 600 }),
     );
     const ticket = res.data!.createUpload;
     const row = await asset(ticket.assetId);
@@ -185,6 +185,8 @@ describe('Uploads: createUpload → confirmUpload (e2e)', () => {
       s3Key: `raw/${courseId}/${ticket.assetId}.mp4`,
       originalName: 'Week 1.mp4',
       size: BigInt(120 * MB),
+      // The length the teacher's browser read: the 90% rule uses this one
+      durationSec: 600,
     });
     expect(ticket.uploadUrl).toContain(row.s3Key);
     // About 15 minutes from now

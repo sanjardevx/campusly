@@ -160,3 +160,21 @@ export const MAX_PENDING_UPLOADS = 20;
 export const UPLOAD_URL_TTL_SEC = 15 * 60;
 /** A CloudFront video link works this long (DECISIONS §11: ~3 h) */
 export const VIDEO_URL_TTL_SEC = 3 * 60 * 60;
+
+// ───────────────────────────── progress ─────────────────────────────
+
+/**
+ * Video progress (DECISIONS §11, sequential watch rule). Until a lesson is completed the student
+ * watches at 1× without seeking forward; the server lets the furthest point grow only as fast as
+ * real time, so skipping ahead or a fake request does not complete a lesson.
+ */
+export const PROGRESS = {
+  /** A VIDEO_WATCHED lesson is done when the furthest point reaches this share of the video */
+  completePercent: 90,
+  /** The player sends its position about this often; a longer gap counts as this long */
+  heartbeatSec: 20,
+  /** Until completed: the furthest point may not move faster than this */
+  maxSpeed: 1,
+  /** Network delays between two heartbeats */
+  toleranceSec: 3,
+};
