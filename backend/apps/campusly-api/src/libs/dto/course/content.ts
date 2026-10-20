@@ -22,6 +22,10 @@ export class Lesson {
   @Field(() => String, { nullable: true })
   body: string | null;
 
+  /** A READY video (VIDEO lessons); the link comes from `lessonVideo` */
+  @Field(() => String, { nullable: true })
+  videoAssetId: string | null;
+
   @Field(() => Date, { nullable: true })
   dueAt: Date | null;
 

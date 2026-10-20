@@ -12,8 +12,13 @@ import {
   MIME_EXTENSIONS,
   UPLOAD_RULES,
   UPLOAD_URL_TTL_SEC,
+  VIDEO_URL_TTL_SEC,
 } from '../../libs/config';
-import { MediaAsset, UploadTicket } from '../../libs/dto/media/media';
+import {
+  LessonVideo,
+  MediaAsset,
+  UploadTicket,
+} from '../../libs/dto/media/media';
 import { CreateUploadInput } from '../../libs/dto/media/media.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import type { AuthUser } from '../../libs/types/auth';
@@ -137,6 +142,43 @@ export class MediaService {
       where: { id: asset.id },
     });
     return toMediaAsset(ready);
+  }
+
+  /** A fresh 3-hour link for a lesson video, only for users who may see the lesson */
+  public async getLessonVideo(
+    user: AuthUser,
+    lessonId: string,
+  ): Promise<LessonVideo> {
+    const lesson = await this.accessPolicy.assertCanViewLesson(user, lessonId);
+    const asset = lesson.videoAssetId
+      ? await this.prismaService.mediaAsset.findUnique({
+          where: { id: lesson.videoAssetId },
+        })
+      : null;
+    if (!asset?.s3Key || asset.status !== 'READY') {
+      throw notFound('This lesson has no video yet');
+    }
+
+    const [viewer, progress] = await Promise.all([
+      this.prismaService.user.findUniqueOrThrow({
+        where: { id: user.id },
+        select: { loginId: true },
+      }),
+      // Only a student's own watching counts (parents and teachers may watch too)
+      user.role === 'STUDENT'
+        ? this.prismaService.lessonProgress.findUnique({
+            where: { studentId_lessonId: { studentId: user.id, lessonId } },
+            select: { lastPositionSec: true },
+          })
+        : null,
+    ]);
+
+    return {
+      url: this.storageService.signedUrl(asset.s3Key, VIDEO_URL_TTL_SEC),
+      expiresAt: new Date(Date.now() + VIDEO_URL_TTL_SEC * 1000),
+      resumeAt: progress?.lastPositionSec ?? 0,
+      watermark: viewer.loginId,
+    };
   }
 }
 

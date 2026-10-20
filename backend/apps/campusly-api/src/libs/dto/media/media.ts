@@ -1,4 +1,4 @@
-import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { MediaKind, MediaStatus } from '../../enums/media.enum';
 
 @ObjectType()
@@ -39,4 +39,23 @@ export class UploadTicket {
 
   @Field(() => Date)
   expiresAt: Date;
+}
+
+/** What the video player needs. The link is made for every request and is never stored. */
+@ObjectType()
+export class LessonVideo {
+  /** CloudFront signed URL, valid until expiresAt (~3 h) */
+  @Field(() => String)
+  url: string;
+
+  @Field(() => Date)
+  expiresAt: Date;
+
+  /** Seconds: where the student stopped last time (0 for teachers, parents, admins) */
+  @Field(() => Int)
+  resumeAt: number;
+
+  /** The viewer's login ID, shown over the player: a screen recording shows who shared it */
+  @Field(() => String)
+  watermark: string;
 }

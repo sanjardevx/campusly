@@ -183,3 +183,16 @@ export class ReorderInput {
   @ArrayUnique()
   ids: string[];
 }
+
+@InputType()
+export class SetLessonVideoInput {
+  @Field(() => String)
+  @IsUUID()
+  lessonId: string;
+
+  /** A READY video uploaded for this course; null removes the video */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  assetId?: string | null;
+}

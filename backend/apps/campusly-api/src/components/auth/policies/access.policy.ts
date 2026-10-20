@@ -54,6 +54,44 @@ export class AccessPolicy {
       throw notFound('Course not found');
   }
 
+  /**
+   * One lesson (video, files, later assignments). Teachers and admins see drafts; students and
+   * parents only a lesson that is published in a published, not hidden week of a non-draft course.
+   * Returns the lesson so the caller does not load it again.
+   */
+  public async assertCanViewLesson(user: AuthUser, lessonId: string) {
+    const lesson = await this.prismaService.lesson.findUnique({
+      where: { id: lessonId },
+      include: {
+        module: {
+          select: {
+            courseId: true,
+            isHidden: true,
+            publishedAt: true,
+            course: { select: { status: true } },
+          },
+        },
+      },
+    });
+    if (!lesson) throw notFound('Lesson not found');
+    await this.assertCanViewCourse(user, lesson.module.courseId);
+
+    if (user.role === 'STUDENT' || user.role === 'PARENT') {
+      const now = new Date();
+      const { module } = lesson;
+      const visible =
+        module.course.status !== 'DRAFT' &&
+        !module.isHidden &&
+        !!module.publishedAt &&
+        module.publishedAt <= now &&
+        !!lesson.publishedAt &&
+        lesson.publishedAt <= now;
+      // A draft is "not found", the same as a lesson of another course
+      if (!visible) throw notFound('Lesson not found');
+    }
+    return lesson;
+  }
+
   /** Change the course (lessons, assignments, grades, attendance): its teachers and admins */
   public async assertTeacherOf(
     user: AuthUser,

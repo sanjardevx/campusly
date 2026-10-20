@@ -11,6 +11,7 @@ import {
   CreateModuleInput,
   PublishInput,
   ReorderInput,
+  SetLessonVideoInput,
   UpdateLessonInput,
   UpdateModuleInput,
 } from '../../libs/dto/course/content.input';
@@ -205,6 +206,39 @@ export class ContentService {
     return toLesson(lesson);
   }
 
+  /**
+   * Attach a READY video to a VIDEO lesson (null detaches it). The video must have been uploaded
+   * for this course: its key starts with raw/{courseId}/, so another course's video cannot be used.
+   */
+  public async setLessonVideo(
+    user: AuthUser,
+    input: SetLessonVideoInput,
+  ): Promise<Lesson> {
+    const lesson = await this.findLesson(input.lessonId);
+    const { courseId } = lesson.module;
+    await this.assertCanEdit(user, courseId);
+    if (lesson.type !== LessonType.VIDEO) {
+      throw badRequest('Only a video lesson can have a video');
+    }
+
+    if (input.assetId) {
+      const asset = await this.prismaService.mediaAsset.findUnique({
+        where: { id: input.assetId },
+      });
+      const ofThisCourse = !!asset?.s3Key?.startsWith(`raw/${courseId}/`);
+      if (!asset || !ofThisCourse) throw notFound('Video not found');
+      if (asset.kind !== 'VIDEO' || asset.status !== 'READY') {
+        throw badRequest('The video is not ready (finish the upload first)');
+      }
+    }
+
+    const updated = await this.prismaService.lesson.update({
+      where: { id: lesson.id },
+      data: { videoAssetId: input.assetId ?? null },
+    });
+    return toLesson(updated);
+  }
+
   /** `ids` = every lesson of the module, in the new order */
   public async reorderLessons(
     user: AuthUser,
@@ -308,6 +342,7 @@ export function toLesson(lesson: LessonRow): Lesson {
     title: lesson.title,
     type: lesson.type,
     body: lesson.body,
+    videoAssetId: lesson.videoAssetId,
     dueAt: lesson.dueAt,
     completionType: lesson.completionType,
     tutorNotes: lesson.tutorNotes,

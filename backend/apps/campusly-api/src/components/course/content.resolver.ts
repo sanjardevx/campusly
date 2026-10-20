@@ -5,6 +5,7 @@ import {
   CreateModuleInput,
   PublishInput,
   ReorderInput,
+  SetLessonVideoInput,
   UpdateLessonInput,
   UpdateModuleInput,
 } from '../../libs/dto/course/content.input';
@@ -78,6 +79,14 @@ export class ContentResolver {
     @Args('input') input: PublishInput,
   ): Promise<Lesson> {
     return this.contentService.publishLesson(user, input);
+  }
+
+  @Mutation(() => Lesson)
+  public setLessonVideo(
+    @CurrentUser() user: AuthUser,
+    @Args('input') input: SetLessonVideoInput,
+  ): Promise<Lesson> {
+    return this.contentService.setLessonVideo(user, input);
   }
 
   /** parentId = moduleId */
