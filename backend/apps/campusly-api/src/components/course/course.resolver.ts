@@ -1,0 +1,56 @@
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Course } from '../../libs/dto/course/course';
+import {
+  CreateCourseInput,
+  SetCourseStudentsInput,
+  SetCourseTeachersInput,
+  UpdateCourseInput,
+} from '../../libs/dto/course/course.input';
+import { Role } from '../../libs/enums/user.enum';
+import type { AuthUser } from '../../libs/types/auth';
+import { CurrentUser, Roles } from '../auth/decorators/auth.decorators';
+import { CourseService } from './course.service';
+
+@Resolver()
+export class CourseResolver {
+  constructor(private readonly courseService: CourseService) {}
+
+  // ───────────────────── setup (admin) ─────────────────────
+
+  @Roles(Role.ADMIN)
+  @Mutation(() => Course)
+  public createCourse(
+    @CurrentUser() admin: AuthUser,
+    @Args('input') input: CreateCourseInput,
+  ): Promise<Course> {
+    return this.courseService.createCourse(admin, input);
+  }
+
+  @Roles(Role.ADMIN)
+  @Mutation(() => Course)
+  public updateCourse(
+    @CurrentUser() admin: AuthUser,
+    @Args('input') input: UpdateCourseInput,
+  ): Promise<Course> {
+    return this.courseService.updateCourse(admin, input);
+  }
+
+  @Roles(Role.ADMIN)
+  @Mutation(() => Course)
+  public setCourseTeachers(
+    @CurrentUser() admin: AuthUser,
+    @Args('input') input: SetCourseTeachersInput,
+  ): Promise<Course> {
+    return this.courseService.setCourseTeachers(admin, input);
+  }
+
+  /** The course's own teachers may pick their split group too (AccessPolicy checks) */
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @Mutation(() => Course)
+  public setCourseStudents(
+    @CurrentUser() user: AuthUser,
+    @Args('input') input: SetCourseStudentsInput,
+  ): Promise<Course> {
+    return this.courseService.setCourseStudents(user, input);
+  }
+}

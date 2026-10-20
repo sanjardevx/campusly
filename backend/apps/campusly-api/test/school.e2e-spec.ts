@@ -319,7 +319,8 @@ describe('School settings, years, periods (e2e)', () => {
       const current = await gql<{ currentAcademicYear: { name: string } }>(
         '{ currentAcademicYear { name } }',
       );
-      expect(current.data!.currentAcademicYear.name).toMatch(/^E2E 2099/);
+      // Which request runs last is not fixed, so either year may win — but only one
+      expect(current.data!.currentAcademicYear.name).toMatch(/^E2E 209[89]/);
     });
   });
 });

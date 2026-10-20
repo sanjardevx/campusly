@@ -66,7 +66,7 @@ export class EnrollmentService {
   }
 
   /** New rows are created, DROPPED rows come back to ACTIVE (same row, same history) */
-  private async enroll(
+  public async enroll(
     tx: Prisma.TransactionClient,
     pairs: { courseId: string; studentId: string }[],
   ): Promise<void> {

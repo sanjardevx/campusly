@@ -18,4 +18,8 @@ export enum AuditAction {
   GROUP_CREATE = 'group.create',
   GROUP_UPDATE = 'group.update',
   STUDENT_MOVE = 'student.moveClass',
+  COURSE_CREATE = 'course.create',
+  COURSE_UPDATE = 'course.update',
+  COURSE_TEACHERS = 'course.setTeachers',
+  COURSE_STUDENTS = 'course.setStudents',
 }
