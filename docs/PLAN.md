@@ -124,11 +124,11 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 6 (S) — Media
 
-- [ ] S3 bucket (private) + CloudFront with OAC + key group.
-- [ ] `createUpload` (policy check, file type/size check, server-generated key, `MediaAsset UPLOADING`, presigned PUT) → `confirmUpload` (`HeadObject`, `READY`).
-- [ ] `lessonVideo(lessonId)`: `assertCanViewCourse`, CloudFront signed URL (~3 h), `resumeAt`.
-- [ ] `updateLessonProgress` (heartbeat), complete at 90%.
-- [ ] Batch cron: mark `UPLOADING` assets older than 24 h as `FAILED`.
+- [x] S3 bucket (private) + CloudFront with OAC + key group.
+- [x] `createUpload` (policy check, file type/size check, server-generated key, `MediaAsset UPLOADING`, presigned PUT) → `confirmUpload` (`HeadObject`, `READY`).
+- [x] `lessonVideo(lessonId)`: `assertCanViewCourse`, CloudFront signed URL (~3 h), `resumeAt`.
+- [x] `updateLessonProgress` (heartbeat), complete at 90%.
+- [x] Batch cron: mark `UPLOADING` assets older than 24 h as `FAILED`.
 
 **Interview:** Why doesn't the file go through our server? What is a signed URL and why does it expire?
 

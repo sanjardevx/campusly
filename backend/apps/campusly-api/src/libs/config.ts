@@ -158,6 +158,8 @@ export const MIME_EXTENSIONS: Record<string, string> = {
 export const MAX_PENDING_UPLOADS = 20;
 /** A presigned upload URL works this long */
 export const UPLOAD_URL_TTL_SEC = 15 * 60;
+/** The batch app marks uploads still UPLOADING after this long as FAILED (and deletes the file) */
+export const STALE_UPLOAD_HOURS = 24;
 /** A CloudFront video link works this long (DECISIONS §11: ~3 h) */
 export const VIDEO_URL_TTL_SEC = 3 * 60 * 60;
 
