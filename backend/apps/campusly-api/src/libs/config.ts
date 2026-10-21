@@ -180,3 +180,21 @@ export const PROGRESS = {
   /** Network delays between two heartbeats */
   toleranceSec: 3,
 };
+
+// ───────────────────────────── assignments ─────────────────────────────
+
+/** File types a teacher may accept in a submission (the upload rules allow exactly these) */
+export const SUBMISSION_FILE_TYPES = [
+  'pdf',
+  'docx',
+  'pptx',
+  'jpg',
+  'png',
+  'webp',
+] as const;
+/** Default grade category for a new assignment, by type (the school default categories) */
+export const DEFAULT_CATEGORY_BY_TYPE = {
+  HOMEWORK: 'Homework',
+  QUIZ: 'Quizzes',
+  EXAM: 'Exams',
+} as const;

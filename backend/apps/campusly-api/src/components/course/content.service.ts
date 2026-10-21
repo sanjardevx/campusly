@@ -265,15 +265,8 @@ export class ContentService {
   // ───────────────────────── helpers ─────────────────────────
 
   /** Teachers of the course (or the admin); an archived course is read-only */
-  private async assertCanEdit(user: AuthUser, courseId: string) {
-    await this.accessPolicy.assertTeacherOf(user, courseId);
-    const course = await this.prismaService.course.findUniqueOrThrow({
-      where: { id: courseId },
-      select: { status: true },
-    });
-    if (course.status === 'ARCHIVED') {
-      throw badRequest('The course is archived');
-    }
+  private assertCanEdit(user: AuthUser, courseId: string) {
+    return this.accessPolicy.assertCanEditCourse(user, courseId);
   }
 
   private async findModule(id: string): Promise<ModuleRow> {

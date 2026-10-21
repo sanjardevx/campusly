@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -113,6 +114,50 @@ export class AccessPolicy {
       throw forbidden('Only the teachers of this course can do this');
     }
     throw notFound('Course not found');
+  }
+
+  /**
+   * One assignment. Teachers and admins see drafts; students and parents only a published one
+   * of a non-draft course. Returns the assignment so the caller does not load it again.
+   */
+  public async assertCanViewAssignment(user: AuthUser, assignmentId: string) {
+    const assignment = await this.prismaService.assignment.findUnique({
+      where: { id: assignmentId },
+      include: {
+        category: { select: { name: true } },
+        course: { select: { status: true } },
+      },
+    });
+    if (!assignment) throw notFound('Assignment not found');
+    await this.assertCanViewCourse(user, assignment.courseId);
+
+    if (user.role === 'STUDENT' || user.role === 'PARENT') {
+      const visible =
+        assignment.course.status !== 'DRAFT' &&
+        !!assignment.publishedAt &&
+        assignment.publishedAt <= new Date();
+      if (!visible) throw notFound('Assignment not found');
+    }
+    return assignment;
+  }
+
+  /** Change course content (lessons, assignments): its teachers or admins, and not archived */
+  public async assertCanEditCourse(
+    user: AuthUser,
+    courseId: string,
+  ): Promise<void> {
+    await this.assertTeacherOf(user, courseId);
+    const course = await this.prismaService.course.findUniqueOrThrow({
+      where: { id: courseId },
+      select: { status: true },
+    });
+    // An archived course (past year) is read-only, also for its teachers
+    if (course.status === 'ARCHIVED') {
+      throw new BadRequestException({
+        code: ErrorCode.BAD_REQUEST,
+        message: 'The course is archived',
+      });
+    }
   }
 
   /** A teacher (or admin) looks at one student of the course: the student must be enrolled */
