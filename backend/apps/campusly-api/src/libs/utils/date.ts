@@ -33,3 +33,50 @@ export function isValidTimeZone(timeZone: string): boolean {
     return false;
   }
 }
+
+/**
+ * The UTC moment a calendar day starts in a timezone.
+ * "2026-09-02" in Asia/Tashkent (UTC+5) → 2026-09-01T19:00:00Z.
+ * Used for period boundaries: an assignment due at 03:00 on 1 November in Tashkent
+ * (22:00 UTC on 31 October) belongs to November, not to the quarter that ends on 31 October.
+ */
+export function startOfDayInZone(day: string, timeZone: string): Date {
+  const utcMidnight = toDbDate(day);
+  const offset = zoneOffsetMinutes(utcMidnight, timeZone);
+  const guess = new Date(utcMidnight.getTime() - offset * 60_000);
+  // A daylight-saving change on that night: use the offset of the result itself
+  const exact = zoneOffsetMinutes(guess, timeZone);
+  return exact === offset
+    ? guess
+    : new Date(utcMidnight.getTime() - exact * 60_000);
+}
+
+/** "2026-10-31" → "2026-11-01" */
+export function nextDay(day: string): string {
+  return fromDbDate(new Date(toDbDate(day).getTime() + 86_400_000));
+}
+
+/** How many minutes the timezone is ahead of UTC at that moment (Tashkent: +300) */
+function zoneOffsetMinutes(at: Date, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(at);
+  const get = (type: string) =>
+    Number(parts.find((p) => p.type === type)?.value);
+  const asUtc = Date.UTC(
+    get('year'),
+    get('month') - 1,
+    get('day'),
+    get('hour'),
+    get('minute'),
+    get('second'),
+  );
+  return Math.round((asUtc - at.getTime()) / 60_000);
+}

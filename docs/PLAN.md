@@ -136,11 +136,11 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 7 (S) — Assignments and grading
 
-- [ ] `Assignment` CRUD (category, `maxScore`, `dueAt`, `allowLate`, `maxAttempts`, accepted file types, `tutorMode`, optional `finalAnswer`); item type `EXAM` (offline, grade only).
-- [ ] `submitAssignment` with attempts and files (validate every `assetId` belongs to the student), statuses `DRAFT / SUBMITTED / LATE`, submission comments.
-- [ ] `gradeSubmission` (teacher of the course only), `giveZeroToMissing`, `publishGrades`.
-- [ ] One mapper hides score/feedback until `gradesPublishedAt`.
-- [ ] Quarter % from weighted categories (published grades only).
+- [x] `Assignment` CRUD (category, `maxScore`, `dueAt`, `allowLate`, `maxAttempts`, accepted file types, `tutorMode`, optional `finalAnswer`); item type `EXAM` (offline, grade only).
+- [x] `submitAssignment` with attempts and files (validate every `assetId` belongs to the student), statuses `DRAFT / SUBMITTED / LATE`, submission comments.
+- [x] `gradeSubmission` (teacher of the course only), `giveZeroToMissing`, `publishGrades`.
+- [x] One mapper hides score/feedback until `gradesPublishedAt`.
+- [x] Quarter % from weighted categories (published grades only).
 
 **Interview:** How does a student not see an unpublished grade? How is the quarter percentage calculated?
 

@@ -1,4 +1,10 @@
-import { fromDbDate, isValidTimeZone, toDbDate } from './date';
+import {
+  fromDbDate,
+  isValidTimeZone,
+  nextDay,
+  startOfDayInZone,
+  toDbDate,
+} from './date';
 
 describe('calendar dates', () => {
   it('round-trips "YYYY-MM-DD" through a UTC-midnight Date', () => {
@@ -17,5 +23,36 @@ describe('calendar dates', () => {
   it('accepts real IANA timezones only', () => {
     expect(isValidTimeZone('Asia/Tashkent')).toBe(true);
     expect(isValidTimeZone('Mars/Olympus')).toBe(false);
+  });
+});
+
+describe('days in the school timezone', () => {
+  it('a Tashkent day starts at 19:00 UTC the day before (UTC+5)', () => {
+    expect(startOfDayInZone('2026-09-02', 'Asia/Tashkent').toISOString()).toBe(
+      '2026-09-01T19:00:00.000Z',
+    );
+  });
+
+  it('a quarter ending on 31 October ends at 1 November 00:00 Tashkent', () => {
+    const end = startOfDayInZone(nextDay('2026-10-31'), 'Asia/Tashkent');
+    expect(end.toISOString()).toBe('2026-10-31T19:00:00.000Z');
+    // Due 31 Oct 23:59 in Tashkent → inside; due 1 Nov 03:00 in Tashkent → outside
+    expect(new Date('2026-10-31T18:59:00Z') < end).toBe(true);
+    expect(new Date('2026-10-31T22:00:00Z') < end).toBe(false);
+  });
+
+  it('handles a timezone with daylight saving time', () => {
+    // Berlin: summer UTC+2, winter UTC+1
+    expect(startOfDayInZone('2026-07-01', 'Europe/Berlin').toISOString()).toBe(
+      '2026-06-30T22:00:00.000Z',
+    );
+    expect(startOfDayInZone('2026-12-01', 'Europe/Berlin').toISOString()).toBe(
+      '2026-11-30T23:00:00.000Z',
+    );
+  });
+
+  it('nextDay crosses months and years', () => {
+    expect(nextDay('2026-10-31')).toBe('2026-11-01');
+    expect(nextDay('2026-12-31')).toBe('2027-01-01');
   });
 });

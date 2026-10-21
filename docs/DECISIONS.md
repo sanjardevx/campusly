@@ -143,7 +143,9 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - Course = subject × class (e.g. `Algebra · 9A`). Class students are enrolled automatically; split groups (e.g. Korean group 1/2) pick students manually.
 - `GradeCategory` weights per course (school default Homework 30 / Quizzes 30 / Exams 40). Quarter % = weighted average of **published** grades; empty categories are skipped and the other weights rebalanced.
 - 5-point mark thresholds come from school settings (default 5 ≥ 86%, 4 ≥ 71%, 3 ≥ 56%, else 2). The mark is shown next to the %.
-- An assignment belongs to a period by its `dueAt`.
+- An assignment belongs to a period by its `dueAt`, with the period's days taken in the school timezone (a period ending on 31 Oct ends at 1 Nov 00:00 Tashkent). An assignment without `dueAt` is in no period.
+- Inside a category, points are summed (`earned / possible`), not percents averaged: a 100-point exam weighs more than a 10-point quiz. A `MISSING` zero counts like any grade.
+- Everyone (teachers too) sees the period % from **published** grades only, so all roles see the same number.
 - `PeriodGrade`: computed live until the teacher publishes; publishing stores a snapshot (`computedScore`, optional manual `finalScore`). The annual grade is derived from period snapshots.
 - Late submissions are allowed until grades are published (if `allowLate`). "Give 0 to not submitted" sets `MISSING`.
 - Attendance is per **course session** (`ClassSession` by date), not per school day. Default status is `PRESENT`; teachers mark exceptions.
@@ -195,3 +197,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-19 | Access token carries `sid` (session = refresh-token family); `changePassword` stays GraphQL and revokes all other sessions |
 | 2026-10-20 | AWS region `eu-central-1` (Frankfurt) for all resources; IAM admin user with MFA, root only for billing/account tasks |
 | 2026-10-21 | Sequential video watch rule: 1× and no forward seeking until 90% (`COMPLETED`), then free; progress = furthest point reached, enforced by the server |
+| 2026-10-21 | Period %: points summed per category, published grades only for every role, period days in the school timezone, no `dueAt` = no period |
