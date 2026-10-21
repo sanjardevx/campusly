@@ -86,3 +86,70 @@ export class StudentGrade {
   @Field(() => [GradeItem])
   items: GradeItem[];
 }
+
+/**
+ * A period (quarter) or annual grade of one student. Published = a snapshot that does not
+ * change by itself; not published = the live % from published assignment grades.
+ */
+@ObjectType()
+export class PeriodGradeRow {
+  /** null = annual grade */
+  @Field(() => String, { nullable: true })
+  periodId: string | null;
+
+  /** e.g. "Quarter 1" or "Annual" */
+  @Field(() => String)
+  periodName: string;
+
+  @Field(() => String)
+  studentId: string;
+
+  @Field(() => String)
+  loginId: string;
+
+  @Field(() => String)
+  firstName: string;
+
+  @Field(() => String)
+  lastName: string;
+
+  /** The grade to show: final ?? snapshot when published, else the live % */
+  @Field(() => Float, { nullable: true })
+  score: number | null;
+
+  @Field(() => Int, { nullable: true })
+  mark: number | null;
+
+  @Field(() => Boolean)
+  isPublished: boolean;
+
+  @Field(() => Date, { nullable: true })
+  publishedAt: Date | null;
+
+  /** Teachers only (null for students and parents): the % right now */
+  @Field(() => Float, { nullable: true })
+  livePercent: number | null;
+
+  /** Teachers only: the snapshot taken when publishing */
+  @Field(() => Float, { nullable: true })
+  computedScore: number | null;
+
+  /** Teachers only: the manual override */
+  @Field(() => Float, { nullable: true })
+  finalScore: number | null;
+
+  /** Teachers only: grades changed after publishing; publish again to update */
+  @Field(() => Boolean)
+  isOutdated: boolean;
+}
+
+@ObjectType()
+export class MyPeriodGrades {
+  /** Every period of the course's year, in order */
+  @Field(() => [PeriodGradeRow])
+  periods: PeriodGradeRow[];
+
+  /** Override, or the average of the published periods */
+  @Field(() => PeriodGradeRow)
+  annual: PeriodGradeRow;
+}

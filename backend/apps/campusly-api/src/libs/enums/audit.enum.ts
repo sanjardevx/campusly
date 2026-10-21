@@ -26,4 +26,6 @@ export enum AuditAction {
   SUBMISSION_RETURN = 'submission.return',
   ASSIGNMENT_ZERO_MISSING = 'assignment.zeroMissing',
   ASSIGNMENT_PUBLISH_GRADES = 'assignment.publishGrades',
+  PERIOD_GRADES_PUBLISH = 'periodGrades.publish',
+  PERIOD_GRADE_OVERRIDE = 'periodGrade.override',
 }

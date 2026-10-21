@@ -8,14 +8,14 @@ import { calculateGrade } from '../../libs/utils/grade';
 import { AccessPolicy } from '../auth/policies/access.policy';
 import { SchoolService } from '../school/school.service';
 
-interface StudentRef {
+export interface StudentRef {
   id: string;
   loginId: string;
   firstName: string;
   lastName: string;
 }
 
-const STUDENT_SELECT = {
+export const STUDENT_SELECT = {
   id: true,
   loginId: true,
   firstName: true,
@@ -82,7 +82,8 @@ export class GradeService {
     return grade;
   }
 
-  private async compute(
+  /** Live grades of the given students (also used by period-grade snapshots) */
+  public async compute(
     courseId: string,
     periodId: string,
     students: StudentRef[],
