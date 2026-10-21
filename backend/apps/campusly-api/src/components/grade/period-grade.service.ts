@@ -185,6 +185,22 @@ export class PeriodGradeService {
     return this.build(user, courseId, enrollment.student);
   }
 
+  /** One student's grade in one period, for learner views (overview): snapshot or live */
+  public async getStudentPeriodGrade(
+    courseId: string,
+    period: { id: string; name: string },
+    student: StudentRef,
+  ): Promise<PeriodGradeRow> {
+    const [[live], snap, settings] = await Promise.all([
+      this.gradeService.compute(courseId, period.id, [student]),
+      this.prismaService.periodGrade.findFirst({
+        where: { courseId, periodId: period.id, studentId: student.id },
+      }),
+      this.schoolService.getSettings(),
+    ]);
+    return toRow(student, period, snap, live.percent, false, settings);
+  }
+
   // ───────────────────────── helpers ─────────────────────────
 
   /** Every leaf period of the year (quarters, not the semesters above them) + the annual grade */
