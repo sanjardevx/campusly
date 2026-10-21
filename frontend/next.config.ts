@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
+import i18nConfig from "./next-i18next.config.js";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Locale routing (/uz/..., /ru/..., /ko/...); the list lives in next-i18next.config.js
+  i18n: i18nConfig.i18n,
   // The repo already has CLAUDE.md; do not generate AGENTS.md on `next dev`
   agentRules: false,
   // Bundle MUI's Next.js integration together with MUI on the server. Otherwise Turbopack loads it

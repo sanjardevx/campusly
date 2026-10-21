@@ -171,9 +171,12 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 
 ## 13. Design
 
-- Google Stitch projects: "Campusly K-12 LMS Dashboard" (student / teacher / parent), "Campusly Admin" (admin + website CMS), "Campusly Public" (public site, desktop + mobile).
-- Tokens: primary spruce `#1F4E43` (hover `#163931`, tint `#E8EFEA`), accent ochre `#B45309` (tint `#FEF3C7`), background `#F7F8F6`, surface `#FFFFFF`, border `#E5E7E3`, text `#1F2328`, secondary text `#5B6370`, success `#2E7D4F`, error `#C0392B`.
-- Font: Plus Jakarta Sans. Icons: Material Symbols Outlined. Cards: radius 10, 1px border, no shadows, no gradients. Compact (Moodle / eCampus) density.
+- Google Stitch projects: "Campusly K-12 LMS Dashboard" (student / teacher / parent), "Campusly Admin" (admin + website CMS), "Campusly Public" (public site, desktop + mobile). **Stitch is the source of truth** for the UI: every screen is built from its Stitch screen; tokens below are copied from the dashboard's design system "Academic Editorial Calm" and live in `frontend/libs/theme.ts`.
+- Colours: primary spruce `#1F4E43` (hover `#163830`, wash `#E8EFEA`); secondary sage `#3E6B5C` (progress, category pills, focus ring, hover borders); ochre `#B45309` **only for time-sensitive notices** (text `#9A3412` on `#FEF7EE`; MUI `warning`); success `#1B633E` on `#F0F6F2`; info `#5C625E` on `#F1F2F0`; error `#BA1A1A`.
+- Neutrals: canvas `#F8F8F6`, cards `#FFFFFF`, recessed panels `#F1F2EE`, card border `#E3E5DF`, rules inside cards `#ECEEE8`, input border `#D1D5CB`, text `#242A27` (never pure black), secondary text `#5C625E`.
+- Font: Plus Jakarta Sans for every role (headings 600 with slight negative tracking); `tabular-nums` for all numbers (grades, scores, dates). Icons: Material Symbols Outlined style (MUI Outlined icons).
+- Shapes: 8px for inputs, buttons, chips with corners; **16px cards** (24px for hero banners); pills only for status chips. Elevation by borders, with a faint shadow trace (cards `0 1px 3px` at 4 %); no gradients.
+- Card padding 1.5rem on desktop, 1rem on phones; compact (Moodle / eCampus) density.
 - Student and parent screens must work on mobile.
 
 ## 14. Later phases (approved, not in the 2-week MVP)
@@ -198,3 +201,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-20 | AWS region `eu-central-1` (Frankfurt) for all resources; IAM admin user with MFA, root only for billing/account tasks |
 | 2026-10-21 | Sequential video watch rule: 1× and no forward seeking until 90% (`COMPLETED`), then free; progress = furthest point reached, enforced by the server |
 | 2026-10-21 | Period %: points summed per category, published grades only for every role, period days in the school timezone, no `dueAt` = no period |
+| 2026-10-22 | Stitch is the UI source of truth; §13 tokens re-copied from its design system (sage secondary, ochre only for deadlines, 16px cards, tabular numbers, faint card shadow) |

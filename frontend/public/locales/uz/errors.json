@@ -1,0 +1,15 @@
+{
+  "BAD_REQUEST": "Kiritilgan ma’lumotlarni tekshiring.",
+  "UNAUTHENTICATED": "Iltimos, qaytadan kiring.",
+  "INVALID_CREDENTIALS": "Login ID yoki parol noto‘g‘ri.",
+  "ACCOUNT_BLOCKED": "Hisobingiz bloklangan. Maktab ma’muriyatiga murojaat qiling.",
+  "PASSWORD_CHANGE_REQUIRED": "Davom etish uchun yangi parol o‘rnating.",
+  "FORBIDDEN": "Bunga ruxsatingiz yo‘q.",
+  "NOT_FOUND": "Topilmadi.",
+  "CONFLICT": "Bu qiymat allaqachon ishlatilgan.",
+  "RATE_LIMITED": "Urinishlar juda ko‘p. Bir necha daqiqadan keyin qayta urinib ko‘ring.",
+  "MEDIA_DISABLED": "Fayl saqlash hozircha ishlamayapti.",
+  "INTERNAL_SERVER_ERROR": "Bizda xatolik yuz berdi. Qayta urinib ko‘ring.",
+  "NETWORK_ERROR": "Serverga ulanib bo‘lmadi. Internetni tekshiring.",
+  "UNKNOWN": "Xatolik yuz berdi. Qayta urinib ko‘ring."
+}

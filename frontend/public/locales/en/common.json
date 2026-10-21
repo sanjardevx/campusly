@@ -1,0 +1,24 @@
+{
+  "app": {
+    "name": "Campusly",
+    "tagline": "Learning platform of your school"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "auth": {
+    "title": "Sign in",
+    "loginId": "Login ID",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "restoring": "Checking your session…",
+    "signedInAs": "Signed in as {{name}}"
+  },
+  "roles": {
+    "ADMIN": "Admin",
+    "TEACHER": "Teacher",
+    "STUDENT": "Student",
+    "PARENT": "Parent"
+  }
+}

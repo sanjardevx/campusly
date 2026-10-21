@@ -1,0 +1,24 @@
+{
+  "app": {
+    "name": "Campusly",
+    "tagline": "Учебная платформа вашей школы"
+  },
+  "language": {
+    "label": "Язык"
+  },
+  "auth": {
+    "title": "Вход",
+    "loginId": "Логин (ID)",
+    "password": "Пароль",
+    "signIn": "Войти",
+    "signOut": "Выйти",
+    "restoring": "Проверяем сессию…",
+    "signedInAs": "Вы вошли как {{name}}"
+  },
+  "roles": {
+    "ADMIN": "Администратор",
+    "TEACHER": "Учитель",
+    "STUDENT": "Ученик",
+    "PARENT": "Родитель"
+  }
+}

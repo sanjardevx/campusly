@@ -5,11 +5,14 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { HEALTH } from "@/apollo/app/query";
 import { API_GRAPHQL_URL } from "@/libs/config";
+import { withTranslations } from "@/libs/i18n/server";
+
+export const getStaticProps = withTranslations();
 
 function ServiceRow({ name, up }: { name: string; up: boolean }) {
   return (
     <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-      {up ? <CheckCircleIcon sx={{ color: "#2E7D4F" }} /> : <CancelIcon sx={{ color: "#C0392B" }} />}
+      {up ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />}
       <Typography>{name}</Typography>
     </Stack>
   );
@@ -29,11 +32,11 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <Box component="main" sx={{ maxWidth: 480, mx: "auto", px: 2, py: 6 }}>
-        <Typography variant="h4" sx={{ color: "#1F4E43", fontWeight: 700, mb: 3 }}>
+        <Typography variant="h4" color="primary" sx={{ mb: 3 }}>
           Campusly
         </Typography>
 
-        <Card variant="outlined" sx={{ borderRadius: "10px" }}>
+        <Card>
           <CardContent>
             <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 2 }}>
               <Typography variant="h6">API health</Typography>

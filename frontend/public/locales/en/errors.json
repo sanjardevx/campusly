@@ -1,0 +1,15 @@
+{
+  "BAD_REQUEST": "Please check the entered data.",
+  "UNAUTHENTICATED": "Please sign in again.",
+  "INVALID_CREDENTIALS": "Wrong login ID or password.",
+  "ACCOUNT_BLOCKED": "Your account is blocked. Please contact the school administration.",
+  "PASSWORD_CHANGE_REQUIRED": "Please set a new password to continue.",
+  "FORBIDDEN": "You do not have access to this.",
+  "NOT_FOUND": "Not found.",
+  "CONFLICT": "This value is already in use.",
+  "RATE_LIMITED": "Too many attempts. Please try again in a few minutes.",
+  "MEDIA_DISABLED": "File storage is not available right now.",
+  "INTERNAL_SERVER_ERROR": "Something went wrong on our side. Please try again.",
+  "NETWORK_ERROR": "Cannot reach the server. Check your internet connection.",
+  "UNKNOWN": "Something went wrong. Please try again."
+}

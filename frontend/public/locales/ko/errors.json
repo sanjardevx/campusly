@@ -1,0 +1,15 @@
+{
+  "BAD_REQUEST": "입력한 내용을 확인해 주세요.",
+  "UNAUTHENTICATED": "다시 로그인해 주세요.",
+  "INVALID_CREDENTIALS": "로그인 ID 또는 비밀번호가 올바르지 않습니다.",
+  "ACCOUNT_BLOCKED": "계정이 차단되었습니다. 학교 행정실에 문의해 주세요.",
+  "PASSWORD_CHANGE_REQUIRED": "계속하려면 새 비밀번호를 설정해 주세요.",
+  "FORBIDDEN": "접근 권한이 없습니다.",
+  "NOT_FOUND": "찾을 수 없습니다.",
+  "CONFLICT": "이미 사용 중인 값입니다.",
+  "RATE_LIMITED": "시도 횟수가 너무 많습니다. 몇 분 후에 다시 시도해 주세요.",
+  "MEDIA_DISABLED": "지금은 파일 저장소를 사용할 수 없습니다.",
+  "INTERNAL_SERVER_ERROR": "서버에 문제가 발생했습니다. 다시 시도해 주세요.",
+  "NETWORK_ERROR": "서버에 연결할 수 없습니다. 인터넷 연결을 확인해 주세요.",
+  "UNKNOWN": "문제가 발생했습니다. 다시 시도해 주세요."
+}

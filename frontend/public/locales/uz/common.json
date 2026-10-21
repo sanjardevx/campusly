@@ -1,0 +1,24 @@
+{
+  "app": {
+    "name": "Campusly",
+    "tagline": "Maktabingizning ta’lim platformasi"
+  },
+  "language": {
+    "label": "Til"
+  },
+  "auth": {
+    "title": "Kirish",
+    "loginId": "Login ID",
+    "password": "Parol",
+    "signIn": "Kirish",
+    "signOut": "Chiqish",
+    "restoring": "Sessiya tekshirilmoqda…",
+    "signedInAs": "{{name}} sifatida kirgansiz"
+  },
+  "roles": {
+    "ADMIN": "Administrator",
+    "TEACHER": "O‘qituvchi",
+    "STUDENT": "O‘quvchi",
+    "PARENT": "Ota-ona"
+  }
+}

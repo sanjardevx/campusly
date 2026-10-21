@@ -75,5 +75,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # Types come from backend/schema.gql: regenerated types must equal the committed ones
       - run: pnpm codegen && git diff --exit-code -- libs/gql
+      - run: pnpm check:locales
       - run: pnpm lint
       - run: pnpm typecheck
