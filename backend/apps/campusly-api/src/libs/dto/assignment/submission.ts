@@ -100,3 +100,23 @@ export class Submission {
   @Field(() => [SubmissionComment])
   comments: SubmissionComment[];
 }
+
+/** One line of the teacher's grading page: every active student, with or without work */
+@ObjectType()
+export class GradebookRow {
+  @Field(() => String)
+  studentId: string;
+
+  @Field(() => String)
+  loginId: string;
+
+  @Field(() => String)
+  firstName: string;
+
+  @Field(() => String)
+  lastName: string;
+
+  /** null = nothing submitted and not graded yet */
+  @Field(() => Submission, { nullable: true })
+  submission: Submission | null;
+}

@@ -126,7 +126,8 @@ export class SubmissionService {
       throw badRequest('Already graded: ask the teacher to return it');
     }
     const used = existing?._count.attempts ?? 0;
-    if (used >= assignment.maxAttempts) {
+    // RETURNED ("please redo") gives one more attempt even when all were used
+    if (used >= assignment.maxAttempts && existing?.status !== 'RETURNED') {
       throw badRequest('No attempts left');
     }
 
@@ -278,7 +279,10 @@ export class SubmissionService {
       score: hidden || row.score === null ? null : Number(row.score),
       feedback: hidden ? null : row.feedback,
       gradedAt: hidden ? null : row.gradedAt,
-      attemptsLeft: Math.max(0, rules.maxAttempts - row.attempts.length),
+      attemptsLeft:
+        row.status === 'RETURNED'
+          ? Math.max(1, rules.maxAttempts - row.attempts.length)
+          : Math.max(0, rules.maxAttempts - row.attempts.length),
       attempts: row.attempts.map((a) => ({
         number: a.number,
         text: a.text,

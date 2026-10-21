@@ -3,6 +3,8 @@ import { AuthModule } from '../auth/auth.module';
 import { MediaModule } from '../media/media.module';
 import { AssignmentResolver } from './assignment.resolver';
 import { AssignmentService } from './assignment.service';
+import { GradingResolver } from './grading.resolver';
+import { GradingService } from './grading.service';
 import { SubmissionResolver } from './submission.resolver';
 import { SubmissionService } from './submission.service';
 
@@ -13,6 +15,8 @@ import { SubmissionService } from './submission.service';
     AssignmentService,
     SubmissionResolver,
     SubmissionService,
+    GradingResolver,
+    GradingService,
   ],
   exports: [AssignmentService, SubmissionService],
 })
