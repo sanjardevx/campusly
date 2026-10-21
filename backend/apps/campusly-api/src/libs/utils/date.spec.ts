@@ -4,6 +4,7 @@ import {
   nextDay,
   startOfDayInZone,
   toDbDate,
+  todayInZone,
 } from './date';
 
 describe('calendar dates', () => {
@@ -54,5 +55,13 @@ describe('days in the school timezone', () => {
   it('nextDay crosses months and years', () => {
     expect(nextDay('2026-10-31')).toBe('2026-11-01');
     expect(nextDay('2026-12-31')).toBe('2027-01-01');
+  });
+});
+
+describe('todayInZone', () => {
+  it('is already tomorrow in Tashkent when it is 20:00 UTC', () => {
+    const now = new Date('2026-10-21T20:00:00Z');
+    expect(todayInZone('Asia/Tashkent', now)).toBe('2026-10-22');
+    expect(todayInZone('UTC', now)).toBe('2026-10-21');
   });
 });

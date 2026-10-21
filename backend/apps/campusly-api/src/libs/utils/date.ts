@@ -51,6 +51,17 @@ export function startOfDayInZone(day: string, timeZone: string): Date {
     : new Date(utcMidnight.getTime() - exact * 60_000);
 }
 
+/** Today's calendar date in a timezone: "2026-10-21" (the server itself runs in UTC) */
+export function todayInZone(timeZone: string, now = new Date()): string {
+  // en-CA prints dates as YYYY-MM-DD
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now);
+}
+
 /** "2026-10-31" → "2026-11-01" */
 export function nextDay(day: string): string {
   return fromDbDate(new Date(toDbDate(day).getTime() + 86_400_000));
