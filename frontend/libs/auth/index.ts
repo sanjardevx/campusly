@@ -7,6 +7,7 @@ import {
   refreshRequest,
   type SessionUser,
 } from './api';
+import { CHANGE_PASSWORD } from '@/apollo/user/mutation';
 import { setAccessToken } from './token';
 
 function applyAuthResult(result: AuthResult): string {
@@ -20,7 +21,16 @@ function endSession() {
   setAccessToken(null);
   userVar(null);
   tempPasswordWarningVar(null);
+  pendingPassword = null;
 }
+
+/**
+ * The temporary password just typed, kept ONLY in memory and only while a new password is
+ * required: the backend asks for the current password, and the user has just entered it.
+ * Gone after a reload (then the page asks for it) and cleared after the change or sign-out.
+ */
+let pendingPassword: string | null = null;
+export const getPendingPassword = () => pendingPassword;
 
 export async function logIn(
   loginId: string,
@@ -28,7 +38,26 @@ export async function logIn(
 ): Promise<SessionUser> {
   const result = await loginRequest(loginId, password);
   applyAuthResult(result);
+  pendingPassword = result.user.mustChangePassword ? password : null;
   return result.user;
+}
+
+/** Sets the user's own password; the server answers with a fresh access token */
+export async function changePassword(
+  client: ApolloClient,
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  const { data } = await client.mutate({
+    mutation: CHANGE_PASSWORD,
+    variables: { input: { currentPassword, newPassword } },
+  });
+  if (!data) return;
+  setAccessToken(data.changePassword.accessToken);
+  const user = userVar();
+  if (user) userVar({ ...user, mustChangePassword: false });
+  tempPasswordWarningVar(null);
+  pendingPassword = null;
 }
 
 /**

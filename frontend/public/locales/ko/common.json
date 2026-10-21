@@ -20,5 +20,9 @@
     "TEACHER": "교사",
     "STUDENT": "학생",
     "PARENT": "학부모"
+  },
+  "home": {
+    "welcome": "{{name}}님, 환영합니다",
+    "soon": "대시보드는 다음 단계에서 준비됩니다."
   }
 }

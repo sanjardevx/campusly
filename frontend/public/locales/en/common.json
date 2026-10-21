@@ -20,5 +20,9 @@
     "TEACHER": "Teacher",
     "STUDENT": "Student",
     "PARENT": "Parent"
+  },
+  "home": {
+    "welcome": "Welcome, {{name}}",
+    "soon": "Your dashboard is coming in the next step."
   }
 }

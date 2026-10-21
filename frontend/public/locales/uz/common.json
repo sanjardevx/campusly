@@ -20,5 +20,9 @@
     "TEACHER": "O‘qituvchi",
     "STUDENT": "O‘quvchi",
     "PARENT": "Ota-ona"
+  },
+  "home": {
+    "welcome": "Xush kelibsiz, {{name}}",
+    "soon": "Bosh sahifangiz keyingi qadamda tayyor bo‘ladi."
   }
 }
