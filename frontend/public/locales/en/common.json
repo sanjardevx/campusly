@@ -21,8 +21,54 @@
     "STUDENT": "Student",
     "PARENT": "Parent"
   },
-  "home": {
-    "welcome": "Welcome, {{name}}",
-    "soon": "Your dashboard is coming in the next step."
+  "nav": {
+    "home": "Home",
+    "courses": "My Courses",
+    "grades": "Grades",
+    "announcements": "Announcements",
+    "dashboard": "Dashboard",
+    "gradebook": "Gradebook",
+    "attendance": "Attendance",
+    "overview": "Overview",
+    "users": "Users",
+    "classes": "Classes & Courses",
+    "settings": "Settings",
+    "more": "More",
+    "tab": {
+      "home": "Home",
+      "courses": "Courses",
+      "grades": "Grades",
+      "announcements": "News",
+      "overview": "Home",
+      "attendance": "Attendance"
+    },
+    "sections": {
+      "school": "School",
+      "system": "System"
+    }
+  },
+  "shell": {
+    "portal": {
+      "STUDENT": "Student Portal",
+      "TEACHER": "Teacher Portal",
+      "PARENT": "Parent Portal",
+      "ADMIN": "Admin Console"
+    },
+    "subtitle": {
+      "STUDENT": "Student · ID {{id}}",
+      "TEACHER": "Teacher",
+      "PARENT": "Parent / Guardian",
+      "ADMIN": "School administrator"
+    },
+    "footer": "Campusly · {{portal}} · {{year}}",
+    "notifications": "Notifications",
+    "openMenu": "Open menu",
+    "account": "Account",
+    "changePassword": "Change password",
+    "signOut": "Sign out",
+    "children": "Children",
+    "comingSoon": "This page is coming soon",
+    "comingSoonBody": "It is built on day {{day}} of the plan.",
+    "loading": "Loading…"
   }
 }

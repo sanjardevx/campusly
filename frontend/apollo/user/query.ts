@@ -13,3 +13,16 @@ export const ME = graphql(`
     }
   }
 `);
+
+/** A parent's children, for the child switcher in the top bar */
+export const MY_CHILDREN = graphql(`
+  query MyChildren {
+    myChildren {
+      id
+      loginId
+      firstName
+      lastName
+      className
+    }
+  }
+`);

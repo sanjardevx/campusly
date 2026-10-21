@@ -21,8 +21,54 @@
     "STUDENT": "학생",
     "PARENT": "학부모"
   },
-  "home": {
-    "welcome": "{{name}}님, 환영합니다",
-    "soon": "대시보드는 다음 단계에서 준비됩니다."
+  "nav": {
+    "home": "홈",
+    "courses": "내 강좌",
+    "grades": "성적",
+    "announcements": "공지사항",
+    "dashboard": "대시보드",
+    "gradebook": "성적부",
+    "attendance": "출결",
+    "overview": "개요",
+    "users": "사용자",
+    "classes": "학급 및 강좌",
+    "settings": "설정",
+    "more": "더보기",
+    "tab": {
+      "home": "홈",
+      "courses": "강좌",
+      "grades": "성적",
+      "announcements": "공지",
+      "overview": "홈",
+      "attendance": "출결"
+    },
+    "sections": {
+      "school": "학교",
+      "system": "시스템"
+    }
+  },
+  "shell": {
+    "portal": {
+      "STUDENT": "학생 포털",
+      "TEACHER": "교사 포털",
+      "PARENT": "학부모 포털",
+      "ADMIN": "관리자 콘솔"
+    },
+    "subtitle": {
+      "STUDENT": "학생 · ID {{id}}",
+      "TEACHER": "교사",
+      "PARENT": "학부모 / 보호자",
+      "ADMIN": "학교 관리자"
+    },
+    "footer": "Campusly · {{portal}} · {{year}}",
+    "notifications": "알림",
+    "openMenu": "메뉴 열기",
+    "account": "계정",
+    "changePassword": "비밀번호 변경",
+    "signOut": "로그아웃",
+    "children": "자녀",
+    "comingSoon": "이 페이지는 곧 준비됩니다",
+    "comingSoonBody": "계획의 {{day}}일차에 만들어집니다.",
+    "loading": "불러오는 중…"
   }
 }

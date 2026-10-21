@@ -21,8 +21,54 @@
     "STUDENT": "Ученик",
     "PARENT": "Родитель"
   },
-  "home": {
-    "welcome": "Добро пожаловать, {{name}}",
-    "soon": "Ваша главная страница появится на следующем шаге."
+  "nav": {
+    "home": "Главная",
+    "courses": "Мои курсы",
+    "grades": "Оценки",
+    "announcements": "Объявления",
+    "dashboard": "Панель",
+    "gradebook": "Журнал",
+    "attendance": "Посещаемость",
+    "overview": "Обзор",
+    "users": "Пользователи",
+    "classes": "Классы и курсы",
+    "settings": "Настройки",
+    "more": "Ещё",
+    "tab": {
+      "home": "Главная",
+      "courses": "Курсы",
+      "grades": "Оценки",
+      "announcements": "Новости",
+      "overview": "Главная",
+      "attendance": "Явка"
+    },
+    "sections": {
+      "school": "Школа",
+      "system": "Система"
+    }
+  },
+  "shell": {
+    "portal": {
+      "STUDENT": "Портал ученика",
+      "TEACHER": "Портал учителя",
+      "PARENT": "Портал родителя",
+      "ADMIN": "Панель администратора"
+    },
+    "subtitle": {
+      "STUDENT": "Ученик · ID {{id}}",
+      "TEACHER": "Учитель",
+      "PARENT": "Родитель / опекун",
+      "ADMIN": "Администратор школы"
+    },
+    "footer": "Campusly · {{portal}} · {{year}}",
+    "notifications": "Уведомления",
+    "openMenu": "Открыть меню",
+    "account": "Аккаунт",
+    "changePassword": "Сменить пароль",
+    "signOut": "Выйти",
+    "children": "Дети",
+    "comingSoon": "Эта страница скоро появится",
+    "comingSoonBody": "Она будет сделана в {{day}}-й день плана.",
+    "loading": "Загрузка…"
   }
 }

@@ -9,7 +9,7 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { sessionReadyVar, userVar } from '@/apollo/store';
-import { homeFor } from '@/libs/auth/routes';
+import { afterSignIn } from '@/libs/auth/routes';
 import { AuthLayout } from '@/libs/components/auth/AuthLayout';
 import { SignInForm } from '@/libs/components/auth/SignInForm';
 import { withTranslations } from '@/libs/i18n/server';
@@ -26,7 +26,8 @@ export default function TeacherSignIn() {
   const ready = useReactiveVar(sessionReadyVar);
 
   useEffect(() => {
-    if (ready && user) void router.replace(user.mustChangePassword ? '/password' : homeFor(user.role));
+    // Same target as the form: the form and this effect both react to the new user, so they must agree
+    if (ready && user) void router.replace(afterSignIn(user, router.query.next));
   }, [ready, user, router]);
 
   return (

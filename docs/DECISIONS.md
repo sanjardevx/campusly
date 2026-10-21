@@ -178,6 +178,8 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - Shapes: 8px for inputs, buttons, chips with corners; **16px cards** (24px for hero banners); pills only for status chips. Elevation by borders, with a faint shadow trace (cards `0 1px 3px` at 4 %); no gradients.
 - Card padding 1.5rem on desktop, 1rem on phones; compact (Moodle / eCampus) density.
 - Student and parent screens must work on mobile.
+- Phone tab bar (student / parent): iOS 26 "Liquid Glass" style instead of Stitch's white pill — frosted glass capsule (`backdrop-filter: blur + saturate`, light top edge, faint sheen) and one glass lens that slides under the active tab, moved on tap. CSS only (SVG refraction does not work in Safari); solid white when blur is unsupported or `prefers-reduced-transparency`, no animation with `prefers-reduced-motion`. This is the one place the "no gradients" rule is relaxed.
+- Desktop shell follows the same motion: one spruce lens slides to the chosen sidebar link (moved on tap, measured because admin section titles make gaps), and the top bar is translucent glass (`blur + saturate`, solid fallback) so content scrolls under it. The sidebar itself stays solid white.
 
 ## 14. Later phases (approved, not in the 2-week MVP)
 
@@ -202,3 +204,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-21 | Sequential video watch rule: 1× and no forward seeking until 90% (`COMPLETED`), then free; progress = furthest point reached, enforced by the server |
 | 2026-10-21 | Period %: points summed per category, published grades only for every role, period days in the school timezone, no `dueAt` = no period |
 | 2026-10-22 | Stitch is the UI source of truth; §13 tokens re-copied from its design system (sage secondary, ochre only for deadlines, 16px cards, tabular numbers, faint card shadow) |
+| 2026-10-22 | Phone tab bar uses the iOS 26 Liquid Glass style (developer's choice over the Stitch pill); desktop gets the sliding sidebar lens and a glass top bar; CSS-only with solid fallbacks for reduced transparency / motion |

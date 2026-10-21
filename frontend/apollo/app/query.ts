@@ -10,3 +10,22 @@ export const HEALTH = graphql(`
     }
   }
 `);
+
+/** Sidebar footer: "Campusly · Student Portal · 2026–27" */
+export const CURRENT_YEAR = graphql(`
+  query CurrentYear {
+    currentAcademicYear {
+      id
+      name
+    }
+  }
+`);
+
+/** The bell in the top bar: unread announcements for the viewer */
+export const UNREAD_ANNOUNCEMENTS = graphql(`
+  query UnreadAnnouncements {
+    announcements(input: { limit: 1 }) {
+      unread
+    }
+  }
+`);

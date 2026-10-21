@@ -161,13 +161,13 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 9 (L) — Frontend base
 
-- [ ] Port from `nestar-next`: layouts (Student, Teacher, Parent, Admin), `apollo/client.ts`, `apollo/store.ts`, `libs/auth`.
-- [ ] Apollo: access token in a module variable, auth link, `TokenRefreshLink` filled in (single-flight refresh), `errorLink` handles `UNAUTHENTICATED` and `PASSWORD_CHANGE_REQUIRED`; `clearStore()` on logout.
-- [ ] MUI theme from the design tokens; Plus Jakarta Sans via `next/font`.
-- [ ] `next-i18next` with `en` (default), `uz`, `ru`, `ko`; language switcher; error codes translated.
-- [ ] Pages: student/parent sign-in (tabs), teacher sign-in, temp-password banner, "Set a new password".
-- [ ] Role-based route guard; silent refresh + `me` on app start.
-- [ ] GraphQL Codegen setup.
+- [x] Port from `nestar-next`: layouts (Student, Teacher, Parent, Admin), `apollo/client.ts`, `apollo/store.ts`, `libs/auth`.
+- [x] Apollo: access token in a module variable, auth link, `TokenRefreshLink` filled in (single-flight refresh), `errorLink` handles `UNAUTHENTICATED` and `PASSWORD_CHANGE_REQUIRED`; `clearStore()` on logout.
+- [x] MUI theme from the design tokens; Plus Jakarta Sans via `next/font`.
+- [x] `next-i18next` with `en` (default), `uz`, `ru`, `ko`; language switcher; error codes translated.
+- [x] Pages: student/parent sign-in (tabs), teacher sign-in, temp-password banner, "Set a new password".
+- [x] Role-based route guard; silent refresh + `me` on app start.
+- [x] GraphQL Codegen setup.
 
 **Interview:** Where is the access token stored and why? What happens when it expires mid-session?
 

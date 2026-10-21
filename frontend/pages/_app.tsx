@@ -10,10 +10,13 @@ import { useApollo } from "@/apollo/client";
 import { restoreSession } from "@/libs/auth";
 import { installAuthDebug } from "@/libs/auth/debug";
 import { theme } from "@/libs/theme";
+import type { NextPageWithLayout } from "@/libs/types/page";
 import i18nConfig from "../next-i18next.config.js";
 
-function App(props: AppProps) {
+function App(props: AppProps & { Component: NextPageWithLayout }) {
   const { Component, pageProps } = props;
+  // Signed-in areas wrap their pages in AppShell; public pages (login, password) have no layout
+  const getLayout = Component.getLayout ?? ((page) => page);
   const client = useApollo();
 
   // After a reload the access token (memory) is gone: the httpOnly cookie brings it back
@@ -28,7 +31,7 @@ function App(props: AppProps) {
       <ThemeProvider theme={theme}>
         <ApolloProvider client={client}>
           <CssBaseline />
-          <Component {...pageProps} />
+          {getLayout(<Component {...pageProps} />)}
         </ApolloProvider>
       </ThemeProvider>
     </AppCacheProvider>

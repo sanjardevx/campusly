@@ -21,8 +21,54 @@
     "STUDENT": "O‘quvchi",
     "PARENT": "Ota-ona"
   },
-  "home": {
-    "welcome": "Xush kelibsiz, {{name}}",
-    "soon": "Bosh sahifangiz keyingi qadamda tayyor bo‘ladi."
+  "nav": {
+    "home": "Bosh sahifa",
+    "courses": "Kurslarim",
+    "grades": "Baholar",
+    "announcements": "E’lonlar",
+    "dashboard": "Boshqaruv paneli",
+    "gradebook": "Baholar jurnali",
+    "attendance": "Davomat",
+    "overview": "Umumiy holat",
+    "users": "Foydalanuvchilar",
+    "classes": "Sinflar va kurslar",
+    "settings": "Sozlamalar",
+    "more": "Yana",
+    "tab": {
+      "home": "Asosiy",
+      "courses": "Kurslar",
+      "grades": "Baholar",
+      "announcements": "E’lonlar",
+      "overview": "Asosiy",
+      "attendance": "Davomat"
+    },
+    "sections": {
+      "school": "Maktab",
+      "system": "Tizim"
+    }
+  },
+  "shell": {
+    "portal": {
+      "STUDENT": "O‘quvchi portali",
+      "TEACHER": "O‘qituvchi portali",
+      "PARENT": "Ota-ona portali",
+      "ADMIN": "Admin paneli"
+    },
+    "subtitle": {
+      "STUDENT": "O‘quvchi · ID {{id}}",
+      "TEACHER": "O‘qituvchi",
+      "PARENT": "Ota-ona / vasiy",
+      "ADMIN": "Maktab administratori"
+    },
+    "footer": "Campusly · {{portal}} · {{year}}",
+    "notifications": "Bildirishnomalar",
+    "openMenu": "Menyuni ochish",
+    "account": "Hisob",
+    "changePassword": "Parolni o‘zgartirish",
+    "signOut": "Chiqish",
+    "children": "Farzandlar",
+    "comingSoon": "Bu sahifa tez orada tayyor bo‘ladi",
+    "comingSoonBody": "U rejaning {{day}}-kunida quriladi.",
+    "loading": "Yuklanmoqda…"
   }
 }
