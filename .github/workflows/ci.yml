@@ -73,5 +73,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      # Types come from backend/schema.gql: regenerated types must equal the committed ones
+      - run: pnpm codegen && git diff --exit-code -- libs/gql
       - run: pnpm lint
       - run: pnpm typecheck

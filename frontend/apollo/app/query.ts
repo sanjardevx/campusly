@@ -1,6 +1,7 @@
-import { gql } from '@apollo/client';
+import { graphql } from '@/libs/gql';
 
-export const HEALTH = gql`
+// Typed by codegen (libs/gql): the result type is HealthQuery, no hand-written interface
+export const HEALTH = graphql(`
   query Health {
     health {
       status
@@ -8,4 +9,4 @@ export const HEALTH = gql`
       redis
     }
   }
-`;
+`);

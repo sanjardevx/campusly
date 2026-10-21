@@ -6,10 +6,6 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { HEALTH } from "@/apollo/app/query";
 import { API_GRAPHQL_URL } from "@/libs/config";
 
-interface HealthData {
-  health: { status: "ok" | "degraded"; postgres: boolean; redis: boolean };
-}
-
 function ServiceRow({ name, up }: { name: string; up: boolean }) {
   return (
     <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
@@ -21,7 +17,7 @@ function ServiceRow({ name, up }: { name: string; up: boolean }) {
 
 // Day 1 skeleton page: proves the browser → API → Postgres/Redis chain works.
 export default function Home() {
-  const { data, loading, error, refetch } = useQuery<HealthData>(HEALTH, {
+  const { data, loading, error, refetch } = useQuery(HEALTH, {
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });

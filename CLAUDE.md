@@ -48,7 +48,7 @@ pnpm prisma studio
 
 # frontend/
 pnpm dev                      # http://localhost:3001
-pnpm codegen                  # GraphQL types from the backend schema
+pnpm codegen                  # libs/gql types from ../backend/schema.gql (commit them; CI checks it)
 ```
 
 Package manager is **pnpm 12.11.2** (corepack). Never use npm or yarn, never commit a second lockfile.
