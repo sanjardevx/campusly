@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AnnouncementModule } from './announcement/announcement.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { AuditModule } from './audit/audit.module';
@@ -14,6 +15,7 @@ import { UserModule } from './user/user.module';
 // Every feature module is registered here (same as Nestar's ComponentsModule)
 @Module({
   imports: [
+    AnnouncementModule,
     AssignmentModule,
     AttendanceModule,
     AuditModule,
