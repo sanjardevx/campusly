@@ -148,12 +148,12 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 8 (L) — Attendance, overview, period grades, announcements
 
-- [ ] `ClassSession` by date + `markAttendance` (bulk; every `studentId` must be enrolled), default `PRESENT`.
-- [ ] `studentOverview(studentId?)` with `resolveStudentScope` — shared by student, parent and admin.
-- [ ] `PeriodGrade`: live computation + `publishPeriodGrades` snapshot + manual `finalScore` override; annual grade.
-- [ ] Announcements: course or school-wide, pinned, attachments, `AnnouncementRead`, `eventDate`.
-- [ ] **Isolation test table** (DECISIONS.md §8): student vs other course, parent vs other child, teacher vs other teacher's course, unpublished grades, roster access.
-- [ ] Export the GraphQL schema for frontend codegen.
+- [x] `ClassSession` by date + `markAttendance` (bulk; every `studentId` must be enrolled), default `PRESENT`.
+- [x] `studentOverview(studentId?)` with `resolveStudentScope` — shared by student, parent and admin.
+- [x] `PeriodGrade`: live computation + `publishPeriodGrades` snapshot + manual `finalScore` override; annual grade.
+- [x] Announcements: course or school-wide, pinned, `AnnouncementRead`, `eventDate`. (Attachments moved to later: no table for them yet.)
+- [x] **Isolation test table** (DECISIONS.md §8): student vs other course, parent vs other child, teacher vs other teacher's course, unpublished grades, roster access.
+- [x] Export the GraphQL schema for frontend codegen.
 
 **Interview:** How do you prove a parent cannot see another child's data?
 

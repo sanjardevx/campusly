@@ -1,0 +1,1041 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AcademicYear {
+  endsAt: String!
+  id: String!
+  isCurrent: Boolean!
+  name: String!
+  startsAt: String!
+}
+
+type AccessToken {
+  accessToken: String!
+}
+
+input AddSubmissionCommentInput {
+  body: String!
+  submissionId: String!
+}
+
+type Announcement {
+  authorName: String!
+  authorRole: Role!
+  body: String!
+  courseId: String
+  courseTitle: String
+  eventDate: String
+  id: String!
+  isPinned: Boolean!
+  isRead: Boolean!
+  publishedAt: DateTime!
+  readCount: Int
+  title: String!
+}
+
+type Announcements {
+  list: [Announcement!]!
+  total: Int!
+  unread: Int!
+}
+
+input AnnouncementsInquiry {
+  courseId: String
+  limit: Int
+  page: Int
+}
+
+type Assignment {
+  acceptedFileTypes: [String!]!
+  allowLate: Boolean!
+  categoryId: String!
+  categoryName: String!
+  courseId: String!
+  dueAt: DateTime
+  finalAnswer: String
+  gradesPublishedAt: DateTime
+  id: String!
+  instructions: String
+  lessonId: String
+  maxAttempts: Int!
+  maxScore: Float!
+  publishedAt: DateTime
+  title: String!
+  tutorMode: TutorMode!
+  type: AssignmentType!
+}
+
+enum AssignmentType {
+  EXAM
+  HOMEWORK
+  QUIZ
+}
+
+type AttendanceEntry {
+  date: String!
+  note: String
+  status: AttendanceStatus!
+}
+
+input AttendanceMarkInput {
+  note: String
+  status: AttendanceStatus!
+  studentId: String!
+}
+
+type AttendanceRow {
+  firstName: String!
+  lastName: String!
+  loginId: String!
+  note: String
+  status: AttendanceStatus!
+  studentId: String!
+}
+
+enum AttendanceStatus {
+  ABSENT
+  EXCUSED
+  LATE
+  PRESENT
+}
+
+type AttendanceSummary {
+  absent: Int!
+  excused: Int!
+  late: Int!
+  present: Int!
+  rate: Float
+  total: Int!
+}
+
+type CategoryGrade {
+  categoryId: String!
+  count: Int!
+  earned: Float!
+  name: String!
+  percent: Float
+  possible: Float!
+  weight: Int!
+}
+
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
+type Child {
+  className: String
+  firstName: String!
+  id: String!
+  lastName: String!
+  loginId: String!
+  relation: ParentRelation!
+}
+
+enum CompletionType {
+  MANUAL
+  VIDEO_WATCHED
+  VIEW
+}
+
+type Course {
+  academicYearId: String!
+  groupId: String!
+  groupName: String!
+  id: String!
+  isSplitGroup: Boolean!
+  periodId: String
+  status: CourseStatus!
+  studentCount: Int!
+  subjectId: String!
+  subjectName: String!
+  teachers: [CourseTeacher!]!
+  title: String!
+}
+
+type CourseAttendance {
+  courseId: String!
+  date: String!
+  isMarked: Boolean!
+  lessonId: String
+  rows: [AttendanceRow!]!
+}
+
+type CourseDetail {
+  academicYearId: String!
+  gradeCategories: [GradeCategory!]!
+  groupId: String!
+  groupName: String!
+  id: String!
+  isSplitGroup: Boolean!
+  modules: [Module!]!
+  periodId: String
+  status: CourseStatus!
+  studentCount: Int!
+  subjectId: String!
+  subjectName: String!
+  teachers: [CourseTeacher!]!
+  title: String!
+}
+
+enum CourseStatus {
+  ACTIVE
+  ARCHIVED
+  DRAFT
+}
+
+type CourseTeacher {
+  firstName: String!
+  id: String!
+  lastName: String!
+  role: CourseTeacherRole!
+}
+
+enum CourseTeacherRole {
+  ASSISTANT
+  OWNER
+}
+
+input CoursesFilter {
+  academicYearId: String
+  groupId: String
+  status: CourseStatus
+  subjectId: String
+  teacherId: String
+}
+
+input CreateAcademicYearInput {
+  endsAt: String!
+  isCurrent: Boolean
+  name: String!
+  startsAt: String!
+}
+
+input CreateAnnouncementInput {
+  body: String!
+  courseId: String
+  eventDate: String
+  isPinned: Boolean
+  title: String!
+}
+
+input CreateAssignmentInput {
+  acceptedFileTypes: [String!]
+  allowLate: Boolean
+  categoryId: String
+  courseId: String!
+  dueAt: DateTime
+  finalAnswer: String
+  instructions: String
+  lessonId: String
+  maxAttempts: Int
+  maxScore: Float!
+  title: String!
+  tutorMode: TutorMode
+  type: AssignmentType!
+}
+
+input CreateCourseInput {
+  groupId: String!
+  isSplitGroup: Boolean
+  periodId: String
+  studentIds: [String!]
+  subjectId: String!
+  teacherIds: [String!]!
+  title: String
+}
+
+input CreateGroupInput {
+  academicYearId: String!
+  name: String!
+}
+
+input CreateLessonInput {
+  body: String
+  completionType: CompletionType
+  dueAt: DateTime
+  moduleId: String!
+  title: String!
+  tutorNotes: String
+  type: LessonType!
+}
+
+input CreateModuleInput {
+  courseId: String!
+  endsAt: String
+  startsAt: String
+  title: String!
+}
+
+input CreatePeriodInput {
+  academicYearId: String!
+  endsAt: String!
+  kind: PeriodKind!
+  name: String!
+  order: Int!
+  parentId: String
+  startsAt: String!
+}
+
+input CreateStudentInput {
+  admissionYear: Int
+  birthDate: DateTime
+  firstName: String!
+  groupId: String!
+  lastName: String!
+  parent: ParentInput
+}
+
+type CreateStudentResult {
+  parent: LoginSlip
+  student: LoginSlip!
+}
+
+input CreateSubjectInput {
+  name: String!
+}
+
+input CreateSubmissionUploadInput {
+  assignmentId: String!
+  fileName: String!
+  kind: MediaKind!
+  mimeType: String!
+  size: Float!
+}
+
+input CreateTeacherInput {
+  firstName: String!
+  lastName: String!
+  title: String
+}
+
+input CreateUploadInput {
+  courseId: String!
+  durationSec: Int
+  fileName: String!
+  kind: MediaKind!
+  mimeType: String!
+  size: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum Direction {
+  ASC
+  DESC
+}
+
+type GradeCategory {
+  id: String!
+  name: String!
+  order: Int!
+  weight: Int!
+}
+
+type GradeItem {
+  assignmentId: String!
+  categoryName: String!
+  dueAt: DateTime
+  maxScore: Float!
+  score: Float!
+  status: SubmissionStatus!
+  title: String!
+  type: AssignmentType!
+}
+
+input GradeSubmissionInput {
+  assignmentId: String!
+  feedback: String
+  score: Float!
+  studentId: String!
+}
+
+type GradebookRow {
+  firstName: String!
+  lastName: String!
+  loginId: String!
+  studentId: String!
+  submission: Submission
+}
+
+type Group {
+  academicYearId: String!
+  id: String!
+  name: String!
+  status: RecordStatus!
+  studentCount: Int!
+}
+
+type Health {
+  migration: String
+  postgres: Boolean!
+  redis: Boolean!
+  status: String!
+}
+
+type ImportPreview {
+  rows: [ImportRowPreview!]!
+  summary: ImportSummary!
+}
+
+type ImportResult {
+  created: Int!
+  linkedParents: Int!
+  skipped: Int!
+  slips: [CreateStudentResult!]!
+}
+
+type ImportRowPreview {
+  admissionYear: Int
+  className: String!
+  errors: [String!]!
+  firstName: String!
+  lastName: String!
+  line: Int!
+  parentName: String
+  parentPhone: String
+  status: ImportRowStatus!
+}
+
+enum ImportRowStatus {
+  ERROR
+  LINK_PARENT
+  READY
+}
+
+type ImportSummary {
+  errors: Int!
+  linkParent: Int!
+  ready: Int!
+}
+
+type Lesson {
+  body: String
+  completionType: CompletionType!
+  dueAt: DateTime
+  id: String!
+  moduleId: String!
+  order: Int!
+  publishedAt: DateTime
+  title: String!
+  tutorNotes: String
+  type: LessonType!
+  videoAssetId: String
+}
+
+type LessonProgress {
+  completedAt: DateTime
+  lastPositionSec: Int!
+  lessonId: String!
+  maxPositionSec: Int!
+  percent: Int
+  status: ProgressStatus!
+  watchedSeconds: Int!
+}
+
+input LessonProgressInput {
+  durationSec: Int
+  lessonId: String!
+  positionSec: Int!
+}
+
+enum LessonType {
+  FILE
+  LINK
+  READING
+  VIDEO
+}
+
+type LessonVideo {
+  expiresAt: DateTime!
+  isLocked: Boolean!
+  maxSeekSec: Int
+  resumeAt: Int!
+  url: String!
+  watermark: String!
+}
+
+type LinkedUser {
+  fullName: String!
+  id: String!
+  loginId: String!
+  relation: ParentRelation!
+}
+
+type LoginSlip {
+  fullName: String!
+  isNew: Boolean!
+  loginId: String!
+  role: Role!
+  tempPassword: String
+  userId: String!
+}
+
+input MarkAttendanceInput {
+  courseId: String!
+  date: String!
+  lessonId: String
+  records: [AttendanceMarkInput!]!
+  title: String
+}
+
+type MediaAsset {
+  createdAt: DateTime!
+  id: String!
+  kind: MediaKind!
+  mimeType: String!
+  originalName: String!
+  size: Float!
+  status: MediaStatus!
+}
+
+enum MediaKind {
+  DOCUMENT
+  IMAGE
+  OTHER
+  VIDEO
+}
+
+enum MediaStatus {
+  FAILED
+  PROCESSING
+  READY
+  UPLOADING
+}
+
+type Module {
+  courseId: String!
+  endsAt: String
+  id: String!
+  isHidden: Boolean!
+  lessons: [Lesson!]!
+  order: Int!
+  publishedAt: DateTime
+  startsAt: String
+  title: String!
+}
+
+input MoveStudentInput {
+  groupId: String!
+  studentId: String!
+}
+
+type Mutation {
+  addSubmissionComment(input: AddSubmissionCommentInput!): Submission!
+  blockUser(userId: String!): Boolean!
+  changePassword(input: ChangePasswordInput!): AccessToken!
+  completeLesson(lessonId: String!): LessonProgress!
+  confirmUpload(assetId: String!): MediaAsset!
+  createAcademicYear(input: CreateAcademicYearInput!): AcademicYear!
+  createAnnouncement(input: CreateAnnouncementInput!): Announcement!
+  createAssignment(input: CreateAssignmentInput!): Assignment!
+  createCourse(input: CreateCourseInput!): Course!
+  createGroup(input: CreateGroupInput!): Group!
+  createLesson(input: CreateLessonInput!): Lesson!
+  createModule(input: CreateModuleInput!): Module!
+  createPeriod(input: CreatePeriodInput!): Period!
+  createStudent(input: CreateStudentInput!): CreateStudentResult!
+  createSubject(input: CreateSubjectInput!): Subject!
+  createSubmissionUpload(input: CreateSubmissionUploadInput!): UploadTicket!
+  createTeacher(input: CreateTeacherInput!): LoginSlip!
+  createUpload(input: CreateUploadInput!): UploadTicket!
+  giveZeroToMissing(assignmentId: String!): Int!
+  gradeSubmission(input: GradeSubmissionInput!): Submission!
+  importStudents(csv: String!, skipErrors: Boolean! = false): ImportResult!
+  linkParent(input: ParentInput!, studentId: String!): LoginSlip!
+  markAnnouncementRead(id: String!): Announcement!
+  markAttendance(input: MarkAttendanceInput!): CourseAttendance!
+  moveStudent(input: MoveStudentInput!): Group!
+  previewStudentImport(csv: String!): ImportPreview!
+  publishAssignment(input: PublishInput!): Assignment!
+  publishGrades(input: PublishGradesInput!): Assignment!
+  publishLesson(input: PublishInput!): Lesson!
+  publishModule(input: PublishInput!): Module!
+  publishPeriodGrades(input: PublishPeriodGradesInput!): [PeriodGradeRow!]!
+  reorderLessons(input: ReorderInput!): Module!
+  reorderModules(input: ReorderInput!): [Module!]!
+  resetPassword(userId: String!): LoginSlip!
+  returnSubmission(input: ReturnSubmissionInput!): Submission!
+  setCourseStudents(input: SetCourseStudentsInput!): Course!
+  setCourseTeachers(input: SetCourseTeachersInput!): Course!
+  setCurrentAcademicYear(id: String!): AcademicYear!
+  setLessonVideo(input: SetLessonVideoInput!): Lesson!
+  setPeriodFinalScore(input: SetPeriodFinalScoreInput!): PeriodGradeRow!
+  submitAssignment(input: SubmitAssignmentInput!): Submission!
+  unblockUser(userId: String!): Boolean!
+  unlinkParent(parentId: String!, studentId: String!): Boolean!
+  updateAcademicYear(input: UpdateAcademicYearInput!): AcademicYear!
+  updateAnnouncement(input: UpdateAnnouncementInput!): Announcement!
+  updateAssignment(input: UpdateAssignmentInput!): Assignment!
+  updateCourse(input: UpdateCourseInput!): Course!
+  updateGroup(input: UpdateGroupInput!): Group!
+  updateLesson(input: UpdateLessonInput!): Lesson!
+  updateLessonProgress(input: LessonProgressInput!): LessonProgress!
+  updateModule(input: UpdateModuleInput!): Module!
+  updatePeriod(input: UpdatePeriodInput!): Period!
+  updateSchoolSettings(input: UpdateSchoolSettingsInput!): SchoolSettings!
+  updateSubject(input: UpdateSubjectInput!): Subject!
+}
+
+type MyPeriodGrades {
+  annual: PeriodGradeRow!
+  periods: [PeriodGradeRow!]!
+}
+
+type OverviewCourse {
+  attendanceRate: Float
+  courseId: String!
+  isPublished: Boolean!
+  mark: Int
+  score: Float
+  subjectName: String!
+  teacherName: String
+  title: String!
+}
+
+type OverviewPeriod {
+  id: String!
+  name: String!
+}
+
+type OverviewStudent {
+  className: String
+  firstName: String!
+  id: String!
+  lastName: String!
+  loginId: String!
+}
+
+input ParentInput {
+  firstName: String!
+  lastName: String!
+  phone: String!
+  relation: ParentRelation!
+}
+
+enum ParentRelation {
+  FATHER
+  GUARDIAN
+  MOTHER
+  OTHER
+}
+
+enum PasswordState {
+  EXPIRED
+  MUST_CHANGE
+  SET
+  TEMPORARY
+}
+
+type Period {
+  academicYearId: String!
+  endsAt: String!
+  id: String!
+  kind: PeriodKind!
+  name: String!
+  order: Int!
+  parentId: String
+  startsAt: String!
+}
+
+type PeriodGradeRow {
+  computedScore: Float
+  finalScore: Float
+  firstName: String!
+  isOutdated: Boolean!
+  isPublished: Boolean!
+  lastName: String!
+  livePercent: Float
+  loginId: String!
+  mark: Int
+  periodId: String
+  periodName: String!
+  publishedAt: DateTime
+  score: Float
+  studentId: String!
+}
+
+enum PeriodKind {
+  CUSTOM
+  MONTH
+  QUARTER
+  SEMESTER
+}
+
+enum ProgressStatus {
+  COMPLETED
+  IN_PROGRESS
+  NOT_STARTED
+}
+
+input PublishGradesInput {
+  assignmentId: String!
+  publish: Boolean!
+}
+
+input PublishInput {
+  id: String!
+  publish: Boolean!
+  publishAt: DateTime
+}
+
+input PublishPeriodGradesInput {
+  courseId: String!
+  periodId: String!
+}
+
+type Query {
+  academicYears: [AcademicYear!]!
+  announcements(input: AnnouncementsInquiry): Announcements!
+  assignment(id: String!): Assignment!
+  assignmentSubmissions(assignmentId: String!): [GradebookRow!]!
+  courseAssignments(courseId: String!): [Assignment!]!
+  courseAttendance(courseId: String!, date: String!): CourseAttendance!
+  courseDetail(courseId: String!): CourseDetail!
+  courseGrades(courseId: String!, periodId: String!): [StudentGrade!]!
+  coursePeriodGrades(courseId: String!, periodId: String!): [PeriodGradeRow!]!
+  courses(filter: CoursesFilter): [Course!]!
+  currentAcademicYear: AcademicYear
+  groups(academicYearId: String): [Group!]!
+  health: Health!
+  lessonVideo(lessonId: String!): LessonVideo!
+  me: User!
+  myAttendance(courseId: String!, studentId: String): StudentAttendance!
+  myChildren: [Child!]!
+  myCourseGrade(courseId: String!, periodId: String!, studentId: String): StudentGrade!
+  myCourses(studentId: String): [Course!]!
+  myPeriodGrades(courseId: String!, studentId: String): MyPeriodGrades!
+  mySubmission(assignmentId: String!, studentId: String): Submission
+  periods(academicYearId: String!): [Period!]!
+  schoolSettings: SchoolSettings!
+  studentOverview(studentId: String): StudentOverview!
+  subjects(includeArchived: Boolean): [Subject!]!
+  teachingCourses: [Course!]!
+  users(input: UsersInquiry!): Users!
+}
+
+type RecentGrade {
+  assignmentId: String!
+  courseTitle: String!
+  maxScore: Float!
+  percent: Float!
+  publishedAt: DateTime!
+  score: Float!
+  title: String!
+}
+
+enum RecordStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+input ReorderInput {
+  ids: [String!]!
+  parentId: String!
+}
+
+input ReturnSubmissionInput {
+  assignmentId: String!
+  feedback: String
+  studentId: String!
+}
+
+enum Role {
+  ADMIN
+  PARENT
+  STUDENT
+  TEACHER
+}
+
+type SchoolSettings {
+  defaultExamWeight: Int!
+  defaultHomeworkWeight: Int!
+  defaultLocale: String!
+  defaultQuizWeight: Int!
+  mark3MinPercent: Int!
+  mark4MinPercent: Int!
+  mark5MinPercent: Int!
+  schoolName: String!
+  timezone: String!
+}
+
+input SetCourseStudentsInput {
+  courseId: String!
+  studentIds: [String!]!
+}
+
+input SetCourseTeachersInput {
+  courseId: String!
+  teacherIds: [String!]!
+}
+
+input SetLessonVideoInput {
+  assetId: String
+  lessonId: String!
+}
+
+input SetPeriodFinalScoreInput {
+  courseId: String!
+  finalScore: Float
+  periodId: String
+  studentId: String!
+}
+
+type StudentAttendance {
+  courseId: String!
+  entries: [AttendanceEntry!]!
+  studentId: String!
+  summary: AttendanceSummary!
+}
+
+type StudentGrade {
+  categories: [CategoryGrade!]!
+  firstName: String!
+  items: [GradeItem!]!
+  lastName: String!
+  loginId: String!
+  mark: Int
+  percent: Float
+  studentId: String!
+}
+
+type StudentOverview {
+  announcements: Announcements!
+  attendance: AttendanceSummary!
+  courses: [OverviewCourse!]!
+  period: OverviewPeriod
+  recentGrades: [RecentGrade!]!
+  student: OverviewStudent!
+  upcoming: [UpcomingItem!]!
+}
+
+type Subject {
+  id: String!
+  name: String!
+  status: RecordStatus!
+}
+
+type Submission {
+  assignmentId: String!
+  attempts: [SubmissionAttempt!]!
+  attemptsLeft: Int!
+  comments: [SubmissionComment!]!
+  feedback: String
+  gradedAt: DateTime
+  id: String!
+  score: Float
+  status: SubmissionStatus!
+  studentId: String!
+  submittedAt: DateTime
+}
+
+type SubmissionAttempt {
+  files: [SubmissionFile!]!
+  isLate: Boolean!
+  number: Int!
+  submittedAt: DateTime!
+  text: String
+}
+
+type SubmissionComment {
+  authorName: String!
+  authorRole: Role!
+  body: String!
+  createdAt: DateTime!
+  id: String!
+}
+
+type SubmissionFile {
+  assetId: String!
+  mimeType: String!
+  originalName: String!
+  size: Float!
+  url: String
+}
+
+enum SubmissionStatus {
+  DRAFT
+  GRADED
+  LATE
+  MISSING
+  RETURNED
+  SUBMITTED
+}
+
+input SubmitAssignmentInput {
+  assetIds: [String!]
+  assignmentId: String!
+  text: String
+}
+
+type TotalCounter {
+  total: Int!
+}
+
+enum TutorMode {
+  CHECK_ONLY
+  HINTS
+  OFF
+}
+
+type UpcomingItem {
+  assignmentId: String!
+  courseId: String!
+  courseTitle: String!
+  dueAt: DateTime!
+  isDone: Boolean!
+  title: String!
+  type: AssignmentType!
+}
+
+input UpdateAcademicYearInput {
+  endsAt: String
+  id: String!
+  name: String
+  startsAt: String
+}
+
+input UpdateAnnouncementInput {
+  body: String
+  eventDate: String
+  id: String!
+  isPinned: Boolean
+  title: String
+}
+
+input UpdateAssignmentInput {
+  acceptedFileTypes: [String!]
+  allowLate: Boolean
+  categoryId: String
+  dueAt: DateTime
+  finalAnswer: String
+  id: String!
+  instructions: String
+  lessonId: String
+  maxAttempts: Int
+  maxScore: Float
+  title: String
+  tutorMode: TutorMode
+}
+
+input UpdateCourseInput {
+  id: String!
+  periodId: String
+  status: CourseStatus
+  title: String
+}
+
+input UpdateGroupInput {
+  id: String!
+  name: String
+  status: RecordStatus
+}
+
+input UpdateLessonInput {
+  body: String
+  completionType: CompletionType
+  dueAt: DateTime
+  id: String!
+  title: String
+  tutorNotes: String
+}
+
+input UpdateModuleInput {
+  endsAt: String
+  id: String!
+  isHidden: Boolean
+  startsAt: String
+  title: String
+}
+
+input UpdatePeriodInput {
+  endsAt: String
+  id: String!
+  name: String
+  order: Int
+  startsAt: String
+}
+
+input UpdateSchoolSettingsInput {
+  defaultExamWeight: Int
+  defaultHomeworkWeight: Int
+  defaultLocale: String
+  defaultQuizWeight: Int
+  mark3MinPercent: Int
+  mark4MinPercent: Int
+  mark5MinPercent: Int
+  schoolName: String
+  timezone: String
+}
+
+input UpdateSubjectInput {
+  id: String!
+  name: String
+  status: RecordStatus
+}
+
+type UploadTicket {
+  assetId: String!
+  expiresAt: DateTime!
+  uploadUrl: String!
+}
+
+type User {
+  createdAt: DateTime!
+  firstName: String!
+  id: String!
+  lastName: String!
+  locale: String!
+  loginId: String!
+  mustChangePassword: Boolean!
+  role: Role!
+  status: UserStatus!
+}
+
+type UserListItem {
+  className: String
+  createdAt: DateTime!
+  firstName: String!
+  id: String!
+  lastActiveAt: DateTime
+  lastName: String!
+  links: [LinkedUser!]!
+  loginId: String!
+  passwordState: PasswordState!
+  phone: String
+  role: Role!
+  status: UserStatus!
+  tempPasswordUsesLeft: Int
+  title: String
+}
+
+enum UserStatus {
+  ACTIVE
+  ARCHIVED
+  BLOCKED
+}
+
+type Users {
+  list: [UserListItem!]!
+  metaCounter: TotalCounter!
+}
+
+input UsersInquiry {
+  direction: Direction
+  limit: Int!
+  page: Int!
+  search: UsersSearch!
+  sort: String
+}
+
+input UsersSearch {
+  groupId: String
+  passwordState: PasswordState
+  role: Role!
+  status: UserStatus
+  text: String
+}

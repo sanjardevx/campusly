@@ -295,6 +295,26 @@ describe('School settings, years, periods (e2e)', () => {
         { i: { id: yearId, startsAt: '2098-10-01' } },
       );
       expect(code(shrink)).toBe('BAD_REQUEST');
+
+      // The calendar is readable for every signed-in role; changing it is admin-only
+      const ids = await gql<{ periods: { id: string }[] }>(
+        'query($y: String!) { periods(academicYearId: $y) { id } }',
+        { y: yearId },
+        studentToken,
+      );
+      expect(ids.data?.periods).toHaveLength(1);
+      expect(
+        code(await gql('{ academicYears { id } }', {}, studentToken)),
+      ).toBeUndefined();
+      expect(
+        code(
+          await gql(
+            'mutation($i: UpdatePeriodInput!) { updatePeriod(input: $i) { id } }',
+            { i: { id: ids.data!.periods[0].id, name: 'Hacked' } },
+            studentToken,
+          ),
+        ),
+      ).toBe('FORBIDDEN');
     });
 
     it('two admins setting the current year at the same time leave exactly one current year', async () => {

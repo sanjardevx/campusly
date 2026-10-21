@@ -54,6 +54,8 @@ jobs:
       - run: pnpm test
       - run: pnpm prisma migrate deploy # create the tables in the empty CI database
       - run: pnpm test:e2e
+      # The e2e run rewrites schema.gql: a difference means the committed schema is out of date
+      - run: git diff --exit-code -- schema.gql
 
   frontend:
     runs-on: ubuntu-latest

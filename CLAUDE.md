@@ -41,6 +41,7 @@ pnpm dev:batch                # campusly-batch worker
 pnpm typecheck && pnpm lint
 pnpm test                     # unit tests
 pnpm test:e2e                 # e2e + isolation tests (needs Docker DB)
+                              # pnpm dev / test:e2e rewrite backend/schema.gql (commit it; CI checks it)
 pnpm prisma migrate dev --name <change>
 pnpm prisma db seed
 pnpm prisma studio

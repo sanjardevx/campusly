@@ -1,3 +1,4 @@
+import { join } from 'node:path';
 import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -20,7 +21,12 @@ import { formatGraphqlError } from './libs/utils/graphql-error';
         const isProduction =
           config.get('NODE_ENV', { infer: true }) === 'production';
         return {
-          autoSchemaFile: true,
+          // Dev and tests write backend/schema.gql (sorted, so diffs stay small): the frontend's
+          // codegen reads it. Production keeps the schema in memory and writes no files.
+          autoSchemaFile: isProduction
+            ? true
+            : join(process.cwd(), 'schema.gql'),
+          sortSchema: true,
           playground: false, // Apollo Sandbox is the default landing page in development
           introspection: !isProduction,
           formatError: (formatted, error) =>
