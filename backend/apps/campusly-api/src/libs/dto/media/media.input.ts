@@ -11,14 +11,9 @@ import {
 } from 'class-validator';
 import { MediaKind } from '../../enums/media.enum';
 
-/** Allowed types and sizes per kind: UPLOAD_RULES in libs/config.ts (checked in the service) */
+/** The file itself. Allowed types and sizes per kind: UPLOAD_RULES in libs/config.ts */
 @InputType()
-export class CreateUploadInput {
-  /** The course the file belongs to (lesson video or lesson file) */
-  @Field(() => String)
-  @IsUUID()
-  courseId: string;
-
+export class UploadFileInput {
   @Field(() => MediaKind)
   @IsEnum(MediaKind)
   kind: MediaKind;
@@ -38,6 +33,14 @@ export class CreateUploadInput {
   @IsInt()
   @IsPositive()
   size: number;
+}
+
+/** A course file (lesson video or lesson file), uploaded by a teacher of the course */
+@InputType()
+export class CreateUploadInput extends UploadFileInput {
+  @Field(() => String)
+  @IsUUID()
+  courseId: string;
 
   /**
    * VIDEO: length in seconds, read by the teacher's browser before the upload. The 90% rule uses
@@ -49,4 +52,12 @@ export class CreateUploadInput {
   @IsPositive()
   @Max(6 * 60 * 60)
   durationSec?: number;
+}
+
+/** A student's file for one assignment (only the types the assignment accepts) */
+@InputType()
+export class CreateSubmissionUploadInput extends UploadFileInput {
+  @Field(() => String)
+  @IsUUID()
+  assignmentId: string;
 }

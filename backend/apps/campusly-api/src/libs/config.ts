@@ -192,6 +192,10 @@ export const SUBMISSION_FILE_TYPES = [
   'png',
   'webp',
 ] as const;
+/** A submitted file's download link works this long (teachers open it from the grading page) */
+export const FILE_URL_TTL_SEC = 15 * 60;
+/** Files per submission attempt */
+export const MAX_SUBMISSION_FILES = 10;
 /** Default grade category for a new assignment, by type (the school default categories) */
 export const DEFAULT_CATEGORY_BY_TYPE = {
   HOMEWORK: 'Homework',

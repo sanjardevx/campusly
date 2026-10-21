@@ -5,14 +5,17 @@ import {
   MediaAsset,
   UploadTicket,
 } from '../../libs/dto/media/media';
-import { CreateUploadInput } from '../../libs/dto/media/media.input';
+import {
+  CreateSubmissionUploadInput,
+  CreateUploadInput,
+} from '../../libs/dto/media/media.input';
 import { Role } from '../../libs/enums/user.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { CurrentUser, Roles } from '../auth/decorators/auth.decorators';
 import { MediaService } from './media.service';
 
-// Uploads: the course's teachers (AccessPolicy) and admins; student submission files come with
-// assignments (day 7). Watching a lesson video: every role, decided by AccessPolicy.
+// Course files: the course's teachers (AccessPolicy) and admins. Submission files: students of
+// the course. Watching a lesson video: every role, decided by AccessPolicy.
 @Roles(Role.ADMIN, Role.TEACHER)
 @Resolver()
 export class MediaResolver {
@@ -26,6 +29,17 @@ export class MediaResolver {
     return this.mediaService.createUpload(user, input);
   }
 
+  @Roles(Role.STUDENT)
+  @Mutation(() => UploadTicket)
+  public createSubmissionUpload(
+    @CurrentUser() user: AuthUser,
+    @Args('input') input: CreateSubmissionUploadInput,
+  ): Promise<UploadTicket> {
+    return this.mediaService.createSubmissionUpload(user, input);
+  }
+
+  /** Only the uploader can confirm (others get NOT_FOUND) */
+  @Roles(Role.ADMIN, Role.TEACHER, Role.STUDENT)
   @Mutation(() => MediaAsset)
   public confirmUpload(
     @CurrentUser() user: AuthUser,

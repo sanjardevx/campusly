@@ -19,7 +19,11 @@ import {
   MediaAsset,
   UploadTicket,
 } from '../../libs/dto/media/media';
-import { CreateUploadInput } from '../../libs/dto/media/media.input';
+import {
+  CreateSubmissionUploadInput,
+  CreateUploadInput,
+  UploadFileInput,
+} from '../../libs/dto/media/media.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { AccessPolicy } from '../auth/policies/access.policy';
@@ -39,10 +43,52 @@ export class MediaService {
     private readonly accessPolicy: AccessPolicy,
   ) {}
 
+  /** A course file: the course's teachers (or admins) */
   public async createUpload(
     user: AuthUser,
     input: CreateUploadInput,
   ): Promise<UploadTicket> {
+    await this.assertCanUpload(user);
+    await this.accessPolicy.assertTeacherOf(user, input.courseId);
+    return this.startUpload(user, input, `raw/${input.courseId}`, {
+      durationSec: input.kind === 'VIDEO' ? input.durationSec : undefined,
+    });
+  }
+
+  /**
+   * A student's file for one assignment. The key holds the assignment id, so the file can only
+   * be attached to this assignment (submitAssignment checks the prefix).
+   */
+  public async createSubmissionUpload(
+    user: AuthUser,
+    input: CreateSubmissionUploadInput,
+  ): Promise<UploadTicket> {
+    await this.assertCanUpload(user);
+    const assignment = await this.accessPolicy.assertCanViewAssignment(
+      user,
+      input.assignmentId,
+    );
+    if (assignment.type === 'EXAM') {
+      throw badRequest('An offline exam has no submission');
+    }
+    if (input.kind !== 'DOCUMENT' && input.kind !== 'IMAGE') {
+      throw badRequest('Only documents and images can be submitted');
+    }
+    const ext = MIME_EXTENSIONS[input.mimeType];
+    if (!ext || !assignment.acceptedFileTypes.includes(ext)) {
+      throw badRequest(
+        `This assignment accepts: ${assignment.acceptedFileTypes.join(', ')}`,
+      );
+    }
+    return this.startUpload(
+      user,
+      input,
+      submissionKeyPrefix(assignment.courseId, assignment.id),
+    );
+  }
+
+  /** Media on, not a demo account (checked before anything else) */
+  private async assertCanUpload(user: AuthUser) {
     if (!this.storageService.isEnabled) {
       throw new HttpException(
         {
@@ -57,8 +103,15 @@ export class MediaService {
       select: { isDemo: true },
     });
     if (account.isDemo) throw forbidden('Demo accounts cannot upload files');
-    await this.accessPolicy.assertTeacherOf(user, input.courseId);
+  }
 
+  /** Type/size rules, pending limit, the asset row and the presigned PUT */
+  private async startUpload(
+    user: AuthUser,
+    input: UploadFileInput,
+    keyPrefix: string,
+    extra: { durationSec?: number } = {},
+  ): Promise<UploadTicket> {
     assertAllowedFile(input);
     const pending = await this.prismaService.mediaAsset.count({
       where: { ownerId: user.id, status: 'UPLOADING' },
@@ -83,13 +136,13 @@ export class MediaService {
           originalName: cleanFileName(input.fileName),
           mimeType: input.mimeType,
           size: BigInt(input.size),
-          durationSec: input.kind === 'VIDEO' ? input.durationSec : undefined,
+          durationSec: extra.durationSec,
         },
       });
       const ext = MIME_EXTENSIONS[input.mimeType];
       return tx.mediaAsset.update({
         where: { id: created.id },
-        data: { s3Key: `raw/${input.courseId}/${created.id}.${ext}` },
+        data: { s3Key: `${keyPrefix}/${created.id}.${ext}` },
       });
     });
 
@@ -194,8 +247,13 @@ export class MediaService {
   }
 }
 
+/** Where a student's files for one assignment live in S3 */
+export function submissionKeyPrefix(courseId: string, assignmentId: string) {
+  return `raw/${courseId}/submissions/${assignmentId}`;
+}
+
 /** Type and size by kind (UPLOAD_RULES); anything else is refused before S3 is touched */
-function assertAllowedFile(input: CreateUploadInput) {
+function assertAllowedFile(input: UploadFileInput) {
   const rule = UPLOAD_RULES[input.kind as keyof typeof UPLOAD_RULES];
   if (!rule) throw badRequest(`${input.kind} files cannot be uploaded`);
   if (!(rule.mimeTypes as readonly string[]).includes(input.mimeType)) {
