@@ -35,3 +35,21 @@ export enum ImportRowStatus {
   ERROR = 'ERROR',
 }
 registerEnumType(ImportRowStatus, { name: 'ImportRowStatus' });
+
+/**
+ * What is wrong with one CSV row. A code (plus the bad value), never an English sentence:
+ * the UI translates it into 4 languages and knows which cell to mark red.
+ */
+export enum ImportIssueCode {
+  FIRST_NAME_LENGTH = 'FIRST_NAME_LENGTH',
+  LAST_NAME_LENGTH = 'LAST_NAME_LENGTH',
+  CLASS_EMPTY = 'CLASS_EMPTY',
+  CLASS_NOT_FOUND = 'CLASS_NOT_FOUND',
+  ADMISSION_YEAR_INVALID = 'ADMISSION_YEAR_INVALID',
+  PHONE_INVALID = 'PHONE_INVALID',
+  PARENT_NAME_INVALID = 'PARENT_NAME_INVALID',
+  RELATION_UNKNOWN = 'RELATION_UNKNOWN',
+  /** The parent login (last 9 phone digits) belongs to a non-parent account */
+  PARENT_LOGIN_TAKEN = 'PARENT_LOGIN_TAKEN',
+}
+registerEnumType(ImportIssueCode, { name: 'ImportIssueCode' });

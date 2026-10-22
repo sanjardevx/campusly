@@ -20,7 +20,12 @@ interface GqlBody<T> {
 }
 interface Preview {
   previewStudentImport: {
-    rows: { line: number; status: string; errors: string[] }[];
+    rows: {
+      line: number;
+      status: string;
+      errors: { code: string; value: string | null }[];
+      loginIdPreview: string | null;
+    }[];
     summary: { ready: number; linkParent: number; errors: number };
   };
 }
@@ -65,7 +70,10 @@ describe('Student CSV import (e2e)', () => {
     return res.body as GqlBody<T>;
   }
   const PREVIEW = `mutation($csv: String!) {
-    previewStudentImport(csv: $csv) { rows { line status errors } summary { ready linkParent errors } }
+    previewStudentImport(csv: $csv) {
+      rows { line status errors { code value } loginIdPreview }
+      summary { ready linkParent errors }
+    }
   }`;
   const IMPORT = `mutation($csv: String!, $skip: Boolean) {
     importStudents(csv: $csv, skipErrors: $skip) {
@@ -175,15 +183,23 @@ describe('Student CSV import (e2e)', () => {
       [6, 'ERROR'],
       [7, 'ERROR'],
     ]);
-    expect(rows[4].errors).toEqual(['Class 9Z not found in E2E 2097']);
-    expect(rows[5].errors).toEqual(['Invalid phone: +998 99 77']);
+    // Codes + the bad value (the UI translates them and marks the cell)
+    expect(rows[4].errors).toEqual([{ code: 'CLASS_NOT_FOUND', value: '9Z' }]);
+    expect(rows[5].errors).toEqual([
+      { code: 'PHONE_INVALID', value: '+998 99 77' },
+    ]);
+    // "Student ID (preview)": the next numbers, in file order, only for rows that can be imported
+    const previews = rows.map((r) => r.loginIdPreview);
+    expect(previews.slice(4)).toEqual([null, null]);
+    expect(new Set(previews.slice(0, 4)).size).toBe(4);
+    for (const id of previews.slice(0, 4)) expect(id).toMatch(/^\d{2}1\d{5}$/);
     expect(summary).toEqual({ ready: 2, linkParent: 2, errors: 2 });
     expect(await importedCount()).toBe(2); // only the admin and the existing parent
   });
 
   it('import with errors and without "skip" is refused; nothing is created', async () => {
     const res = await gql(IMPORT, { csv: CSV, skip: false });
-    expect(res.errors?.[0].extensions.code).toBe('BAD_REQUEST');
+    expect(res.errors?.[0].extensions.code).toBe('IMPORT_HAS_ERRORS');
     expect(res.errors?.[0].message).toMatch('2 row(s) have errors');
     expect(await importedCount()).toBe(2);
   });
@@ -209,8 +225,16 @@ describe('Student CSV import (e2e)', () => {
   });
 
   it('import with skip: creates the good rows in one go and returns the login slips', async () => {
+    const preview = await gql<Preview>(PREVIEW, { csv: CSV });
     const res = await gql<Imported>(IMPORT, { csv: CSV, skip: true });
     const result = res.data!.importStudents;
+
+    // Nobody created a student in between, so the preview IDs are the real ones
+    expect(result.slips.map((s) => s.student.loginId)).toEqual(
+      preview
+        .data!.previewStudentImport.rows.map((r) => r.loginIdPreview)
+        .filter(Boolean),
+    );
 
     expect(result).toMatchObject({ created: 4, linkedParents: 2, skipped: 2 });
     const [ali, bobur, bonu, dilshod] = result.slips;

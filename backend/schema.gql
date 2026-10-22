@@ -377,6 +377,23 @@ type Health {
   status: String!
 }
 
+type ImportIssue {
+  code: ImportIssueCode!
+  value: String
+}
+
+enum ImportIssueCode {
+  ADMISSION_YEAR_INVALID
+  CLASS_EMPTY
+  CLASS_NOT_FOUND
+  FIRST_NAME_LENGTH
+  LAST_NAME_LENGTH
+  PARENT_LOGIN_TAKEN
+  PARENT_NAME_INVALID
+  PHONE_INVALID
+  RELATION_UNKNOWN
+}
+
 type ImportPreview {
   rows: [ImportRowPreview!]!
   summary: ImportSummary!
@@ -392,10 +409,11 @@ type ImportResult {
 type ImportRowPreview {
   admissionYear: Int
   className: String!
-  errors: [String!]!
+  errors: [ImportIssue!]!
   firstName: String!
   lastName: String!
   line: Int!
+  loginIdPreview: String
   parentName: String
   parentPhone: String
   status: ImportRowStatus!

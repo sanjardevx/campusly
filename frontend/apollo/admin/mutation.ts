@@ -89,3 +89,60 @@ export const CREATE_TEACHER = graphql(`
     }
   }
 `);
+
+/** CSV step 2: checks every row, writes nothing. The file goes as text (no multipart upload) */
+export const PREVIEW_IMPORT = graphql(`
+  mutation PreviewStudentImport($csv: String!) {
+    previewStudentImport(csv: $csv) {
+      rows {
+        line
+        firstName
+        lastName
+        className
+        admissionYear
+        parentName
+        parentPhone
+        status
+        loginIdPreview
+        errors {
+          code
+          value
+        }
+      }
+      summary {
+        ready
+        linkParent
+        errors
+      }
+    }
+  }
+`);
+
+/** CSV step 3: checks again and creates all good rows in ONE transaction */
+export const IMPORT_STUDENTS = graphql(`
+  mutation ImportStudents($csv: String!, $skipErrors: Boolean!) {
+    importStudents(csv: $csv, skipErrors: $skipErrors) {
+      created
+      linkedParents
+      skipped
+      slips {
+        student {
+          userId
+          loginId
+          fullName
+          role
+          tempPassword
+          isNew
+        }
+        parent {
+          userId
+          loginId
+          fullName
+          role
+          tempPassword
+          isNew
+        }
+      }
+    }
+  }
+`);

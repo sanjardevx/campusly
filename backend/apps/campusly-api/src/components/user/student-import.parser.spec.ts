@@ -7,14 +7,17 @@ const HEADER =
 /** Excel puts a byte-order mark at the start of a CSV */
 const BOM = String.fromCharCode(0xfeff);
 
-const messageOf = (run: () => unknown) => {
+/** The code the client gets for a refused file (and the message, for people reading logs) */
+const refusal = (run: () => unknown) => {
   try {
     run();
   } catch (err) {
-    return ((err as HttpException).getResponse() as { message: string })
-      .message;
+    return (err as HttpException).getResponse() as {
+      code: string;
+      message: string;
+    };
   }
-  return 'NO_ERROR';
+  return { code: 'NO_ERROR', message: '' };
 };
 
 describe('parseStudentCsv', () => {
@@ -38,6 +41,7 @@ describe('parseStudentCsv', () => {
           phone: '+998901234567',
           relation: 'FATHER',
         },
+        parentNameRaw: 'Sardor Aliyev',
         errors: [],
       },
       {
@@ -57,31 +61,39 @@ describe('parseStudentCsv', () => {
       `${HEADER}\nA,Kadyrov,10B,1850,Farrukh,+998 99 78,uncle\n`,
     );
 
+    // Codes + the bad value, never English sentences: the UI translates them
     expect(row.errors).toEqual([
-      'First name must be 2–50 characters',
-      'Invalid admission year: 1850',
-      'Invalid phone: +998 99 78',
-      'Parent name must be "First Last"',
-      'Unknown parent relation: uncle',
+      { code: 'FIRST_NAME_LENGTH', value: 'A' },
+      { code: 'ADMISSION_YEAR_INVALID', value: '1850' },
+      { code: 'PHONE_INVALID', value: '+998 99 78' },
+      { code: 'PARENT_NAME_INVALID', value: 'Farrukh' },
+      { code: 'RELATION_UNKNOWN', value: 'uncle' },
     ]);
+    // The phone is wrong, so there is no parent to create, but the preview still shows the name
+    expect(row.parent).toBeUndefined();
+    expect(row.parentNameRaw).toBe('Farrukh');
   });
 
   it('rejects the whole file for missing columns, no rows or too many rows', () => {
-    expect(messageOf(() => parseStudentCsv('name,surname\nA,B\n'))).toMatch(
-      'Missing columns: first_name, last_name, class',
-    );
-    expect(messageOf(() => parseStudentCsv(`${HEADER}\n`))).toBe(
-      'The file has no student rows',
+    const missing = refusal(() => parseStudentCsv('name,surname\nA,B\n'));
+    expect(missing.code).toBe('IMPORT_MISSING_COLUMNS');
+    expect(missing.message).toMatch('first_name, last_name, class');
+
+    expect(refusal(() => parseStudentCsv(`${HEADER}\n`)).code).toBe(
+      'IMPORT_EMPTY',
     );
     const big = `${HEADER}\n` + 'Ali,Valiyev,9A,,,,\n'.repeat(301);
-    expect(messageOf(() => parseStudentCsv(big))).toBe(
-      'Too many rows: 301 (max 300)',
-    );
+    expect(refusal(() => parseStudentCsv(big))).toEqual({
+      code: 'IMPORT_TOO_MANY_ROWS',
+      message: 'Too many rows: 301 (max 300)',
+    });
   });
 
   it('reports a broken CSV clearly', () => {
-    expect(
-      messageOf(() => parseStudentCsv(`${HEADER}\n"unclosed,quote\n`)),
-    ).toMatch('The file is not a valid CSV');
+    const broken = refusal(() =>
+      parseStudentCsv(`${HEADER}\n"unclosed,quote\n`),
+    );
+    expect(broken.code).toBe('IMPORT_INVALID_CSV');
+    expect(broken.message).toMatch('The file is not a valid CSV');
   });
 });

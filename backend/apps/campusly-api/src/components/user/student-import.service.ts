@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { IMPORT_LIMIT } from '../../libs/config';
 import { AuditAction } from '../../libs/enums/audit.enum';
 import { ErrorCode } from '../../libs/enums/common.enum';
-import { ImportRowStatus } from '../../libs/enums/user.enum';
+import { ImportIssueCode, ImportRowStatus } from '../../libs/enums/user.enum';
 import {
   CreateStudentResult,
   ImportPreview,
@@ -16,7 +16,11 @@ import {
   generateStudentPassword,
 } from '../../libs/utils/temp-password';
 import { AuditService } from '../audit/audit.service';
-import { ImportRow, parseStudentCsv } from './student-import.parser';
+import {
+  badRequest,
+  ImportRow,
+  parseStudentCsv,
+} from './student-import.parser';
 import { UserAdminService } from './user-admin.service';
 
 /** A row after the database checks: the class id is known, the status is decided */
@@ -40,6 +44,20 @@ export class StudentImportService {
 
   public async preview(csv: string): Promise<ImportPreview> {
     const rows = await this.check(parseStudentCsv(csv));
+
+    // "Student ID (preview)": the numbers the good rows would get if imported now, in file order.
+    // Only read, never reserved (the import takes them from id_counters inside its transaction).
+    const year = new Date().getUTCFullYear();
+    const counter = await this.prismaService.idCounter.findUnique({
+      where: { year_roleCode: { year, roleCode: 1 } },
+      select: { lastValue: true },
+    });
+    let next = counter?.lastValue ?? 0;
+    const preview = (r: CheckedRow) =>
+      r.status === ImportRowStatus.ERROR
+        ? null
+        : `${year % 100}1${String(++next).padStart(5, '0')}`;
+
     return {
       rows: rows.map((r) => ({
         line: r.line,
@@ -49,10 +67,11 @@ export class StudentImportService {
         admissionYear: r.admissionYear ?? null,
         parentName: r.parent
           ? `${r.parent.firstName} ${r.parent.lastName}`
-          : null,
+          : (r.parentNameRaw ?? null),
         parentPhone: r.parent?.phone ?? null,
         status: r.status,
         errors: r.errors,
+        loginIdPreview: preview(r),
       })),
       summary: {
         ready: rows.filter((r) => r.status === ImportRowStatus.READY).length,
@@ -73,10 +92,13 @@ export class StudentImportService {
     const good = rows.filter((r) => r.status !== ImportRowStatus.ERROR);
     if (bad.length && !skipErrors) {
       throw badRequest(
+        ErrorCode.IMPORT_HAS_ERRORS,
         `${bad.length} row(s) have errors. Fix them or turn on "Skip rows with errors".`,
       );
     }
-    if (good.length === 0) throw badRequest('There is nothing to import');
+    if (good.length === 0) {
+      throw badRequest(ErrorCode.IMPORT_NOTHING, 'There is nothing to import');
+    }
 
     // bcrypt is slow on purpose: hash every password BEFORE the transaction starts
     const passwords = await Promise.all(
@@ -142,7 +164,12 @@ export class StudentImportService {
       where: { isCurrent: true },
       select: { id: true, name: true },
     });
-    if (!year) throw badRequest('Set the current academic year first');
+    if (!year) {
+      throw badRequest(
+        ErrorCode.NO_CURRENT_YEAR,
+        'Set the current academic year first',
+      );
+    }
 
     const groups = await this.prismaService.group.findMany({
       where: { academicYearId: year.id, status: 'ACTIVE' },
@@ -174,10 +201,16 @@ export class StudentImportService {
       const errors = [...row.errors];
       const groupId = groupIdByName.get(row.className);
       if (row.className && !groupId) {
-        errors.push(`Class ${row.className} not found in ${year.name}`);
+        errors.push({
+          code: ImportIssueCode.CLASS_NOT_FOUND,
+          value: row.className,
+        });
       }
       if (row.parent && takenLoginIds.has(parentLoginId(row.parent.phone))) {
-        errors.push('The parent login ID is already used by another account');
+        errors.push({
+          code: ImportIssueCode.PARENT_LOGIN_TAKEN,
+          value: parentLoginId(row.parent.phone),
+        });
       }
 
       let status = ImportRowStatus.READY;
@@ -192,8 +225,4 @@ export class StudentImportService {
       return { ...row, groupId, errors, status };
     });
   }
-}
-
-function badRequest(message: string) {
-  return new BadRequestException({ code: ErrorCode.BAD_REQUEST, message });
 }

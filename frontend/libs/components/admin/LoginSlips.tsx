@@ -54,6 +54,41 @@ export function CopyButton({ text }: { text: string }) {
   );
 }
 
+/** Name · login ID · temporary password, with copy buttons (dialog, import result) */
+export function SlipsTable({ slips }: { slips: Slip[] }) {
+  const { t } = useTranslation('admin');
+  return (
+    <Table size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell>{t('slips.name')}</TableCell>
+          <TableCell>{t('slips.loginId')}</TableCell>
+          <TableCell>{t('slips.password')}</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {slips.map((s) => (
+          <TableRow key={s.userId}>
+            <TableCell sx={{ fontWeight: 600 }}>{s.fullName}</TableCell>
+            <TableCell>
+              <Box component="span" sx={mono}>
+                {s.loginId}
+              </Box>
+              <CopyButton text={s.loginId} />
+            </TableCell>
+            <TableCell>
+              <Box component="span" sx={mono}>
+                {s.tempPassword ?? '—'}
+              </Box>
+              {s.tempPassword && <CopyButton text={s.tempPassword} />}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
 /**
  * The paper version: one card per person, cut along the dashed lines and handed out.
  * Rendered into <body> next to the app, so the print CSS (globals.css) can hide everything else.
@@ -135,34 +170,7 @@ export function SlipsDialog({
           <Alert severity="warning" sx={{ mb: 2 }}>
             {t('slips.warning')}
           </Alert>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('slips.name')}</TableCell>
-                <TableCell>{t('slips.loginId')}</TableCell>
-                <TableCell>{t('slips.password')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {slips.map((s) => (
-                <TableRow key={s.userId}>
-                  <TableCell sx={{ fontWeight: 600 }}>{s.fullName}</TableCell>
-                  <TableCell>
-                    <Box component="span" sx={mono}>
-                      {s.loginId}
-                    </Box>
-                    <CopyButton text={s.loginId} />
-                  </TableCell>
-                  <TableCell>
-                    <Box component="span" sx={mono}>
-                      {s.tempPassword ?? '—'}
-                    </Box>
-                    {s.tempPassword && <CopyButton text={s.tempPassword} />}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <SlipsTable slips={slips} />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
           <Button variant="outlined" startIcon={<PrintOutlinedIcon />} onClick={() => window.print()}>

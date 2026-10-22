@@ -2,8 +2,9 @@ import { BadRequestException } from '@nestjs/common';
 import { parse } from 'csv-parse/sync';
 import { IMPORT_LIMIT } from '../../libs/config';
 import { ErrorCode } from '../../libs/enums/common.enum';
-import { ParentRelation } from '../../libs/enums/user.enum';
+import { ImportIssueCode, ParentRelation } from '../../libs/enums/user.enum';
 import { normalizeUzPhone } from '../../libs/utils/phone';
+import type { ImportIssue } from '../../libs/dto/user/user';
 
 /** CSV template columns (the design's "Download CSV template") */
 export const IMPORT_COLUMNS = [
@@ -32,7 +33,9 @@ export interface ImportRow {
     phone: string;
     relation: ParentRelation;
   };
-  errors: string[];
+  /** The parent name as written: shown in the preview even when the phone is wrong */
+  parentNameRaw?: string;
+  errors: ImportIssue[];
 }
 
 type RawRow = Partial<Record<(typeof IMPORT_COLUMNS)[number], string>>;
@@ -44,6 +47,7 @@ type RawRow = Partial<Record<(typeof IMPORT_COLUMNS)[number], string>>;
 export function parseStudentCsv(csv: string): ImportRow[] {
   if (csv.length > IMPORT_LIMIT.maxChars) {
     throw badRequest(
+      ErrorCode.IMPORT_FILE_TOO_BIG,
       `The file is too big (max ${IMPORT_LIMIT.maxChars / 1000} KB)`,
     );
   }
@@ -58,18 +62,25 @@ export function parseStudentCsv(csv: string): ImportRow[] {
       trim: true,
     });
   } catch (err) {
-    throw badRequest(`The file is not a valid CSV: ${(err as Error).message}`);
+    throw badRequest(
+      ErrorCode.IMPORT_INVALID_CSV,
+      `The file is not a valid CSV: ${(err as Error).message}`,
+    );
   }
 
-  if (records.length === 0) throw badRequest('The file has no student rows');
+  if (records.length === 0) {
+    throw badRequest(ErrorCode.IMPORT_EMPTY, 'The file has no student rows');
+  }
   if (records.length > IMPORT_LIMIT.maxRows) {
     throw badRequest(
+      ErrorCode.IMPORT_TOO_MANY_ROWS,
       `Too many rows: ${records.length} (max ${IMPORT_LIMIT.maxRows})`,
     );
   }
   const missing = REQUIRED_COLUMNS.filter((c) => !(c in records[0]));
   if (missing.length) {
     throw badRequest(
+      ErrorCode.IMPORT_MISSING_COLUMNS,
       `Missing columns: ${missing.join(', ')}. Use the CSV template.`,
     );
   }
@@ -78,14 +89,16 @@ export function parseStudentCsv(csv: string): ImportRow[] {
 }
 
 function checkRow(raw: RawRow, line: number): ImportRow {
-  const errors: string[] = [];
+  const errors: ImportIssue[] = [];
+  const issue = (code: ImportIssueCode, value?: string) =>
+    errors.push({ code, value: value ?? null });
   const firstName = raw.first_name ?? '';
   const lastName = raw.last_name ?? '';
   const className = (raw.class ?? '').toUpperCase();
 
-  if (!isName(firstName)) errors.push('First name must be 2–50 characters');
-  if (!isName(lastName)) errors.push('Last name must be 2–50 characters');
-  if (!className) errors.push('Class is empty');
+  if (!isName(firstName)) issue(ImportIssueCode.FIRST_NAME_LENGTH, firstName);
+  if (!isName(lastName)) issue(ImportIssueCode.LAST_NAME_LENGTH, lastName);
+  if (!className) issue(ImportIssueCode.CLASS_EMPTY);
 
   let admissionYear: number | undefined;
   if (raw.admission_year) {
@@ -95,7 +108,7 @@ function checkRow(raw: RawRow, line: number): ImportRow {
       admissionYear < 2000 ||
       admissionYear > 2100
     ) {
-      errors.push(`Invalid admission year: ${raw.admission_year}`);
+      issue(ImportIssueCode.ADMISSION_YEAR_INVALID, raw.admission_year);
     }
   }
 
@@ -109,12 +122,12 @@ function checkRow(raw: RawRow, line: number): ImportRow {
     const parentLast = rest.join(' ');
     const relation = (raw.parent_relation || 'OTHER').toUpperCase();
 
-    if (!phone) errors.push(`Invalid phone: ${parentPhone || '(empty)'}`);
+    if (!phone) issue(ImportIssueCode.PHONE_INVALID, parentPhone);
     if (!isName(parentFirst) || !isName(parentLast)) {
-      errors.push('Parent name must be "First Last"');
+      issue(ImportIssueCode.PARENT_NAME_INVALID, parentName);
     }
     if (!(relation in ParentRelation)) {
-      errors.push(`Unknown parent relation: ${raw.parent_relation}`);
+      issue(ImportIssueCode.RELATION_UNKNOWN, raw.parent_relation);
     }
     if (phone) {
       parent = {
@@ -133,12 +146,14 @@ function checkRow(raw: RawRow, line: number): ImportRow {
     className,
     admissionYear,
     parent,
+    ...(parentName && { parentNameRaw: parentName }),
     errors,
   };
 }
 
 const isName = (value: string) => value.length >= 2 && value.length <= 50;
 
-function badRequest(message: string) {
-  return new BadRequestException({ code: ErrorCode.BAD_REQUEST, message });
+/** 400 with a specific code: the UI says what is wrong with the file in the admin's language */
+export function badRequest(code: ErrorCode, message: string) {
+  return new BadRequestException({ code, message });
 }

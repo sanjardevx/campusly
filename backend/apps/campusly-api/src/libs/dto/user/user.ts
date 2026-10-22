@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import {
+  ImportIssueCode,
   ImportRowStatus,
   ParentRelation,
   PasswordState,
@@ -167,6 +168,16 @@ export class Users {
 
 // ───────────────────────────── CSV import ─────────────────────────────
 
+/** One problem of a CSV row: what (code) and the value that caused it */
+@ObjectType()
+export class ImportIssue {
+  @Field(() => ImportIssueCode)
+  code: ImportIssueCode;
+
+  @Field(() => String, { nullable: true })
+  value: string | null;
+}
+
 @ObjectType()
 export class ImportRowPreview {
   /** Line in the file (header = 1) */
@@ -194,8 +205,15 @@ export class ImportRowPreview {
   @Field(() => ImportRowStatus)
   status: ImportRowStatus;
 
-  @Field(() => [String])
-  errors: string[];
+  @Field(() => [ImportIssue])
+  errors: ImportIssue[];
+
+  /**
+   * The login ID this row would get if imported now (Stitch "Student ID (preview)"). Not reserved:
+   * if someone adds a student in between, the real IDs move up. Null for rows with errors.
+   */
+  @Field(() => String, { nullable: true })
+  loginIdPreview: string | null;
 }
 
 @ObjectType()

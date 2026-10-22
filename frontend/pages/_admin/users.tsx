@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { Box, Button, Chip, Tab, Tabs } from '@mui/material';
 import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { GROUPS, USER_COUNTS, USERS } from '@/apollo/admin/query';
 import { PageHeader } from '@/libs/components/admin/PageHeader';
 import { AddStudentDrawer } from '@/libs/components/admin/users/AddStudentDrawer';
 import { AddTeacherDrawer } from '@/libs/components/admin/users/AddTeacherDrawer';
 import { BulkBar } from '@/libs/components/admin/users/BulkBar';
+import { ImportStudentsDialog } from '@/libs/components/admin/users/ImportStudentsDialog';
 import { gradeOf, PASSWORD_STATES, STATUSES, UsersFilters } from '@/libs/components/admin/users/UsersFilters';
 import { UsersTable } from '@/libs/components/admin/users/UsersTable';
 import { useUserActions } from '@/libs/components/admin/users/useUserActions';
@@ -89,7 +91,7 @@ const UsersPage: NextPageWithLayout = () => {
   const chosen = rows.filter((u) => selected.has(u.id));
 
   const actions = useUserActions(() => select(NONE));
-  const [adding, setAdding] = useState<'student' | 'teacher' | null>(null);
+  const [adding, setAdding] = useState<'student' | 'teacher' | 'import' | null>(null);
   // Parents are added with their child; admins cannot be created from the console
   const addKind = role === 'TEACHER' ? 'teacher' : role === 'ADMIN' ? null : 'student';
   const selectable = role !== 'ADMIN';
@@ -100,11 +102,18 @@ const UsersPage: NextPageWithLayout = () => {
         title={t('users.title')}
         subtitle={t('users.subtitle')}
         actions={
-          addKind && (
-            <Button variant="contained" startIcon={<PersonAddAltOutlinedIcon />} onClick={() => setAdding(addKind)}>
-              {t(`add.${addKind}`)}
-            </Button>
-          )
+          <>
+            {students && (
+              <Button variant="outlined" startIcon={<UploadFileOutlinedIcon />} onClick={() => setAdding('import')}>
+                {t('import.button')}
+              </Button>
+            )}
+            {addKind && (
+              <Button variant="contained" startIcon={<PersonAddAltOutlinedIcon />} onClick={() => setAdding(addKind)}>
+                {t(`add.${addKind}`)}
+              </Button>
+            )}
+          </>
         }
       />
       {/* Mounted only while open: every opening starts with a fresh form */}
@@ -117,6 +126,7 @@ const UsersPage: NextPageWithLayout = () => {
         />
       )}
       {adding === 'teacher' && <AddTeacherDrawer open onClose={() => setAdding(null)} />}
+      {adding === 'import' && <ImportStudentsDialog open onClose={() => setAdding(null)} />}
 
       <Tabs
         value={role}
