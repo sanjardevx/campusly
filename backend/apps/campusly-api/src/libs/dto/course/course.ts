@@ -76,6 +76,10 @@ export class Course {
   /** Active enrollments */
   @Field(() => Int)
   studentCount: number;
+
+  /** Homework / Quizzes / Exams with their weights (school default 30/30/40) */
+  @Field(() => [GradeCategory])
+  gradeCategories: GradeCategory[];
 }
 
 /**
@@ -86,7 +90,4 @@ export class Course {
 export class CourseDetail extends Course {
   @Field(() => [Module])
   modules: Module[];
-
-  @Field(() => [GradeCategory])
-  gradeCategories: GradeCategory[];
 }

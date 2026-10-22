@@ -70,3 +70,56 @@ export const GROUPS = graphql(`
     }
   }
 `);
+
+/** Courses of one class (Classes & Courses page); every class's courses when groupId is empty */
+export const COURSES = graphql(`
+  query Courses($filter: CoursesFilter) {
+    courses(filter: $filter) {
+      id
+      title
+      status
+      isSplitGroup
+      groupId
+      groupName
+      subjectId
+      subjectName
+      studentCount
+      teachers {
+        id
+        firstName
+        lastName
+        role
+      }
+      gradeCategories {
+        id
+        name
+        weight
+      }
+    }
+  }
+`);
+
+export const SUBJECTS = graphql(`
+  query Subjects($includeArchived: Boolean) {
+    subjects(includeArchived: $includeArchived) {
+      id
+      name
+      status
+    }
+  }
+`);
+
+/** Active teachers for the teacher pickers (a school has dozens, not thousands) */
+export const TEACHERS = graphql(`
+  query Teachers {
+    users(input: { page: 1, limit: 100, sort: "lastName", direction: ASC, search: { role: TEACHER, status: ACTIVE } }) {
+      list {
+        id
+        loginId
+        firstName
+        lastName
+        title
+      }
+    }
+  }
+`);

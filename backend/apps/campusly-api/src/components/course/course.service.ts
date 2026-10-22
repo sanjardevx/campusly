@@ -34,6 +34,11 @@ const COURSE_INCLUDE = {
     },
   },
   _count: { select: { enrollments: { where: { status: 'ACTIVE' } } } },
+  // Weights for lists too (admin "30/30/40" column): in the same query, not one per course
+  gradeCategories: {
+    orderBy: { order: 'asc' },
+    select: { id: true, name: true, weight: true, order: true },
+  },
 } satisfies Prisma.CourseInclude;
 
 type CourseRow = Prisma.CourseGetPayload<{ include: typeof COURSE_INCLUDE }>;
@@ -123,10 +128,6 @@ export class CourseService {
       where: { id: courseId },
       include: {
         ...COURSE_INCLUDE,
-        gradeCategories: {
-          orderBy: { order: 'asc' },
-          select: { id: true, name: true, weight: true, order: true },
-        },
         modules: {
           // publishedAt null (draft) or in the future (scheduled) does not match `lte: now`
           where: learner ? { isHidden: false, publishedAt: { lte: now } } : {},
@@ -401,6 +402,7 @@ function toCourse(course: CourseRow): Course {
     subjectName: course.subject.name,
     teachers: course.teachers.map((t) => ({ ...t.teacher, role: t.role })),
     studentCount: course._count.enrollments,
+    gradeCategories: course.gradeCategories,
   };
 }
 

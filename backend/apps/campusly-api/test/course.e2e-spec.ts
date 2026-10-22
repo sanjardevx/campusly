@@ -176,6 +176,23 @@ describe('Course setup (e2e)', () => {
       ['Quizzes', settings.defaultQuizWeight],
       ['Exams', settings.defaultExamWeight],
     ]);
+
+    // The admin's course list shows the weights ("30/30/40") from the same query
+    const { academicYearId } = await prisma.course.findUniqueOrThrow({
+      where: { id: wholeId },
+    });
+    const list = await gql<{
+      courses: { id: string; gradeCategories: { weight: number }[] }[];
+    }>(
+      'query($f: CoursesFilter) { courses(filter: $f) { id gradeCategories { weight } } }',
+      { f: { groupId, academicYearId } },
+    );
+    const listed = list.data!.courses.find((c) => c.id === wholeId)!;
+    expect(listed.gradeCategories.map((c) => c.weight)).toEqual([
+      settings.defaultHomeworkWeight,
+      settings.defaultQuizWeight,
+      settings.defaultExamWeight,
+    ]);
   });
 
   it('createCourse rejects wrong input and non-admins', async () => {

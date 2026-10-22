@@ -146,3 +146,70 @@ export const IMPORT_STUDENTS = graphql(`
     }
   }
 `);
+
+export const CREATE_GROUP = graphql(`
+  mutation CreateGroup($input: CreateGroupInput!) {
+    createGroup(input: $input) {
+      id
+      name
+      studentCount
+      status
+    }
+  }
+`);
+
+/** Rename a class, or archive it (no hard delete: DECISIONS §5) */
+export const UPDATE_GROUP = graphql(`
+  mutation UpdateGroup($input: UpdateGroupInput!) {
+    updateGroup(input: $input) {
+      id
+      name
+      studentCount
+      status
+    }
+  }
+`);
+
+/** One subject × one class; the whole class is enrolled unless studentIds picks a split group */
+export const CREATE_COURSE = graphql(`
+  mutation CreateCourse($input: CreateCourseInput!) {
+    createCourse(input: $input) {
+      id
+      title
+    }
+  }
+`);
+
+export const SET_COURSE_TEACHERS = graphql(`
+  mutation SetCourseTeachers($input: SetCourseTeachersInput!) {
+    setCourseTeachers(input: $input) {
+      id
+      teachers {
+        id
+        firstName
+        lastName
+        role
+      }
+    }
+  }
+`);
+
+export const CREATE_SUBJECT = graphql(`
+  mutation CreateSubject($input: CreateSubjectInput!) {
+    createSubject(input: $input) {
+      id
+      name
+      status
+    }
+  }
+`);
+
+export const UPDATE_SUBJECT = graphql(`
+  mutation UpdateSubject($input: UpdateSubjectInput!) {
+    updateSubject(input: $input) {
+      id
+      name
+      status
+    }
+  }
+`);

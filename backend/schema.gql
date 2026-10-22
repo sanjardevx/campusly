@@ -141,6 +141,7 @@ enum CompletionType {
 
 type Course {
   academicYearId: String!
+  gradeCategories: [GradeCategory!]!
   groupId: String!
   groupName: String!
   id: String!

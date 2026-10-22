@@ -45,13 +45,16 @@ export const PERIODS = graphql(`
   }
 `);
 
-/** School name (login slips, settings) */
+/** School name (login slips) and the default grading weights (Add course) */
 export const SCHOOL_SETTINGS = graphql(`
   query SchoolSettings {
     schoolSettings {
       schoolName
       timezone
       defaultLocale
+      defaultHomeworkWeight
+      defaultQuizWeight
+      defaultExamWeight
     }
   }
 `);
