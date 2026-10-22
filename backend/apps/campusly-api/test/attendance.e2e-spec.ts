@@ -305,6 +305,37 @@ describe('Attendance: whole class at once, exceptions only (e2e)', () => {
     expect(bobur.summary).toMatchObject({ excused: 1, rate: 100 });
   });
 
+  it('attendanceJournal: taken days × active roster, PRESENT by default, range checked', async () => {
+    const JOURNAL = `query($c: String!, $f: String!, $t: String!) {
+      attendanceJournal(courseId: $c, from: $f, to: $t) { dates rows { firstName statuses } } }`;
+    type Journal = {
+      attendanceJournal: {
+        dates: string[];
+        rows: { firstName: string; statuses: string[] }[];
+      };
+    };
+    const journal = (f: string, t: string, as: Key = 'tA') =>
+      gql<Journal>(JOURNAL, { c: course.A, f, t }, as);
+
+    const month = await journal('2026-10-01', '2026-10-31');
+    expect(month.data!.attendanceJournal).toEqual({
+      dates: [DAY1, DAY2],
+      rows: [
+        { firstName: 'Aziz', statuses: ['PRESENT', 'ABSENT'] },
+        { firstName: 'Bobur', statuses: ['EXCUSED', 'PRESENT'] },
+        { firstName: 'Dilnoza', statuses: ['PRESENT', 'PRESENT'] },
+      ],
+    });
+    // Both ends are included
+    const second = await journal(DAY2, DAY2);
+    expect(second.data!.attendanceJournal.dates).toEqual([DAY2]);
+
+    expect(code(await journal(DAY2, DAY1))).toBe('DATES_ORDER');
+    expect(code(await journal('2025-09-01', '2026-10-31'))).toBe('BAD_REQUEST');
+    expect(code(await journal(DAY1, DAY2, 'tB'))).toBe('NOT_FOUND');
+    expect(code(await journal(DAY1, DAY2, 'sA'))).toBe('FORBIDDEN');
+  });
+
   // ───────────── isolation: who → whose attendance → expected ─────────────
   const table: [string, Key, () => object, string][] = [
     ['parent: the child', 'pA', () => ({ c: course.A }), 'OK'],

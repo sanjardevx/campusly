@@ -78,6 +78,20 @@ type AttendanceEntry {
   status: AttendanceStatus!
 }
 
+type AttendanceJournal {
+  courseId: String!
+  dates: [String!]!
+  rows: [AttendanceJournalRow!]!
+}
+
+type AttendanceJournalRow {
+  firstName: String!
+  lastName: String!
+  loginId: String!
+  statuses: [AttendanceStatus!]!
+  studentId: String!
+}
+
 input AttendanceMarkInput {
   note: String
   status: AttendanceStatus!
@@ -566,6 +580,7 @@ type Mutation {
   gradeSubmission(input: GradeSubmissionInput!): Submission!
   importStudents(csv: String!, skipErrors: Boolean! = false): ImportResult!
   linkParent(input: ParentInput!, studentId: String!): LoginSlip!
+  logRecordExport(input: RecordExportInput!): Boolean!
   markAnnouncementRead(id: String!): Announcement!
   markAttendance(input: MarkAttendanceInput!): CourseAttendance!
   moveStudent(input: MoveStudentInput!): Group!
@@ -712,6 +727,7 @@ type Query {
   announcements(input: AnnouncementsInquiry): Announcements!
   assignment(id: String!): Assignment!
   assignmentSubmissions(assignmentId: String!): [GradebookRow!]!
+  attendanceJournal(courseId: String!, from: String!, to: String!): AttendanceJournal!
   courseAssignments(courseId: String!): [Assignment!]!
   courseAttendance(courseId: String!, date: String!): CourseAttendance!
   courseDetail(courseId: String!): CourseDetail!
@@ -745,6 +761,25 @@ type RecentGrade {
   publishedAt: DateTime!
   score: Float!
   title: String!
+}
+
+input RecordExportInput {
+  format: RecordFormat!
+  report: RecordReport!
+  scope: String
+  targetId: String
+}
+
+enum RecordFormat {
+  CSV
+  PRINT
+}
+
+enum RecordReport {
+  ATTENDANCE
+  GRADES
+  REPORT_CARD
+  STUDENTS
 }
 
 enum RecordStatus {

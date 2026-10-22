@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import {
+  AttendanceJournal,
   AttendanceSummary,
   CourseAttendance,
   StudentAttendance,
@@ -154,6 +155,72 @@ export class AttendanceService {
     };
   }
 
+  /**
+   * The journal for a date range (Records page): columns = days attendance was taken,
+   * rows = active students by name. A missing record means PRESENT, as on the teacher's screen.
+   */
+  public async getAttendanceJournal(
+    user: AuthUser,
+    courseId: string,
+    from: string,
+    to: string,
+  ): Promise<AttendanceJournal> {
+    await this.accessPolicy.assertTeacherOf(user, courseId);
+    const start = toDbDate(from);
+    const end = toDbDate(to);
+    if (end < start) {
+      throw new BadRequestException({
+        code: ErrorCode.DATES_ORDER,
+        message: 'The end date must not be before the start date',
+      });
+    }
+    if (end.getTime() - start.getTime() > MAX_JOURNAL_DAYS * DAY_MS) {
+      throw badRequest(`The range can be at most ${MAX_JOURNAL_DAYS} days`);
+    }
+
+    const [sessions, enrollments] = await Promise.all([
+      this.prismaService.classSession.findMany({
+        where: { courseId, date: { gte: start, lte: end } },
+        include: { records: { select: { studentId: true, status: true } } },
+        orderBy: { date: 'asc' },
+      }),
+      this.prismaService.enrollment.findMany({
+        where: { courseId, status: 'ACTIVE' },
+        include: {
+          student: {
+            select: {
+              id: true,
+              loginId: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+        orderBy: [
+          { student: { lastName: 'asc' } },
+          { student: { firstName: 'asc' } },
+        ],
+      }),
+    ]);
+    // One map per day: studentId → status
+    const days = sessions.map(
+      (s) => new Map(s.records.map((r) => [r.studentId, r.status])),
+    );
+    return {
+      courseId,
+      dates: sessions.map((s) => fromDbDate(s.date)),
+      rows: enrollments.map(({ student }) => ({
+        studentId: student.id,
+        loginId: student.loginId,
+        firstName: student.firstName,
+        lastName: student.lastName,
+        statuses: days.map(
+          (day) => day.get(student.id) ?? AttendanceStatus.PRESENT,
+        ),
+      })),
+    };
+  }
+
   /** Student: own. Parent: a child. Admin: any student of the course. */
   public async getMyAttendance(
     user: AuthUser,
@@ -184,6 +251,10 @@ export class AttendanceService {
     };
   }
 }
+
+/** A school year fits; longer ranges are a mistake (and a huge table) */
+const MAX_JOURNAL_DAYS = 366;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Counts and the attendance rate; an excused absence does not lower the rate */
 export function summarizeAttendance(

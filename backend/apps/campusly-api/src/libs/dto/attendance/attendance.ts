@@ -96,3 +96,37 @@ export class StudentAttendance {
   @Field(() => [AttendanceEntry])
   entries: AttendanceEntry[];
 }
+
+/** One student's line in the journal: one status per date of `AttendanceJournal.dates` */
+@ObjectType()
+export class AttendanceJournalRow {
+  @Field(() => String)
+  studentId: string;
+
+  @Field(() => String)
+  loginId: string;
+
+  @Field(() => String)
+  firstName: string;
+
+  @Field(() => String)
+  lastName: string;
+
+  /** Same order as `dates`; a student without a record that day is PRESENT */
+  @Field(() => [AttendanceStatus])
+  statuses: AttendanceStatus[];
+}
+
+/** A course over a date range (Records page): the days attendance was taken × the active roster */
+@ObjectType()
+export class AttendanceJournal {
+  @Field(() => String)
+  courseId: string;
+
+  /** "YYYY-MM-DD", oldest first; only days with a class session */
+  @Field(() => [String])
+  dates: string[];
+
+  @Field(() => [AttendanceJournalRow])
+  rows: AttendanceJournalRow[];
+}

@@ -28,4 +28,5 @@ export enum AuditAction {
   ASSIGNMENT_PUBLISH_GRADES = 'assignment.publishGrades',
   PERIOD_GRADES_PUBLISH = 'periodGrades.publish',
   PERIOD_GRADE_OVERRIDE = 'periodGrade.override',
+  RECORDS_EXPORT = 'records.export',
 }

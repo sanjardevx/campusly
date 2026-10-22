@@ -5,6 +5,7 @@ import { AssignmentResolver } from '../src/components/assignment/assignment.reso
 import { GradingResolver } from '../src/components/assignment/grading.resolver';
 import { SubmissionResolver } from '../src/components/assignment/submission.resolver';
 import { AttendanceResolver } from '../src/components/attendance/attendance.resolver';
+import { AuditResolver } from '../src/components/audit/audit.resolver';
 import { ContentResolver } from '../src/components/course/content.resolver';
 import { CourseResolver } from '../src/components/course/course.resolver';
 import { GradeResolver } from '../src/components/grade/grade.resolver';
@@ -31,6 +32,7 @@ const RESOLVERS = [
   AnnouncementResolver,
   AssignmentResolver,
   AttendanceResolver,
+  AuditResolver,
   ContentResolver,
   CourseResolver,
   GradeResolver,
@@ -120,7 +122,9 @@ describe('Every GraphQL operation has a deliberate role rule', () => {
 
   it('admin-only areas never let other roles in', () => {
     const adminOnly = ops.filter((o) =>
-      ['UserAdminResolver', 'GroupResolver'].includes(o.resolver),
+      ['UserAdminResolver', 'GroupResolver', 'AuditResolver'].includes(
+        o.resolver,
+      ),
     );
     for (const op of adminOnly) expect(op.roles).toEqual([Role.ADMIN]);
   });

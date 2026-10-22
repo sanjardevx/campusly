@@ -403,4 +403,39 @@ describe('School settings, years, periods (e2e)', () => {
     });
   });
 
+  describe('records page', () => {
+    const EXPORT = `mutation($i: RecordExportInput!) { logRecordExport(input: $i) }`;
+
+    it('every download / print leaves an audit row; only an admin may log one', async () => {
+      const targetId = '00000000-0000-7000-8000-000000000001';
+      const res = await gql<{ logRecordExport: boolean }>(EXPORT, {
+        i: { report: 'GRADES', format: 'CSV', targetId, scope: 'Q1' },
+      });
+      expect(res.data!.logRecordExport).toBe(true);
+      const row = await prisma.auditLog.findFirst({
+        where: { action: 'records.export', entityId: targetId },
+      });
+      expect(row).toMatchObject({
+        entityType: 'Course',
+        after: { report: 'GRADES', format: 'CSV', scope: 'Q1' },
+      });
+
+      expect(
+        code(
+          await gql(
+            EXPORT,
+            { i: { report: 'STUDENTS', format: 'PRINT' } },
+            studentToken,
+          ),
+        ),
+      ).toBe('FORBIDDEN');
+      expect(
+        code(
+          await gql(EXPORT, {
+            i: { report: 'STUDENTS', format: 'CSV', targetId: 'x' },
+          }),
+        ),
+      ).toBe('BAD_REQUEST');
+    });
+  });
 });

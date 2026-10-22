@@ -1,6 +1,7 @@
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
+  AttendanceJournal,
   CourseAttendance,
   StudentAttendance,
 } from '../../libs/dto/attendance/attendance';
@@ -32,6 +33,23 @@ export class AttendanceResolver {
     @Args('date') date: string,
   ): Promise<CourseAttendance> {
     return this.attendanceService.getCourseAttendance(user, courseId, date);
+  }
+
+  /** from / to: "YYYY-MM-DD", both included (Records page: attendance journal) */
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @Query(() => AttendanceJournal)
+  public attendanceJournal(
+    @CurrentUser() user: AuthUser,
+    @Args('courseId', ParseUUIDPipe) courseId: string,
+    @Args('from') from: string,
+    @Args('to') to: string,
+  ): Promise<AttendanceJournal> {
+    return this.attendanceService.getAttendanceJournal(
+      user,
+      courseId,
+      from,
+      to,
+    );
   }
 
   /** Student: own. Parent: a child (studentId optional with one child). Admin: any student. */
