@@ -5,6 +5,7 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
 import { CourseModule } from './course/course.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { GradeModule } from './grade/grade.module';
 import { GroupModule } from './group/group.module';
 import { MediaModule } from './media/media.module';
@@ -22,6 +23,7 @@ import { UserModule } from './user/user.module';
     AuditModule,
     AuthModule,
     CourseModule,
+    DashboardModule,
     GradeModule,
     GroupModule,
     MediaModule,

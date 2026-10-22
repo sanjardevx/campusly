@@ -14,9 +14,33 @@ type AccessToken {
   accessToken: String!
 }
 
+type ActivityItem {
+  action: String!
+  actorName: String
+  createdAt: DateTime!
+  id: String!
+}
+
 input AddSubmissionCommentInput {
   body: String!
   submissionId: String!
+}
+
+type AdminDashboard {
+  accounts: Int!
+  attendanceLastMonth: Float
+  attendanceThisMonth: Float
+  classes: Int!
+  courses: Int!
+  needsAttention: NeedsAttention!
+  newStudentsThisMonth: Int!
+  newTeachersThisMonth: Int!
+  notSignedIn: Int!
+  period: DashboardPeriod
+  recentActivity: [ActivityItem!]!
+  students: Int!
+  teachers: Int!
+  today: String!
 }
 
 type Announcement {
@@ -98,6 +122,22 @@ input AttendanceMarkInput {
   studentId: String!
 }
 
+type AttendanceOverview {
+  absent: Int!
+  excused: Int!
+  from: String!
+  late: Int!
+  present: Int!
+  to: String!
+  total: Int!
+}
+
+enum AttendanceRange {
+  MONTH
+  TODAY
+  WEEK
+}
+
 type AttendanceRow {
   firstName: String!
   lastName: String!
@@ -121,6 +161,42 @@ type AttendanceSummary {
   present: Int!
   rate: Float
   total: Int!
+}
+
+enum AttentionPriority {
+  HIGH
+  LOW
+  MEDIUM
+}
+
+type AttentionStudent {
+  attendanceRate: Float!
+  className: String
+  firstName: String!
+  lastName: String!
+  loginId: String!
+  marks: Int!
+  priority: AttentionPriority!
+  studentId: String!
+}
+
+type CalendarEvent {
+  endsOn: String!
+  id: String!
+  kind: CalendarEventKind!
+  note: String
+  schoolEventId: String
+  startsOn: String!
+  title: String!
+}
+
+enum CalendarEventKind {
+  DEADLINE
+  EVENT
+  HOLIDAY
+  START
+  TERM_END
+  TERM_START
 }
 
 type CategoryGrade {
@@ -293,6 +369,14 @@ input CreatePeriodInput {
   startsAt: String!
 }
 
+input CreateSchoolEventInput {
+  endsOn: String
+  kind: SchoolEventKind!
+  note: String
+  startsOn: String!
+  title: String!
+}
+
 input CreateStudentInput {
   admissionYear: Int
   birthDate: DateTime
@@ -332,6 +416,13 @@ input CreateUploadInput {
   kind: MediaKind!
   mimeType: String!
   size: Float!
+}
+
+type DashboardPeriod {
+  id: String!
+  name: String!
+  week: Int!
+  weeks: Int!
 }
 
 """
@@ -559,6 +650,7 @@ input MoveStudentInput {
 
 type Mutation {
   addSubmissionComment(input: AddSubmissionCommentInput!): Submission!
+  archiveSchoolEvent(id: String!): SchoolEvent!
   blockUser(userId: String!): Boolean!
   changePassword(input: ChangePasswordInput!): AccessToken!
   completeLesson(lessonId: String!): LessonProgress!
@@ -571,6 +663,7 @@ type Mutation {
   createLesson(input: CreateLessonInput!): Lesson!
   createModule(input: CreateModuleInput!): Module!
   createPeriod(input: CreatePeriodInput!): Period!
+  createSchoolEvent(input: CreateSchoolEventInput!): SchoolEvent!
   createStudent(input: CreateStudentInput!): CreateStudentResult!
   createSubject(input: CreateSubjectInput!): Subject!
   createSubmissionUpload(input: CreateSubmissionUploadInput!): UploadTicket!
@@ -611,6 +704,7 @@ type Mutation {
   updateLessonProgress(input: LessonProgressInput!): LessonProgress!
   updateModule(input: UpdateModuleInput!): Module!
   updatePeriod(input: UpdatePeriodInput!): Period!
+  updateSchoolEvent(input: UpdateSchoolEventInput!): SchoolEvent!
   updateSchoolSettings(input: UpdateSchoolSettingsInput!): SchoolSettings!
   updateSubject(input: UpdateSubjectInput!): Subject!
 }
@@ -618,6 +712,14 @@ type Mutation {
 type MyPeriodGrades {
   annual: PeriodGradeRow!
   periods: [PeriodGradeRow!]!
+}
+
+type NeedsAttention {
+  high: Int!
+  low: Int!
+  medium: Int!
+  students: [AttentionStudent!]!
+  total: Int!
 }
 
 type OverviewCourse {
@@ -724,10 +826,12 @@ input PublishPeriodGradesInput {
 
 type Query {
   academicYears: [AcademicYear!]!
+  adminDashboard: AdminDashboard!
   announcements(input: AnnouncementsInquiry): Announcements!
   assignment(id: String!): Assignment!
   assignmentSubmissions(assignmentId: String!): [GradebookRow!]!
   attendanceJournal(courseId: String!, from: String!, to: String!): AttendanceJournal!
+  attendanceOverview(range: AttendanceRange!): AttendanceOverview!
   courseAssignments(courseId: String!): [Assignment!]!
   courseAttendance(courseId: String!, date: String!): CourseAttendance!
   courseDetail(courseId: String!): CourseDetail!
@@ -735,6 +839,7 @@ type Query {
   coursePeriodGrades(courseId: String!, periodId: String!): [PeriodGradeRow!]!
   courses(filter: CoursesFilter): [Course!]!
   currentAcademicYear: AcademicYear
+  dashboardCalendar(month: String!): [CalendarEvent!]!
   groups(academicYearId: String): [Group!]!
   health: Health!
   lessonVideo(lessonId: String!): LessonVideo!
@@ -803,6 +908,23 @@ enum Role {
   PARENT
   STUDENT
   TEACHER
+}
+
+type SchoolEvent {
+  endsOn: String!
+  id: String!
+  kind: SchoolEventKind!
+  note: String
+  startsOn: String!
+  status: RecordStatus!
+  title: String!
+}
+
+enum SchoolEventKind {
+  DEADLINE
+  EVENT
+  HOLIDAY
+  START
 }
 
 type SchoolSettings {
@@ -1018,6 +1140,15 @@ input UpdatePeriodInput {
   name: String
   order: Int
   startsAt: String
+}
+
+input UpdateSchoolEventInput {
+  endsOn: String
+  id: String!
+  kind: SchoolEventKind
+  note: String
+  startsOn: String
+  title: String
 }
 
 input UpdateSchoolSettingsInput {

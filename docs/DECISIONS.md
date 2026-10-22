@@ -65,7 +65,7 @@ When a decision changes, update it here **and** add a line to the [Decision log]
 | Area | Tables |
 |---|---|
 | Identity | `User` (loginId, role, status, passwordHash, tempPasswordUsesLeft, tempPasswordExpiresAt, mustChangePassword, firstName, lastName, locale, timezone?, isDemo, telegramChatId?), `StudentProfile` (birthDate, admissionYear), `TeacherProfile`, `ParentProfile` (phone), `ParentStudent` (relation, createdById, revokedAt), `RefreshToken` (familyId, tokenHash, expiresAt, revokedAt, replacedBy), `OneTimeToken` (purpose, tokenHash, expiresAt, usedAt), `IdCounter` (year, roleCode, lastValue) |
-| School | `SchoolSetting`, `AcademicYear` (name, startsAt, endsAt, isCurrent), `Period` (academicYearId, parentId?, kind `SEMESTER \| QUARTER \| MONTH \| CUSTOM`, name, order, startsAt, endsAt) |
+| School | `SchoolSetting`, `AcademicYear` (name, startsAt, endsAt, isCurrent), `Period` (academicYearId, parentId?, kind `SEMESTER \| QUARTER \| MONTH \| CUSTOM`, name, order, startsAt, endsAt), `SchoolEvent` (kind `HOLIDAY \| EVENT \| DEADLINE \| START`, title, startsOn, endsOn, note?, status, createdById) |
 | Courses | `Subject` (name @unique, status — admin "Manage subjects"), `Group` (academicYearId, name; `@@unique([academicYearId, name])` — 9A of 2026–27 and 9A of 2027–28 are separate rows) + `GroupMember` (class, e.g. 9A), `Course` (academicYearId, periodId?, groupId, subjectId, title e.g. "Algebra · 9A", status), `CourseTeacher` (OWNER / ASSISTANT), `Enrollment`, `Module` (week: order, startsAt, endsAt, isHidden, publishedAt), `Lesson` (type, body, videoAssetId?, dueAt?, completionType, tutorNotes, publishedAt), `LessonResource` |
 | Media | `MediaAsset` (ownerId, kind, provider `S3 \| VIMEO`, s3Key, originalName, mimeType, size, status `UPLOADING \| PROCESSING \| READY \| FAILED`, durationSec, hlsKey?) |
 | Learning | `LessonProgress` (status, watchedSeconds, lastPositionSec, maxPositionSec, completedAt) |
@@ -153,6 +153,8 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - `PeriodGrade`: computed live until the teacher publishes; publishing stores a snapshot (`computedScore`, optional manual `finalScore`). The annual grade is derived from period snapshots.
 - Late submissions are allowed until grades are published (if `allowLate`). "Give 0 to not submitted" sets `MISSING`.
 - Attendance is per **course session** (`ClassSession` by date), not per school day. Default status is `PRESENT`; teachers mark exceptions.
+- **Admin dashboard "needs attention" is about attendance only** (current period, up to today): below 75 % → HIGH, 75–85 % → MEDIUM, 85–90 % → LOW. A rate needs at least 5 marks. Counted on the server (`groupBy`); the list shows the 5 lowest rates.
+- **School calendar** (`SchoolEvent`, admin dashboard): holidays (one day or a range), school events, programme deadlines and start dates, added by admins; term starts / ends come from `Period`. Course deadlines are not on it (they stay in the courses). Edit and archive only (no hard delete), every change audited; a range is at most 92 days.
 
 ## 11. Media
 
@@ -183,11 +185,13 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - Card padding 1.5rem on desktop, 1rem on phones; compact (Moodle / eCampus) density.
 - Student and parent screens must work on mobile.
 - Phone tab bar (student / parent): iOS 26 "Liquid Glass" style instead of Stitch's white pill — frosted glass capsule (`backdrop-filter: blur + saturate`, light top edge, faint sheen) and one glass lens that slides under the active tab, moved on tap. CSS only (SVG refraction does not work in Safari); solid white when blur is unsupported or `prefers-reduced-transparency`, no animation with `prefers-reduced-motion`. This is the one place the "no gradients" rule is relaxed.
+- **Data colours** (`frontend/libs/viz.ts`, checked with the dataviz palette validator): attendance present `#1BAF7A`, late `#EDA100`, excused `#2A78D6`, absent `#E34948` — always with a text label, 2 px gaps in the donut. KPI icon tiles use soft tints (spruce, blue, aqua, amber). Calendar dots use the same four validated hues with a legend: holiday red, school event blue, deadline amber, start green (term starts count as a start, term ends as a deadline).
+- Dashboard motion: cards fade up 8 px in 260 ms (ease-out) with a 40 ms stagger, KPI numbers count up, donut segments draw in; transform / opacity only; nothing with `prefers-reduced-motion`.
 - Desktop shell follows the same motion: one spruce lens slides to the chosen sidebar link (moved on tap, measured because admin section titles make gaps), and the top bar is translucent glass (`blur + saturate`, solid fallback) so content scrolls under it. The sidebar itself stays solid white.
 
 ## 14. Later phases (approved, not in the 2-week MVP)
 
-Order after day 14: Telegram bot (password reset + notifications) → quiz engine (MC / True-False / Number, 1 attempt, auto-grade) → AI Study Tutor (Socratic hints, help levels 1–4, per-assignment `tutorMode`, daily limits) → Website CMS + public site (News & Events, Programs, Mock tests, Open Courses, Honor Students, Our team, Enquiries) → Q&A and calendar → HLS (MediaConvert) + multipart upload → Socket.IO notifications.
+Order after day 14: Telegram bot (password reset + notifications) → quiz engine (MC / True-False / Number, 1 attempt, auto-grade) → AI Study Tutor (Socratic hints, help levels 1–4, per-assignment `tutorMode`, daily limits) → Website CMS + public site (News & Events, Programs, Mock tests, Open Courses, Honor Students, Our team, Enquiries) → Q&A and the calendar for students / parents → HLS (MediaConvert) + multipart upload → Socket.IO notifications.
 
 ---
 
@@ -213,3 +217,6 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-22 | Errors the UI explains get specific codes (CSV import issues, settings and calendar rules) instead of `BAD_REQUEST` + an English sentence |
 | 2026-10-22 | Settings cards open in view mode (Edit → Cancel / Save); Telegram channel (public site footer) and password-reset bot are separate settings |
 | 2026-10-22 | Admin Records page: lists and journals as CSV / print built in the browser, every export audited (`records.export`); past years reachable for grades and attendance |
+| 2026-10-23 | Admin dashboard: KPI tiles with month-over-month change, attendance donut (today / week / month), "needs attention", month calendar, recent activity from the audit log; website blocks hidden until the CMS phase |
+| 2026-10-23 | Developer's choice: "needs attention" is attendance only (75 / 85 / 90 %); the admin calendar holds the school's own events — new `SchoolEvent` table (holiday, event, deadline, start), so the admin part of the calendar moves into the MVP; students' / parents' calendar stays a later phase |
+| 2026-10-23 | Data colour palette and dashboard motion rules added to §13 |

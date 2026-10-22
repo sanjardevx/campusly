@@ -8,12 +8,14 @@ import { AttendanceResolver } from '../src/components/attendance/attendance.reso
 import { AuditResolver } from '../src/components/audit/audit.resolver';
 import { ContentResolver } from '../src/components/course/content.resolver';
 import { CourseResolver } from '../src/components/course/course.resolver';
+import { DashboardResolver } from '../src/components/dashboard/dashboard.resolver';
 import { GradeResolver } from '../src/components/grade/grade.resolver';
 import { PeriodGradeResolver } from '../src/components/grade/period-grade.resolver';
 import { GroupResolver } from '../src/components/group/group.resolver';
 import { MediaResolver } from '../src/components/media/media.resolver';
 import { OverviewResolver } from '../src/components/overview/overview.resolver';
 import { ProgressResolver } from '../src/components/progress/progress.resolver';
+import { SchoolEventResolver } from '../src/components/school/school-event.resolver';
 import { SchoolResolver } from '../src/components/school/school.resolver';
 import { UserAdminResolver } from '../src/components/user/user-admin.resolver';
 import { UserResolver } from '../src/components/user/user.resolver';
@@ -35,6 +37,7 @@ const RESOLVERS = [
   AuditResolver,
   ContentResolver,
   CourseResolver,
+  DashboardResolver,
   GradeResolver,
   GradingResolver,
   GroupResolver,
@@ -42,6 +45,7 @@ const RESOLVERS = [
   OverviewResolver,
   PeriodGradeResolver,
   ProgressResolver,
+  SchoolEventResolver,
   SchoolResolver,
   SubmissionResolver,
   UserAdminResolver,
@@ -122,9 +126,13 @@ describe('Every GraphQL operation has a deliberate role rule', () => {
 
   it('admin-only areas never let other roles in', () => {
     const adminOnly = ops.filter((o) =>
-      ['UserAdminResolver', 'GroupResolver', 'AuditResolver'].includes(
-        o.resolver,
-      ),
+      [
+        'UserAdminResolver',
+        'GroupResolver',
+        'AuditResolver',
+        'DashboardResolver',
+        'SchoolEventResolver',
+      ].includes(o.resolver),
     );
     for (const op of adminOnly) expect(op.roles).toEqual([Role.ADMIN]);
   });

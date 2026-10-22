@@ -62,6 +62,17 @@ export function todayInZone(timeZone: string, now = new Date()): string {
   }).format(now);
 }
 
+/** Monday to Friday of the week that contains `day`; Saturday and Sunday show that week too */
+export function weekDays(day: string): string[] {
+  const date = toDbDate(day);
+  // getUTCDay: 0 = Sunday … 6 = Saturday → days since Monday
+  const fromMonday = (date.getUTCDay() + 6) % 7;
+  const monday = date.getTime() - fromMonday * 86_400_000;
+  return [0, 1, 2, 3, 4].map((i) =>
+    fromDbDate(new Date(monday + i * 86_400_000)),
+  );
+}
+
 /** "2026-10-31" → "2026-11-01" */
 export function nextDay(day: string): string {
   return fromDbDate(new Date(toDbDate(day).getTime() + 86_400_000));

@@ -5,6 +5,7 @@ import {
   startOfDayInZone,
   toDbDate,
   todayInZone,
+  weekDays,
 } from './date';
 
 describe('calendar dates', () => {
@@ -63,5 +64,36 @@ describe('todayInZone', () => {
     const now = new Date('2026-10-21T20:00:00Z');
     expect(todayInZone('Asia/Tashkent', now)).toBe('2026-10-22');
     expect(todayInZone('UTC', now)).toBe('2026-10-21');
+  });
+});
+
+describe('weekDays (admin dashboard)', () => {
+  const WEEK = [
+    '2026-10-19',
+    '2026-10-20',
+    '2026-10-21',
+    '2026-10-22',
+    '2026-10-23',
+  ];
+
+  it('Monday to Friday of the same week, from any school day', () => {
+    expect(weekDays('2026-10-19')).toEqual(WEEK);
+    expect(weekDays('2026-10-23')).toEqual(WEEK);
+  });
+
+  it('Saturday and Sunday show the week that just ended', () => {
+    expect(weekDays('2026-10-24')).toEqual(WEEK);
+    expect(weekDays('2026-10-25')).toEqual(WEEK);
+  });
+
+  it('crosses a month end', () => {
+    expect(weekDays('2026-10-30')).toEqual([
+      '2026-10-26',
+      '2026-10-27',
+      '2026-10-28',
+      '2026-10-29',
+      '2026-10-30',
+    ]);
+    expect(weekDays('2026-11-02')[0]).toBe('2026-11-02');
   });
 });

@@ -95,6 +95,7 @@ model User {
   announcementReads     AnnouncementRead[]  @relation("AnnouncementReads")
   notifications         Notification[]      @relation("Notifications")
   auditLogs             AuditLog[]          @relation("AuditActor")
+  schoolEventsCreated   SchoolEvent[]       @relation("SchoolEventsCreated")
 
   @@index([role, status])
   @@map("users")
@@ -206,6 +207,36 @@ enum PeriodKind {
   CUSTOM
 }
 
+enum SchoolEventKind {
+  HOLIDAY
+  EVENT
+  /// A programme or application deadline
+  DEADLINE
+  /// A programme, club or course starts
+  START
+}
+
+/// School calendar (admin dashboard): holidays, events, deadlines, starts. Term dates come from
+/// Period, assignment deadlines stay in the courses. No hard delete: status ARCHIVED + AuditLog.
+model SchoolEvent {
+  id          String          @id @default(uuid(7)) @db.Uuid
+  kind        SchoolEventKind
+  title       String
+  /// Calendar days in the school timezone; a one-day event has endsOn = startsOn
+  startsOn    DateTime        @db.Date
+  endsOn      DateTime        @db.Date
+  note        String?
+  status      RecordStatus    @default(ACTIVE)
+  createdById String          @db.Uuid
+  createdAt   DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime        @updatedAt @db.Timestamptz(3)
+
+  createdBy User @relation("SchoolEventsCreated", fields: [createdById], references: [id])
+
+  @@index([startsOn, endsOn])
+  @@map("school_events")
+}
+
 /// Single row (id = 1), edited on the admin Settings page
 model SchoolSetting {
   id            Int    @id @default(1)
@@ -225,8 +256,8 @@ model SchoolSetting {
   defaultExamWeight     Int @default(40)
 
   /// "Forgot password?" on the login page and the login slips tell people where to go
-  contactPhone String?
-  officeHours  String?
+  contactPhone   String?
+  officeHours    String?
   /// The school's official channel (public website footer); only https://t.me/<name>
   telegramUrl    String?
   /// Password-reset bot ("Forgot password?" on the sign-in page); only https://t.me/<name>bot

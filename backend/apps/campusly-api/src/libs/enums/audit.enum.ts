@@ -29,4 +29,7 @@ export enum AuditAction {
   PERIOD_GRADES_PUBLISH = 'periodGrades.publish',
   PERIOD_GRADE_OVERRIDE = 'periodGrade.override',
   RECORDS_EXPORT = 'records.export',
+  SCHOOL_EVENT_CREATE = 'schoolEvent.create',
+  SCHOOL_EVENT_UPDATE = 'schoolEvent.update',
+  SCHOOL_EVENT_ARCHIVE = 'schoolEvent.archive',
 }
