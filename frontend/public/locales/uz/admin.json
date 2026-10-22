@@ -118,8 +118,13 @@
     "password": "Vaqtinchalik parol",
     "heading": "Campusly’ga kirish",
     "signInAt": "Kirish manzili",
-    "rule": "Bu parol 3 marta kirish yoki 14 kun amal qiladi. Keyin o‘z parolingizni o‘rnatasiz.",
-    "issued": "Berilgan sana: {{date}}"
+    "rule": "Bu parol {{signIns}} yoki {{days}} amal qiladi. Keyin o‘z parolingizni o‘rnatasiz.",
+    "issued": "Berilgan sana: {{date}}",
+    "nSignIns_one": "{{count}} marta kirish",
+    "nSignIns_other": "{{count}} marta kirish",
+    "nDays_one": "{{count}} kun",
+    "nDays_other": "{{count}} kun",
+    "contact": "Savollar bo‘lsa: {{contact}}"
   },
   "add": {
     "student": "O‘quvchi qo‘shish",
@@ -164,7 +169,7 @@
     "pickParent": "Ota-onani tanlang",
     "idExplain": "ID = yil {{year}} + rol {{role}} + raqam {{seq}} · takrorlanmaydi, tizim beradi",
     "parentIdExplain": "Ota-ona ID = telefonning oxirgi 9 raqami.",
-    "tempNote": "Vaqtinchalik parol 3 marta kirish yoki 14 kun amal qiladi. Keyin o‘z parolini o‘rnatadi.",
+    "tempNote": "Vaqtinchalik parol {{signIns}} yoki {{days}} amal qiladi. Keyin o‘z parolini o‘rnatadi.",
     "existingAccount": "Mavjud akkaunt: endi bu farzandga bog‘landi, o‘z paroli saqlanadi.",
     "saved": "Saqlandi",
     "partial": "O‘quvchi saqlandi, lekin ikkinchi ota-ona qo‘shilmadi: {{error}}"
@@ -314,5 +319,108 @@
     "nStudents_other": "{{count}} o‘quvchi",
     "nCourses_one": "{{count}} kurs",
     "nCourses_other": "{{count}} kurs"
+  },
+  "settings": {
+    "title": "Sozlamalar",
+    "subtitle": "Maktab ma’lumotlari, baholash qoidalari va o‘quv taqvimi.",
+    "save": "Saqlash",
+    "edit": "Tahrirlash",
+    "saved": "Saqlandi",
+    "cancel": "Bekor qilish",
+    "school": {
+      "title": "Maktab",
+      "subtitle": "Login varaqalari va ochiq saytda ko‘rinadi.",
+      "name": "Maktab nomi",
+      "locale": "Standart til",
+      "localeHint": "Yangi foydalanuvchilar uchun, o‘zlari til tanlaguncha.",
+      "timezone": "Vaqt zonasi",
+      "timezoneHint": "Muddatlar, “bugun” va davomat kunlari shu zona bo‘yicha hisoblanadi.",
+      "contactTitle": "O‘quvchi va ota-onalar uchun aloqa",
+      "contactHint": "Telefon va ish vaqti kirish sahifasida “Parolni unutdingizmi?” ostida va login varaqalarida ko‘rinadi. Yashirish uchun bo‘sh qoldiring.",
+      "phone": "Ofis telefoni",
+      "phoneHint": "masalan +998 71 200 00 00",
+      "phoneBad": "Faqat raqam, bo‘sh joy, +, - va ( )",
+      "hours": "Ish vaqti",
+      "hoursHint": "masalan Du–Ju 9:00–17:00",
+      "telegram": "Telegram kanal",
+      "telegramBad": "https://t.me/nom ko‘rinishida bo‘lishi kerak",
+      "telegramPlaceholder": "https://t.me/maktabingiz",
+      "telegramHint": "Maktabning rasmiy kanali. Ochiq sayt pastida ko‘rinadi.",
+      "bot": "Telegram bot (parolni tiklash)",
+      "botPlaceholder": "https://t.me/maktabingiz_bot",
+      "botHint": "Kirish sahifasidagi “Parolni unutdingizmi?” shu botga yo‘naltiradi. Bot ishga tushguncha bo‘sh qoldiring.",
+      "botBad": "https://t.me/nom_bot ko‘rinishida bo‘lishi kerak"
+    },
+    "grading": {
+      "title": "Baholash",
+      "subtitle": "Davr foizi 5 ballik bahoga qanday aylanadi va yangi kurslarning standart vaznlari.",
+      "marks": "Baho chegaralari (minimal %)",
+      "mark": "{{n}} baho",
+      "below": "{{n}}% dan past — 2",
+      "weights": "Standart kategoriya vaznlari",
+      "weightsHint": "Yangi kurslar shu vaznlar bilan boshlanadi. O‘qituvchi har kurs uchun o‘zgartira oladi.",
+      "total": "Jami {{n}}%",
+      "totalBad": "Jami {{n}}% — 100% bo‘lishi kerak",
+      "orderBad": "Har bir baho keyingisidan yuqori minimal foizga ega bo‘lishi kerak."
+    },
+    "accounts": {
+      "title": "Akkauntlar",
+      "subtitle": "Login varaqalari va parol yangilashdagi vaqtinchalik parollar qoidasi.",
+      "uses": "Kirishlar",
+      "days": "Kunlar",
+      "preview": "Yangi vaqtinchalik parollar {{signIns}} yoki {{days}} amal qiladi — qaysi biri oldin tugasa.",
+      "note": "Allaqachon berilgan parollar o‘z qoidasi bilan qoladi.",
+      "limits": "Ruxsat: 1–10 marta kirish, 1–60 kun."
+    },
+    "years": {
+      "title": "O‘quv yillari",
+      "subtitle": "Sinflar va kurslar o‘quv yiliga tegishli. Hamma joriy yilni ko‘radi.",
+      "add": "Yil qo‘shish",
+      "current": "Joriy",
+      "makeCurrent": "Joriy qilish",
+      "edit": "Tahrirlash",
+      "periods": "{{name}} davrlari",
+      "addPeriod": "Davr qo‘shish",
+      "noPeriods": "Hali davrlar yo‘q. Bu yilning choraklarini qo‘shing.",
+      "noYears": "Hali o‘quv yillari yo‘q.",
+      "col": {
+        "name": "Nomi",
+        "dates": "Sanalar",
+        "kind": "Turi",
+        "order": "Tartib"
+      },
+      "currentTitle": "{{name}} joriy qilinsinmi?",
+      "currentBody": "Sinflar, kurslar va CSV import hamma uchun {{name}} yiliga o‘tadi. O‘quvchi va o‘qituvchilar shu yil kurslarini ko‘radi.",
+      "currentConfirm": "Joriy qilish"
+    },
+    "yearDialog": {
+      "addTitle": "O‘quv yili qo‘shish",
+      "editTitle": "O‘quv yilini tahrirlash",
+      "name": "Nomi",
+      "nameHint": "masalan 2027–28",
+      "startsAt": "Boshlanishi",
+      "endsAt": "Tugashi",
+      "makeCurrent": "Joriy yil qilish"
+    },
+    "periodDialog": {
+      "addTitle": "Davr qo‘shish",
+      "editTitle": "Davrni tahrirlash",
+      "name": "Nomi",
+      "nameHint": "masalan 1-chorak",
+      "kind": "Turi",
+      "parent": "Ichida (ixtiyoriy)",
+      "none": "— yo‘q —",
+      "order": "Tartib",
+      "startsAt": "Boshlanishi",
+      "endsAt": "Tugashi"
+    },
+    "kind": {
+      "QUARTER": "Chorak",
+      "SEMESTER": "Semestr",
+      "MONTH": "Oy",
+      "CUSTOM": "Boshqa"
+    },
+    "required": "Majburiy",
+    "datesBad": "Tugash sanasi boshlanishidan keyin bo‘lishi kerak"
   }
 }

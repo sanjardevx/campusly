@@ -2,6 +2,7 @@ import { Alert, Box, Stack, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next/pages';
 import { monoFontFamily } from '@/libs/fonts';
 import { CopyButton, type Slip } from './LoginSlips';
+import { useTempRule } from './useTempRule';
 
 /**
  * Stitch's green "credentials" card under a form section: login ID and temporary password with
@@ -10,6 +11,7 @@ import { CopyButton, type Slip } from './LoginSlips';
  */
 export function CredentialCard({ slip }: { slip: Slip }) {
   const { t } = useTranslation(['admin', 'common']);
+  const rule = useTempRule();
   const id = slip.loginId;
   const explain =
     slip.role === 'PARENT'
@@ -46,7 +48,7 @@ export function CredentialCard({ slip }: { slip: Slip }) {
         </Typography>
         {slip.tempPassword ? (
           <Alert severity="warning" sx={{ py: 0, fontSize: '0.75rem' }}>
-            {t('add.tempNote')}
+            {t('add.tempNote', rule)}
           </Alert>
         ) : (
           <Alert severity="info" sx={{ py: 0, fontSize: '0.75rem' }}>

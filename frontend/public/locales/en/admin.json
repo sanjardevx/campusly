@@ -118,8 +118,13 @@
     "password": "Temporary password",
     "heading": "Campusly sign-in",
     "signInAt": "Sign in at",
-    "rule": "This password works for 3 sign-ins or 14 days. After that you set your own password.",
-    "issued": "Issued {{date}}"
+    "rule": "This password works for {{signIns}} or {{days}}. After that you set your own password.",
+    "issued": "Issued {{date}}",
+    "nSignIns_one": "{{count}} sign-in",
+    "nSignIns_other": "{{count}} sign-ins",
+    "nDays_one": "{{count}} day",
+    "nDays_other": "{{count}} days",
+    "contact": "Questions? {{contact}}"
   },
   "add": {
     "student": "Add student",
@@ -164,7 +169,7 @@
     "pickParent": "Choose a parent",
     "idExplain": "ID = year {{year}} + role {{role}} + number {{seq}} · unique, given by the system",
     "parentIdExplain": "Parent ID = the last 9 digits of the phone.",
-    "tempNote": "The temporary password works for 3 sign-ins or 14 days. Then they set their own.",
+    "tempNote": "The temporary password works for {{signIns}} or {{days}}. Then they set their own.",
     "existingAccount": "Existing account: now linked to this child, keeps their own password.",
     "saved": "Saved",
     "partial": "The student was saved, but the second parent was not: {{error}}"
@@ -314,5 +319,108 @@
     "nStudents_other": "{{count}} students",
     "nCourses_one": "{{count}} course",
     "nCourses_other": "{{count}} courses"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "School details, grading rules and the academic calendar.",
+    "save": "Save",
+    "edit": "Edit",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "school": {
+      "title": "School",
+      "subtitle": "Shown on login slips and the public site.",
+      "name": "School name",
+      "locale": "Default language",
+      "localeHint": "For new users before they pick their own.",
+      "timezone": "Timezone",
+      "timezoneHint": "Deadlines, “today” and attendance days use this timezone.",
+      "contactTitle": "Contact for students and parents",
+      "contactHint": "Phone and hours are shown on the sign-in page under “Forgot password?” and on login slips. Leave empty to hide.",
+      "phone": "Office phone",
+      "phoneHint": "e.g. +998 71 200 00 00",
+      "phoneBad": "Digits, spaces, +, - and ( ) only",
+      "hours": "Office hours",
+      "hoursHint": "e.g. Mon–Fri 9:00–17:00",
+      "telegram": "Telegram channel",
+      "telegramBad": "Must look like https://t.me/name",
+      "telegramPlaceholder": "https://t.me/your_school",
+      "telegramHint": "The school’s official channel. Shown at the bottom of the public website.",
+      "bot": "Telegram bot (password reset)",
+      "botPlaceholder": "https://t.me/your_school_bot",
+      "botHint": "“Forgot password?” on the sign-in page sends people to this bot. Leave empty until the bot works.",
+      "botBad": "Must look like https://t.me/name_bot"
+    },
+    "grading": {
+      "title": "Grading",
+      "subtitle": "How a period percent becomes a 5-point mark, and the default weights of new courses.",
+      "marks": "Mark thresholds (minimum %)",
+      "mark": "Mark {{n}}",
+      "below": "2 below {{n}}%",
+      "weights": "Default category weights",
+      "weightsHint": "New courses start with these. Teachers can change them per course.",
+      "total": "Total {{n}}%",
+      "totalBad": "Total {{n}}% — must be 100%",
+      "orderBad": "Each mark needs a higher minimum than the next one."
+    },
+    "accounts": {
+      "title": "Accounts",
+      "subtitle": "The rule for temporary passwords on login slips and password resets.",
+      "uses": "Sign-ins",
+      "days": "Days",
+      "preview": "New temporary passwords work for {{signIns}} or {{days}}, whichever comes first.",
+      "note": "Passwords already handed out keep the rule they were given with.",
+      "limits": "Allowed: 1–10 sign-ins, 1–60 days."
+    },
+    "years": {
+      "title": "Academic years",
+      "subtitle": "Classes and courses belong to a year. The current year is what everyone sees.",
+      "add": "Add year",
+      "current": "Current",
+      "makeCurrent": "Make current",
+      "edit": "Edit",
+      "periods": "Periods of {{name}}",
+      "addPeriod": "Add period",
+      "noPeriods": "No periods yet. Add the quarters of this year.",
+      "noYears": "No academic years yet.",
+      "col": {
+        "name": "Name",
+        "dates": "Dates",
+        "kind": "Kind",
+        "order": "Order"
+      },
+      "currentTitle": "Make {{name}} current?",
+      "currentBody": "Classes, courses and the CSV import switch to {{name}} for everyone. Students and teachers see its courses.",
+      "currentConfirm": "Make current"
+    },
+    "yearDialog": {
+      "addTitle": "Add academic year",
+      "editTitle": "Edit academic year",
+      "name": "Name",
+      "nameHint": "e.g. 2027–28",
+      "startsAt": "Starts",
+      "endsAt": "Ends",
+      "makeCurrent": "Make it the current year"
+    },
+    "periodDialog": {
+      "addTitle": "Add period",
+      "editTitle": "Edit period",
+      "name": "Name",
+      "nameHint": "e.g. Quarter 1",
+      "kind": "Kind",
+      "parent": "Inside (optional)",
+      "none": "— none —",
+      "order": "Order",
+      "startsAt": "Starts",
+      "endsAt": "Ends"
+    },
+    "kind": {
+      "QUARTER": "Quarter",
+      "SEMESTER": "Semester",
+      "MONTH": "Month",
+      "CUSTOM": "Custom"
+    },
+    "required": "Required",
+    "datesBad": "The end date must be after the start date"
   }
 }

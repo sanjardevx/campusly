@@ -116,8 +116,11 @@
     "password": "임시 비밀번호",
     "heading": "Campusly 로그인",
     "signInAt": "로그인 주소",
-    "rule": "이 비밀번호는 3회 로그인 또는 14일 동안 사용할 수 있습니다. 그 후 직접 비밀번호를 설정합니다.",
-    "issued": "발급일 {{date}}"
+    "rule": "이 비밀번호는 {{signIns}} 또는 {{days}} 동안 사용할 수 있습니다. 그 후 직접 비밀번호를 설정합니다.",
+    "issued": "발급일 {{date}}",
+    "nSignIns_other": "{{count}}회 로그인",
+    "nDays_other": "{{count}}일",
+    "contact": "문의: {{contact}}"
   },
   "add": {
     "student": "학생 추가",
@@ -162,7 +165,7 @@
     "pickParent": "학부모를 선택하세요",
     "idExplain": "ID = 연도 {{year}} + 역할 {{role}} + 번호 {{seq}} · 시스템이 부여하는 고유 번호",
     "parentIdExplain": "학부모 ID = 전화번호 끝 9자리.",
-    "tempNote": "임시 비밀번호는 3회 로그인 또는 14일 동안 유효합니다. 이후 직접 비밀번호를 설정합니다.",
+    "tempNote": "임시 비밀번호는 {{signIns}} 또는 {{days}} 동안 사용할 수 있습니다. 이후 직접 설정합니다.",
     "existingAccount": "기존 계정: 이 자녀와 연결되었으며 기존 비밀번호를 그대로 사용합니다.",
     "saved": "저장됨",
     "partial": "학생은 저장되었지만 두 번째 학부모는 추가되지 않았습니다: {{error}}"
@@ -310,5 +313,108 @@
     "assignBody": "{{course}}: 강좌와 성적부를 담당하는 교사입니다.",
     "nStudents_other": "학생 {{count}}명",
     "nCourses_other": "강좌 {{count}}개"
+  },
+  "settings": {
+    "title": "설정",
+    "subtitle": "학교 정보, 성적 규칙, 학사 일정.",
+    "save": "저장",
+    "edit": "편집",
+    "saved": "저장됨",
+    "cancel": "취소",
+    "school": {
+      "title": "학교",
+      "subtitle": "로그인 안내문과 공개 사이트에 표시됩니다.",
+      "name": "학교 이름",
+      "locale": "기본 언어",
+      "localeHint": "새 사용자가 직접 언어를 고르기 전까지 사용됩니다.",
+      "timezone": "시간대",
+      "timezoneHint": "마감일, “오늘”, 출결 날짜는 이 시간대를 기준으로 합니다.",
+      "contactTitle": "학생·학부모 연락처",
+      "contactHint": "전화번호와 운영 시간은 로그인 페이지의 “비밀번호를 잊으셨나요?” 아래와 로그인 안내문에 표시됩니다. 숨기려면 비워 두세요.",
+      "phone": "사무실 전화",
+      "phoneHint": "예: +998 71 200 00 00",
+      "phoneBad": "숫자, 공백, +, -, ( )만 사용할 수 있습니다",
+      "hours": "운영 시간",
+      "hoursHint": "예: 월–금 9:00–17:00",
+      "telegram": "텔레그램 채널",
+      "telegramBad": "https://t.me/이름 형식이어야 합니다",
+      "telegramPlaceholder": "https://t.me/your_school",
+      "telegramHint": "학교 공식 채널입니다. 공개 웹사이트 하단에 표시됩니다.",
+      "bot": "텔레그램 봇 (비밀번호 재설정)",
+      "botPlaceholder": "https://t.me/your_school_bot",
+      "botHint": "로그인 페이지의 “비밀번호를 잊으셨나요?”가 이 봇으로 안내합니다. 봇이 작동하기 전까지 비워 두세요.",
+      "botBad": "https://t.me/name_bot 형식이어야 합니다"
+    },
+    "grading": {
+      "title": "성적",
+      "subtitle": "기간 백분율이 5점 척도로 바뀌는 기준과 새 강좌의 기본 가중치.",
+      "marks": "점수 기준 (최소 %)",
+      "mark": "{{n}}점",
+      "below": "{{n}}% 미만은 2점",
+      "weights": "기본 범주 가중치",
+      "weightsHint": "새 강좌는 이 가중치로 시작합니다. 교사는 강좌별로 변경할 수 있습니다.",
+      "total": "합계 {{n}}%",
+      "totalBad": "합계 {{n}}% — 100%여야 합니다",
+      "orderBad": "각 점수는 다음 점수보다 높은 최소값이 필요합니다."
+    },
+    "accounts": {
+      "title": "계정",
+      "subtitle": "로그인 안내문과 비밀번호 초기화에 쓰이는 임시 비밀번호 규칙입니다.",
+      "uses": "로그인 횟수",
+      "days": "일수",
+      "preview": "새 임시 비밀번호는 {{signIns}} 또는 {{days}} 동안 사용할 수 있습니다(먼저 도달하는 쪽).",
+      "note": "이미 발급된 비밀번호는 발급 당시 규칙을 유지합니다.",
+      "limits": "허용 범위: 1–10회, 1–60일."
+    },
+    "years": {
+      "title": "학년도",
+      "subtitle": "반과 강좌는 학년도에 속합니다. 모두가 현재 학년도를 봅니다.",
+      "add": "학년도 추가",
+      "current": "현재",
+      "makeCurrent": "현재로 지정",
+      "edit": "편집",
+      "periods": "{{name}} 기간",
+      "addPeriod": "기간 추가",
+      "noPeriods": "아직 기간이 없습니다. 이 학년도의 분기를 추가하세요.",
+      "noYears": "아직 학년도가 없습니다.",
+      "col": {
+        "name": "이름",
+        "dates": "날짜",
+        "kind": "종류",
+        "order": "순서"
+      },
+      "currentTitle": "{{name}}을(를) 현재 학년도로 지정할까요?",
+      "currentBody": "반, 강좌, CSV 가져오기가 모두 {{name}}(으)로 바뀝니다. 학생과 교사는 해당 학년도의 강좌를 보게 됩니다.",
+      "currentConfirm": "현재로 지정"
+    },
+    "yearDialog": {
+      "addTitle": "학년도 추가",
+      "editTitle": "학년도 편집",
+      "name": "이름",
+      "nameHint": "예: 2027–28",
+      "startsAt": "시작",
+      "endsAt": "종료",
+      "makeCurrent": "현재 학년도로 지정"
+    },
+    "periodDialog": {
+      "addTitle": "기간 추가",
+      "editTitle": "기간 편집",
+      "name": "이름",
+      "nameHint": "예: 1분기",
+      "kind": "종류",
+      "parent": "상위 기간 (선택)",
+      "none": "— 없음 —",
+      "order": "순서",
+      "startsAt": "시작",
+      "endsAt": "종료"
+    },
+    "kind": {
+      "QUARTER": "분기",
+      "SEMESTER": "학기",
+      "MONTH": "월",
+      "CUSTOM": "기타"
+    },
+    "required": "필수",
+    "datesBad": "종료일은 시작일 이후여야 합니다"
   }
 }

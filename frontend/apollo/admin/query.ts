@@ -123,3 +123,17 @@ export const TEACHERS = graphql(`
     }
   }
 `);
+
+/** Every academic year, newest first (Settings) */
+export const ACADEMIC_YEARS = graphql(`
+  query AcademicYears {
+    academicYears {
+      id
+      name
+      startsAt
+      endsAt
+      isCurrent
+    }
+  }
+`);
+

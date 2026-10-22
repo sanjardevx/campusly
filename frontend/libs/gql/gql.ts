@@ -29,17 +29,24 @@ type Documents = {
     "\n  mutation SetCourseTeachers($input: SetCourseTeachersInput!) {\n    setCourseTeachers(input: $input) {\n      id\n      teachers {\n        id\n        firstName\n        lastName\n        role\n      }\n    }\n  }\n": typeof types.SetCourseTeachersDocument,
     "\n  mutation CreateSubject($input: CreateSubjectInput!) {\n    createSubject(input: $input) {\n      id\n      name\n      status\n    }\n  }\n": typeof types.CreateSubjectDocument,
     "\n  mutation UpdateSubject($input: UpdateSubjectInput!) {\n    updateSubject(input: $input) {\n      id\n      name\n      status\n    }\n  }\n": typeof types.UpdateSubjectDocument,
+    "\n  mutation UpdateSchoolSettings($input: UpdateSchoolSettingsInput!) {\n    updateSchoolSettings(input: $input) {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n": typeof types.UpdateSchoolSettingsDocument,
+    "\n  mutation CreateAcademicYear($input: CreateAcademicYearInput!) {\n    createAcademicYear(input: $input) {\n      id\n    }\n  }\n": typeof types.CreateAcademicYearDocument,
+    "\n  mutation UpdateAcademicYear($input: UpdateAcademicYearInput!) {\n    updateAcademicYear(input: $input) {\n      id\n    }\n  }\n": typeof types.UpdateAcademicYearDocument,
+    "\n  mutation SetCurrentAcademicYear($id: String!) {\n    setCurrentAcademicYear(id: $id) {\n      id\n    }\n  }\n": typeof types.SetCurrentAcademicYearDocument,
+    "\n  mutation CreatePeriod($input: CreatePeriodInput!) {\n    createPeriod(input: $input) {\n      id\n    }\n  }\n": typeof types.CreatePeriodDocument,
+    "\n  mutation UpdatePeriod($input: UpdatePeriodInput!) {\n    updatePeriod(input: $input) {\n      id\n    }\n  }\n": typeof types.UpdatePeriodDocument,
     "\n  query Users($input: UsersInquiry!) {\n    users(input: $input) {\n      list {\n        id\n        loginId\n        role\n        status\n        firstName\n        lastName\n        className\n        title\n        phone\n        passwordState\n        tempPasswordUsesLeft\n        lastActiveAt\n        links {\n          id\n          loginId\n          fullName\n          relation\n        }\n      }\n      metaCounter {\n        total\n      }\n    }\n  }\n": typeof types.UsersDocument,
     "\n  query UserCounts {\n    students: users(input: { page: 1, limit: 1, search: { role: STUDENT } }) {\n      metaCounter {\n        total\n      }\n    }\n    teachers: users(input: { page: 1, limit: 1, search: { role: TEACHER } }) {\n      metaCounter {\n        total\n      }\n    }\n    parents: users(input: { page: 1, limit: 1, search: { role: PARENT } }) {\n      metaCounter {\n        total\n      }\n    }\n    admins: users(input: { page: 1, limit: 1, search: { role: ADMIN } }) {\n      metaCounter {\n        total\n      }\n    }\n  }\n": typeof types.UserCountsDocument,
     "\n  query Groups {\n    groups {\n      id\n      name\n      studentCount\n      status\n    }\n  }\n": typeof types.GroupsDocument,
     "\n  query Courses($filter: CoursesFilter) {\n    courses(filter: $filter) {\n      id\n      title\n      status\n      isSplitGroup\n      groupId\n      groupName\n      subjectId\n      subjectName\n      studentCount\n      teachers {\n        id\n        firstName\n        lastName\n        role\n      }\n      gradeCategories {\n        id\n        name\n        weight\n      }\n    }\n  }\n": typeof types.CoursesDocument,
     "\n  query Subjects($includeArchived: Boolean) {\n    subjects(includeArchived: $includeArchived) {\n      id\n      name\n      status\n    }\n  }\n": typeof types.SubjectsDocument,
     "\n  query Teachers {\n    users(input: { page: 1, limit: 100, sort: \"lastName\", direction: ASC, search: { role: TEACHER, status: ACTIVE } }) {\n      list {\n        id\n        loginId\n        firstName\n        lastName\n        title\n      }\n    }\n  }\n": typeof types.TeachersDocument,
+    "\n  query AcademicYears {\n    academicYears {\n      id\n      name\n      startsAt\n      endsAt\n      isCurrent\n    }\n  }\n": typeof types.AcademicYearsDocument,
     "\n  query Health {\n    health {\n      status\n      postgres\n      redis\n    }\n  }\n": typeof types.HealthDocument,
     "\n  query CurrentYear {\n    currentAcademicYear {\n      id\n      name\n    }\n  }\n": typeof types.CurrentYearDocument,
     "\n  query UnreadAnnouncements {\n    announcements(input: { limit: 1 }) {\n      unread\n    }\n  }\n": typeof types.UnreadAnnouncementsDocument,
     "\n  query Periods($academicYearId: String!) {\n    periods(academicYearId: $academicYearId) {\n      id\n      name\n      kind\n      order\n      startsAt\n      endsAt\n      parentId\n    }\n  }\n": typeof types.PeriodsDocument,
-    "\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n    }\n  }\n": typeof types.SchoolSettingsDocument,
+    "\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n": typeof types.SchoolSettingsDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input) {\n      accessToken\n    }\n  }\n": typeof types.ChangePasswordDocument,
     "\n  query Me {\n    me {\n      id\n      loginId\n      role\n      firstName\n      lastName\n      locale\n      mustChangePassword\n    }\n  }\n": typeof types.MeDocument,
     "\n  query MyChildren {\n    myChildren {\n      id\n      loginId\n      firstName\n      lastName\n      className\n    }\n  }\n": typeof types.MyChildrenDocument,
@@ -60,17 +67,24 @@ const documents: Documents = {
     "\n  mutation SetCourseTeachers($input: SetCourseTeachersInput!) {\n    setCourseTeachers(input: $input) {\n      id\n      teachers {\n        id\n        firstName\n        lastName\n        role\n      }\n    }\n  }\n": types.SetCourseTeachersDocument,
     "\n  mutation CreateSubject($input: CreateSubjectInput!) {\n    createSubject(input: $input) {\n      id\n      name\n      status\n    }\n  }\n": types.CreateSubjectDocument,
     "\n  mutation UpdateSubject($input: UpdateSubjectInput!) {\n    updateSubject(input: $input) {\n      id\n      name\n      status\n    }\n  }\n": types.UpdateSubjectDocument,
+    "\n  mutation UpdateSchoolSettings($input: UpdateSchoolSettingsInput!) {\n    updateSchoolSettings(input: $input) {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n": types.UpdateSchoolSettingsDocument,
+    "\n  mutation CreateAcademicYear($input: CreateAcademicYearInput!) {\n    createAcademicYear(input: $input) {\n      id\n    }\n  }\n": types.CreateAcademicYearDocument,
+    "\n  mutation UpdateAcademicYear($input: UpdateAcademicYearInput!) {\n    updateAcademicYear(input: $input) {\n      id\n    }\n  }\n": types.UpdateAcademicYearDocument,
+    "\n  mutation SetCurrentAcademicYear($id: String!) {\n    setCurrentAcademicYear(id: $id) {\n      id\n    }\n  }\n": types.SetCurrentAcademicYearDocument,
+    "\n  mutation CreatePeriod($input: CreatePeriodInput!) {\n    createPeriod(input: $input) {\n      id\n    }\n  }\n": types.CreatePeriodDocument,
+    "\n  mutation UpdatePeriod($input: UpdatePeriodInput!) {\n    updatePeriod(input: $input) {\n      id\n    }\n  }\n": types.UpdatePeriodDocument,
     "\n  query Users($input: UsersInquiry!) {\n    users(input: $input) {\n      list {\n        id\n        loginId\n        role\n        status\n        firstName\n        lastName\n        className\n        title\n        phone\n        passwordState\n        tempPasswordUsesLeft\n        lastActiveAt\n        links {\n          id\n          loginId\n          fullName\n          relation\n        }\n      }\n      metaCounter {\n        total\n      }\n    }\n  }\n": types.UsersDocument,
     "\n  query UserCounts {\n    students: users(input: { page: 1, limit: 1, search: { role: STUDENT } }) {\n      metaCounter {\n        total\n      }\n    }\n    teachers: users(input: { page: 1, limit: 1, search: { role: TEACHER } }) {\n      metaCounter {\n        total\n      }\n    }\n    parents: users(input: { page: 1, limit: 1, search: { role: PARENT } }) {\n      metaCounter {\n        total\n      }\n    }\n    admins: users(input: { page: 1, limit: 1, search: { role: ADMIN } }) {\n      metaCounter {\n        total\n      }\n    }\n  }\n": types.UserCountsDocument,
     "\n  query Groups {\n    groups {\n      id\n      name\n      studentCount\n      status\n    }\n  }\n": types.GroupsDocument,
     "\n  query Courses($filter: CoursesFilter) {\n    courses(filter: $filter) {\n      id\n      title\n      status\n      isSplitGroup\n      groupId\n      groupName\n      subjectId\n      subjectName\n      studentCount\n      teachers {\n        id\n        firstName\n        lastName\n        role\n      }\n      gradeCategories {\n        id\n        name\n        weight\n      }\n    }\n  }\n": types.CoursesDocument,
     "\n  query Subjects($includeArchived: Boolean) {\n    subjects(includeArchived: $includeArchived) {\n      id\n      name\n      status\n    }\n  }\n": types.SubjectsDocument,
     "\n  query Teachers {\n    users(input: { page: 1, limit: 100, sort: \"lastName\", direction: ASC, search: { role: TEACHER, status: ACTIVE } }) {\n      list {\n        id\n        loginId\n        firstName\n        lastName\n        title\n      }\n    }\n  }\n": types.TeachersDocument,
+    "\n  query AcademicYears {\n    academicYears {\n      id\n      name\n      startsAt\n      endsAt\n      isCurrent\n    }\n  }\n": types.AcademicYearsDocument,
     "\n  query Health {\n    health {\n      status\n      postgres\n      redis\n    }\n  }\n": types.HealthDocument,
     "\n  query CurrentYear {\n    currentAcademicYear {\n      id\n      name\n    }\n  }\n": types.CurrentYearDocument,
     "\n  query UnreadAnnouncements {\n    announcements(input: { limit: 1 }) {\n      unread\n    }\n  }\n": types.UnreadAnnouncementsDocument,
     "\n  query Periods($academicYearId: String!) {\n    periods(academicYearId: $academicYearId) {\n      id\n      name\n      kind\n      order\n      startsAt\n      endsAt\n      parentId\n    }\n  }\n": types.PeriodsDocument,
-    "\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n    }\n  }\n": types.SchoolSettingsDocument,
+    "\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n": types.SchoolSettingsDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input) {\n      accessToken\n    }\n  }\n": types.ChangePasswordDocument,
     "\n  query Me {\n    me {\n      id\n      loginId\n      role\n      firstName\n      lastName\n      locale\n      mustChangePassword\n    }\n  }\n": types.MeDocument,
     "\n  query MyChildren {\n    myChildren {\n      id\n      loginId\n      firstName\n      lastName\n      className\n    }\n  }\n": types.MyChildrenDocument,
@@ -153,6 +167,30 @@ export function graphql(source: "\n  mutation UpdateSubject($input: UpdateSubjec
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation UpdateSchoolSettings($input: UpdateSchoolSettingsInput!) {\n    updateSchoolSettings(input: $input) {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateSchoolSettings($input: UpdateSchoolSettingsInput!) {\n    updateSchoolSettings(input: $input) {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateAcademicYear($input: CreateAcademicYearInput!) {\n    createAcademicYear(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreateAcademicYear($input: CreateAcademicYearInput!) {\n    createAcademicYear(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateAcademicYear($input: UpdateAcademicYearInput!) {\n    updateAcademicYear(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateAcademicYear($input: UpdateAcademicYearInput!) {\n    updateAcademicYear(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetCurrentAcademicYear($id: String!) {\n    setCurrentAcademicYear(id: $id) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation SetCurrentAcademicYear($id: String!) {\n    setCurrentAcademicYear(id: $id) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreatePeriod($input: CreatePeriodInput!) {\n    createPeriod(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreatePeriod($input: CreatePeriodInput!) {\n    createPeriod(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdatePeriod($input: UpdatePeriodInput!) {\n    updatePeriod(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdatePeriod($input: UpdatePeriodInput!) {\n    updatePeriod(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query Users($input: UsersInquiry!) {\n    users(input: $input) {\n      list {\n        id\n        loginId\n        role\n        status\n        firstName\n        lastName\n        className\n        title\n        phone\n        passwordState\n        tempPasswordUsesLeft\n        lastActiveAt\n        links {\n          id\n          loginId\n          fullName\n          relation\n        }\n      }\n      metaCounter {\n        total\n      }\n    }\n  }\n"): (typeof documents)["\n  query Users($input: UsersInquiry!) {\n    users(input: $input) {\n      list {\n        id\n        loginId\n        role\n        status\n        firstName\n        lastName\n        className\n        title\n        phone\n        passwordState\n        tempPasswordUsesLeft\n        lastActiveAt\n        links {\n          id\n          loginId\n          fullName\n          relation\n        }\n      }\n      metaCounter {\n        total\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -177,6 +215,10 @@ export function graphql(source: "\n  query Teachers {\n    users(input: { page: 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query AcademicYears {\n    academicYears {\n      id\n      name\n      startsAt\n      endsAt\n      isCurrent\n    }\n  }\n"): (typeof documents)["\n  query AcademicYears {\n    academicYears {\n      id\n      name\n      startsAt\n      endsAt\n      isCurrent\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query Health {\n    health {\n      status\n      postgres\n      redis\n    }\n  }\n"): (typeof documents)["\n  query Health {\n    health {\n      status\n      postgres\n      redis\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -193,7 +235,7 @@ export function graphql(source: "\n  query Periods($academicYearId: String!) {\n
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n    }\n  }\n"): (typeof documents)["\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n    }\n  }\n"];
+export function graphql(source: "\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n"): (typeof documents)["\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

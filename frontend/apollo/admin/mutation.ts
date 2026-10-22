@@ -213,3 +213,68 @@ export const UPDATE_SUBJECT = graphql(`
     }
   }
 `);
+
+/** Partial: only the fields of the card that was saved; the server merges and checks the whole */
+export const UPDATE_SCHOOL_SETTINGS = graphql(`
+  mutation UpdateSchoolSettings($input: UpdateSchoolSettingsInput!) {
+    updateSchoolSettings(input: $input) {
+      schoolName
+      timezone
+      defaultLocale
+      defaultHomeworkWeight
+      defaultQuizWeight
+      defaultExamWeight
+      mark5MinPercent
+      mark4MinPercent
+      mark3MinPercent
+      contactPhone
+      officeHours
+      telegramUrl
+      telegramBotUrl
+      tempPasswordUses
+      tempPasswordDays
+    }
+  }
+`);
+
+export const CREATE_ACADEMIC_YEAR = graphql(`
+  mutation CreateAcademicYear($input: CreateAcademicYearInput!) {
+    createAcademicYear(input: $input) {
+      id
+    }
+  }
+`);
+
+export const UPDATE_ACADEMIC_YEAR = graphql(`
+  mutation UpdateAcademicYear($input: UpdateAcademicYearInput!) {
+    updateAcademicYear(input: $input) {
+      id
+    }
+  }
+`);
+
+/** The school's current year changes for everyone: classes, courses and the CSV import follow it */
+export const SET_CURRENT_YEAR = graphql(`
+  mutation SetCurrentAcademicYear($id: String!) {
+    setCurrentAcademicYear(id: $id) {
+      id
+    }
+  }
+`);
+
+export const CREATE_PERIOD = graphql(`
+  mutation CreatePeriod($input: CreatePeriodInput!) {
+    createPeriod(input: $input) {
+      id
+    }
+  }
+`);
+
+export const UPDATE_PERIOD = graphql(`
+  mutation UpdatePeriod($input: UpdatePeriodInput!) {
+    updatePeriod(input: $input) {
+      id
+    }
+  }
+`);
+

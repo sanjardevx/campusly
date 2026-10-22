@@ -217,6 +217,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [ ] RDS Postgres (with pgvector), SSM parameters, `prisma migrate deploy`, seed demo.
 - [ ] Frontend on Vercel (root `frontend/`), env vars, custom domain.
 - [ ] Smoke test all 4 roles on `campusly.uz`; AWS budget alerts on.
+- [ ] If time is left: admin **Activity log** page — read-only `auditLogs(filter, page)` (action, user, date), with the before → after of each change (the rows are already written by every admin action).
 
 **Done when:** the demo works end-to-end on the real domain.
 

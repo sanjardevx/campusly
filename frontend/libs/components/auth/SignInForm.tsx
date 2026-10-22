@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useQuery } from '@apollo/client/react';
 import { Alert, Box, Button, Collapse, Link, Stack, Typography } from '@mui/material';
+import TelegramIcon from '@mui/icons-material/Telegram';
 import { useTranslation } from 'next-i18next/pages';
+import { SCHOOL_SETTINGS } from '@/apollo/app/query';
 import { logIn } from '@/libs/auth';
 import { afterSignIn } from '@/libs/auth/routes';
 import { errorCode } from '@/libs/errors';
@@ -25,6 +28,8 @@ export function SignInForm({ mode }: { mode: SignInMode }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
+  // Public query: the school's office contact, set in Settings (only fetched once the hint is open)
+  const school = useQuery(SCHOOL_SETTINGS, { skip: !showForgot }).data?.schoolSettings;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +113,35 @@ export function SignInForm({ mode }: { mode: SignInMode }) {
       />
       {/* Password reset by the Telegram bot comes in a later phase (DECISIONS §14) */}
       <Collapse in={showForgot}>
-        <Alert severity="info" icon={false}>{t('signIn.forgotHint')}</Alert>
+        <Alert severity="info" icon={false}>
+          {t('signIn.forgotHint')}
+          {(school?.contactPhone || school?.officeHours) && (
+            <Typography variant="body2" sx={{ mt: 0.75, fontWeight: 600 }}>
+              {school.contactPhone && (
+                <Link href={`tel:${school.contactPhone.replace(/[^\d+]/g, '')}`} underline="hover">
+                  {t('signIn.forgotCall', { phone: school.contactPhone })}
+                </Link>
+              )}
+              {school.contactPhone && school.officeHours && ' · '}
+              {school.officeHours}
+            </Typography>
+          )}
+          {school?.telegramBotUrl && (
+            // The password-reset bot (the channel belongs to the public site). Only https://t.me/…bot
+            // can be saved (server DTO), so this never leads to another site
+            <Button
+              size="small"
+              variant="outlined"
+              href={school.telegramBotUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              startIcon={<TelegramIcon />}
+              sx={{ mt: 1 }}
+            >
+              {t('signIn.forgotTelegram')}
+            </Button>
+          )}
+        </Alert>
       </Collapse>
       {error && (
         <Alert severity="error" role="alert">

@@ -83,10 +83,10 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - **Parent login ID:** last 9 digits of the phone number (e.g. `901234567`). One parent account can have many children; one child can have two parents.
 - **No public signup.** Admin creates every account (single form or CSV import) and prints login slips.
 - **Temporary passwords (final rule, same for parents and students):**
-  - Valid for **3 sign-ins or 14 days**, whichever comes first.
+  - Valid for **N sign-ins or D days**, whichever comes first. N and D are a school setting (Settings → Accounts): default **3 / 14**, allowed 1–10 / 1–60. A change applies to passwords made from then on; passwords already handed out keep their rule.
   - Every sign-in with a temporary password shows a warning banner. **No forced change on first sign-in.**
   - When the limit is reached, only the "Set a new password" screen is available (`mustChangePassword = true`).
-  - Fields: `tempPasswordUsesLeft` (starts at 3), `tempPasswordExpiresAt` (+14 days), `mustChangePassword`.
+  - Fields: `tempPasswordUsesLeft` (starts at N), `tempPasswordExpiresAt` (+D days), `mustChangePassword`.
   - Student temp password: 8 chars (upper + digit + symbol). Parent temp password: readable format like `Rus6738#`.
 - New password rules: 8–128 chars. Hash with `bcryptjs`.
 - Login rate limit in Redis: 5 attempts per loginId per 15 min, 30 per IP per 15 min.
@@ -137,6 +137,9 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - Config is validated with `zod` at startup — a missing env var stops the app (fail fast).
 - Logging: `LoggingInterceptor` redacts `password`, `token` and similar fields (Nestar logged raw `req.body`).
 - CORS: only `FRONTEND_URL`, `credentials: true` (Nestar had `origin: true`).
+
+- Validation the UI must explain gets its own error code (`IMPORT_*`, `WEIGHTS_SUM`, `PERIOD_OVERLAP` …; CSV rows: `ImportIssueCode` + the bad value). The client translates codes; messages are only for logs.
+- **School settings hold only rules the system really uses:** name, default language, timezone, mark thresholds, default weights, office contact (phone and hours: sign-in page and login slips), two Telegram links — the school's **channel** (`https://t.me/…`, only on the public website footer) and the password-reset **bot** (`https://t.me/…bot`, the "Reset in Telegram" button under "Forgot password?", shown only when set) — and the temporary-password rule. Security limits (login rate limit, token lifetimes, upload sizes and types) stay in code / env: an admin must not be able to weaken them by accident.
 
 ## 10. Grading and attendance
 
@@ -205,3 +208,6 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-21 | Period %: points summed per category, published grades only for every role, period days in the school timezone, no `dueAt` = no period |
 | 2026-10-22 | Stitch is the UI source of truth; §13 tokens re-copied from its design system (sage secondary, ochre only for deadlines, 16px cards, tabular numbers, faint card shadow) |
 | 2026-10-22 | Phone tab bar uses the iOS 26 Liquid Glass style (developer's choice over the Stitch pill); desktop gets the sliding sidebar lens and a glass top bar; CSS-only with solid fallbacks for reduced transparency / motion |
+| 2026-10-22 | Settings: office contact (phone, hours, `https://t.me/…` only) shown under "Forgot password?" and on login slips; temporary-password rule becomes a setting (default 3 / 14, limits 1–10 / 1–60, new passwords only); security limits stay in code; activity (audit) log page moved to day 14 if time is left |
+| 2026-10-22 | Errors the UI explains get specific codes (CSV import issues, settings and calendar rules) instead of `BAD_REQUEST` + an English sentence |
+| 2026-10-22 | Settings cards open in view mode (Edit → Cancel / Save); Telegram channel (public site footer) and password-reset bot are separate settings |

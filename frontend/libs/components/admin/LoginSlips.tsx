@@ -27,6 +27,7 @@ import { SCHOOL_SETTINGS } from '@/apollo/app/query';
 import { monoFontFamily } from '@/libs/fonts';
 import type { Role } from '@/libs/gql/graphql';
 import { formatDate } from '@/libs/i18n/format';
+import { contactLine, useTempRule } from './useTempRule';
 
 export interface Slip {
   userId: string;
@@ -96,7 +97,10 @@ export function SlipsTable({ slips }: { slips: Slip[] }) {
 export function PrintableSlips({ slips }: { slips: Slip[] }) {
   const { t } = useTranslation(['admin', 'common']);
   const { locale } = useRouter();
-  const school = useQuery(SCHOOL_SETTINGS).data?.schoolSettings.schoolName;
+  const settings = useQuery(SCHOOL_SETTINGS).data?.schoolSettings;
+  const school = settings?.schoolName;
+  const rule = useTempRule();
+  const contact = contactLine(settings);
   const origin = typeof window === 'undefined' ? '' : window.location.origin;
   const today = formatDate(new Date(), locale);
 
@@ -127,7 +131,10 @@ export function PrintableSlips({ slips }: { slips: Slip[] }) {
               <span>{t('slips.signInAt')}</span>
               <span>{`${origin}${s.role === 'TEACHER' || s.role === 'ADMIN' ? '/login/teacher' : '/login'}`}</span>
             </Box>
-            <Typography sx={{ fontSize: '8.5pt', color: '#5C625E', mt: '3mm' }}>{t('slips.rule')}</Typography>
+            <Typography sx={{ fontSize: '8.5pt', color: '#5C625E', mt: '3mm' }}>{t('slips.rule', rule)}</Typography>
+            {contact && (
+              <Typography sx={{ fontSize: '8.5pt', color: '#5C625E', mt: '1mm' }}>{t('slips.contact', { contact })}</Typography>
+            )}
             <Typography sx={{ fontSize: '8pt', color: '#9AA19C', mt: '1mm' }}>{t('slips.issued', { date: today })}</Typography>
           </Box>
         ))}

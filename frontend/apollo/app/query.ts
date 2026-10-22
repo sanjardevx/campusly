@@ -45,7 +45,7 @@ export const PERIODS = graphql(`
   }
 `);
 
-/** School name (login slips) and the default grading weights (Add course) */
+/** School settings: name (login slips), weights (Add course), everything on the Settings page */
 export const SCHOOL_SETTINGS = graphql(`
   query SchoolSettings {
     schoolSettings {
@@ -55,6 +55,15 @@ export const SCHOOL_SETTINGS = graphql(`
       defaultHomeworkWeight
       defaultQuizWeight
       defaultExamWeight
+      mark5MinPercent
+      mark4MinPercent
+      mark3MinPercent
+      contactPhone
+      officeHours
+      telegramUrl
+      telegramBotUrl
+      tempPasswordUses
+      tempPasswordDays
     }
   }
 `);
