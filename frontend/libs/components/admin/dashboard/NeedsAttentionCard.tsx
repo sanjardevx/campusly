@@ -27,7 +27,7 @@ export function NeedsAttentionCard({ data, index }: { data: Attention; index: nu
   ];
 
   return (
-    <Card variant="outlined" sx={{ borderRadius: '12px', p: 2.5, display: 'flex', flexDirection: 'column', ...fadeUp(index) }}>
+    <Card variant="outlined" sx={{ borderRadius: '12px', p: 2.5, display: 'flex', flexDirection: 'column', height: '100%', ...fadeUp(index) }}>
       <Typography component="h2" sx={{ fontSize: '1rem', fontWeight: 700 }}>
         {t('dashboard.attention.title')}
       </Typography>
@@ -52,7 +52,11 @@ export function NeedsAttentionCard({ data, index }: { data: Attention; index: nu
           {t('dashboard.attention.none')}
         </Typography>
       ) : (
-        <Stack spacing={1} sx={{ mt: 1.5 }}>
+        // The list scrolls inside the card: the header and the summary stay, the card never grows
+        <Stack
+          spacing={1}
+          sx={{ mt: 1.5, mx: -1, px: 1, pb: 0.5, flex: 1, minHeight: 0, maxHeight: { xs: 360, md: 'none' }, overflowY: 'auto' }}
+        >
           {data.students.map((s, i) => {
             return (
               <Box

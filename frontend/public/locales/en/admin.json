@@ -639,10 +639,7 @@
       "addStudent": "Add student",
       "import": "Import students (CSV)",
       "addTeacher": "Add teacher",
-      "addCourse": "Add course",
-      "term": "Active term: {{period}}",
-      "week": "Week {{week}} of {{weeks}}",
-      "noTerm": "No active term"
+      "addCourse": "Add course"
     },
     "event": {
       "addTitle": "Add to the school calendar",

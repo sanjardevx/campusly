@@ -628,10 +628,7 @@
       "addStudent": "학생 추가",
       "import": "학생 가져오기 (CSV)",
       "addTeacher": "교사 추가",
-      "addCourse": "과목 추가",
-      "term": "현재 기간: {{period}}",
-      "week": "{{weeks}}주 중 {{week}}주차",
-      "noTerm": "현재 기간 없음"
+      "addCourse": "과목 추가"
     },
     "event": {
       "addTitle": "학교 일정 추가",

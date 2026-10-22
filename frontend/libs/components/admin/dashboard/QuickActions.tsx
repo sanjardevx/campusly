@@ -1,16 +1,13 @@
 import NextLink from 'next/link';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Card, Typography } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LibraryAddOutlinedIcon from '@mui/icons-material/LibraryAddOutlined';
 import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
 import CoPresentOutlinedIcon from '@mui/icons-material/CoPresentOutlined';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { useTranslation } from 'next-i18next/pages';
-import type { AdminDashboardQuery } from '@/libs/gql/graphql';
-import { DashCard } from './DashCard';
 import { fadeUp } from './motion';
-
-type Period = AdminDashboardQuery['adminDashboard']['period'];
 
 interface Action {
   key: string;
@@ -27,55 +24,49 @@ const ACTIONS: Action[] = [
   { key: 'addCourse', icon: LibraryAddOutlinedIcon, href: '/_admin/classes?add=course' },
 ];
 
-/** Stitch "Quick actions" + the active term line at the bottom */
-export function QuickActions({ period, index }: { period: Period; index: number }) {
+/**
+ * Stitch "Quick actions" as one small link card per action, in a row under the KPI tiles.
+ * The active term and week are already in the greeting line, so the row has no term footer.
+ */
+export function QuickActions({ index }: { index: number }) {
   const { t } = useTranslation('admin');
   return (
-    <DashCard title={t('dashboard.quick.title')} sx={fadeUp(index)}>
-      <Stack spacing={1.25} sx={{ mt: 2 }}>
-        {ACTIONS.map(({ key, icon: Icon, href }) => (
-          <Button
-            key={key}
-            variant="outlined"
-            color="inherit"
-            component={NextLink}
-            href={href}
-            startIcon={<Icon sx={{ color: 'primary.main' }} />}
-            sx={{
-              justifyContent: 'flex-start',
-              borderColor: 'divider',
-              fontSize: '0.8125rem',
-              fontWeight: 500,
-              py: 1.1,
-              '&:hover': { borderColor: 'primary.main', bgcolor: 'background.default' },
-            }}
-          >
-            {t(`dashboard.quick.${key}`)}
-          </Button>
-        ))}
-      </Stack>
-      <Box
-        sx={{
-          mt: 'auto',
-          pt: 2,
-          borderTop: 1,
-          borderColor: 'divider',
-          display: 'flex',
-          justifyContent: 'space-between',
-          fontSize: '0.75rem',
-          color: 'text.secondary',
-          gap: 1,
-        }}
-      >
-        <Typography component="span" sx={{ fontSize: 'inherit' }}>
-          {period ? t('dashboard.quick.term', { period: period.name }) : t('dashboard.quick.noTerm')}
-        </Typography>
-        {period && (
-          <Typography component="span" sx={{ fontSize: 'inherit', fontWeight: 500, color: 'text.primary' }}>
-            {t('dashboard.quick.week', { week: period.week, weeks: period.weeks })}
-          </Typography>
-        )}
-      </Box>
-    </DashCard>
+    <Box
+      component="nav"
+      aria-label={t('dashboard.quick.title')}
+      sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'repeat(2, minmax(0, 1fr))', lg: 'repeat(4, minmax(0, 1fr))' } }}
+    >
+      {ACTIONS.map(({ key, icon: Icon, href }, i) => (
+        <Card
+          key={key}
+          variant="outlined"
+          component={NextLink}
+          href={href}
+          sx={{
+            borderRadius: '12px',
+            p: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            color: 'text.primary',
+            textDecoration: 'none',
+            transition: 'border-color 150ms, background-color 150ms',
+            '&:hover': { borderColor: 'primary.main', bgcolor: 'background.default' },
+            '&:hover .quick-arrow': { color: 'primary.main', transform: 'translateX(2px)' },
+            '&:focus-visible': { outline: 2, outlineColor: 'secondary.main', outlineOffset: 2 },
+            ...fadeUp(index + i),
+          }}
+        >
+          <Box sx={{ width: 36, height: 36, borderRadius: '10px', display: 'grid', placeItems: 'center', flexShrink: 0, bgcolor: 'primary.light', color: 'primary.main' }}>
+            <Icon sx={{ fontSize: 20 }} />
+          </Box>
+          <Typography sx={{ flex: 1, minWidth: 0, fontSize: '0.875rem', fontWeight: 600 }}>{t(`dashboard.quick.${key}`)}</Typography>
+          <ChevronRightIcon
+            className="quick-arrow"
+            sx={{ fontSize: 20, color: 'text.secondary', transition: 'color 150ms, transform 150ms', '@media (prefers-reduced-motion: reduce)': { transition: 'none' } }}
+          />
+        </Card>
+      ))}
+    </Box>
   );
 }

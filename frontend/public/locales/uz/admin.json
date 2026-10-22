@@ -639,10 +639,7 @@
       "addStudent": "O‘quvchi qo‘shish",
       "import": "O‘quvchilarni import qilish (CSV)",
       "addTeacher": "O‘qituvchi qo‘shish",
-      "addCourse": "Kurs qo‘shish",
-      "term": "Joriy davr: {{period}}",
-      "week": "{{weeks}} haftadan {{week}}-hafta",
-      "noTerm": "Joriy davr yo‘q"
+      "addCourse": "Kurs qo‘shish"
     },
     "event": {
       "addTitle": "Maktab kalendariga qo‘shish",

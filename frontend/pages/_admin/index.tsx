@@ -58,6 +58,7 @@ const DashboardPage: NextPageWithLayout = () => {
       </Box>
 
       <KpiRow data={dashboard} />
+      <QuickActions index={4} />
 
       <Box
         sx={{
@@ -65,28 +66,26 @@ const DashboardPage: NextPageWithLayout = () => {
           gap: 3,
           gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(2, minmax(0, 1fr))', lg: 'minmax(0, 4fr) minmax(0, 5fr) minmax(0, 4fr)' },
           gridTemplateAreas: {
-            xs: '"donut" "attention" "calendar" "activity" "quick"',
-            md: '"donut calendar" "attention attention" "activity quick"',
-            lg: '"donut attention calendar" "activity activity quick"',
+            xs: '"activity" "calendar" "donut" "attention"',
+            md: '"activity calendar" "donut attention"',
+            lg: '"activity activity calendar" "donut attention attention"',
           },
-          // Every card is as tall as its own content
+          // Every card is as tall as its own content (the attention card follows the donut)
           alignItems: 'start',
         }}
       >
-        <Box sx={{ gridArea: 'donut' }}>
-          <AttendanceDonut index={4} />
-        </Box>
-        <Box sx={{ gridArea: 'attention' }}>
-          <NeedsAttentionCard data={dashboard.needsAttention} index={5} />
+        <Box sx={{ gridArea: 'activity' }}>
+          <RecentActivity items={dashboard.recentActivity} index={8} />
         </Box>
         <Box sx={{ gridArea: 'calendar' }}>
-          <CalendarCard today={dashboard.today} index={6} />
+          <CalendarCard today={dashboard.today} index={9} />
         </Box>
-        <Box sx={{ gridArea: 'activity' }}>
-          <RecentActivity items={dashboard.recentActivity} index={7} />
+        <Box sx={{ gridArea: 'donut' }}>
+          <AttendanceDonut index={10} />
         </Box>
-        <Box sx={{ gridArea: 'quick' }}>
-          <QuickActions period={period} index={8} />
+        {/* Height 0 + min-height 100%: the row is as tall as the donut card, the list scrolls (phones: max height) */}
+        <Box sx={{ gridArea: 'attention', alignSelf: { md: 'stretch' }, height: { md: 0 }, minHeight: { md: '100%' } }}>
+          <NeedsAttentionCard data={dashboard.needsAttention} index={11} />
         </Box>
       </Box>
     </Stack>
