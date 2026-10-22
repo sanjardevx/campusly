@@ -34,6 +34,18 @@
     "classes": "Классы и курсы",
     "settings": "Настройки",
     "more": "Ещё",
+    "sections": {
+      "school": "Школа",
+      "system": "Система",
+      "website": "Сайт"
+    },
+    "news": "Новости и события",
+    "programs": "Программы",
+    "mockTests": "Пробные тесты",
+    "openCourses": "Открытые курсы",
+    "honorStudents": "Отличники",
+    "team": "Наша команда",
+    "enquiries": "Заявки",
     "tab": {
       "home": "Главная",
       "courses": "Курсы",
@@ -41,10 +53,6 @@
       "announcements": "Новости",
       "overview": "Главная",
       "attendance": "Явка"
-    },
-    "sections": {
-      "school": "Школа",
-      "system": "Система"
     }
   },
   "shell": {
@@ -69,6 +77,12 @@
     "children": "Дети",
     "comingSoon": "Эта страница скоро появится",
     "comingSoonBody": "Она будет сделана в {{day}}-й день плана.",
-    "loading": "Загрузка…"
+    "loading": "Загрузка…",
+    "laterPhase": "Запланировано на этап после MVP.",
+    "viewPublicSite": "Открыть сайт",
+    "period": "{{year}} · {{period}}",
+    "periods": "Периоды {{year}}",
+    "manageYears": "Управлять в настройках",
+    "noPeriod": "Сегодня нет периода"
   }
 }

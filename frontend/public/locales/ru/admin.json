@@ -1,0 +1,77 @@
+{
+  "users": {
+    "title": "Пользователи",
+    "subtitle": "Ученики, учителя и родители, которые могут входить в Campusly.",
+    "tabs": {
+      "STUDENT": "Ученики",
+      "TEACHER": "Учителя",
+      "PARENT": "Родители",
+      "ADMIN": "Администраторы"
+    },
+    "search": {
+      "STUDENT": "Поиск по имени или ID ученика",
+      "TEACHER": "Поиск по имени или ID сотрудника",
+      "PARENT": "Поиск по имени или телефону",
+      "ADMIN": "Поиск по имени или ID"
+    },
+    "filters": {
+      "grade": "Параллель",
+      "gradeN": "{{n}} классы",
+      "class": "Класс",
+      "status": "Статус",
+      "password": "Пароль",
+      "all": "Все",
+      "clear": "Сбросить фильтры"
+    },
+    "columns": {
+      "STUDENT": "ID ученика",
+      "TEACHER": "ID сотрудника",
+      "PARENT": "ID родителя",
+      "ADMIN": "ID",
+      "name": "Имя",
+      "class": "Класс",
+      "parent": "Родитель",
+      "parentId": "ID родителя",
+      "title": "Должность",
+      "phone": "Телефон",
+      "children": "Дети",
+      "status": "Статус",
+      "password": "Пароль",
+      "lastSignIn": "Последний вход"
+    },
+    "empty": "Пользователей пока нет.",
+    "emptyFiltered": "Нет пользователей по этим фильтрам.",
+    "rowsPerPage": "Строк на странице:",
+    "showing": "Показано <b>{{from}}–{{to}}</b> из <b>{{total}}</b>"
+  },
+  "status": {
+    "ACTIVE": "Активен",
+    "BLOCKED": "Заблокирован",
+    "ARCHIVED": "В архиве"
+  },
+  "password": {
+    "SET": "Установлен",
+    "TEMPORARY": "Временный",
+    "temporaryLeft": "Временный · осталось {{count}}",
+    "MUST_CHANGE": "Нужно сменить",
+    "EXPIRED": "Временный · истёк"
+  },
+  "relation": {
+    "FATHER": "Отец",
+    "MOTHER": "Мать",
+    "GUARDIAN": "Опекун",
+    "OTHER": "Другое"
+  },
+  "time": {
+    "today": "Сегодня, {{time}}",
+    "yesterday": "Вчера",
+    "daysAgo_one": "{{count}} день назад",
+    "daysAgo_few": "{{count}} дня назад",
+    "daysAgo_many": "{{count}} дней назад",
+    "daysAgo_other": "{{count}} дня назад",
+    "weeksAgo_one": "{{count}} неделю назад",
+    "weeksAgo_few": "{{count}} недели назад",
+    "weeksAgo_many": "{{count}} недель назад",
+    "weeksAgo_other": "{{count}} недели назад"
+  }
+}

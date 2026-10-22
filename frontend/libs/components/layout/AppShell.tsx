@@ -1,21 +1,25 @@
 import { forwardRef, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import NextLink from 'next/link';
-import { useQuery } from '@apollo/client/react';
+import { useQuery, useReactiveVar } from '@apollo/client/react';
 import {
   Box,
   ButtonBase,
   CircularProgress,
+  Divider,
   Drawer,
   IconButton,
+  Link,
   Stack,
   Typography,
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
+import NorthEastIcon from '@mui/icons-material/NorthEast';
 import SchoolIcon from '@mui/icons-material/School';
 import { useTranslation } from 'next-i18next/pages';
 import { CURRENT_YEAR } from '@/apollo/app/query';
+import { crumbVar } from '@/apollo/store';
 import type { SessionUser } from '@/libs/auth/api';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
 import { TempPasswordBanner } from '@/libs/components/TempPasswordBanner';
@@ -27,6 +31,7 @@ import { NAV, useActiveItem, useNavHref, type NavItem } from './nav';
 import { NotificationBell } from './NotificationBell';
 import { UserMenu } from './UserMenu';
 import { useRoleGuard } from './useRoleGuard';
+import { YearPill } from './YearPill';
 
 const SIDEBAR = 256;
 const TOPBAR = 64;
@@ -69,6 +74,7 @@ function DesktopShell({ user, desktop, children }: { user: SessionUser; desktop:
   const navHref = useNavHref();
   const [drawer, setDrawer] = useState(false);
   const current = useActiveItem(user.role);
+  const crumb = useReactiveVar(crumbVar);
   const announcements = NAV[user.role].flatMap((s) => s.items).find((i) => i.key === 'announcements');
 
   const sidebar = <Sidebar role={user.role} onNavigate={() => setDrawer(false)} />;
@@ -130,8 +136,23 @@ function DesktopShell({ user, desktop, children }: { user: SessionUser; desktop:
             <MenuIcon />
           </IconButton>
         )}
+        {/* Breadcrumb: menu item, then what the page says it shows (Users / Students) */}
         <Typography component="h1" sx={{ fontSize: '1rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
-          {current ? t(`nav.${current.key}`) : ''}
+          {current && crumb ? (
+            <>
+              <Box component="span" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                {t(`nav.${current.key}`)}
+              </Box>
+              <Box component="span" sx={{ color: 'text.disabled', mx: 1 }}>
+                /
+              </Box>
+              <Box component="span" sx={{ color: 'primary.main' }}>
+                {crumb}
+              </Box>
+            </>
+          ) : (
+            current && t(`nav.${current.key}`)
+          )}
         </Typography>
         {user.role === 'PARENT' && (
           <Box sx={{ ml: 2, display: { xs: 'none', lg: 'block' } }}>
@@ -139,10 +160,18 @@ function DesktopShell({ user, desktop, children }: { user: SessionUser; desktop:
           </Box>
         )}
         <Stack direction="row" spacing={1} sx={{ ml: 'auto', alignItems: 'center' }}>
+          {user.role === 'ADMIN' && (
+            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+              <YearPill />
+            </Box>
+          )}
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             <LanguageSwitcher />
           </Box>
           {announcements && <NotificationBell href={navHref(announcements.href)} />}
+          {/* Admins have no announcements page yet: the bell leads to enquiries (later phase) */}
+          {user.role === 'ADMIN' && <NotificationBell href="/_admin/enquiries" unread={false} />}
+          <Divider orientation="vertical" flexItem sx={{ my: 2, display: { xs: 'none', sm: 'block' } }} />
           <UserMenu user={user} />
         </Stack>
       </Box>
@@ -190,8 +219,13 @@ function Sidebar({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
 
   return (
     <Stack sx={{ height: '100%', p: 2, justifyContent: 'space-between' }}>
-      <Box>
-        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', px: 1, py: 1, mb: 3 }}>
+      {/* The menu scrolls on short screens; the footer stays at the bottom */}
+      <Box sx={{ minHeight: 0, overflowY: 'auto', mx: -2, px: 2, mt: -2, pt: 2 }}>
+        <Stack
+          direction="row"
+          spacing={1.5}
+          sx={{ alignItems: 'center', mx: -2, mt: -2, px: 3, py: 2, mb: 2, borderBottom: 1, borderColor: 'divider' }}
+        >
           <Box
             sx={{
               width: 32,
@@ -272,13 +306,28 @@ function Sidebar({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
         </Box>
       </Box>
 
-      <Typography sx={{ px: 1, fontSize: '0.75rem', color: 'text.secondary' }}>
-        {t('shell.footer', {
-          portal,
-          // Word joiners: "2026–27" never breaks at the dash
-          year: (data?.currentAcademicYear?.name ?? '').replace('–', '\u2060–\u2060'),
-        })}
-      </Typography>
+      <Box sx={{ mx: -2, mb: -2, px: 3, py: 2, borderTop: role === 'ADMIN' ? 1 : 0, borderColor: 'divider' }}>
+        {role === 'ADMIN' && (
+          // The public site comes with the landing page (day 13); it opens in a new tab
+          <Link
+            component={NextLink}
+            href="/"
+            target="_blank"
+            underline="hover"
+            sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 500, mb: 0.75 }}
+          >
+            {t('shell.viewPublicSite')}
+            <NorthEastIcon sx={{ fontSize: 14 }} />
+          </Link>
+        )}
+        <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+          {t('shell.footer', {
+            portal,
+            // Word joiners: "2026–27" never breaks at the dash
+            year: (data?.currentAcademicYear?.name ?? '').replace('–', '\u2060–\u2060'),
+          })}
+        </Typography>
+      </Box>
     </Stack>
   );
 }

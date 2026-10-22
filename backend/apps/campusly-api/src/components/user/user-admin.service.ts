@@ -393,7 +393,8 @@ export class UserAdminService {
   /** Admin Users page: one role per tab, filters, paging (Nestar "Inquiry" style) */
   public async getUsers(input: UsersInquiry): Promise<Users> {
     const now = new Date();
-    const { role, status, groupId, passwordState, text } = input.search;
+    const { role, status, groupId, groupIds, passwordState, text } =
+      input.search;
 
     // Every filter is its own AND item (CLAUDE.md): later a role scope is added the same way,
     // and a client filter can never overwrite it the way `{ ...scope, ...filters }` could
@@ -403,6 +404,13 @@ export class UserAdminService {
         status ? { status } : {},
         groupId
           ? { groupMemberships: { some: { groupId, leftAt: null } } }
+          : {},
+        groupIds?.length
+          ? {
+              groupMemberships: {
+                some: { groupId: { in: groupIds }, leftAt: null },
+              },
+            }
           : {},
         passwordState ? passwordStateWhere(passwordState, now) : {},
         text ? textWhere(text) : {},

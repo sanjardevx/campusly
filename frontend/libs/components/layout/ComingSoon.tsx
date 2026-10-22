@@ -21,7 +21,7 @@ export function ComingSoon() {
           </Typography>
           {item && (
             <Typography color="text.secondary" sx={{ mt: 1 }}>
-              {t('shell.comingSoonBody', { day: item.day })}
+              {item.day ? t('shell.comingSoonBody', { day: item.day }) : t('shell.laterPhase')}
             </Typography>
           )}
         </Box>

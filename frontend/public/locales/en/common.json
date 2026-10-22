@@ -34,6 +34,18 @@
     "classes": "Classes & Courses",
     "settings": "Settings",
     "more": "More",
+    "sections": {
+      "school": "School",
+      "system": "System",
+      "website": "Website"
+    },
+    "news": "News & Events",
+    "programs": "Programs",
+    "mockTests": "Mock tests",
+    "openCourses": "Open Courses",
+    "honorStudents": "Honor Students",
+    "team": "Our team",
+    "enquiries": "Enquiries",
     "tab": {
       "home": "Home",
       "courses": "Courses",
@@ -41,10 +53,6 @@
       "announcements": "News",
       "overview": "Home",
       "attendance": "Attendance"
-    },
-    "sections": {
-      "school": "School",
-      "system": "System"
     }
   },
   "shell": {
@@ -69,6 +77,12 @@
     "children": "Children",
     "comingSoon": "This page is coming soon",
     "comingSoonBody": "It is built on day {{day}} of the plan.",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "laterPhase": "Planned for a later phase, after the MVP.",
+    "viewPublicSite": "View public site",
+    "period": "{{year}} · {{period}}",
+    "periods": "Periods of {{year}}",
+    "manageYears": "Manage in Settings",
+    "noPeriod": "No period today"
   }
 }

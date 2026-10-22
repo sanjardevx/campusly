@@ -1,0 +1,73 @@
+{
+  "users": {
+    "title": "Foydalanuvchilar",
+    "subtitle": "Campusly’ga kira oladigan o‘quvchilar, o‘qituvchilar va ota-onalar.",
+    "tabs": {
+      "STUDENT": "O‘quvchilar",
+      "TEACHER": "O‘qituvchilar",
+      "PARENT": "Ota-onalar",
+      "ADMIN": "Adminlar"
+    },
+    "search": {
+      "STUDENT": "Ism yoki o‘quvchi ID bo‘yicha qidirish",
+      "TEACHER": "Ism yoki xodim ID bo‘yicha qidirish",
+      "PARENT": "Ism yoki telefon bo‘yicha qidirish",
+      "ADMIN": "Ism yoki ID bo‘yicha qidirish"
+    },
+    "filters": {
+      "grade": "Sinf darajasi",
+      "gradeN": "{{n}}-sinflar",
+      "class": "Sinf",
+      "status": "Holat",
+      "password": "Parol",
+      "all": "Hammasi",
+      "clear": "Filtrlarni tozalash"
+    },
+    "columns": {
+      "STUDENT": "O‘quvchi ID",
+      "TEACHER": "Xodim ID",
+      "PARENT": "Ota-ona ID",
+      "ADMIN": "ID",
+      "name": "Ism",
+      "class": "Sinf",
+      "parent": "Ota-ona",
+      "parentId": "Ota-ona ID",
+      "title": "Lavozim",
+      "phone": "Telefon",
+      "children": "Farzandlar",
+      "status": "Holat",
+      "password": "Parol",
+      "lastSignIn": "Oxirgi kirish"
+    },
+    "empty": "Hali foydalanuvchilar yo‘q.",
+    "emptyFiltered": "Bu filtrlarga mos foydalanuvchi topilmadi.",
+    "rowsPerPage": "Sahifadagi qatorlar:",
+    "showing": "<b>{{total}}</b> tadan <b>{{from}}–{{to}}</b> ko‘rsatilmoqda"
+  },
+  "status": {
+    "ACTIVE": "Faol",
+    "BLOCKED": "Bloklangan",
+    "ARCHIVED": "Arxivda"
+  },
+  "password": {
+    "SET": "O‘rnatilgan",
+    "TEMPORARY": "Vaqtinchalik",
+    "temporaryLeft": "Vaqtinchalik · {{count}} ta qoldi",
+    "MUST_CHANGE": "Almashtirishi kerak",
+    "EXPIRED": "Vaqtinchalik · muddati o‘tgan"
+  },
+  "relation": {
+    "FATHER": "Otasi",
+    "MOTHER": "Onasi",
+    "GUARDIAN": "Vasiysi",
+    "OTHER": "Boshqa"
+  },
+  "time": {
+    "today": "Bugun, {{time}}",
+    "yesterday": "Kecha",
+    "daysAgo_one": "{{count}} kun oldin",
+    "daysAgo_other": "{{count}} kun oldin",
+    "weeksAgo_one": "{{count}} hafta oldin",
+    "weeksAgo_other": "{{count}} hafta oldin"
+  }
+}

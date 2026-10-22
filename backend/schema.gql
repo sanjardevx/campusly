@@ -1034,6 +1034,7 @@ input UsersInquiry {
 
 input UsersSearch {
   groupId: String
+  groupIds: [String!]
   passwordState: PasswordState
   role: Role!
   status: UserStatus

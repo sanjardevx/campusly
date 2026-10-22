@@ -34,6 +34,18 @@
     "classes": "Sinflar va kurslar",
     "settings": "Sozlamalar",
     "more": "Yana",
+    "sections": {
+      "school": "Maktab",
+      "system": "Tizim",
+      "website": "Veb-sayt"
+    },
+    "news": "Yangiliklar va tadbirlar",
+    "programs": "Dasturlar",
+    "mockTests": "Sinov imtihonlari",
+    "openCourses": "Ochiq kurslar",
+    "honorStudents": "Faxriy o‘quvchilar",
+    "team": "Jamoamiz",
+    "enquiries": "Murojaatlar",
     "tab": {
       "home": "Asosiy",
       "courses": "Kurslar",
@@ -41,10 +53,6 @@
       "announcements": "E’lonlar",
       "overview": "Asosiy",
       "attendance": "Davomat"
-    },
-    "sections": {
-      "school": "Maktab",
-      "system": "Tizim"
     }
   },
   "shell": {
@@ -69,6 +77,12 @@
     "children": "Farzandlar",
     "comingSoon": "Bu sahifa tez orada tayyor bo‘ladi",
     "comingSoonBody": "U rejaning {{day}}-kunida quriladi.",
-    "loading": "Yuklanmoqda…"
+    "loading": "Yuklanmoqda…",
+    "laterPhase": "MVP’dan keyingi bosqichda qilinadi.",
+    "viewPublicSite": "Saytni ochish",
+    "period": "{{year}} · {{period}}",
+    "periods": "{{year}} davrlari",
+    "manageYears": "Sozlamalarda boshqarish",
+    "noPeriod": "Bugun davr yo‘q"
   }
 }

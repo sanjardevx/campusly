@@ -29,3 +29,18 @@ export const UNREAD_ANNOUNCEMENTS = graphql(`
     }
   }
 `);
+
+/** Periods of a year (top-bar "2026–27 · Quarter 1" pill, Settings) */
+export const PERIODS = graphql(`
+  query Periods($academicYearId: String!) {
+    periods(academicYearId: $academicYearId) {
+      id
+      name
+      kind
+      order
+      startsAt
+      endsAt
+      parentId
+    }
+  }
+`);

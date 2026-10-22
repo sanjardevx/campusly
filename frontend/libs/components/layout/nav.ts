@@ -1,15 +1,21 @@
 import type { SvgIconComponent } from '@mui/icons-material';
 import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
+import LibraryBooksOutlinedIcon from '@mui/icons-material/LibraryBooksOutlined';
+import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
 import { useRouter } from 'next/router';
 import type { Role } from '@/libs/gql/graphql';
 
@@ -18,8 +24,8 @@ export interface NavItem {
   key: string;
   href: string;
   icon: SvgIconComponent;
-  /** The plan day that builds the page (shown on the "coming soon" placeholder) */
-  day: number;
+  /** The plan day that builds the page (shown on the "coming soon" placeholder); none = later phase */
+  day?: number;
 }
 
 export interface NavSection {
@@ -70,7 +76,21 @@ export const NAV: Record<Role, NavSection[]> = {
       title: 'school',
       items: [
         { key: 'users', href: '/_admin/users', icon: GroupOutlinedIcon, day: 10 },
-        { key: 'classes', href: '/_admin/classes', icon: SchoolOutlinedIcon, day: 10 },
+        { key: 'classes', href: '/_admin/classes', icon: MenuBookOutlinedIcon, day: 10 },
+      ],
+    },
+    // The public website CMS and enquiries are a later phase (DECISIONS §14): the menu matches
+    // Stitch, the pages say "later phase"
+    {
+      title: 'website',
+      items: [
+        { key: 'news', href: '/_admin/news', icon: EventNoteOutlinedIcon },
+        { key: 'programs', href: '/_admin/programs', icon: SchoolOutlinedIcon },
+        { key: 'mockTests', href: '/_admin/mock-tests', icon: QuizOutlinedIcon },
+        { key: 'openCourses', href: '/_admin/open-courses', icon: LibraryBooksOutlinedIcon },
+        { key: 'honorStudents', href: '/_admin/honor-students', icon: WorkspacePremiumOutlinedIcon },
+        { key: 'team', href: '/_admin/team', icon: BadgeOutlinedIcon },
+        { key: 'enquiries', href: '/_admin/enquiries', icon: MarkEmailUnreadOutlinedIcon },
       ],
     },
     {

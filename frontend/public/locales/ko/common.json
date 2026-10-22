@@ -34,6 +34,18 @@
     "classes": "학급 및 강좌",
     "settings": "설정",
     "more": "더보기",
+    "sections": {
+      "school": "학교",
+      "system": "시스템",
+      "website": "웹사이트"
+    },
+    "news": "소식 및 행사",
+    "programs": "프로그램",
+    "mockTests": "모의고사",
+    "openCourses": "공개 강좌",
+    "honorStudents": "우수 학생",
+    "team": "우리 팀",
+    "enquiries": "문의",
     "tab": {
       "home": "홈",
       "courses": "강좌",
@@ -41,10 +53,6 @@
       "announcements": "공지",
       "overview": "홈",
       "attendance": "출결"
-    },
-    "sections": {
-      "school": "학교",
-      "system": "시스템"
     }
   },
   "shell": {
@@ -69,6 +77,12 @@
     "children": "자녀",
     "comingSoon": "이 페이지는 곧 준비됩니다",
     "comingSoonBody": "계획의 {{day}}일차에 만들어집니다.",
-    "loading": "불러오는 중…"
+    "loading": "불러오는 중…",
+    "laterPhase": "MVP 이후 단계에서 제공될 예정입니다.",
+    "viewPublicSite": "공개 사이트 보기",
+    "period": "{{year}} · {{period}}",
+    "periods": "{{year}} 기간",
+    "manageYears": "설정에서 관리",
+    "noPeriod": "오늘은 기간이 없습니다"
   }
 }

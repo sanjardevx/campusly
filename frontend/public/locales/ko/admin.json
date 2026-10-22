@@ -1,0 +1,71 @@
+{
+  "users": {
+    "title": "사용자",
+    "subtitle": "Campusly에 로그인할 수 있는 학생, 교사, 학부모입니다.",
+    "tabs": {
+      "STUDENT": "학생",
+      "TEACHER": "교사",
+      "PARENT": "학부모",
+      "ADMIN": "관리자"
+    },
+    "search": {
+      "STUDENT": "이름 또는 학생 ID로 검색",
+      "TEACHER": "이름 또는 교직원 ID로 검색",
+      "PARENT": "이름 또는 전화번호로 검색",
+      "ADMIN": "이름 또는 ID로 검색"
+    },
+    "filters": {
+      "grade": "학년",
+      "gradeN": "{{n}}학년",
+      "class": "반",
+      "status": "상태",
+      "password": "비밀번호",
+      "all": "전체",
+      "clear": "필터 초기화"
+    },
+    "columns": {
+      "STUDENT": "학생 ID",
+      "TEACHER": "교직원 ID",
+      "PARENT": "학부모 ID",
+      "ADMIN": "ID",
+      "name": "이름",
+      "class": "반",
+      "parent": "학부모",
+      "parentId": "학부모 ID",
+      "title": "직책",
+      "phone": "전화번호",
+      "children": "자녀",
+      "status": "상태",
+      "password": "비밀번호",
+      "lastSignIn": "최근 로그인"
+    },
+    "empty": "아직 사용자가 없습니다.",
+    "emptyFiltered": "조건에 맞는 사용자가 없습니다.",
+    "rowsPerPage": "페이지당 행 수:",
+    "showing": "<b>{{total}}</b>명 중 <b>{{from}}–{{to}}</b>"
+  },
+  "status": {
+    "ACTIVE": "활성",
+    "BLOCKED": "차단됨",
+    "ARCHIVED": "보관됨"
+  },
+  "password": {
+    "SET": "설정됨",
+    "TEMPORARY": "임시",
+    "temporaryLeft": "임시 · {{count}}회 남음",
+    "MUST_CHANGE": "변경 필요",
+    "EXPIRED": "임시 · 만료됨"
+  },
+  "relation": {
+    "FATHER": "아버지",
+    "MOTHER": "어머니",
+    "GUARDIAN": "보호자",
+    "OTHER": "기타"
+  },
+  "time": {
+    "today": "오늘 {{time}}",
+    "yesterday": "어제",
+    "daysAgo_other": "{{count}}일 전",
+    "weeksAgo_other": "{{count}}주 전"
+  }
+}

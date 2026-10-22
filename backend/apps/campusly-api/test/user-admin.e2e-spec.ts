@@ -378,6 +378,30 @@ describe('User admin (e2e)', () => {
       expect(sort.errors?.[0].extensions.code).toBe('BAD_REQUEST');
     });
 
+    it('groupIds (the grade filter) lists students of any of the classes; bad ids are refused', async () => {
+      const other = '01a00000-0000-7000-8000-000000000000';
+      const grade = await gql<UsersResult>(
+        USERS,
+        inquiry({ groupId: undefined, groupIds: [groupId, other] }),
+      );
+      expect(grade.data!.users.metaCounter.total).toBe(2);
+
+      const none = await gql<UsersResult>(
+        USERS,
+        inquiry({ groupId: undefined, groupIds: [other] }),
+      );
+      expect(none.data!.users.metaCounter.total).toBe(0);
+
+      const bad = await gql(USERS, inquiry({ groupIds: ['9A'] }));
+      expect(bad.errors?.[0].extensions.code).toBe('BAD_REQUEST');
+
+      const many = await gql(
+        USERS,
+        inquiry({ groupIds: Array.from({ length: 51 }, () => other) }),
+      );
+      expect(many.errors?.[0].extensions.code).toBe('BAD_REQUEST');
+    });
+
     it('treats search text as plain text (no regex), an empty result is not an error', async () => {
       const res = await gql<UsersResult>(USERS, inquiry({ text: '(a+)+$' }));
       expect(res.errors).toBeUndefined();

@@ -105,6 +105,8 @@ export const TEMP_PASSWORD = { uses: 3, days: 14 };
 export const USER_SORTS = ['createdAt', 'lastName', 'loginId'] as const;
 /** Page size limit for every list (Nestar had none: limit=1000000 returned the whole collection) */
 export const MAX_PAGE_SIZE = 100;
+/** Classes in one "grade" filter (a grade has a handful of classes; this only stops abuse) */
+export const MAX_GROUP_FILTER = 50;
 
 // ───────────────────────────── school ─────────────────────────────
 

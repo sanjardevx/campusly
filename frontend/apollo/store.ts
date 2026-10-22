@@ -15,3 +15,6 @@ export const tempPasswordWarningVar = makeVar<{
 
 /** false until the first silent refresh has answered (route guards wait for it) */
 export const sessionReadyVar = makeVar(false);
+
+/** Last part of the top-bar breadcrumb set by the page ("Users / Students"); null = menu label only */
+export const crumbVar = makeVar<string | null>(null);

@@ -1,6 +1,8 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  IsArray,
   IsDate,
   IsEnum,
   IsIn,
@@ -15,7 +17,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { MAX_PAGE_SIZE, USER_SORTS } from '../../config';
+import { MAX_GROUP_FILTER, MAX_PAGE_SIZE, USER_SORTS } from '../../config';
 import { Direction } from '../../enums/common.enum';
 import {
   ParentRelation,
@@ -138,6 +140,14 @@ export class UsersSearch {
   @IsOptional()
   @IsUUID()
   groupId?: string;
+
+  /** Students of several classes: the "Grade 9" filter sends 9A, 9B and 9C */
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(MAX_GROUP_FILTER)
+  @IsUUID('all', { each: true })
+  groupIds?: string[];
 
   @Field(() => PasswordState, { nullable: true })
   @IsOptional()

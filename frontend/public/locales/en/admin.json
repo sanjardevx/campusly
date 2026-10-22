@@ -1,0 +1,73 @@
+{
+  "users": {
+    "title": "Users",
+    "subtitle": "Students, teachers and parents who can sign in to Campusly.",
+    "tabs": {
+      "STUDENT": "Students",
+      "TEACHER": "Teachers",
+      "PARENT": "Parents",
+      "ADMIN": "Admins"
+    },
+    "search": {
+      "STUDENT": "Search by name or Student ID",
+      "TEACHER": "Search by name or Staff ID",
+      "PARENT": "Search by name or phone",
+      "ADMIN": "Search by name or ID"
+    },
+    "filters": {
+      "grade": "Grade",
+      "gradeN": "Grade {{n}}",
+      "class": "Class",
+      "status": "Status",
+      "password": "Password",
+      "all": "All",
+      "clear": "Clear filters"
+    },
+    "columns": {
+      "STUDENT": "Student ID",
+      "TEACHER": "Staff ID",
+      "PARENT": "Parent ID",
+      "ADMIN": "ID",
+      "name": "Name",
+      "class": "Class",
+      "parent": "Parent",
+      "parentId": "Parent ID",
+      "title": "Title",
+      "phone": "Phone",
+      "children": "Children",
+      "status": "Status",
+      "password": "Password",
+      "lastSignIn": "Last sign-in"
+    },
+    "empty": "No users yet.",
+    "emptyFiltered": "No users match these filters.",
+    "rowsPerPage": "Rows per page:",
+    "showing": "Showing <b>{{from}}–{{to}}</b> of <b>{{total}}</b>"
+  },
+  "status": {
+    "ACTIVE": "Active",
+    "BLOCKED": "Blocked",
+    "ARCHIVED": "Archived"
+  },
+  "password": {
+    "SET": "Set",
+    "TEMPORARY": "Temporary",
+    "temporaryLeft": "Temporary · {{count}} left",
+    "MUST_CHANGE": "Must change",
+    "EXPIRED": "Temporary · expired"
+  },
+  "relation": {
+    "FATHER": "Father",
+    "MOTHER": "Mother",
+    "GUARDIAN": "Guardian",
+    "OTHER": "Other"
+  },
+  "time": {
+    "today": "Today, {{time}}",
+    "yesterday": "Yesterday",
+    "daysAgo_one": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago",
+    "weeksAgo_one": "{{count}} week ago",
+    "weeksAgo_other": "{{count}} weeks ago"
+  }
+}
