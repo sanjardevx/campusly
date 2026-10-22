@@ -38,3 +38,54 @@ export const MOVE_STUDENT = graphql(`
     }
   }
 `);
+
+/** Student + (optional) parent in one transaction; the IDs come from the atomic id_counters */
+export const CREATE_STUDENT = graphql(`
+  mutation CreateStudent($input: CreateStudentInput!) {
+    createStudent(input: $input) {
+      student {
+        userId
+        loginId
+        fullName
+        role
+        tempPassword
+        isNew
+      }
+      parent {
+        userId
+        loginId
+        fullName
+        role
+        tempPassword
+        isNew
+      }
+    }
+  }
+`);
+
+/** Second parent: found by phone or created; an existing parent keeps their password */
+export const LINK_PARENT = graphql(`
+  mutation LinkParent($studentId: String!, $input: ParentInput!) {
+    linkParent(studentId: $studentId, input: $input) {
+      userId
+      loginId
+      fullName
+      role
+      tempPassword
+      isNew
+    }
+  }
+`);
+
+export const CREATE_TEACHER = graphql(`
+  mutation CreateTeacher($input: CreateTeacherInput!) {
+    createTeacher(input: $input) {
+      userId
+      loginId
+      fullName
+      role
+      tempPassword
+      isNew
+    }
+  }
+`);

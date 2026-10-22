@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useQuery } from '@apollo/client/react';
-import { Box, Chip, Tab, Tabs } from '@mui/material';
+import { Box, Button, Chip, Tab, Tabs } from '@mui/material';
+import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { GROUPS, USER_COUNTS, USERS } from '@/apollo/admin/query';
 import { PageHeader } from '@/libs/components/admin/PageHeader';
+import { AddStudentDrawer } from '@/libs/components/admin/users/AddStudentDrawer';
+import { AddTeacherDrawer } from '@/libs/components/admin/users/AddTeacherDrawer';
 import { BulkBar } from '@/libs/components/admin/users/BulkBar';
 import { gradeOf, PASSWORD_STATES, STATUSES, UsersFilters } from '@/libs/components/admin/users/UsersFilters';
 import { UsersTable } from '@/libs/components/admin/users/UsersTable';
@@ -86,11 +89,34 @@ const UsersPage: NextPageWithLayout = () => {
   const chosen = rows.filter((u) => selected.has(u.id));
 
   const actions = useUserActions(() => select(NONE));
+  const [adding, setAdding] = useState<'student' | 'teacher' | null>(null);
+  // Parents are added with their child; admins cannot be created from the console
+  const addKind = role === 'TEACHER' ? 'teacher' : role === 'ADMIN' ? null : 'student';
   const selectable = role !== 'ADMIN';
 
   return (
     <>
-      <PageHeader title={t('users.title')} subtitle={t('users.subtitle')} />
+      <PageHeader
+        title={t('users.title')}
+        subtitle={t('users.subtitle')}
+        actions={
+          addKind && (
+            <Button variant="contained" startIcon={<PersonAddAltOutlinedIcon />} onClick={() => setAdding(addKind)}>
+              {t(`add.${addKind}`)}
+            </Button>
+          )
+        }
+      />
+      {/* Mounted only while open: every opening starts with a fresh form */}
+      {adding === 'student' && (
+        <AddStudentDrawer
+          open
+          // Looking at 9A? The new student is probably for 9A
+          defaultGroupId={students ? params.group : undefined}
+          onClose={() => setAdding(null)}
+        />
+      )}
+      {adding === 'teacher' && <AddTeacherDrawer open onClose={() => setAdding(null)} />}
 
       <Tabs
         value={role}

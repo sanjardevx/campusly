@@ -7,6 +7,7 @@ import { afterSignIn } from '@/libs/auth/routes';
 import { errorCode } from '@/libs/errors';
 import { useErrorText } from '@/libs/i18n';
 import { FormField } from './FormField';
+import { PhonePrefix } from '@/libs/components/PhonePrefix';
 import { PasswordInput } from './PasswordInput';
 
 export type SignInMode = 'student' | 'parent' | 'staff';
@@ -123,32 +124,5 @@ export function SignInForm({ mode }: { mode: SignInMode }) {
         {mode === 'staff' ? t('signIn.teacherNoAccount') : t('signIn.noAccount')}
       </Typography>
     </Stack>
-  );
-}
-
-/** "+998" in its own grey block at the start of the phone field (Stitch mobile) */
-function PhonePrefix() {
-  return (
-    <Box
-      component="span"
-      sx={{
-        alignSelf: 'stretch',
-        display: 'flex',
-        alignItems: 'center',
-        ml: '-14px',
-        mr: 1.5,
-        px: 1.75,
-        bgcolor: '#EFEEEA',
-        borderRight: '1px solid',
-        borderColor: 'divider',
-        borderTopLeftRadius: 'inherit',
-        borderBottomLeftRadius: 'inherit',
-        color: 'text.secondary',
-        fontWeight: 600,
-        fontSize: '0.875rem',
-      }}
-    >
-      +998
-    </Box>
   );
 }

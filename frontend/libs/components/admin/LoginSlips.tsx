@@ -38,7 +38,7 @@ export interface Slip {
 
 const mono = { fontFamily: monoFontFamily, fontWeight: 600, letterSpacing: '0.04em' };
 
-function CopyButton({ text }: { text: string }) {
+export function CopyButton({ text }: { text: string }) {
   const { t } = useTranslation('admin');
   const [copied, setCopied] = useState(false);
   return (
@@ -58,7 +58,7 @@ function CopyButton({ text }: { text: string }) {
  * The paper version: one card per person, cut along the dashed lines and handed out.
  * Rendered into <body> next to the app, so the print CSS (globals.css) can hide everything else.
  */
-function PrintableSlips({ slips }: { slips: Slip[] }) {
+export function PrintableSlips({ slips }: { slips: Slip[] }) {
   const { t } = useTranslation(['admin', 'common']);
   const { locale } = useRouter();
   const school = useQuery(SCHOOL_SETTINGS).data?.schoolSettings.schoolName;
