@@ -137,3 +137,81 @@ export const ACADEMIC_YEARS = graphql(`
   }
 `);
 
+// ───────────────────────── Records page ─────────────────────────
+
+/** Courses of any academic year (records of past years stay reachable) */
+export const RECORD_COURSES = graphql(`
+  query RecordCourses($filter: CoursesFilter) {
+    courses(filter: $filter) {
+      id
+      title
+      groupName
+      subjectName
+    }
+  }
+`);
+
+/** One course, one quarter: the class grades journal */
+export const COURSE_PERIOD_GRADES = graphql(`
+  query CoursePeriodGrades($courseId: String!, $periodId: String!) {
+    coursePeriodGrades(courseId: $courseId, periodId: $periodId) {
+      studentId
+      loginId
+      firstName
+      lastName
+      score
+      mark
+      isPublished
+    }
+  }
+`);
+
+/** One course over a date range: days attendance was taken × students */
+export const ATTENDANCE_JOURNAL = graphql(`
+  query AttendanceJournal($courseId: String!, $from: String!, $to: String!) {
+    attendanceJournal(courseId: $courseId, from: $from, to: $to) {
+      dates
+      rows {
+        studentId
+        loginId
+        firstName
+        lastName
+        statuses
+      }
+    }
+  }
+`);
+
+/** One student's report card: every course of the current quarter */
+export const REPORT_CARD = graphql(`
+  query ReportCard($studentId: String!) {
+    studentOverview(studentId: $studentId) {
+      student {
+        id
+        loginId
+        firstName
+        lastName
+        className
+      }
+      period {
+        id
+        name
+      }
+      attendance {
+        total
+        absent
+        rate
+      }
+      courses {
+        courseId
+        title
+        subjectName
+        teacherName
+        score
+        mark
+        isPublished
+        attendanceRate
+      }
+    }
+  }
+`);

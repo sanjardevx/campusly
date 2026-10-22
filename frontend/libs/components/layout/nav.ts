@@ -5,6 +5,7 @@ import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -77,6 +78,7 @@ export const NAV: Record<Role, NavSection[]> = {
       items: [
         { key: 'users', href: '/_admin/users', icon: GroupOutlinedIcon, day: 10 },
         { key: 'classes', href: '/_admin/classes', icon: MenuBookOutlinedIcon, day: 10 },
+        { key: 'records', href: '/_admin/records', icon: FolderOpenOutlinedIcon, day: 10 },
       ],
     },
     // The public website CMS and enquiries are a later phase (DECISIONS §14): the menu matches

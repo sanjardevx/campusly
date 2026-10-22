@@ -416,5 +416,68 @@
     },
     "required": "필수",
     "datesBad": "종료일은 시작일 이후여야 합니다"
+  },
+  "records": {
+    "title": "기록",
+    "subtitle": "학급 명단, 성적·출결 일지, 성적표 — 보기, CSV 다운로드, 인쇄.",
+    "tabs": {
+      "STUDENTS": "학생",
+      "GRADES": "성적",
+      "ATTENDANCE": "출결",
+      "REPORT_CARD": "성적표"
+    },
+    "docs": {
+      "STUDENTS": "학급 명단",
+      "GRADES": "성적 일지",
+      "ATTENDANCE": "출결 일지",
+      "REPORT_CARD": "성적표"
+    },
+    "filters": {
+      "year": "학년도",
+      "class": "반",
+      "course": "과목",
+      "period": "분기",
+      "student": "학생",
+      "from": "시작일",
+      "to": "종료일"
+    },
+    "col": {
+      "lastName": "성",
+      "firstName": "이름",
+      "name": "이름",
+      "score": "점수",
+      "mark": "등급",
+      "gradeStatus": "상태",
+      "rate": "출석률",
+      "course": "과목",
+      "teacher": "교사",
+      "attendance": "출석률"
+    },
+    "status": {
+      "PRESENT": "출석",
+      "LATE": "지각",
+      "ABSENT": "결석",
+      "EXCUSED": "인정 결석"
+    },
+    "letter": {
+      "PRESENT": "출",
+      "LATE": "지",
+      "ABSENT": "결",
+      "EXCUSED": "인"
+    },
+    "published": "공개됨",
+    "draft": "미공개",
+    "notPublished": "미공개",
+    "attendanceTotal": "이번 분기 출석률: {{rate}}%, 결석: {{absent}}일",
+    "csv": "CSV 다운로드",
+    "print": "인쇄",
+    "printedOn": "인쇄일 {{date}}",
+    "rowCount_other": "{{count}}행",
+    "chooseClass": "반을 선택하세요.",
+    "chooseCourse": "과목과 분기를 선택하세요.",
+    "chooseStudent": "반과 학생을 선택하세요.",
+    "badRange": "시작일이 종료일보다 늦을 수 없습니다.",
+    "empty": "아직 표시할 내용이 없습니다.",
+    "emptyAttendance": "이 기간에는 출결 기록이 없습니다."
   }
 }

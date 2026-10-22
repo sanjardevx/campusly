@@ -422,5 +422,69 @@
     },
     "required": "Required",
     "datesBad": "The end date must be after the start date"
+  },
+  "records": {
+    "title": "Records",
+    "subtitle": "Class lists, grade and attendance journals, report cards — view, download as CSV or print.",
+    "tabs": {
+      "STUDENTS": "Students",
+      "GRADES": "Grades",
+      "ATTENDANCE": "Attendance",
+      "REPORT_CARD": "Report card"
+    },
+    "docs": {
+      "STUDENTS": "Class list",
+      "GRADES": "Grades journal",
+      "ATTENDANCE": "Attendance journal",
+      "REPORT_CARD": "Report card"
+    },
+    "filters": {
+      "year": "Year",
+      "class": "Class",
+      "course": "Course",
+      "period": "Quarter",
+      "student": "Student",
+      "from": "From",
+      "to": "To"
+    },
+    "col": {
+      "lastName": "Last name",
+      "firstName": "First name",
+      "name": "Name",
+      "score": "Score",
+      "mark": "Mark",
+      "gradeStatus": "Status",
+      "rate": "Rate",
+      "course": "Course",
+      "teacher": "Teacher",
+      "attendance": "Attendance"
+    },
+    "status": {
+      "PRESENT": "present",
+      "LATE": "late",
+      "ABSENT": "absent",
+      "EXCUSED": "excused"
+    },
+    "letter": {
+      "PRESENT": "P",
+      "LATE": "L",
+      "ABSENT": "A",
+      "EXCUSED": "E"
+    },
+    "published": "Published",
+    "draft": "Not published",
+    "notPublished": "Not published",
+    "attendanceTotal": "Attendance this quarter: {{rate}}%, absences: {{absent}}",
+    "csv": "Download CSV",
+    "print": "Print",
+    "printedOn": "printed {{date}}",
+    "rowCount_one": "{{count}} row",
+    "rowCount_other": "{{count}} rows",
+    "chooseClass": "Choose a class.",
+    "chooseCourse": "Choose a course and a quarter.",
+    "chooseStudent": "Choose a class and a student.",
+    "badRange": "The start date must not be after the end date.",
+    "empty": "Nothing to show yet.",
+    "emptyAttendance": "No attendance was taken in this period."
   }
 }

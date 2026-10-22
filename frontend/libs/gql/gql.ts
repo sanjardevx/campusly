@@ -35,6 +35,7 @@ type Documents = {
     "\n  mutation SetCurrentAcademicYear($id: String!) {\n    setCurrentAcademicYear(id: $id) {\n      id\n    }\n  }\n": typeof types.SetCurrentAcademicYearDocument,
     "\n  mutation CreatePeriod($input: CreatePeriodInput!) {\n    createPeriod(input: $input) {\n      id\n    }\n  }\n": typeof types.CreatePeriodDocument,
     "\n  mutation UpdatePeriod($input: UpdatePeriodInput!) {\n    updatePeriod(input: $input) {\n      id\n    }\n  }\n": typeof types.UpdatePeriodDocument,
+    "\n  mutation LogRecordExport($input: RecordExportInput!) {\n    logRecordExport(input: $input)\n  }\n": typeof types.LogRecordExportDocument,
     "\n  query Users($input: UsersInquiry!) {\n    users(input: $input) {\n      list {\n        id\n        loginId\n        role\n        status\n        firstName\n        lastName\n        className\n        title\n        phone\n        passwordState\n        tempPasswordUsesLeft\n        lastActiveAt\n        links {\n          id\n          loginId\n          fullName\n          relation\n        }\n      }\n      metaCounter {\n        total\n      }\n    }\n  }\n": typeof types.UsersDocument,
     "\n  query UserCounts {\n    students: users(input: { page: 1, limit: 1, search: { role: STUDENT } }) {\n      metaCounter {\n        total\n      }\n    }\n    teachers: users(input: { page: 1, limit: 1, search: { role: TEACHER } }) {\n      metaCounter {\n        total\n      }\n    }\n    parents: users(input: { page: 1, limit: 1, search: { role: PARENT } }) {\n      metaCounter {\n        total\n      }\n    }\n    admins: users(input: { page: 1, limit: 1, search: { role: ADMIN } }) {\n      metaCounter {\n        total\n      }\n    }\n  }\n": typeof types.UserCountsDocument,
     "\n  query Groups {\n    groups {\n      id\n      name\n      studentCount\n      status\n    }\n  }\n": typeof types.GroupsDocument,
@@ -42,6 +43,10 @@ type Documents = {
     "\n  query Subjects($includeArchived: Boolean) {\n    subjects(includeArchived: $includeArchived) {\n      id\n      name\n      status\n    }\n  }\n": typeof types.SubjectsDocument,
     "\n  query Teachers {\n    users(input: { page: 1, limit: 100, sort: \"lastName\", direction: ASC, search: { role: TEACHER, status: ACTIVE } }) {\n      list {\n        id\n        loginId\n        firstName\n        lastName\n        title\n      }\n    }\n  }\n": typeof types.TeachersDocument,
     "\n  query AcademicYears {\n    academicYears {\n      id\n      name\n      startsAt\n      endsAt\n      isCurrent\n    }\n  }\n": typeof types.AcademicYearsDocument,
+    "\n  query RecordCourses($filter: CoursesFilter) {\n    courses(filter: $filter) {\n      id\n      title\n      groupName\n      subjectName\n    }\n  }\n": typeof types.RecordCoursesDocument,
+    "\n  query CoursePeriodGrades($courseId: String!, $periodId: String!) {\n    coursePeriodGrades(courseId: $courseId, periodId: $periodId) {\n      studentId\n      loginId\n      firstName\n      lastName\n      score\n      mark\n      isPublished\n    }\n  }\n": typeof types.CoursePeriodGradesDocument,
+    "\n  query AttendanceJournal($courseId: String!, $from: String!, $to: String!) {\n    attendanceJournal(courseId: $courseId, from: $from, to: $to) {\n      dates\n      rows {\n        studentId\n        loginId\n        firstName\n        lastName\n        statuses\n      }\n    }\n  }\n": typeof types.AttendanceJournalDocument,
+    "\n  query ReportCard($studentId: String!) {\n    studentOverview(studentId: $studentId) {\n      student {\n        id\n        loginId\n        firstName\n        lastName\n        className\n      }\n      period {\n        id\n        name\n      }\n      attendance {\n        total\n        absent\n        rate\n      }\n      courses {\n        courseId\n        title\n        subjectName\n        teacherName\n        score\n        mark\n        isPublished\n        attendanceRate\n      }\n    }\n  }\n": typeof types.ReportCardDocument,
     "\n  query Health {\n    health {\n      status\n      postgres\n      redis\n    }\n  }\n": typeof types.HealthDocument,
     "\n  query CurrentYear {\n    currentAcademicYear {\n      id\n      name\n    }\n  }\n": typeof types.CurrentYearDocument,
     "\n  query UnreadAnnouncements {\n    announcements(input: { limit: 1 }) {\n      unread\n    }\n  }\n": typeof types.UnreadAnnouncementsDocument,
@@ -73,6 +78,7 @@ const documents: Documents = {
     "\n  mutation SetCurrentAcademicYear($id: String!) {\n    setCurrentAcademicYear(id: $id) {\n      id\n    }\n  }\n": types.SetCurrentAcademicYearDocument,
     "\n  mutation CreatePeriod($input: CreatePeriodInput!) {\n    createPeriod(input: $input) {\n      id\n    }\n  }\n": types.CreatePeriodDocument,
     "\n  mutation UpdatePeriod($input: UpdatePeriodInput!) {\n    updatePeriod(input: $input) {\n      id\n    }\n  }\n": types.UpdatePeriodDocument,
+    "\n  mutation LogRecordExport($input: RecordExportInput!) {\n    logRecordExport(input: $input)\n  }\n": types.LogRecordExportDocument,
     "\n  query Users($input: UsersInquiry!) {\n    users(input: $input) {\n      list {\n        id\n        loginId\n        role\n        status\n        firstName\n        lastName\n        className\n        title\n        phone\n        passwordState\n        tempPasswordUsesLeft\n        lastActiveAt\n        links {\n          id\n          loginId\n          fullName\n          relation\n        }\n      }\n      metaCounter {\n        total\n      }\n    }\n  }\n": types.UsersDocument,
     "\n  query UserCounts {\n    students: users(input: { page: 1, limit: 1, search: { role: STUDENT } }) {\n      metaCounter {\n        total\n      }\n    }\n    teachers: users(input: { page: 1, limit: 1, search: { role: TEACHER } }) {\n      metaCounter {\n        total\n      }\n    }\n    parents: users(input: { page: 1, limit: 1, search: { role: PARENT } }) {\n      metaCounter {\n        total\n      }\n    }\n    admins: users(input: { page: 1, limit: 1, search: { role: ADMIN } }) {\n      metaCounter {\n        total\n      }\n    }\n  }\n": types.UserCountsDocument,
     "\n  query Groups {\n    groups {\n      id\n      name\n      studentCount\n      status\n    }\n  }\n": types.GroupsDocument,
@@ -80,6 +86,10 @@ const documents: Documents = {
     "\n  query Subjects($includeArchived: Boolean) {\n    subjects(includeArchived: $includeArchived) {\n      id\n      name\n      status\n    }\n  }\n": types.SubjectsDocument,
     "\n  query Teachers {\n    users(input: { page: 1, limit: 100, sort: \"lastName\", direction: ASC, search: { role: TEACHER, status: ACTIVE } }) {\n      list {\n        id\n        loginId\n        firstName\n        lastName\n        title\n      }\n    }\n  }\n": types.TeachersDocument,
     "\n  query AcademicYears {\n    academicYears {\n      id\n      name\n      startsAt\n      endsAt\n      isCurrent\n    }\n  }\n": types.AcademicYearsDocument,
+    "\n  query RecordCourses($filter: CoursesFilter) {\n    courses(filter: $filter) {\n      id\n      title\n      groupName\n      subjectName\n    }\n  }\n": types.RecordCoursesDocument,
+    "\n  query CoursePeriodGrades($courseId: String!, $periodId: String!) {\n    coursePeriodGrades(courseId: $courseId, periodId: $periodId) {\n      studentId\n      loginId\n      firstName\n      lastName\n      score\n      mark\n      isPublished\n    }\n  }\n": types.CoursePeriodGradesDocument,
+    "\n  query AttendanceJournal($courseId: String!, $from: String!, $to: String!) {\n    attendanceJournal(courseId: $courseId, from: $from, to: $to) {\n      dates\n      rows {\n        studentId\n        loginId\n        firstName\n        lastName\n        statuses\n      }\n    }\n  }\n": types.AttendanceJournalDocument,
+    "\n  query ReportCard($studentId: String!) {\n    studentOverview(studentId: $studentId) {\n      student {\n        id\n        loginId\n        firstName\n        lastName\n        className\n      }\n      period {\n        id\n        name\n      }\n      attendance {\n        total\n        absent\n        rate\n      }\n      courses {\n        courseId\n        title\n        subjectName\n        teacherName\n        score\n        mark\n        isPublished\n        attendanceRate\n      }\n    }\n  }\n": types.ReportCardDocument,
     "\n  query Health {\n    health {\n      status\n      postgres\n      redis\n    }\n  }\n": types.HealthDocument,
     "\n  query CurrentYear {\n    currentAcademicYear {\n      id\n      name\n    }\n  }\n": types.CurrentYearDocument,
     "\n  query UnreadAnnouncements {\n    announcements(input: { limit: 1 }) {\n      unread\n    }\n  }\n": types.UnreadAnnouncementsDocument,
@@ -191,6 +201,10 @@ export function graphql(source: "\n  mutation UpdatePeriod($input: UpdatePeriodI
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation LogRecordExport($input: RecordExportInput!) {\n    logRecordExport(input: $input)\n  }\n"): (typeof documents)["\n  mutation LogRecordExport($input: RecordExportInput!) {\n    logRecordExport(input: $input)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query Users($input: UsersInquiry!) {\n    users(input: $input) {\n      list {\n        id\n        loginId\n        role\n        status\n        firstName\n        lastName\n        className\n        title\n        phone\n        passwordState\n        tempPasswordUsesLeft\n        lastActiveAt\n        links {\n          id\n          loginId\n          fullName\n          relation\n        }\n      }\n      metaCounter {\n        total\n      }\n    }\n  }\n"): (typeof documents)["\n  query Users($input: UsersInquiry!) {\n    users(input: $input) {\n      list {\n        id\n        loginId\n        role\n        status\n        firstName\n        lastName\n        className\n        title\n        phone\n        passwordState\n        tempPasswordUsesLeft\n        lastActiveAt\n        links {\n          id\n          loginId\n          fullName\n          relation\n        }\n      }\n      metaCounter {\n        total\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -216,6 +230,22 @@ export function graphql(source: "\n  query Teachers {\n    users(input: { page: 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query AcademicYears {\n    academicYears {\n      id\n      name\n      startsAt\n      endsAt\n      isCurrent\n    }\n  }\n"): (typeof documents)["\n  query AcademicYears {\n    academicYears {\n      id\n      name\n      startsAt\n      endsAt\n      isCurrent\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query RecordCourses($filter: CoursesFilter) {\n    courses(filter: $filter) {\n      id\n      title\n      groupName\n      subjectName\n    }\n  }\n"): (typeof documents)["\n  query RecordCourses($filter: CoursesFilter) {\n    courses(filter: $filter) {\n      id\n      title\n      groupName\n      subjectName\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CoursePeriodGrades($courseId: String!, $periodId: String!) {\n    coursePeriodGrades(courseId: $courseId, periodId: $periodId) {\n      studentId\n      loginId\n      firstName\n      lastName\n      score\n      mark\n      isPublished\n    }\n  }\n"): (typeof documents)["\n  query CoursePeriodGrades($courseId: String!, $periodId: String!) {\n    coursePeriodGrades(courseId: $courseId, periodId: $periodId) {\n      studentId\n      loginId\n      firstName\n      lastName\n      score\n      mark\n      isPublished\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AttendanceJournal($courseId: String!, $from: String!, $to: String!) {\n    attendanceJournal(courseId: $courseId, from: $from, to: $to) {\n      dates\n      rows {\n        studentId\n        loginId\n        firstName\n        lastName\n        statuses\n      }\n    }\n  }\n"): (typeof documents)["\n  query AttendanceJournal($courseId: String!, $from: String!, $to: String!) {\n    attendanceJournal(courseId: $courseId, from: $from, to: $to) {\n      dates\n      rows {\n        studentId\n        loginId\n        firstName\n        lastName\n        statuses\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ReportCard($studentId: String!) {\n    studentOverview(studentId: $studentId) {\n      student {\n        id\n        loginId\n        firstName\n        lastName\n        className\n      }\n      period {\n        id\n        name\n      }\n      attendance {\n        total\n        absent\n        rate\n      }\n      courses {\n        courseId\n        title\n        subjectName\n        teacherName\n        score\n        mark\n        isPublished\n        attendanceRate\n      }\n    }\n  }\n"): (typeof documents)["\n  query ReportCard($studentId: String!) {\n    studentOverview(studentId: $studentId) {\n      student {\n        id\n        loginId\n        firstName\n        lastName\n        className\n      }\n      period {\n        id\n        name\n      }\n      attendance {\n        total\n        absent\n        rate\n      }\n      courses {\n        courseId\n        title\n        subjectName\n        teacherName\n        score\n        mark\n        isPublished\n        attendanceRate\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

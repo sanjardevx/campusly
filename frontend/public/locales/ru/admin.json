@@ -434,5 +434,71 @@
     },
     "required": "Обязательно",
     "datesBad": "Дата окончания должна быть позже даты начала"
+  },
+  "records": {
+    "title": "Документы",
+    "subtitle": "Списки классов, журналы оценок и посещаемости, табели — просмотр, скачивание CSV и печать.",
+    "tabs": {
+      "STUDENTS": "Ученики",
+      "GRADES": "Оценки",
+      "ATTENDANCE": "Посещаемость",
+      "REPORT_CARD": "Табель"
+    },
+    "docs": {
+      "STUDENTS": "Список класса",
+      "GRADES": "Журнал оценок",
+      "ATTENDANCE": "Журнал посещаемости",
+      "REPORT_CARD": "Табель"
+    },
+    "filters": {
+      "year": "Учебный год",
+      "class": "Класс",
+      "course": "Курс",
+      "period": "Четверть",
+      "student": "Ученик",
+      "from": "С",
+      "to": "По"
+    },
+    "col": {
+      "lastName": "Фамилия",
+      "firstName": "Имя",
+      "name": "ФИО",
+      "score": "Балл",
+      "mark": "Оценка",
+      "gradeStatus": "Статус",
+      "rate": "Посещаемость",
+      "course": "Курс",
+      "teacher": "Учитель",
+      "attendance": "Посещаемость"
+    },
+    "status": {
+      "PRESENT": "присутствовал",
+      "LATE": "опоздал",
+      "ABSENT": "отсутствовал",
+      "EXCUSED": "по уважительной причине"
+    },
+    "letter": {
+      "PRESENT": "П",
+      "LATE": "О",
+      "ABSENT": "Н",
+      "EXCUSED": "У"
+    },
+    "published": "Опубликована",
+    "draft": "Не опубликована",
+    "notPublished": "Не опубликована",
+    "attendanceTotal": "Посещаемость за четверть: {{rate}}%, пропусков: {{absent}}",
+    "csv": "Скачать CSV",
+    "print": "Печать",
+    "printedOn": "напечатано {{date}}",
+    "rowCount_one": "{{count}} строка",
+    "rowCount_few": "{{count}} строки",
+    "rowCount_many": "{{count}} строк",
+    "rowCount_other": "{{count}} строки",
+    "chooseClass": "Выберите класс.",
+    "chooseCourse": "Выберите курс и четверть.",
+    "chooseStudent": "Выберите класс и ученика.",
+    "badRange": "Дата начала не должна быть позже даты окончания.",
+    "empty": "Пока нечего показать.",
+    "emptyAttendance": "За этот период посещаемость не отмечалась."
   }
 }

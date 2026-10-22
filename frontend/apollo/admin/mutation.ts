@@ -278,3 +278,9 @@ export const UPDATE_PERIOD = graphql(`
   }
 `);
 
+/** Records page: every CSV download and print is written to the audit log */
+export const LOG_RECORD_EXPORT = graphql(`
+  mutation LogRecordExport($input: RecordExportInput!) {
+    logRecordExport(input: $input)
+  }
+`);

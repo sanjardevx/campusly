@@ -139,6 +139,7 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - CORS: only `FRONTEND_URL`, `credentials: true` (Nestar had `origin: true`).
 
 - Validation the UI must explain gets its own error code (`IMPORT_*`, `WEIGHTS_SUM`, `PERIOD_OVERLAP` …; CSV rows: `ImportIssueCode` + the bad value). The client translates codes; messages are only for logs.
+- **Records page (admin):** class lists, grades journal (course × quarter), attendance journal (course × date range), report card (one student, current quarter, published grades only). Files (CSV with a UTF-8 BOM, print view) are built in the browser from the normal policy-checked queries — nothing is stored on the server. Every download and print calls `logRecordExport` → `AuditLog` (`records.export`: who, which document, which class/course/student).
 - **School settings hold only rules the system really uses:** name, default language, timezone, mark thresholds, default weights, office contact (phone and hours: sign-in page and login slips), two Telegram links — the school's **channel** (`https://t.me/…`, only on the public website footer) and the password-reset **bot** (`https://t.me/…bot`, the "Reset in Telegram" button under "Forgot password?", shown only when set) — and the temporary-password rule. Security limits (login rate limit, token lifetimes, upload sizes and types) stay in code / env: an admin must not be able to weaken them by accident.
 
 ## 10. Grading and attendance
@@ -211,3 +212,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-22 | Settings: office contact (phone, hours, `https://t.me/…` only) shown under "Forgot password?" and on login slips; temporary-password rule becomes a setting (default 3 / 14, limits 1–10 / 1–60, new passwords only); security limits stay in code; activity (audit) log page moved to day 14 if time is left |
 | 2026-10-22 | Errors the UI explains get specific codes (CSV import issues, settings and calendar rules) instead of `BAD_REQUEST` + an English sentence |
 | 2026-10-22 | Settings cards open in view mode (Edit → Cancel / Save); Telegram channel (public site footer) and password-reset bot are separate settings |
+| 2026-10-22 | Admin Records page: lists and journals as CSV / print built in the browser, every export audited (`records.export`); past years reachable for grades and attendance |

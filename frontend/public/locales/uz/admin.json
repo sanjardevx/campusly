@@ -422,5 +422,69 @@
     },
     "required": "Majburiy",
     "datesBad": "Tugash sanasi boshlanishidan keyin bo‘lishi kerak"
+  },
+  "records": {
+    "title": "Hujjatlar",
+    "subtitle": "Sinf ro‘yxatlari, baho va davomat jurnallari, tabellar — ko‘rish, CSV yuklab olish yoki chop etish.",
+    "tabs": {
+      "STUDENTS": "O‘quvchilar",
+      "GRADES": "Baholar",
+      "ATTENDANCE": "Davomat",
+      "REPORT_CARD": "Tabel"
+    },
+    "docs": {
+      "STUDENTS": "Sinf ro‘yxati",
+      "GRADES": "Baholar jurnali",
+      "ATTENDANCE": "Davomat jurnali",
+      "REPORT_CARD": "Tabel"
+    },
+    "filters": {
+      "year": "O‘quv yili",
+      "class": "Sinf",
+      "course": "Kurs",
+      "period": "Chorak",
+      "student": "O‘quvchi",
+      "from": "Dan",
+      "to": "Gacha"
+    },
+    "col": {
+      "lastName": "Familiya",
+      "firstName": "Ism",
+      "name": "F.I.",
+      "score": "Ball",
+      "mark": "Baho",
+      "gradeStatus": "Holat",
+      "rate": "Davomat",
+      "course": "Kurs",
+      "teacher": "O‘qituvchi",
+      "attendance": "Davomat"
+    },
+    "status": {
+      "PRESENT": "bor",
+      "LATE": "kechikdi",
+      "ABSENT": "yo‘q",
+      "EXCUSED": "sababli"
+    },
+    "letter": {
+      "PRESENT": "B",
+      "LATE": "K",
+      "ABSENT": "Y",
+      "EXCUSED": "S"
+    },
+    "published": "E’lon qilingan",
+    "draft": "E’lon qilinmagan",
+    "notPublished": "E’lon qilinmagan",
+    "attendanceTotal": "Chorak davomati: {{rate}}%, kelmagan kunlar: {{absent}}",
+    "csv": "CSV yuklab olish",
+    "print": "Chop etish",
+    "printedOn": "chop etildi: {{date}}",
+    "rowCount_one": "{{count}} qator",
+    "rowCount_other": "{{count}} qator",
+    "chooseClass": "Sinfni tanlang.",
+    "chooseCourse": "Kurs va chorakni tanlang.",
+    "chooseStudent": "Sinf va o‘quvchini tanlang.",
+    "badRange": "Boshlanish sanasi tugash sanasidan keyin bo‘lmasin.",
+    "empty": "Hozircha ko‘rsatadigan narsa yo‘q.",
+    "emptyAttendance": "Bu davrda davomat olinmagan."
   }
 }

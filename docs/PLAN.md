@@ -180,6 +180,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [ ] Import CSV (3 steps: upload → check → import & login slips PDF/print view).
 - [ ] Classes & Courses page + Add Course drawer.
 - [ ] Settings page (school info, academic year/periods, grading thresholds).
+- [ ] Records page: class lists, grades and attendance journals, report cards (CSV + print, every export audited).
 
 ---
 
