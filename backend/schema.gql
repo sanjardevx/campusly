@@ -771,6 +771,7 @@ enum Role {
 }
 
 type SchoolSettings {
+  contactPhone: String
   defaultExamWeight: Int!
   defaultHomeworkWeight: Int!
   defaultLocale: String!
@@ -778,7 +779,12 @@ type SchoolSettings {
   mark3MinPercent: Int!
   mark4MinPercent: Int!
   mark5MinPercent: Int!
+  officeHours: String
   schoolName: String!
+  telegramBotUrl: String
+  telegramUrl: String
+  tempPasswordDays: Int!
+  tempPasswordUses: Int!
   timezone: String!
 }
 
@@ -980,6 +986,7 @@ input UpdatePeriodInput {
 }
 
 input UpdateSchoolSettingsInput {
+  contactPhone: String
   defaultExamWeight: Int
   defaultHomeworkWeight: Int
   defaultLocale: String
@@ -987,7 +994,12 @@ input UpdateSchoolSettingsInput {
   mark3MinPercent: Int
   mark4MinPercent: Int
   mark5MinPercent: Int
+  officeHours: String
   schoolName: String
+  telegramBotUrl: String
+  telegramUrl: String
+  tempPasswordDays: Int
+  tempPasswordUses: Int
   timezone: String
 }
 

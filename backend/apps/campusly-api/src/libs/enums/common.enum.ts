@@ -27,6 +27,22 @@ export enum ErrorCode {
   IMPORT_NOTHING = 'IMPORT_NOTHING',
   /** Classes belong to an academic year: one must be marked current */
   NO_CURRENT_YEAR = 'NO_CURRENT_YEAR',
+  // School settings and the calendar (the UI explains each one in the admin's language)
+  TIMEZONE_UNKNOWN = 'TIMEZONE_UNKNOWN',
+  /** 5 > 4 > 3 minimum percents */
+  MARK_THRESHOLDS_ORDER = 'MARK_THRESHOLDS_ORDER',
+  /** Homework + Quizzes + Exams must be 100 */
+  WEIGHTS_SUM = 'WEIGHTS_SUM',
+  /** The end date is not after the start date */
+  DATES_ORDER = 'DATES_ORDER',
+  YEAR_OVERLAP = 'YEAR_OVERLAP',
+  /** Changing a year's dates would leave some of its periods outside it */
+  PERIODS_OUTSIDE_YEAR = 'PERIODS_OUTSIDE_YEAR',
+  PERIOD_OUTSIDE_YEAR = 'PERIOD_OUTSIDE_YEAR',
+  PERIOD_OUTSIDE_PARENT = 'PERIOD_OUTSIDE_PARENT',
+  PERIOD_PARENT_INVALID = 'PERIOD_PARENT_INVALID',
+  /** Two periods of the same kind (two quarters) share days */
+  PERIOD_OVERLAP = 'PERIOD_OVERLAP',
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
 }
 

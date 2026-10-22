@@ -37,6 +37,12 @@ const DEFAULT_SETTINGS: SchoolSettings = {
   defaultHomeworkWeight: 30,
   defaultQuizWeight: 30,
   defaultExamWeight: 40,
+  contactPhone: null,
+  officeHours: null,
+  telegramUrl: null,
+  telegramBotUrl: null,
+  tempPasswordUses: 3,
+  tempPasswordDays: 14,
 };
 
 @Injectable()
@@ -63,22 +69,40 @@ export class SchoolService {
     const before = await this.getSettings();
     // Only the given fields change (null / missing = keep)
     const after: SchoolSettings = { ...before, ...withoutEmpty(input) };
+    // The contact fields can be cleared: "" (sent on purpose) is stored as null
+    for (const key of [
+      'contactPhone',
+      'officeHours',
+      'telegramUrl',
+      'telegramBotUrl',
+    ] as const) {
+      after[key] = after[key]?.trim() || null;
+    }
 
     if (!isValidTimeZone(after.timezone)) {
-      throw badRequest(`Unknown timezone: ${after.timezone}`);
+      throw badRequest(
+        ErrorCode.TIMEZONE_UNKNOWN,
+        `Unknown timezone: ${after.timezone}`,
+      );
     }
     if (!(
       after.mark5MinPercent > after.mark4MinPercent &&
       after.mark4MinPercent > after.mark3MinPercent
     )) {
-      throw badRequest('Mark thresholds must go down: 5 > 4 > 3');
+      throw badRequest(
+        ErrorCode.MARK_THRESHOLDS_ORDER,
+        'Mark thresholds must go down: 5 > 4 > 3',
+      );
     }
     const weights =
       after.defaultHomeworkWeight +
       after.defaultQuizWeight +
       after.defaultExamWeight;
     if (weights !== 100) {
-      throw badRequest(`Category weights must add up to 100 (now ${weights})`);
+      throw badRequest(
+        ErrorCode.WEIGHTS_SUM,
+        `Category weights must add up to 100 (now ${weights})`,
+      );
     }
 
     await this.prismaService.$transaction(async (tx) => {
@@ -167,7 +191,10 @@ export class SchoolService {
       },
     });
     if (outside > 0) {
-      throw badRequest(`${outside} period(s) would end up outside the year`);
+      throw badRequest(
+        ErrorCode.PERIODS_OUTSIDE_YEAR,
+        `${outside} period(s) would end up outside the year`,
+      );
     }
 
     const year = await this.prismaService.$transaction(async (tx) => {
@@ -238,7 +265,12 @@ export class SchoolService {
       },
       select: { name: true },
     });
-    if (overlap) throw badRequest(`Dates overlap the year ${overlap.name}`);
+    if (overlap) {
+      throw badRequest(
+        ErrorCode.YEAR_OVERLAP,
+        `Dates overlap the year ${overlap.name}`,
+      );
+    }
   }
 
   private async findYear(id: string) {
@@ -343,17 +375,26 @@ export class SchoolService {
     assertRange(p.startsAt, p.endsAt);
     const year = await this.findYear(p.academicYearId);
     if (p.startsAt < year.startsAt || p.endsAt > year.endsAt) {
-      throw badRequest(`The period must be inside ${year.name}`);
+      throw badRequest(
+        ErrorCode.PERIOD_OUTSIDE_YEAR,
+        `The period must be inside ${year.name}`,
+      );
     }
     if (p.parentId) {
       const parent = await this.prismaService.period.findUnique({
         where: { id: p.parentId },
       });
       if (!parent || parent.academicYearId !== p.academicYearId) {
-        throw badRequest('The parent period must belong to the same year');
+        throw badRequest(
+          ErrorCode.PERIOD_PARENT_INVALID,
+          'The parent period must belong to the same year',
+        );
       }
       if (p.startsAt < parent.startsAt || p.endsAt > parent.endsAt) {
-        throw badRequest(`The period must be inside ${parent.name}`);
+        throw badRequest(
+          ErrorCode.PERIOD_OUTSIDE_PARENT,
+          `The period must be inside ${parent.name}`,
+        );
       }
     }
     const overlap = await this.prismaService.period.findFirst({
@@ -366,7 +407,12 @@ export class SchoolService {
       },
       select: { name: true },
     });
-    if (overlap) throw badRequest(`Dates overlap ${overlap.name}`);
+    if (overlap) {
+      throw badRequest(
+        ErrorCode.PERIOD_OVERLAP,
+        `Dates overlap ${overlap.name}`,
+      );
+    }
   }
 
   // ───────────────────────── subjects ─────────────────────────
@@ -468,7 +514,10 @@ function toPeriod(period: {
 
 function assertRange(startsAt: Date, endsAt: Date) {
   if (endsAt <= startsAt)
-    throw badRequest('The end date must be after the start date');
+    throw badRequest(
+      ErrorCode.DATES_ORDER,
+      'The end date must be after the start date',
+    );
 }
 
 /** Drops null / undefined so a partial update keeps the old values */
@@ -478,8 +527,9 @@ function withoutEmpty<T extends object>(input: T): Partial<T> {
   ) as Partial<T>;
 }
 
-function badRequest(message: string) {
-  return new BadRequestException({ code: ErrorCode.BAD_REQUEST, message });
+/** 400 with a specific code: the settings page explains it in the admin's language */
+function badRequest(code: ErrorCode, message: string) {
+  return new BadRequestException({ code, message });
 }
 
 function notFound(message: string) {

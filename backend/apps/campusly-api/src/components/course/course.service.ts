@@ -96,7 +96,12 @@ export class CourseService {
     let yearId = filter.academicYearId;
     if (!yearId) {
       const current = await this.schoolService.getCurrentAcademicYear();
-      if (!current) throw badRequest('Set the current academic year first');
+      if (!current) {
+        throw new BadRequestException({
+          code: ErrorCode.NO_CURRENT_YEAR,
+          message: 'Set the current academic year first',
+        });
+      }
       yearId = current.id;
     }
     return this.list({

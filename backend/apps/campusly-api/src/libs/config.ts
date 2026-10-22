@@ -96,8 +96,11 @@ export const REFRESH_TTL_DAYS = {
 export const LOGIN_LIMIT = { perLoginId: 5, perIp: 30, windowSec: 15 * 60 };
 /** A just-rotated refresh token still works this long (two tabs refreshing at the same time) */
 export const REFRESH_GRACE_SEC = 10;
-/** New accounts and password resets: the temporary password works for 3 sign-ins or 14 days */
-export const TEMP_PASSWORD = { uses: 3, days: 14 };
+/**
+ * Temporary passwords: the rule itself is a school setting (default 3 sign-ins / 14 days). These are
+ * the limits an admin may choose within: a temporary password that lives for months is a hole.
+ */
+export const TEMP_PASSWORD_LIMITS = { maxUses: 10, maxDays: 60 };
 
 // ───────────────────────────── lists ─────────────────────────────
 

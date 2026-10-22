@@ -1,3 +1,5 @@
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -6,6 +8,14 @@ import { AppModule } from './../src/app.module';
 import { setupApp } from './../src/app.setup';
 
 // Needs the Docker Postgres + Redis (docker compose up -d)
+
+/** Folders are named <timestamp>_<name>, so the last one in sort order is the newest */
+const latestMigration = readdirSync(
+  join(__dirname, '../../../prisma/migrations'),
+)
+  .filter((name) => /^\d{14}_/.test(name))
+  .sort()
+  .at(-1);
 describe('AppResolver (e2e)', () => {
   let app: INestApplication<App>;
 
@@ -35,7 +45,8 @@ describe('AppResolver (e2e)', () => {
           status: 'ok',
           postgres: true,
           redis: true,
-          migration: expect.stringMatching(/_init$/) as string,
+          // The newest migration folder: the database is fully migrated
+          migration: latestMigration,
         },
       },
     });

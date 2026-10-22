@@ -100,15 +100,19 @@ export class StudentImportService {
       throw badRequest(ErrorCode.IMPORT_NOTHING, 'There is nothing to import');
     }
 
-    // bcrypt is slow on purpose: hash every password BEFORE the transaction starts
+    // bcrypt is slow on purpose: hash every password BEFORE the transaction starts.
+    // The school's password rule is read once for the whole file, not once per row.
+    const rule = await this.userAdminService.tempPasswordRule();
     const passwords = await Promise.all(
       good.map(async (row) => ({
         student: await this.userAdminService.preparePassword(
           generateStudentPassword(),
+          rule,
         ),
         parent: row.parent
           ? await this.userAdminService.preparePassword(
               generateParentPassword(),
+              rule,
             )
           : null,
       })),

@@ -13,7 +13,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { LOCALES } from '../../config';
+import { LOCALES, TEMP_PASSWORD_LIMITS } from '../../config';
 import { RecordStatus } from '../../enums/course.enum';
 import { PeriodKind } from '../../enums/school.enum';
 import { DATE_ONLY } from '../../utils/date';
@@ -81,6 +81,54 @@ export class UpdateSchoolSettingsInput {
   @Min(0)
   @Max(100)
   defaultExamWeight?: number;
+
+  /** "" clears it. Digits, spaces, +, -, ( ) only */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(30)
+  @Matches(/^[+\d\s()-]*$/, {
+    message: 'contactPhone may only contain digits, spaces, +, -, ( )',
+  })
+  contactPhone?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  officeHours?: string;
+
+  /** "" clears it; otherwise exactly a Telegram link, so the login page never links elsewhere */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @Matches(/^(https:\/\/t\.me\/[A-Za-z0-9_]{5,32})?$/, {
+    message: 'telegramUrl must look like https://t.me/name',
+  })
+  telegramUrl?: string;
+
+  /** "" clears it; Telegram bot usernames end with "bot" */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @Matches(/^(https:\/\/t\.me\/[A-Za-z0-9_]{2,29}bot)?$/i, {
+    message: 'telegramBotUrl must look like https://t.me/name_bot',
+  })
+  telegramBotUrl?: string;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(TEMP_PASSWORD_LIMITS.maxUses)
+  tempPasswordUses?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(TEMP_PASSWORD_LIMITS.maxDays)
+  tempPasswordDays?: number;
 }
 
 @InputType()

@@ -224,6 +224,18 @@ model SchoolSetting {
   defaultQuizWeight     Int @default(30)
   defaultExamWeight     Int @default(40)
 
+  /// "Forgot password?" on the login page and the login slips tell people where to go
+  contactPhone String?
+  officeHours  String?
+  /// The school's official channel (public website footer); only https://t.me/<name>
+  telegramUrl    String?
+  /// Password-reset bot ("Forgot password?" on the sign-in page); only https://t.me/<name>bot
+  telegramBotUrl String?
+
+  /// Temporary passwords: N sign-ins or D days, whichever comes first (applies to NEW passwords)
+  tempPasswordUses Int @default(3)
+  tempPasswordDays Int @default(14)
+
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
   @@map("school_settings")

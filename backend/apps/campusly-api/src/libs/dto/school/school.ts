@@ -34,6 +34,30 @@ export class SchoolSettings {
 
   @Field(() => Int)
   defaultExamWeight: number;
+
+  /** Shown on the login page ("Forgot password?") and on login slips */
+  @Field(() => String, { nullable: true })
+  contactPhone: string | null;
+
+  /** Free text, e.g. "Mon–Fri 9:00–17:00" */
+  @Field(() => String, { nullable: true })
+  officeHours: string | null;
+
+  /** The official channel, https://t.me/<name> (public website footer) or null */
+  @Field(() => String, { nullable: true })
+  telegramUrl: string | null;
+
+  /** The password-reset bot, https://t.me/<name>bot (sign-in page) or null */
+  @Field(() => String, { nullable: true })
+  telegramBotUrl: string | null;
+
+  /** New temporary passwords work for this many sign-ins … */
+  @Field(() => Int)
+  tempPasswordUses: number;
+
+  /** … or this many days, whichever comes first */
+  @Field(() => Int)
+  tempPasswordDays: number;
 }
 
 @ObjectType()

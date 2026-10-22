@@ -462,6 +462,40 @@ describe('User admin (e2e)', () => {
       expect(JSON.stringify(audit)).not.toContain(second);
     });
 
+    it("resetPassword follows the school's password rule (Settings → Accounts)", async () => {
+      const before = await prisma.schoolSetting.findUnique({
+        where: { id: 1 },
+      });
+      await prisma.schoolSetting.upsert({
+        where: { id: 1 },
+        create: {
+          id: 1,
+          schoolName: 'E2E',
+          tempPasswordUses: 5,
+          tempPasswordDays: 30,
+        },
+        update: { tempPasswordUses: 5, tempPasswordDays: 30 },
+      });
+      try {
+        await reset();
+        // The temp-password fields are omitted by default (prisma-omit): ask for them here
+        const db = await prisma.user.findUniqueOrThrow({
+          where: { id: student.id },
+          omit: { tempPasswordUsesLeft: false, tempPasswordExpiresAt: false },
+        });
+        expect(db.tempPasswordUsesLeft).toBe(5);
+        const days =
+          (db.tempPasswordExpiresAt!.getTime() - Date.now()) / 86_400_000;
+        expect(days).toBeGreaterThan(29.9);
+        expect(days).toBeLessThanOrEqual(30);
+      } finally {
+        // Back to exactly what was there (the real school's settings)
+        if (before)
+          await prisma.schoolSetting.update({ where: { id: 1 }, data: before });
+        else await prisma.schoolSetting.deleteMany();
+      }
+    });
+
     it('blockUser ends the sessions and stops sign-in; unblockUser lets the user back in', async () => {
       const password = await reset();
       const session = cookieOf(

@@ -147,14 +147,14 @@ describe('School settings, years, periods (e2e)', () => {
       ).toBe('FORBIDDEN');
     });
 
+    // A specific code per rule: the settings page explains it in the admin's language
     it.each([
-      [{ mark4MinPercent: 90 }, 'Mark thresholds must go down'],
-      [{ defaultHomeworkWeight: 50 }, 'Category weights must add up to 100'],
-      [{ timezone: 'Mars/Olympus' }, 'Unknown timezone'],
-    ])('rejects %o', async (input, message) => {
+      [{ mark4MinPercent: 90 }, 'MARK_THRESHOLDS_ORDER'],
+      [{ defaultHomeworkWeight: 50 }, 'WEIGHTS_SUM'],
+      [{ timezone: 'Mars/Olympus' }, 'TIMEZONE_UNKNOWN'],
+    ])('rejects %o with %s', async (input, expected) => {
       const res = await gql(UPDATE, { i: input });
-      expect(code(res)).toBe('BAD_REQUEST');
-      expect(res.errors![0].message).toContain(message);
+      expect(code(res)).toBe(expected);
     });
 
     it('a partial update keeps the other values and writes an audit row', async () => {
@@ -177,6 +177,65 @@ describe('School settings, years, periods (e2e)', () => {
           },
         }),
       ).toBe(1);
+    });
+
+    it('contacts and the password rule: saved, "" clears, only t.me links, limits enforced, public for the login page', async () => {
+      const CONTACT = `mutation($i: UpdateSchoolSettingsInput!) {
+        updateSchoolSettings(input: $i) { contactPhone officeHours telegramUrl telegramBotUrl tempPasswordUses tempPasswordDays }
+      }`;
+      const saved = await gql<{
+        updateSchoolSettings: Record<string, unknown>;
+      }>(CONTACT, {
+        i: {
+          contactPhone: '+998 71 200 00 00',
+          officeHours: 'Mon–Fri 9:00–17:00',
+          telegramUrl: 'https://t.me/campusly_school',
+          telegramBotUrl: 'https://t.me/campusly_reset_bot',
+          tempPasswordUses: 5,
+          tempPasswordDays: 30,
+        },
+      });
+      expect(saved.data!.updateSchoolSettings).toEqual({
+        contactPhone: '+998 71 200 00 00',
+        officeHours: 'Mon–Fri 9:00–17:00',
+        telegramUrl: 'https://t.me/campusly_school',
+        telegramBotUrl: 'https://t.me/campusly_reset_bot',
+        tempPasswordUses: 5,
+        tempPasswordDays: 30,
+      });
+
+      // The login page reads them before anyone signs in
+      const anonymous = await request(app.getHttpServer())
+        .post('/graphql')
+        .send({ query: '{ schoolSettings { contactPhone telegramUrl } }' });
+      expect(
+        (anonymous.body as { data: { schoolSettings: unknown } }).data
+          .schoolSettings,
+      ).toEqual({
+        contactPhone: '+998 71 200 00 00',
+        telegramUrl: 'https://t.me/campusly_school',
+      });
+
+      const cleared = await gql<{
+        updateSchoolSettings: Record<string, unknown>;
+      }>(CONTACT, {
+        i: { telegramUrl: '', officeHours: '  ' },
+      });
+      expect(cleared.data!.updateSchoolSettings).toMatchObject({
+        contactPhone: '+998 71 200 00 00', // not sent = kept
+        officeHours: null,
+        telegramUrl: null,
+      });
+
+      for (const bad of [
+        { telegramUrl: 'https://evil.example/login' }, // a link on the login page must not lead elsewhere
+        { telegramBotUrl: 'https://t.me/campusly_school' }, // a channel, not a bot
+        { contactPhone: 'call me <script>' },
+        { tempPasswordUses: 11 },
+        { tempPasswordDays: 0 },
+      ]) {
+        expect(code(await gql(CONTACT, { i: bad }))).toBe('BAD_REQUEST');
+      }
     });
   });
 
@@ -212,7 +271,7 @@ describe('School settings, years, periods (e2e)', () => {
             year('E2E overlap', '2099-01-01', '2099-12-31'),
           ),
         ),
-      ).toBe('BAD_REQUEST');
+      ).toBe('YEAR_OVERLAP');
       expect(
         code(
           await gql(
@@ -220,7 +279,7 @@ describe('School settings, years, periods (e2e)', () => {
             year('E2E backwards', '2100-05-01', '2100-01-01'),
           ),
         ),
-      ).toBe('BAD_REQUEST');
+      ).toBe('DATES_ORDER');
       expect(
         code(
           await gql(
@@ -270,7 +329,7 @@ describe('School settings, years, periods (e2e)', () => {
             quarter('Quarter 0', '2098-08-01', '2098-08-30'),
           ),
         ),
-      ).toBe('BAD_REQUEST');
+      ).toBe('PERIOD_OUTSIDE_YEAR');
       expect(
         code(
           await gql(
@@ -278,7 +337,7 @@ describe('School settings, years, periods (e2e)', () => {
             quarter('Quarter 2', '2098-10-15', '2098-12-20', 2),
           ),
         ),
-      ).toBe('BAD_REQUEST');
+      ).toBe('PERIOD_OVERLAP');
       // Same name in the same year: unique index → CONFLICT
       expect(
         code(
@@ -294,7 +353,7 @@ describe('School settings, years, periods (e2e)', () => {
         'mutation($i: UpdateAcademicYearInput!) { updateAcademicYear(input: $i) { id } }',
         { i: { id: yearId, startsAt: '2098-10-01' } },
       );
-      expect(code(shrink)).toBe('BAD_REQUEST');
+      expect(code(shrink)).toBe('PERIODS_OUTSIDE_YEAR');
 
       // The calendar is readable for every signed-in role; changing it is admin-only
       const ids = await gql<{ periods: { id: string }[] }>(
@@ -343,4 +402,5 @@ describe('School settings, years, periods (e2e)', () => {
       expect(current.data!.currentAcademicYear.name).toMatch(/^E2E 209[89]/);
     });
   });
+
 });

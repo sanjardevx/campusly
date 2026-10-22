@@ -8,7 +8,6 @@ import {
 import bcrypt from 'bcryptjs';
 import type { Prisma } from '../../../../../generated/prisma/client';
 import { PrismaService } from '../../database/prisma.service';
-import { TEMP_PASSWORD } from '../../libs/config';
 import { AuditAction } from '../../libs/enums/audit.enum';
 import { Direction, ErrorCode } from '../../libs/enums/common.enum';
 import { PasswordState } from '../../libs/enums/user.enum';
@@ -31,6 +30,7 @@ import {
   generateStudentPassword,
 } from '../../libs/utils/temp-password';
 import { AuditService } from '../audit/audit.service';
+import { SchoolService } from '../school/school.service';
 import { AuthService } from '../auth/auth.service';
 import { EnrollmentService } from '../group/enrollment.service';
 import { LoginIdService } from './login-id.service';
@@ -52,6 +52,12 @@ export interface PreparedPassword {
  * Accounts are created only by the admin: no public signup (Nestar let users sign up and even pick
  * their own role). Every method runs in one transaction and writes an audit row.
  */
+/** N sign-ins or D days, whichever comes first */
+export interface TempPasswordRule {
+  uses: number;
+  days: number;
+}
+
 @Injectable()
 export class UserAdminService {
   constructor(
@@ -60,6 +66,7 @@ export class UserAdminService {
     private readonly auditService: AuditService,
     private readonly authService: AuthService,
     private readonly enrollmentService: EnrollmentService,
+    private readonly schoolService: SchoolService,
   ) {}
 
   // ───────────────────────── students ─────────────────────────
@@ -69,11 +76,13 @@ export class UserAdminService {
     input: CreateStudentInput,
   ): Promise<CreateStudentResult> {
     // bcrypt takes ~70 ms: hash before the transaction, which holds the id_counters row lock
+    const rule = await this.tempPasswordRule();
     const studentPassword = await this.preparePassword(
       generateStudentPassword(),
+      rule,
     );
     const parentPassword = input.parent
-      ? await this.preparePassword(generateParentPassword())
+      ? await this.preparePassword(generateParentPassword(), rule)
       : null;
 
     return this.prismaService.$transaction((tx) =>
@@ -150,7 +159,10 @@ export class UserAdminService {
     admin: AuthUser,
     input: CreateTeacherInput,
   ): Promise<LoginSlip> {
-    const password = await this.preparePassword(generateStudentPassword());
+    const password = await this.preparePassword(
+      generateStudentPassword(),
+      await this.tempPasswordRule(),
+    );
 
     return this.prismaService.$transaction(async (tx) => {
       const loginId = await this.loginIdService.next('TEACHER', tx);
@@ -183,7 +195,10 @@ export class UserAdminService {
     studentId: string,
     input: ParentInput,
   ): Promise<LoginSlip> {
-    const password = await this.preparePassword(generateParentPassword());
+    const password = await this.preparePassword(
+      generateParentPassword(),
+      await this.tempPasswordRule(),
+    );
 
     return this.prismaService.$transaction(async (tx) => {
       const student = await tx.user.findUnique({
@@ -312,6 +327,7 @@ export class UserAdminService {
       target.role === 'PARENT'
         ? generateParentPassword()
         : generateStudentPassword(),
+      await this.tempPasswordRule(),
     );
 
     const user = await this.prismaService.$transaction(async (tx) => {
@@ -482,14 +498,23 @@ export class UserAdminService {
 
   // ───────────────────────── helpers ─────────────────────────
 
-  public async preparePassword(plain: string): Promise<PreparedPassword> {
+  /** The school's rule for NEW temporary passwords (Settings → Accounts); read once per action */
+  public async tempPasswordRule(): Promise<TempPasswordRule> {
+    const settings = await this.schoolService.getSettings();
+    return { uses: settings.tempPasswordUses, days: settings.tempPasswordDays };
+  }
+
+  public async preparePassword(
+    plain: string,
+    rule: TempPasswordRule,
+  ): Promise<PreparedPassword> {
     return {
       plain,
       data: {
         passwordHash: await bcrypt.hash(plain, 10),
-        tempPasswordUsesLeft: TEMP_PASSWORD.uses,
+        tempPasswordUsesLeft: rule.uses,
         tempPasswordExpiresAt: new Date(
-          Date.now() + TEMP_PASSWORD.days * 24 * 60 * 60 * 1000,
+          Date.now() + rule.days * 24 * 60 * 60 * 1000,
         ),
         mustChangePassword: false,
       },
