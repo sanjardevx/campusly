@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import {
   Box,
   Card,
+  Checkbox,
   Chip,
   LinearProgress,
   MenuItem,
@@ -21,6 +22,7 @@ import { Trans, useTranslation } from 'next-i18next/pages';
 import type { Role, UsersQuery } from '@/libs/gql/graphql';
 import { formatLastSeen, formatPhone } from '@/libs/i18n/format';
 import { monoFontFamily } from '@/libs/fonts';
+import { type ActionKind, RowMenu } from './BulkBar';
 import { PasswordChip, StatusChip } from './UserChips';
 
 export type UserRow = UsersQuery['users']['list'][number];
@@ -44,6 +46,11 @@ export function UsersTable({
   filtered,
   onPage,
   onLimit,
+  selectable,
+  selected,
+  onToggle,
+  onToggleAll,
+  onAction,
 }: {
   role: Role;
   rows: UserRow[];
@@ -54,6 +61,12 @@ export function UsersTable({
   filtered: boolean;
   onPage: (page: number) => void;
   onLimit: (limit: number) => void;
+  /** Checkboxes and ⋮ menus (not on the Admins tab: admins cannot change other admins) */
+  selectable: boolean;
+  selected: Set<string>;
+  onToggle: (id: string) => void;
+  onToggleAll: () => void;
+  onAction: (kind: ActionKind, user: UserRow) => void;
 }) {
   const { t } = useTranslation('admin');
   const { locale } = useRouter();
@@ -132,7 +145,27 @@ export function UsersTable({
     ],
     ADMIN: [id, name, status, lastSignIn],
   };
-  const cols = columns[role];
+  const fullName = (u: UserRow) => `${u.firstName} ${u.lastName}`;
+  const allChecked = rows.length > 0 && rows.every((u) => selected.has(u.id));
+  const someChecked = rows.some((u) => selected.has(u.id));
+  const check: Column = {
+    key: 'check',
+    label: '',
+    render: (u) => (
+      <Checkbox
+        size="small"
+        checked={selected.has(u.id)}
+        onChange={() => onToggle(u.id)}
+        slotProps={{ input: { 'aria-label': t('actions.selectRow', { name: fullName(u) }) } }}
+      />
+    ),
+  };
+  const actions: Column = {
+    key: 'actions',
+    label: t('actions.column'),
+    render: (u) => <RowMenu user={u} onAction={(kind) => onAction(kind, u)} />,
+  };
+  const cols = selectable ? [check, ...columns[role], actions] : columns[role];
 
   return (
     <Card sx={{ position: 'relative' }}>
@@ -146,6 +179,8 @@ export function UsersTable({
               {cols.map((c) => (
                 <TableCell
                   key={c.key}
+                  padding={c.key === 'check' ? 'checkbox' : undefined}
+                  align={c.key === 'actions' ? 'right' : undefined}
                   sx={{
                     fontSize: '0.6875rem',
                     fontWeight: 600,
@@ -154,16 +189,38 @@ export function UsersTable({
                     color: 'text.secondary',
                   }}
                 >
-                  {c.label}
+                  {c.key === 'check' ? (
+                    // Header box: all rows of THIS page; "–" when only some are picked
+                    <Checkbox
+                      size="small"
+                      checked={allChecked}
+                      indeterminate={someChecked && !allChecked}
+                      onChange={onToggleAll}
+                      slotProps={{ input: { 'aria-label': t('actions.selectAll') } }}
+                    />
+                  ) : (
+                    c.label
+                  )}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {rows.map((u) => (
-              <TableRow key={u.id} hover>
+              <TableRow
+                key={u.id}
+                hover
+                selected={selected.has(u.id)}
+                sx={{ '&.Mui-selected, &.Mui-selected:hover': { bgcolor: 'rgba(31,78,67,0.06)' } }}
+              >
                 {cols.map((c) => (
-                  <TableCell key={c.key}>{c.render(u)}</TableCell>
+                  <TableCell
+                    key={c.key}
+                    padding={c.key === 'check' ? 'checkbox' : undefined}
+                    align={c.key === 'actions' ? 'right' : undefined}
+                  >
+                    {c.render(u)}
+                  </TableCell>
                 ))}
               </TableRow>
             ))}

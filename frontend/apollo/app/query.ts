@@ -44,3 +44,14 @@ export const PERIODS = graphql(`
     }
   }
 `);
+
+/** School name (login slips, settings) */
+export const SCHOOL_SETTINGS = graphql(`
+  query SchoolSettings {
+    schoolSettings {
+      schoolName
+      timezone
+      defaultLocale
+    }
+  }
+`);

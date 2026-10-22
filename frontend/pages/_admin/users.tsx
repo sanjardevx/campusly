@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { Box, Chip, Tab, Tabs } from '@mui/material';
 import { useTranslation } from 'next-i18next/pages';
 import { GROUPS, USER_COUNTS, USERS } from '@/apollo/admin/query';
 import { PageHeader } from '@/libs/components/admin/PageHeader';
+import { BulkBar } from '@/libs/components/admin/users/BulkBar';
 import { gradeOf, PASSWORD_STATES, STATUSES, UsersFilters } from '@/libs/components/admin/users/UsersFilters';
 import { UsersTable } from '@/libs/components/admin/users/UsersTable';
+import { useUserActions } from '@/libs/components/admin/users/useUserActions';
 import { layoutFor } from '@/libs/components/layout';
 import type { PasswordState, Role, UserStatus } from '@/libs/gql/graphql';
 import { useCrumb } from '@/libs/hooks/useCrumb';
@@ -17,6 +20,7 @@ export const getStaticProps = withTranslations(['admin']);
 const ROLES: Role[] = ['STUDENT', 'TEACHER', 'PARENT', 'ADMIN'];
 const LIMITS = [25, 50, 100];
 const COUNT_KEY = { STUDENT: 'students', TEACHER: 'teachers', PARENT: 'parents', ADMIN: 'admins' } as const;
+const NONE = new Set<string>();
 
 // The URL is typed by hand: anything unknown falls back to a safe default instead of reaching the API
 const pick = <T extends string>(value: string | undefined, allowed: readonly T[]) =>
@@ -64,6 +68,25 @@ const UsersPage: NextPageWithLayout = () => {
     },
   });
   const users = (data ?? previousData)?.users;
+  const rows = users?.list ?? [];
+
+  // The selection belongs to the view it was made in: on another page, filter or tab nothing is
+  // selected, so an action never hits rows the admin cannot see.
+  const view = JSON.stringify([role, params.q, params.grade, params.group, status, passwordState, page, limit]);
+  const [selection, setSelection] = useState({ view, ids: NONE });
+  const selected = selection.view === view ? selection.ids : NONE;
+  const select = (ids: Set<string>) => setSelection({ view, ids });
+  const toggle = (id: string) => {
+    const next = new Set(selected);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    select(next);
+  };
+  const toggleAll = () => select(rows.every((u) => selected.has(u.id)) ? NONE : new Set(rows.map((u) => u.id)));
+  const chosen = rows.filter((u) => selected.has(u.id));
+
+  const actions = useUserActions(() => select(NONE));
+  const selectable = role !== 'ADMIN';
 
   return (
     <>
@@ -102,9 +125,20 @@ const UsersPage: NextPageWithLayout = () => {
         onChange={setParams}
       />
 
+      {actions.element}
+      {selectable && chosen.length > 0 && (
+        <BulkBar
+          count={chosen.length}
+          role={role}
+          allBlocked={chosen.every((u) => u.status === 'BLOCKED')}
+          onAction={(kind) => actions.request(kind, chosen)}
+          onClear={() => select(NONE)}
+        />
+      )}
+
       <UsersTable
         role={role}
-        rows={users?.list ?? []}
+        rows={rows}
         total={users?.metaCounter.total ?? 0}
         page={page}
         limit={limit}
@@ -112,6 +146,11 @@ const UsersPage: NextPageWithLayout = () => {
         filtered={!!(params.q || params.grade || params.group || status !== 'ACTIVE' || passwordState)}
         onPage={(p) => setParams({ page: p > 1 ? String(p) : undefined })}
         onLimit={(l) => setParams({ limit: l === 25 ? undefined : String(l) })}
+        selectable={selectable}
+        selected={selected}
+        onToggle={toggle}
+        onToggleAll={toggleAll}
+        onAction={(kind, user) => actions.request(kind, [user])}
       />
     </>
   );

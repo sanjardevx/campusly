@@ -67,5 +67,56 @@
     "yesterday": "어제",
     "daysAgo_other": "{{count}}일 전",
     "weeksAgo_other": "{{count}}주 전"
+  },
+  "actions": {
+    "column": "작업",
+    "menu": "{{name}} 작업",
+    "selectAll": "이 페이지 전체 선택",
+    "selectRow": "{{name}} 선택",
+    "selected": "{{count}}명 선택됨",
+    "clearSelection": "선택 해제",
+    "moveToClass": "반 이동",
+    "resetPassword": "비밀번호 초기화",
+    "printSlips": "로그인 안내문 인쇄",
+    "block": "차단",
+    "unblock": "차단 해제"
+  },
+  "confirm": {
+    "cancel": "취소",
+    "resetTitle": "비밀번호를 초기화할까요?",
+    "resetBody": "{{count}}명에게 새 임시 비밀번호가 발급됩니다. 현재 비밀번호와 열려 있는 모든 세션이 더 이상 작동하지 않습니다.",
+    "reset": "비밀번호 초기화",
+    "printTitle": "로그인 안내문을 인쇄할까요?",
+    "printBody": "로그인 안내문에는 비밀번호가 표시되지만 저장된 비밀번호는 읽을 수 없습니다. 그래서 {{count}}명에게 먼저 새 임시 비밀번호가 발급되며, 현재 비밀번호와 세션은 작동하지 않습니다.",
+    "print": "초기화 후 인쇄",
+    "blockTitle": "사용자를 차단할까요?",
+    "blockBody": "{{count}}명이 로그아웃되며 차단을 해제할 때까지 로그인할 수 없습니다.",
+    "block": "차단",
+    "unblockTitle": "차단을 해제할까요?",
+    "unblockBody": "{{count}}명이 다시 로그인할 수 있습니다.",
+    "unblock": "차단 해제",
+    "moveTitle": "반 이동",
+    "moveBody": "{{count}}명의 학생이 현재 반과 그 강좌에서 나와 새 반의 강좌에 등록됩니다.",
+    "moveTarget": "새 반",
+    "move": "이동"
+  },
+  "result": {
+    "done": "완료: {{count}}건 중 {{done}}건.",
+    "failed": "{{count}}건 실패:"
+  },
+  "slips": {
+    "title": "새 로그인 정보",
+    "warning": "이 비밀번호는 지금만 표시됩니다. 창을 닫기 전에 인쇄하거나 복사하세요.",
+    "print": "로그인 안내문 인쇄",
+    "close": "완료",
+    "copy": "복사",
+    "copied": "복사됨",
+    "name": "이름",
+    "loginId": "로그인 ID",
+    "password": "임시 비밀번호",
+    "heading": "Campusly 로그인",
+    "signInAt": "로그인 주소",
+    "rule": "이 비밀번호는 3회 로그인 또는 14일 동안 사용할 수 있습니다. 그 후 직접 비밀번호를 설정합니다.",
+    "issued": "발급일 {{date}}"
   }
 }

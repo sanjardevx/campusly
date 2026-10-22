@@ -69,5 +69,56 @@
     "daysAgo_other": "{{count}} kun oldin",
     "weeksAgo_one": "{{count}} hafta oldin",
     "weeksAgo_other": "{{count}} hafta oldin"
+  },
+  "actions": {
+    "column": "Amallar",
+    "menu": "{{name}} uchun amallar",
+    "selectAll": "Shu sahifadagilarni tanlash",
+    "selectRow": "{{name}} ni tanlash",
+    "selected": "{{count}} ta tanlandi",
+    "clearSelection": "Tanlovni bekor qilish",
+    "moveToClass": "Sinfga ko‘chirish",
+    "resetPassword": "Parolni yangilash",
+    "printSlips": "Login varaqalarini chop etish",
+    "block": "Bloklash",
+    "unblock": "Blokdan chiqarish"
+  },
+  "confirm": {
+    "cancel": "Bekor qilish",
+    "resetTitle": "Parollar yangilansinmi?",
+    "resetBody": "{{count}} ta foydalanuvchiga yangi vaqtinchalik parol beriladi. Joriy paroli va barcha ochiq sessiyalari ishlamay qoladi.",
+    "reset": "Parollarni yangilash",
+    "printTitle": "Login varaqalari chop etilsinmi?",
+    "printBody": "Login varaqasida parol yoziladi, saqlangan parollarni esa o‘qib bo‘lmaydi. Shuning uchun {{count}} ta foydalanuvchiga avval yangi vaqtinchalik parol beriladi; joriy paroli va sessiyalari ishlamay qoladi.",
+    "print": "Yangilash va chop etish",
+    "blockTitle": "Foydalanuvchilar bloklansinmi?",
+    "blockBody": "{{count}} ta foydalanuvchi tizimdan chiqariladi va blokdan chiqarilmaguncha kira olmaydi.",
+    "block": "Bloklash",
+    "unblockTitle": "Blokdan chiqarilsinmi?",
+    "unblockBody": "{{count}} ta foydalanuvchi yana kira oladi.",
+    "unblock": "Blokdan chiqarish",
+    "moveTitle": "Sinfga ko‘chirish",
+    "moveBody": "{{count}} ta o‘quvchi joriy sinfi va uning kurslaridan chiqadi hamda yangi sinf kurslariga qo‘shiladi.",
+    "moveTarget": "Yangi sinf",
+    "move": "Ko‘chirish"
+  },
+  "result": {
+    "done": "Bajarildi: {{count}} tadan {{done}} ta.",
+    "failed": "{{count}} tasi uchun bajarilmadi:"
+  },
+  "slips": {
+    "title": "Yangi kirish ma’lumotlari",
+    "warning": "Bu parollar faqat hozir ko‘rinadi. Oynani yopishdan oldin chop eting yoki nusxa oling.",
+    "print": "Login varaqalarini chop etish",
+    "close": "Tayyor",
+    "copy": "Nusxa olish",
+    "copied": "Nusxa olindi",
+    "name": "Ism",
+    "loginId": "Login ID",
+    "password": "Vaqtinchalik parol",
+    "heading": "Campusly’ga kirish",
+    "signInAt": "Kirish manzili",
+    "rule": "Bu parol 3 marta kirish yoki 14 kun amal qiladi. Keyin o‘z parolingizni o‘rnatasiz.",
+    "issued": "Berilgan sana: {{date}}"
   }
 }

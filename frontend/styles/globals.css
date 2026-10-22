@@ -3,3 +3,19 @@ html,
 body {
   min-height: 100%;
 }
+
+/*
+ * Login slips: on screen they live in a hidden container; when printing, ONLY that container is
+ * shown (the admin page, the dialog and the sidebar are not printed).
+ */
+.print-slips {
+  display: none;
+}
+@media print {
+  body > *:not(.print-slips) {
+    display: none !important;
+  }
+  .print-slips {
+    display: block;
+  }
+}

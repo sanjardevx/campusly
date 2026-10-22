@@ -69,5 +69,56 @@
     "daysAgo_other": "{{count}} days ago",
     "weeksAgo_one": "{{count}} week ago",
     "weeksAgo_other": "{{count}} weeks ago"
+  },
+  "actions": {
+    "column": "Actions",
+    "menu": "Actions for {{name}}",
+    "selectAll": "Select all on this page",
+    "selectRow": "Select {{name}}",
+    "selected": "{{count}} selected",
+    "clearSelection": "Clear selection",
+    "moveToClass": "Move to class",
+    "resetPassword": "Reset password",
+    "printSlips": "Print login slips",
+    "block": "Block",
+    "unblock": "Unblock"
+  },
+  "confirm": {
+    "cancel": "Cancel",
+    "resetTitle": "Reset passwords?",
+    "resetBody": "{{count}} user(s) get a new temporary password. Their current password and every open session stop working.",
+    "reset": "Reset passwords",
+    "printTitle": "Print login slips?",
+    "printBody": "A login slip shows a password, and stored passwords cannot be read back. So {{count}} user(s) first get a new temporary password; their current password and sessions stop working.",
+    "print": "Reset and print",
+    "blockTitle": "Block users?",
+    "blockBody": "{{count}} user(s) are signed out and cannot sign in until you unblock them.",
+    "block": "Block",
+    "unblockTitle": "Unblock users?",
+    "unblockBody": "{{count}} user(s) can sign in again.",
+    "unblock": "Unblock",
+    "moveTitle": "Move to class",
+    "moveBody": "{{count}} student(s) leave their current class and its courses and join the courses of the new class.",
+    "moveTarget": "New class",
+    "move": "Move"
+  },
+  "result": {
+    "done": "Done: {{done}} of {{count}}.",
+    "failed": "Not done for {{count}}:"
+  },
+  "slips": {
+    "title": "New sign-in details",
+    "warning": "These passwords are shown only now. Print or copy them before you close this window.",
+    "print": "Print login slips",
+    "close": "Done",
+    "copy": "Copy",
+    "copied": "Copied",
+    "name": "Name",
+    "loginId": "Login ID",
+    "password": "Temporary password",
+    "heading": "Campusly sign-in",
+    "signInAt": "Sign in at",
+    "rule": "This password works for 3 sign-ins or 14 days. After that you set your own password.",
+    "issued": "Issued {{date}}"
   }
 }
