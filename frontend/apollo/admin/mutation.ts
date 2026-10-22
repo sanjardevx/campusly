@@ -284,3 +284,31 @@ export const LOG_RECORD_EXPORT = graphql(`
     logRecordExport(input: $input)
   }
 `);
+
+// ───────────────────────── School calendar (dashboard) ─────────────────────────
+
+export const CREATE_SCHOOL_EVENT = graphql(`
+  mutation CreateSchoolEvent($input: CreateSchoolEventInput!) {
+    createSchoolEvent(input: $input) {
+      id
+    }
+  }
+`);
+
+/** Partial: only the fields that changed ("" clears the note) */
+export const UPDATE_SCHOOL_EVENT = graphql(`
+  mutation UpdateSchoolEvent($input: UpdateSchoolEventInput!) {
+    updateSchoolEvent(input: $input) {
+      id
+    }
+  }
+`);
+
+/** No hard delete: the event is archived and leaves the calendar */
+export const ARCHIVE_SCHOOL_EVENT = graphql(`
+  mutation ArchiveSchoolEvent($id: String!) {
+    archiveSchoolEvent(id: $id) {
+      id
+    }
+  }
+`);

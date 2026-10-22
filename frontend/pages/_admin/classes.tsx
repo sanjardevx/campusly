@@ -43,6 +43,12 @@ const ClassesPage: NextPageWithLayout = () => {
   const coursesOf = (groupId: string) => courses.filter((c) => c.groupId === groupId);
   const teacherCourses = (teacherId: string) => courses.filter((c) => c.teachers.some((x) => x.id === teacherId)).length;
   const select = (id: string) => setParams({ class: id, tab: undefined });
+  // Dashboard "Add course" links here with ?add=course: the drawer opens for the shown class
+  const shown: Open | null = open ?? (params.add === 'course' && group?.status === 'ACTIVE' ? { kind: 'addCourse' } : null);
+  const close = () => {
+    setOpen(null);
+    if (params.add) setParams({ add: undefined });
+  };
 
   return (
     <>
@@ -96,8 +102,8 @@ const ClassesPage: NextPageWithLayout = () => {
       {open?.kind === 'editClass' && group && (
         <ClassDialog group={group} onClose={() => setOpen(null)} onSaved={() => setOpen(null)} />
       )}
-      {open?.kind === 'addCourse' && group && (
-        <AddCourseDrawer group={group} courseCount={teacherCourses} onClose={() => setOpen(null)} onCreated={() => setOpen(null)} />
+      {shown?.kind === 'addCourse' && group && (
+        <AddCourseDrawer group={group} courseCount={teacherCourses} onClose={close} onCreated={close} />
       )}
       {open?.kind === 'assign' && (
         <AssignTeacherDialog course={open.course} courseCount={teacherCourses} onClose={() => setOpen(null)} />

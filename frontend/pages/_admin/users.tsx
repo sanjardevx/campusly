@@ -26,6 +26,7 @@ const ROLES: Role[] = ['STUDENT', 'TEACHER', 'PARENT', 'ADMIN'];
 const LIMITS = [25, 50, 100];
 const COUNT_KEY = { STUDENT: 'students', TEACHER: 'teachers', PARENT: 'parents', ADMIN: 'admins' } as const;
 const NONE = new Set<string>();
+const ADD_KINDS = ['student', 'teacher', 'import'] as const;
 
 // The URL is typed by hand: anything unknown falls back to a safe default instead of reaching the API
 const pick = <T extends string>(value: string | undefined, allowed: readonly T[]) =>
@@ -92,6 +93,13 @@ const UsersPage: NextPageWithLayout = () => {
 
   const actions = useUserActions(() => select(NONE));
   const [adding, setAdding] = useState<'student' | 'teacher' | 'import' | null>(null);
+  // Dashboard quick actions link here with ?add=student|import: the URL opens the drawer,
+  // closing it drops the parameter
+  const shown = adding ?? pick(params.add, ADD_KINDS) ?? null;
+  const close = () => {
+    setAdding(null);
+    if (params.add) setParams({ add: undefined });
+  };
   // Parents are added with their child; admins cannot be created from the console
   const addKind = role === 'TEACHER' ? 'teacher' : role === 'ADMIN' ? null : 'student';
   const selectable = role !== 'ADMIN';
@@ -117,16 +125,16 @@ const UsersPage: NextPageWithLayout = () => {
         }
       />
       {/* Mounted only while open: every opening starts with a fresh form */}
-      {adding === 'student' && (
+      {shown === 'student' && (
         <AddStudentDrawer
           open
           // Looking at 9A? The new student is probably for 9A
           defaultGroupId={students ? params.group : undefined}
-          onClose={() => setAdding(null)}
+          onClose={close}
         />
       )}
-      {adding === 'teacher' && <AddTeacherDrawer open onClose={() => setAdding(null)} />}
-      {adding === 'import' && <ImportStudentsDialog open onClose={() => setAdding(null)} />}
+      {shown === 'teacher' && <AddTeacherDrawer open onClose={close} />}
+      {shown === 'import' && <ImportStudentsDialog open onClose={close} />}
 
       <Tabs
         value={role}

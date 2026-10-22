@@ -175,12 +175,13 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 10 (L) — Admin UI
 
-- [ ] Users page: Students / Teachers / Parents tabs, filters, pagination, bulk actions (reset password, print login slips, block).
-- [ ] Add Student drawer (generate ID + password, parent step, link existing parent).
-- [ ] Import CSV (3 steps: upload → check → import & login slips PDF/print view).
-- [ ] Classes & Courses page + Add Course drawer.
-- [ ] Settings page (school info, academic year/periods, grading thresholds).
-- [ ] Records page: class lists, grades and attendance journals, report cards (CSV + print, every export audited).
+- [x] Users page: Students / Teachers / Parents tabs, filters, pagination, bulk actions (reset password, print login slips, block).
+- [x] Add Student drawer (generate ID + password, parent step, link existing parent).
+- [x] Import CSV (3 steps: upload → check → import & login slips PDF/print view).
+- [x] Classes & Courses page + Add Course drawer.
+- [x] Settings page (school info, academic year/periods, grading thresholds).
+- [x] Records page: class lists, grades and attendance journals, report cards (CSV + print, every export audited).
+- [x] Admin dashboard: KPI tiles, attendance donut, students needing attention (attendance), school calendar (holidays, events, deadlines, starts), recent activity, quick actions.
 
 ---
 

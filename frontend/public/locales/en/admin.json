@@ -486,5 +486,179 @@
     "badRange": "The start date must not be after the end date.",
     "empty": "Nothing to show yet.",
     "emptyAttendance": "No attendance was taken in this period."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning, {{name}}",
+      "afternoon": "Good afternoon, {{name}}",
+      "evening": "Good evening, {{name}}"
+    },
+    "periodWeek": "{{period}}, week {{week}}",
+    "weekday": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "day": {
+      "1": "Mo",
+      "2": "Tu",
+      "3": "We",
+      "4": "Th",
+      "5": "Fr",
+      "6": "Sa",
+      "7": "Su"
+    },
+    "month": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
+    },
+    "kpi": {
+      "students": "Students",
+      "newThisMonth_one": "+{{count}} this month",
+      "newThisMonth_other": "+{{count}} this month",
+      "teachers": "Teachers",
+      "classesCourses": "Classes {{classes}} · courses {{courses}}",
+      "attendanceMonth": "Attendance this month",
+      "points": "pts",
+      "vsLastMonth": "vs last month",
+      "notSignedIn": "Not signed in yet",
+      "ofAccounts_one": "of {{count}} account",
+      "ofAccounts_other": "of {{count}} accounts",
+      "review": "Review →"
+    },
+    "donut": {
+      "title": "Attendance overview",
+      "range": "Period",
+      "ranges": {
+        "TODAY": "Today",
+        "WEEK": "This week",
+        "MONTH": "This month"
+      },
+      "aria": "{{rate}}% attended out of {{total}} marks",
+      "marks_one": "{{count}} mark",
+      "marks_other": "{{count}} marks",
+      "empty": "No marks yet",
+      "status": {
+        "present": "Present",
+        "late": "Late",
+        "excused": "Excused",
+        "absent": "Absent"
+      }
+    },
+    "attention": {
+      "title": "Students needing attention",
+      "total": "Total this quarter",
+      "priority": {
+        "HIGH": "High",
+        "MEDIUM": "Medium",
+        "LOW": "Low"
+      },
+      "none": "Nobody needs attention right now.",
+      "rule": "Attendance below 90% this quarter",
+      "marks_one": "{{count}} mark",
+      "marks_other": "{{count}} marks"
+    },
+    "calendar": {
+      "title": "Upcoming events",
+      "previous": "Previous month",
+      "next": "Next month",
+      "hasEvents": "has events",
+      "onDay": "{{day}} {{month}}",
+      "nothingThenNext": "Nothing on this day · coming up",
+      "nothing": "Nothing planned for the rest of the month",
+      "term": "School calendar",
+      "kind": {
+        "HOLIDAY": "Holiday",
+        "EVENT": "School event",
+        "DEADLINE": "Deadline",
+        "START": "Start",
+        "TERM_START": "{{name}} starts",
+        "TERM_END": "{{name}} ends"
+      },
+      "add": "Add",
+      "edit": "Edit",
+      "archive": "Archive",
+      "archiveTitle": "Archive this event?",
+      "archiveBody": "“{{title}}” will leave the calendar. It stays in the activity log."
+    },
+    "activity": {
+      "title": "Recent activity",
+      "empty": "No changes yet.",
+      "system": "System",
+      "actions": {
+        "user_create": "Account created",
+        "user_update": "Account updated",
+        "user_resetPassword": "Password reset",
+        "user_block": "Account blocked",
+        "user_unblock": "Account unblocked",
+        "parent_link": "Parent linked",
+        "parent_unlink": "Parent unlinked",
+        "users_import": "Students imported",
+        "settings_update": "Settings changed",
+        "academicYear_create": "Academic year created",
+        "academicYear_update": "Academic year changed",
+        "period_create": "Period created",
+        "period_update": "Period changed",
+        "subject_create": "Subject created",
+        "subject_update": "Subject changed",
+        "group_create": "Class created",
+        "group_update": "Class changed",
+        "student_moveClass": "Student moved to another class",
+        "course_create": "Course created",
+        "course_update": "Course changed",
+        "course_setTeachers": "Course teachers changed",
+        "course_setStudents": "Course students changed",
+        "submission_grade": "Submission graded",
+        "submission_return": "Submission returned",
+        "assignment_zeroMissing": "Missing work set to zero",
+        "assignment_publishGrades": "Grades published",
+        "periodGrades_publish": "Quarter grades published",
+        "periodGrade_override": "Quarter grade overridden",
+        "records_export": "Document downloaded",
+        "schoolEvent_create": "Calendar event added",
+        "schoolEvent_update": "Calendar event changed",
+        "schoolEvent_archive": "Calendar event archived"
+      }
+    },
+    "quick": {
+      "title": "Quick actions",
+      "addStudent": "Add student",
+      "import": "Import students (CSV)",
+      "addTeacher": "Add teacher",
+      "addCourse": "Add course",
+      "term": "Active term: {{period}}",
+      "week": "Week {{week}} of {{weeks}}",
+      "noTerm": "No active term"
+    },
+    "event": {
+      "addTitle": "Add to the school calendar",
+      "editTitle": "Edit event",
+      "subtitle": "Holidays, school events, programme deadlines and start dates.",
+      "section": "Event",
+      "kind": "Type",
+      "name": "Title",
+      "namePlaceholder": "e.g. Autumn holidays",
+      "startsOn": "Start date",
+      "endsOn": "End date",
+      "endsOnHint": "Empty for a one-day event",
+      "endsOnBad": "Must not be before the start",
+      "note": "Note",
+      "notePlaceholder": "Place, who it is for…",
+      "save": "Save"
+    }
   }
 }

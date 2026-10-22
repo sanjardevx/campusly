@@ -215,3 +215,80 @@ export const REPORT_CARD = graphql(`
     }
   }
 `);
+
+/** Admin home page: school-wide numbers, counted on the server */
+export const ADMIN_DASHBOARD = graphql(`
+  query AdminDashboard {
+    adminDashboard {
+      today
+      period {
+        id
+        name
+        week
+        weeks
+      }
+      students
+      newStudentsThisMonth
+      teachers
+      newTeachersThisMonth
+      classes
+      courses
+      attendanceThisMonth
+      attendanceLastMonth
+      notSignedIn
+      accounts
+      needsAttention {
+        total
+        high
+        medium
+        low
+        students {
+          studentId
+          loginId
+          firstName
+          lastName
+          className
+          priority
+          attendanceRate
+          marks
+        }
+      }
+      recentActivity {
+        id
+        action
+        actorName
+        createdAt
+      }
+    }
+  }
+`);
+
+/** Dashboard donut: marks by status (its own query: the range switch reloads only this card) */
+export const ATTENDANCE_OVERVIEW = graphql(`
+  query AttendanceOverview($range: AttendanceRange!) {
+    attendanceOverview(range: $range) {
+      from
+      to
+      present
+      late
+      excused
+      absent
+      total
+    }
+  }
+`);
+
+/** Dashboard calendar: the school's events and term dates of one month ("YYYY-MM") */
+export const DASHBOARD_CALENDAR = graphql(`
+  query DashboardCalendar($month: String!) {
+    dashboardCalendar(month: $month) {
+      id
+      kind
+      title
+      startsOn
+      endsOn
+      note
+      schoolEventId
+    }
+  }
+`);

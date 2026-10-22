@@ -486,5 +486,179 @@
     "badRange": "Boshlanish sanasi tugash sanasidan keyin bo‘lmasin.",
     "empty": "Hozircha ko‘rsatadigan narsa yo‘q.",
     "emptyAttendance": "Bu davrda davomat olinmagan."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Xayrli tong, {{name}}",
+      "afternoon": "Xayrli kun, {{name}}",
+      "evening": "Xayrli kech, {{name}}"
+    },
+    "periodWeek": "{{period}}, {{week}}-hafta",
+    "weekday": {
+      "0": "Yakshanba",
+      "1": "Dushanba",
+      "2": "Seshanba",
+      "3": "Chorshanba",
+      "4": "Payshanba",
+      "5": "Juma",
+      "6": "Shanba"
+    },
+    "day": {
+      "1": "Du",
+      "2": "Se",
+      "3": "Ch",
+      "4": "Pa",
+      "5": "Ju",
+      "6": "Sh",
+      "7": "Ya"
+    },
+    "month": {
+      "1": "Yanvar",
+      "2": "Fevral",
+      "3": "Mart",
+      "4": "Aprel",
+      "5": "May",
+      "6": "Iyun",
+      "7": "Iyul",
+      "8": "Avgust",
+      "9": "Sentabr",
+      "10": "Oktabr",
+      "11": "Noyabr",
+      "12": "Dekabr"
+    },
+    "kpi": {
+      "students": "O‘quvchilar",
+      "newThisMonth_one": "bu oy +{{count}}",
+      "newThisMonth_other": "bu oy +{{count}}",
+      "teachers": "O‘qituvchilar",
+      "classesCourses": "Sinflar {{classes}} · kurslar {{courses}}",
+      "attendanceMonth": "Bu oygi davomat",
+      "points": "band",
+      "vsLastMonth": "o‘tgan oyga nisbatan",
+      "notSignedIn": "Hali kirmaganlar",
+      "ofAccounts_one": "{{count}} ta akkauntdan",
+      "ofAccounts_other": "{{count}} ta akkauntdan",
+      "review": "Ko‘rish →"
+    },
+    "donut": {
+      "title": "Davomat holati",
+      "range": "Davr",
+      "ranges": {
+        "TODAY": "Bugun",
+        "WEEK": "Bu hafta",
+        "MONTH": "Bu oy"
+      },
+      "aria": "{{total}} ta belgidan {{rate}}% qatnashgan",
+      "marks_one": "{{count}} ta belgi",
+      "marks_other": "{{count}} ta belgi",
+      "empty": "Hali belgi yo‘q",
+      "status": {
+        "present": "Bor",
+        "late": "Kechikdi",
+        "excused": "Sababli",
+        "absent": "Yo‘q"
+      }
+    },
+    "attention": {
+      "title": "E’tibor kerak bo‘lgan o‘quvchilar",
+      "total": "Shu chorakda jami",
+      "priority": {
+        "HIGH": "Yuqori",
+        "MEDIUM": "O‘rta",
+        "LOW": "Past"
+      },
+      "none": "Hozircha e’tibor kerak bo‘lgan o‘quvchi yo‘q.",
+      "rule": "Shu chorakda davomati 90% dan past",
+      "marks_one": "{{count}} ta belgi",
+      "marks_other": "{{count}} ta belgi"
+    },
+    "calendar": {
+      "title": "Yaqinlashayotgan tadbirlar",
+      "previous": "Oldingi oy",
+      "next": "Keyingi oy",
+      "hasEvents": "tadbir bor",
+      "onDay": "{{day}}-{{month}}",
+      "nothingThenNext": "Bu kunda hech narsa yo‘q · keyingilari",
+      "nothing": "Oy oxirigacha hech narsa rejalashtirilmagan",
+      "term": "Maktab taqvimi",
+      "kind": {
+        "HOLIDAY": "Bayram / ta’til",
+        "EVENT": "Maktab tadbiri",
+        "DEADLINE": "Muddat",
+        "START": "Boshlanish",
+        "TERM_START": "{{name}} boshlanadi",
+        "TERM_END": "{{name}} tugaydi"
+      },
+      "add": "Qo‘shish",
+      "edit": "Tahrirlash",
+      "archive": "Arxivlash",
+      "archiveTitle": "Tadbirni arxivlaysizmi?",
+      "archiveBody": "“{{title}}” kalendardan olinadi. Harakatlar jurnalida qoladi."
+    },
+    "activity": {
+      "title": "So‘nggi harakatlar",
+      "empty": "Hali o‘zgarish yo‘q.",
+      "system": "Tizim",
+      "actions": {
+        "user_create": "Akkaunt yaratildi",
+        "user_update": "Akkaunt o‘zgartirildi",
+        "user_resetPassword": "Parol tiklandi",
+        "user_block": "Akkaunt bloklandi",
+        "user_unblock": "Akkaunt blokdan chiqarildi",
+        "parent_link": "Ota-ona bog‘landi",
+        "parent_unlink": "Ota-ona ajratildi",
+        "users_import": "O‘quvchilar import qilindi",
+        "settings_update": "Sozlamalar o‘zgartirildi",
+        "academicYear_create": "O‘quv yili yaratildi",
+        "academicYear_update": "O‘quv yili o‘zgartirildi",
+        "period_create": "Davr yaratildi",
+        "period_update": "Davr o‘zgartirildi",
+        "subject_create": "Fan yaratildi",
+        "subject_update": "Fan o‘zgartirildi",
+        "group_create": "Sinf yaratildi",
+        "group_update": "Sinf o‘zgartirildi",
+        "student_moveClass": "O‘quvchi boshqa sinfga o‘tkazildi",
+        "course_create": "Kurs yaratildi",
+        "course_update": "Kurs o‘zgartirildi",
+        "course_setTeachers": "Kurs o‘qituvchilari o‘zgartirildi",
+        "course_setStudents": "Kurs o‘quvchilari o‘zgartirildi",
+        "submission_grade": "Topshiriq baholandi",
+        "submission_return": "Topshiriq qaytarildi",
+        "assignment_zeroMissing": "Topshirilmagan ishlarga 0 qo‘yildi",
+        "assignment_publishGrades": "Baholar e’lon qilindi",
+        "periodGrades_publish": "Chorak baholari e’lon qilindi",
+        "periodGrade_override": "Chorak bahosi qo‘lda o‘zgartirildi",
+        "records_export": "Hujjat yuklab olindi",
+        "schoolEvent_create": "Kalendarga tadbir qo‘shildi",
+        "schoolEvent_update": "Kalendar tadbiri o‘zgartirildi",
+        "schoolEvent_archive": "Kalendar tadbiri arxivlandi"
+      }
+    },
+    "quick": {
+      "title": "Tezkor amallar",
+      "addStudent": "O‘quvchi qo‘shish",
+      "import": "O‘quvchilarni import qilish (CSV)",
+      "addTeacher": "O‘qituvchi qo‘shish",
+      "addCourse": "Kurs qo‘shish",
+      "term": "Joriy davr: {{period}}",
+      "week": "{{weeks}} haftadan {{week}}-hafta",
+      "noTerm": "Joriy davr yo‘q"
+    },
+    "event": {
+      "addTitle": "Maktab kalendariga qo‘shish",
+      "editTitle": "Tadbirni tahrirlash",
+      "subtitle": "Bayramlar, maktab tadbirlari, dastur muddatlari va boshlanish sanalari.",
+      "section": "Tadbir",
+      "kind": "Turi",
+      "name": "Nomi",
+      "namePlaceholder": "masalan, Kuzgi ta’til",
+      "startsOn": "Boshlanish sanasi",
+      "endsOn": "Tugash sanasi",
+      "endsOnHint": "Bir kunlik bo‘lsa bo‘sh qoldiring",
+      "endsOnBad": "Boshlanishdan oldin bo‘lmasin",
+      "note": "Izoh",
+      "notePlaceholder": "Joyi, kimlar uchun…",
+      "save": "Saqlash"
+    }
   }
 }

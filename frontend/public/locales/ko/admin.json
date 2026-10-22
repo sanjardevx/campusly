@@ -479,5 +479,175 @@
     "badRange": "시작일이 종료일보다 늦을 수 없습니다.",
     "empty": "아직 표시할 내용이 없습니다.",
     "emptyAttendance": "이 기간에는 출결 기록이 없습니다."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "좋은 아침입니다, {{name}}님",
+      "afternoon": "안녕하세요, {{name}}님",
+      "evening": "좋은 저녁입니다, {{name}}님"
+    },
+    "periodWeek": "{{period}}, {{week}}주차",
+    "weekday": {
+      "0": "일요일",
+      "1": "월요일",
+      "2": "화요일",
+      "3": "수요일",
+      "4": "목요일",
+      "5": "금요일",
+      "6": "토요일"
+    },
+    "day": {
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토",
+      "7": "일"
+    },
+    "month": {
+      "1": "1월",
+      "2": "2월",
+      "3": "3월",
+      "4": "4월",
+      "5": "5월",
+      "6": "6월",
+      "7": "7월",
+      "8": "8월",
+      "9": "9월",
+      "10": "10월",
+      "11": "11월",
+      "12": "12월"
+    },
+    "kpi": {
+      "students": "학생",
+      "newThisMonth_other": "이번 달 +{{count}}",
+      "teachers": "교사",
+      "classesCourses": "반 {{classes}} · 과목 {{courses}}",
+      "attendanceMonth": "이번 달 출석률",
+      "points": "%p",
+      "vsLastMonth": "지난달 대비",
+      "notSignedIn": "아직 로그인하지 않음",
+      "ofAccounts_other": "전체 {{count}}개 계정 중",
+      "review": "확인 →"
+    },
+    "donut": {
+      "title": "출결 현황",
+      "range": "기간",
+      "ranges": {
+        "TODAY": "오늘",
+        "WEEK": "이번 주",
+        "MONTH": "이번 달"
+      },
+      "aria": "{{total}}건 중 {{rate}}% 출석",
+      "marks_other": "{{count}}건",
+      "empty": "아직 기록 없음",
+      "status": {
+        "present": "출석",
+        "late": "지각",
+        "excused": "인정 결석",
+        "absent": "결석"
+      }
+    },
+    "attention": {
+      "title": "관심이 필요한 학생",
+      "total": "이번 분기 합계",
+      "priority": {
+        "HIGH": "높음",
+        "MEDIUM": "보통",
+        "LOW": "낮음"
+      },
+      "none": "현재 관심이 필요한 학생이 없습니다.",
+      "rule": "이번 분기 출석률 90% 미만",
+      "marks_other": "{{count}}건"
+    },
+    "calendar": {
+      "title": "다가오는 일정",
+      "previous": "이전 달",
+      "next": "다음 달",
+      "hasEvents": "일정 있음",
+      "onDay": "{{month}} {{day}}일",
+      "nothingThenNext": "이 날은 일정 없음 · 다음 일정",
+      "nothing": "이번 달 남은 일정이 없습니다",
+      "term": "학사 일정",
+      "kind": {
+        "HOLIDAY": "휴일·방학",
+        "EVENT": "학교 행사",
+        "DEADLINE": "마감",
+        "START": "시작",
+        "TERM_START": "{{name}} 시작",
+        "TERM_END": "{{name}} 종료"
+      },
+      "add": "추가",
+      "edit": "수정",
+      "archive": "보관",
+      "archiveTitle": "이 일정을 보관할까요?",
+      "archiveBody": "“{{title}}” 일정이 달력에서 사라집니다. 활동 기록에는 남습니다."
+    },
+    "activity": {
+      "title": "최근 활동",
+      "empty": "아직 변경 사항이 없습니다.",
+      "system": "시스템",
+      "actions": {
+        "user_create": "계정 생성",
+        "user_update": "계정 수정",
+        "user_resetPassword": "비밀번호 재설정",
+        "user_block": "계정 차단",
+        "user_unblock": "계정 차단 해제",
+        "parent_link": "보호자 연결",
+        "parent_unlink": "보호자 연결 해제",
+        "users_import": "학생 가져오기",
+        "settings_update": "설정 변경",
+        "academicYear_create": "학년도 생성",
+        "academicYear_update": "학년도 수정",
+        "period_create": "기간 생성",
+        "period_update": "기간 수정",
+        "subject_create": "과목 생성",
+        "subject_update": "과목 수정",
+        "group_create": "반 생성",
+        "group_update": "반 수정",
+        "student_moveClass": "학생 반 이동",
+        "course_create": "강좌 생성",
+        "course_update": "강좌 수정",
+        "course_setTeachers": "강좌 교사 변경",
+        "course_setStudents": "강좌 학생 변경",
+        "submission_grade": "제출물 채점",
+        "submission_return": "제출물 반환",
+        "assignment_zeroMissing": "미제출 0점 처리",
+        "assignment_publishGrades": "성적 공개",
+        "periodGrades_publish": "분기 성적 공개",
+        "periodGrade_override": "분기 성적 수동 변경",
+        "records_export": "문서 다운로드",
+        "schoolEvent_create": "학교 일정 추가",
+        "schoolEvent_update": "학교 일정 수정",
+        "schoolEvent_archive": "학교 일정 보관"
+      }
+    },
+    "quick": {
+      "title": "빠른 작업",
+      "addStudent": "학생 추가",
+      "import": "학생 가져오기 (CSV)",
+      "addTeacher": "교사 추가",
+      "addCourse": "과목 추가",
+      "term": "현재 기간: {{period}}",
+      "week": "{{weeks}}주 중 {{week}}주차",
+      "noTerm": "현재 기간 없음"
+    },
+    "event": {
+      "addTitle": "학교 일정 추가",
+      "editTitle": "일정 수정",
+      "subtitle": "휴일, 학교 행사, 프로그램 마감일과 시작일.",
+      "section": "일정",
+      "kind": "유형",
+      "name": "제목",
+      "namePlaceholder": "예: 가을 방학",
+      "startsOn": "시작일",
+      "endsOn": "종료일",
+      "endsOnHint": "하루 일정이면 비워 두세요",
+      "endsOnBad": "시작일보다 빠를 수 없습니다",
+      "note": "메모",
+      "notePlaceholder": "장소, 대상…",
+      "save": "저장"
+    }
   }
 }

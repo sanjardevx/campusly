@@ -500,5 +500,187 @@
     "badRange": "Дата начала не должна быть позже даты окончания.",
     "empty": "Пока нечего показать.",
     "emptyAttendance": "За этот период посещаемость не отмечалась."
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Доброе утро, {{name}}",
+      "afternoon": "Добрый день, {{name}}",
+      "evening": "Добрый вечер, {{name}}"
+    },
+    "periodWeek": "{{period}}, неделя {{week}}",
+    "weekday": {
+      "0": "Воскресенье",
+      "1": "Понедельник",
+      "2": "Вторник",
+      "3": "Среда",
+      "4": "Четверг",
+      "5": "Пятница",
+      "6": "Суббота"
+    },
+    "day": {
+      "1": "Пн",
+      "2": "Вт",
+      "3": "Ср",
+      "4": "Чт",
+      "5": "Пт",
+      "6": "Сб",
+      "7": "Вс"
+    },
+    "month": {
+      "1": "Январь",
+      "2": "Февраль",
+      "3": "Март",
+      "4": "Апрель",
+      "5": "Май",
+      "6": "Июнь",
+      "7": "Июль",
+      "8": "Август",
+      "9": "Сентябрь",
+      "10": "Октябрь",
+      "11": "Ноябрь",
+      "12": "Декабрь"
+    },
+    "kpi": {
+      "students": "Ученики",
+      "newThisMonth_one": "+{{count}} за месяц",
+      "newThisMonth_few": "+{{count}} за месяц",
+      "newThisMonth_many": "+{{count}} за месяц",
+      "newThisMonth_other": "+{{count}} за месяц",
+      "teachers": "Учителя",
+      "classesCourses": "Классы {{classes}} · курсы {{courses}}",
+      "attendanceMonth": "Посещаемость за месяц",
+      "points": "п.",
+      "vsLastMonth": "к прошлому месяцу",
+      "notSignedIn": "Ещё не вошли",
+      "ofAccounts_one": "из {{count}} аккаунта",
+      "ofAccounts_few": "из {{count}} аккаунтов",
+      "ofAccounts_many": "из {{count}} аккаунтов",
+      "ofAccounts_other": "из {{count}} аккаунта",
+      "review": "Открыть →"
+    },
+    "donut": {
+      "title": "Обзор посещаемости",
+      "range": "Период",
+      "ranges": {
+        "TODAY": "Сегодня",
+        "WEEK": "Эта неделя",
+        "MONTH": "Этот месяц"
+      },
+      "aria": "{{rate}}% присутствия из {{total}} отметок",
+      "marks_one": "{{count}} отметка",
+      "marks_few": "{{count}} отметки",
+      "marks_many": "{{count}} отметок",
+      "marks_other": "{{count}} отметки",
+      "empty": "Отметок пока нет",
+      "status": {
+        "present": "Присутствовал",
+        "late": "Опоздал",
+        "excused": "Уважительная",
+        "absent": "Отсутствовал"
+      }
+    },
+    "attention": {
+      "title": "Ученики, требующие внимания",
+      "total": "Всего за четверть",
+      "priority": {
+        "HIGH": "Высокий",
+        "MEDIUM": "Средний",
+        "LOW": "Низкий"
+      },
+      "none": "Сейчас никто не требует внимания.",
+      "rule": "Посещаемость ниже 90% за четверть",
+      "marks_one": "{{count}} отметка",
+      "marks_few": "{{count}} отметки",
+      "marks_many": "{{count}} отметок",
+      "marks_other": "{{count}} отметки"
+    },
+    "calendar": {
+      "title": "Ближайшие события",
+      "previous": "Предыдущий месяц",
+      "next": "Следующий месяц",
+      "hasEvents": "есть события",
+      "onDay": "{{day}} · {{month}}",
+      "nothingThenNext": "В этот день ничего · далее",
+      "nothing": "До конца месяца ничего не запланировано",
+      "term": "Школьный календарь",
+      "kind": {
+        "HOLIDAY": "Праздник / каникулы",
+        "EVENT": "Школьное событие",
+        "DEADLINE": "Срок",
+        "START": "Начало",
+        "TERM_START": "Начало: {{name}}",
+        "TERM_END": "Конец: {{name}}"
+      },
+      "add": "Добавить",
+      "edit": "Изменить",
+      "archive": "В архив",
+      "archiveTitle": "Отправить событие в архив?",
+      "archiveBody": "«{{title}}» уйдёт из календаря. Запись останется в журнале действий."
+    },
+    "activity": {
+      "title": "Последние действия",
+      "empty": "Изменений пока нет.",
+      "system": "Система",
+      "actions": {
+        "user_create": "Аккаунт создан",
+        "user_update": "Аккаунт изменён",
+        "user_resetPassword": "Пароль сброшен",
+        "user_block": "Аккаунт заблокирован",
+        "user_unblock": "Аккаунт разблокирован",
+        "parent_link": "Родитель привязан",
+        "parent_unlink": "Родитель отвязан",
+        "users_import": "Ученики импортированы",
+        "settings_update": "Настройки изменены",
+        "academicYear_create": "Учебный год создан",
+        "academicYear_update": "Учебный год изменён",
+        "period_create": "Период создан",
+        "period_update": "Период изменён",
+        "subject_create": "Предмет создан",
+        "subject_update": "Предмет изменён",
+        "group_create": "Класс создан",
+        "group_update": "Класс изменён",
+        "student_moveClass": "Ученик переведён в другой класс",
+        "course_create": "Курс создан",
+        "course_update": "Курс изменён",
+        "course_setTeachers": "Учителя курса изменены",
+        "course_setStudents": "Ученики курса изменены",
+        "submission_grade": "Работа оценена",
+        "submission_return": "Работа возвращена",
+        "assignment_zeroMissing": "Несданным работам поставлен 0",
+        "assignment_publishGrades": "Оценки опубликованы",
+        "periodGrades_publish": "Четвертные оценки опубликованы",
+        "periodGrade_override": "Четвертная оценка изменена вручную",
+        "records_export": "Документ скачан",
+        "schoolEvent_create": "Событие календаря добавлено",
+        "schoolEvent_update": "Событие календаря изменено",
+        "schoolEvent_archive": "Событие календаря в архиве"
+      }
+    },
+    "quick": {
+      "title": "Быстрые действия",
+      "addStudent": "Добавить ученика",
+      "import": "Импорт учеников (CSV)",
+      "addTeacher": "Добавить учителя",
+      "addCourse": "Добавить курс",
+      "term": "Текущий период: {{period}}",
+      "week": "Неделя {{week}} из {{weeks}}",
+      "noTerm": "Нет текущего периода"
+    },
+    "event": {
+      "addTitle": "Добавить в школьный календарь",
+      "editTitle": "Изменить событие",
+      "subtitle": "Праздники, школьные события, сроки и даты начала программ.",
+      "section": "Событие",
+      "kind": "Тип",
+      "name": "Название",
+      "namePlaceholder": "например, Осенние каникулы",
+      "startsOn": "Дата начала",
+      "endsOn": "Дата окончания",
+      "endsOnHint": "Пусто — событие на один день",
+      "endsOnBad": "Не раньше даты начала",
+      "note": "Примечание",
+      "notePlaceholder": "Место, для кого…",
+      "save": "Сохранить"
+    }
   }
 }
