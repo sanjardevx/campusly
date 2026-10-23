@@ -1,10 +1,22 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { PROGRESS } from '../../libs/config';
-import { LessonProgress } from '../../libs/dto/progress/progress';
+import {
+  CourseProgress,
+  LessonProgress,
+} from '../../libs/dto/progress/progress';
 import { LessonProgressInput } from '../../libs/dto/progress/progress.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
+import { ProgressStatus } from '../../libs/enums/progress.enum';
 import type { AuthUser } from '../../libs/types/auth';
+import {
+  hidesGrades,
+  visibleSubmissionStatus,
+} from '../assignment/submission.service';
 import { AccessPolicy } from '../auth/policies/access.policy';
 
 interface ProgressRow {
@@ -150,6 +162,112 @@ export class ProgressService {
       data: { completedAt: now },
     });
     return this.get(user.id, lesson.id, null);
+  }
+
+  /**
+   * The course page's per-row state for one student: student → self, parent → own child, admin →
+   * any. The student must be enrolled, so a parent cannot read a course the child is not in.
+   * Same visibility as the course page (published lessons in visible weeks, published assignments).
+   */
+  public async getCourseProgress(
+    user: AuthUser,
+    courseId: string,
+    studentId?: string,
+  ): Promise<CourseProgress> {
+    const id = await this.accessPolicy.resolveStudentScope(user, studentId);
+    const enrolled = await this.prismaService.enrollment.findFirst({
+      where: {
+        courseId,
+        studentId: id,
+        status: 'ACTIVE',
+        course: { status: { not: 'DRAFT' } },
+      },
+      select: { id: true },
+    });
+    if (!enrolled) {
+      throw new NotFoundException({
+        code: ErrorCode.NOT_FOUND,
+        message: 'Course not found',
+      });
+    }
+
+    const now = new Date();
+    const [lessons, assignments] = await Promise.all([
+      this.prismaService.lesson.findMany({
+        where: {
+          publishedAt: { lte: now },
+          module: { courseId, isHidden: false, publishedAt: { lte: now } },
+        },
+        select: {
+          id: true,
+          type: true,
+          videoAsset: { select: { durationSec: true } },
+          progress: {
+            where: { studentId: id },
+            select: { status: true, maxPositionSec: true },
+          },
+        },
+      }),
+      this.prismaService.assignment.findMany({
+        where: { courseId, publishedAt: { lte: now } },
+        select: {
+          id: true,
+          gradesPublishedAt: true,
+          submissions: {
+            where: { studentId: id },
+            select: {
+              status: true,
+              score: true,
+              attempts: {
+                orderBy: { number: 'desc' },
+                take: 1,
+                select: { isLate: true },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const lessonStates = lessons.map((l) => {
+      const row = l.progress[0];
+      const duration = l.videoAsset?.durationSec ?? null;
+      return {
+        lessonId: l.id,
+        status: row?.status ?? ProgressStatus.NOT_STARTED,
+        percent:
+          l.type === 'VIDEO' && duration
+            ? Math.min(
+                100,
+                Math.round(((row?.maxPositionSec ?? 0) / duration) * 100),
+              )
+            : null,
+      };
+    });
+    const completed = lessonStates.filter(
+      (l) => l.status === 'COMPLETED',
+    ).length;
+
+    return {
+      courseId,
+      progress: lessons.length
+        ? Math.round((completed / lessons.length) * 100)
+        : null,
+      lessons: lessonStates,
+      // The same rule as every submission the API returns (SubmissionService.toSubmission)
+      assignments: assignments.map((a) => {
+        const sub = a.submissions[0];
+        const hidden = hidesGrades(user, a.gradesPublishedAt);
+        return {
+          assignmentId: a.id,
+          status: sub
+            ? visibleSubmissionStatus(sub.status, sub.attempts[0], hidden)
+            : null,
+          score:
+            hidden || !sub || sub.score === null ? null : Number(sub.score),
+        };
+      }),
+    };
   }
 
   private async get(

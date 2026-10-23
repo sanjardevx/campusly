@@ -9,7 +9,7 @@ import { ProgressBar, STITCH, SectionTitle, SoftPill, enter, liftSx } from './pa
 type Course = StudentOverviewQuery['studentOverview']['courses'][number];
 
 /** Stitch "My Courses": subject, owner teacher, "N new" and the curriculum progress bar */
-export function CourseCards({ courses, periodName, index }: { courses: Course[]; periodName: string | null; index: number }) {
+export function CourseCards({ courses, periodName, index, onListPage }: { courses: Course[]; periodName: string | null; index: number; onListPage?: boolean }) {
   const { t } = useTranslation('student');
   const count = courses.length;
 
@@ -20,6 +20,7 @@ export function CourseCards({ courses, periodName, index }: { courses: Course[];
           title={t('home.courses.title')}
           subtitle={periodName ? t('home.courses.subtitle', { period: periodName, count }) : t('home.courses.count', { count })}
         />
+        {!onListPage && (
         <Link
           component={NextLink}
           href="/student/courses"
@@ -29,6 +30,7 @@ export function CourseCards({ courses, periodName, index }: { courses: Course[];
           {t('home.courses.all')}
           <ArrowForwardRoundedIcon sx={{ fontSize: 16 }} />
         </Link>
+        )}
       </Stack>
 
       {count === 0 ? (

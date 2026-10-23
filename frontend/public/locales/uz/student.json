@@ -91,5 +91,62 @@
       "wasDue": "Muddat edi: {{date}}",
       "submit": "Topshirish"
     }
+  },
+  "course": {
+    "back": "Kurslarim",
+    "week": "{{week}}-hafta",
+    "instructor": "O‘qituvchi",
+    "progress": "Kurs bo‘yicha o‘zlashtirish",
+    "complete": "{{percent}}% bajarildi",
+    "noLessons": "Hali dars yo‘q",
+    "tabs": {
+      "lessons": "Darslar",
+      "assignments": "Topshiriqlar"
+    },
+    "announcements": "E’lonlar",
+    "current": "Joriy hafta",
+    "earlier": "O‘tgan haftalar",
+    "done": "{{done}}/{{total}} bajarildi",
+    "empty": "O‘qituvchi hali birorta haftani ochmagan.",
+    "weekEmpty": "Bu haftada hali hech narsa yo‘q.",
+    "noAssignments": "Hali topshiriq yo‘q.",
+    "minutes_one": "{{count}} daq",
+    "minutes_other": "{{count}} daq",
+    "dueAt": "Muddat: {{date}}",
+    "noDue": "Muddatsiz",
+    "kind": {
+      "VIDEO": "Video",
+      "READING": "O‘qish",
+      "FILE": "Fayl",
+      "LINK": "Havola",
+      "HOMEWORK": "Uy vazifasi",
+      "QUIZ": "Test",
+      "EXAM": "Imtihon"
+    },
+    "lesson": {
+      "COMPLETED": "Tugatilgan",
+      "IN_PROGRESS": "Davom etmoqda",
+      "NOT_STARTED": "Boshlanmagan",
+      "watched": "{{percent}}% ko‘rildi"
+    },
+    "work": {
+      "none": "Topshirilmagan",
+      "SUBMITTED": "Topshirildi",
+      "LATE": "Kech topshirildi",
+      "RETURNED": "Qayta ishlashga qaytarildi",
+      "GRADED": "Baholandi",
+      "MISSING": "Topshirilmagan (0)",
+      "DRAFT": "Topshirilmagan",
+      "exam": "Imtihon kuni"
+    },
+    "action": {
+      "watch": "Ko‘rish",
+      "resume": "Davom etish",
+      "open": "Ochish",
+      "submit": "Topshirish",
+      "startQuiz": "Testni boshlash",
+      "view": "Ko‘rish"
+    },
+    "notFound": "Bu kurs mavjud emas."
   }
 }

@@ -160,6 +160,7 @@ describe('Every GraphQL operation has a deliberate role rule', () => {
             'courseFileUrl',
             'studentOverview',
             'studentCalendar',
+            'courseProgress',
           ].includes(n),
       );
     // addSubmissionComment lets parents in only to answer FORBIDDEN for their own child

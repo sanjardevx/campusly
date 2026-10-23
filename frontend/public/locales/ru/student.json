@@ -105,5 +105,64 @@
       "wasDue": "Срок был {{date}}",
       "submit": "Сдать"
     }
+  },
+  "course": {
+    "back": "Мои курсы",
+    "week": "Неделя {{week}}",
+    "instructor": "Преподаватель",
+    "progress": "Прогресс по курсу",
+    "complete": "Пройдено {{percent}}%",
+    "noLessons": "Уроков пока нет",
+    "tabs": {
+      "lessons": "Уроки",
+      "assignments": "Задания"
+    },
+    "announcements": "Объявления",
+    "current": "Текущая неделя",
+    "earlier": "Прошлые недели",
+    "done": "Выполнено {{done}}/{{total}}",
+    "empty": "Учитель ещё не открыл ни одной недели.",
+    "weekEmpty": "На этой неделе пока ничего нет.",
+    "noAssignments": "Заданий пока нет.",
+    "minutes_one": "{{count}} мин",
+    "minutes_few": "{{count}} мин",
+    "minutes_many": "{{count}} мин",
+    "minutes_other": "{{count}} мин",
+    "dueAt": "Срок: {{date}}",
+    "noDue": "Без срока",
+    "kind": {
+      "VIDEO": "Видео",
+      "READING": "Чтение",
+      "FILE": "Файл",
+      "LINK": "Ссылка",
+      "HOMEWORK": "Домашнее задание",
+      "QUIZ": "Тест",
+      "EXAM": "Экзамен"
+    },
+    "lesson": {
+      "COMPLETED": "Пройдено",
+      "IN_PROGRESS": "В процессе",
+      "NOT_STARTED": "Не начато",
+      "watched": "Просмотрено {{percent}}%"
+    },
+    "work": {
+      "none": "Не сдано",
+      "SUBMITTED": "Сдано",
+      "LATE": "Сдано с опозданием",
+      "RETURNED": "Возвращено на доработку",
+      "GRADED": "Оценено",
+      "MISSING": "Не сдано (0)",
+      "DRAFT": "Не сдано",
+      "exam": "День экзамена"
+    },
+    "action": {
+      "watch": "Смотреть",
+      "resume": "Продолжить",
+      "open": "Открыть",
+      "submit": "Сдать",
+      "startQuiz": "Начать тест",
+      "view": "Открыть"
+    },
+    "notFound": "Этот курс недоступен."
   }
 }

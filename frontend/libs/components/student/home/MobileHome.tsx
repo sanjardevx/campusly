@@ -15,7 +15,7 @@ type Overview = StudentOverviewQuery['studentOverview'];
 const MAX_ROWS = 3;
 
 /** Section heading: title left, a muted note or link right (Stitch "My courses · Quarter 1 · 2026–27") */
-function Heading({ title, aside }: { title: string; aside?: ReactNode }) {
+export function Heading({ title, aside }: { title: string; aside?: ReactNode }) {
   return (
     <Stack direction="row" sx={{ alignItems: 'baseline', justifyContent: 'space-between', gap: 1, px: 0.5, mb: 1.25 }}>
       <Typography component="h2" sx={{ fontSize: '1.0625rem', fontWeight: 600, letterSpacing: '-0.01em' }}>
@@ -27,7 +27,7 @@ function Heading({ title, aside }: { title: string; aside?: ReactNode }) {
 }
 
 /** One tappable white row: icon tile, title, a muted line, an optional pill (the whole row is the link) */
-function TapRow({ href, icon, title, detail, pill, index }: { href: string; icon: ReactNode; title: string; detail: string; pill?: ReactNode; index: number }) {
+export function TapRow({ href, icon, title, detail, pill, index }: { href: string; icon: ReactNode; title: string; detail: string; pill?: ReactNode; index: number }) {
   return (
     <ButtonBase
       component={NextLink}

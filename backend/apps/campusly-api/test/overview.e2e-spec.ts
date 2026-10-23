@@ -532,6 +532,120 @@ describe('studentOverview and myChildren (e2e)', () => {
     );
   });
 
+  // ───────────── courseProgress: the course page's per-row state ─────────────
+  const PROGRESS = `query($c: String!, $s: String) { courseProgress(courseId: $c, studentId: $s) {
+    progress
+    lessons { lessonId status percent }
+    assignments { assignmentId status score }
+  } }`;
+  type CourseState = {
+    progress: number | null;
+    lessons: { lessonId: string; status: string; percent: number | null }[];
+    assignments: {
+      assignmentId: string;
+      status: string | null;
+      score: number | null;
+    }[];
+  };
+  const progressOf = async (as: Key, courseId: string, studentId?: string) =>
+    gql<{ courseProgress: CourseState }>(
+      PROGRESS,
+      { c: courseId, s: studentId },
+      as,
+    );
+
+  it('courseProgress: visible lessons with status and %, assignments with the published score only', async () => {
+    const titles = new Map(
+      [
+        ...(await prisma.lesson.findMany({
+          where: { module: { courseId: course.A } },
+        })),
+        ...(await prisma.assignment.findMany({
+          where: { courseId: course.A },
+        })),
+      ].map((r) => [r.id, r.title]),
+    );
+    const p = (await progressOf('sA', course.A)).data!.courseProgress;
+    expect(p.progress).toBe(33);
+    // The hidden week's lesson and the draft lesson are not there
+    expect(
+      Object.fromEntries(
+        p.lessons.map((l) => [titles.get(l.lessonId), [l.status, l.percent]]),
+      ),
+    ).toEqual({
+      'Done lesson': ['COMPLETED', null],
+      'Half watched': ['IN_PROGRESS', 45],
+      'New today': ['NOT_STARTED', null],
+    });
+    const byTitle: Record<string, [string | null, number | null]> =
+      Object.fromEntries(
+        p.assignments.map((a) => [
+          titles.get(a.assignmentId) ?? a.assignmentId,
+          [a.status, a.score],
+        ]),
+      );
+    expect(byTitle['Graded yesterday']).toEqual(['GRADED', 8]);
+    // Graded but not published: no score and no "GRADED" hint
+    expect(byTitle['Graded, not published']).toEqual(['DRAFT', null]);
+    expect(byTitle['Due in 3 days']).toEqual(['SUBMITTED', null]);
+    expect(byTitle['Due tomorrow']).toEqual([null, null]);
+    expect(byTitle).not.toHaveProperty('Draft due tomorrow');
+  });
+
+  it('courseProgress: a classmate sees only their own state', async () => {
+    const p = (await progressOf('sA2', course.A)).data!.courseProgress;
+    expect(p.progress).toBe(0);
+    expect(p.lessons.every((l) => l.status === 'NOT_STARTED')).toBe(true);
+    expect(p.assignments.every((a) => a.status === null)).toBe(true);
+  });
+
+  const progressTable: [
+    string,
+    Key,
+    () => string,
+    () => string | undefined,
+    string,
+  ][] = [
+    ['parent: own child', 'pA', () => course.A, () => id.sA, 'OK'],
+    [
+      'parent: a course the chosen child is not in',
+      'pA',
+      () => course.A,
+      () => id.sB,
+      'NOT_FOUND',
+    ],
+    [
+      'parent: someone else’s child',
+      'pA',
+      () => course.A,
+      () => id.sA2,
+      'NOT_FOUND',
+    ],
+    [
+      'student: a course they are not in',
+      'sB',
+      () => course.A,
+      () => undefined,
+      'NOT_FOUND',
+    ],
+    [
+      'student: a draft course',
+      'sA',
+      () => course.D,
+      () => undefined,
+      'NOT_FOUND',
+    ],
+    ['teacher: any', 'tA', () => course.A, () => id.sA, 'FORBIDDEN'],
+    ['admin: a chosen student', 'admin', () => course.A, () => id.sA, 'OK'],
+  ];
+  it.each(progressTable)(
+    'courseProgress %s → %s',
+    async (_name, as, courseId, studentId, expected) => {
+      const body = await progressOf(as, courseId(), studentId());
+      expect(code(body) ?? 'OK').toBe(expected);
+    },
+  );
+
   it('myChildren: the parent’s children for the switcher', async () => {
     const res = await gql<{
       myChildren: { firstName: string; className: string | null }[];

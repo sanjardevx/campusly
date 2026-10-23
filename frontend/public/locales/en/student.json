@@ -91,5 +91,62 @@
       "wasDue": "Was due {{date}}",
       "submit": "Submit"
     }
+  },
+  "course": {
+    "back": "My Courses",
+    "week": "Week {{week}}",
+    "instructor": "Instructor",
+    "progress": "Course progress",
+    "complete": "{{percent}}% complete",
+    "noLessons": "No lessons yet",
+    "tabs": {
+      "lessons": "Lessons",
+      "assignments": "Assignments"
+    },
+    "announcements": "Announcements",
+    "current": "Current week",
+    "earlier": "Earlier weeks",
+    "done": "{{done}}/{{total}} done",
+    "empty": "Your teacher has not opened any weeks yet.",
+    "weekEmpty": "Nothing in this week yet.",
+    "noAssignments": "No assignments yet.",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "dueAt": "Due {{date}}",
+    "noDue": "No due date",
+    "kind": {
+      "VIDEO": "Video",
+      "READING": "Reading",
+      "FILE": "File",
+      "LINK": "Link",
+      "HOMEWORK": "Homework",
+      "QUIZ": "Quiz",
+      "EXAM": "Exam"
+    },
+    "lesson": {
+      "COMPLETED": "Completed",
+      "IN_PROGRESS": "In progress",
+      "NOT_STARTED": "Not started",
+      "watched": "{{percent}}% watched"
+    },
+    "work": {
+      "none": "Not submitted",
+      "SUBMITTED": "Submitted",
+      "LATE": "Submitted late",
+      "RETURNED": "Returned for redo",
+      "GRADED": "Graded",
+      "MISSING": "Missing",
+      "DRAFT": "Not submitted",
+      "exam": "Exam day"
+    },
+    "action": {
+      "watch": "Watch",
+      "resume": "Resume",
+      "open": "Open",
+      "submit": "Submit",
+      "startQuiz": "Start quiz",
+      "view": "View"
+    },
+    "notFound": "This course is not available."
   }
 }

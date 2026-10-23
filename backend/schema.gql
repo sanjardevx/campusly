@@ -96,6 +96,12 @@ type Assignment {
   type: AssignmentType!
 }
 
+type AssignmentState {
+  assignmentId: String!
+  score: Float
+  status: SubmissionStatus
+}
+
 enum AssignmentType {
   EXAM
   HOMEWORK
@@ -298,6 +304,13 @@ type CourseFile {
   name: String!
   size: Float!
   status: MediaStatus!
+}
+
+type CourseProgress {
+  assignments: [AssignmentState!]!
+  courseId: String!
+  lessons: [LessonState!]!
+  progress: Int
 }
 
 enum CourseStatus {
@@ -643,6 +656,12 @@ input LessonProgressInput {
   positionSec: Int!
 }
 
+type LessonState {
+  lessonId: String!
+  percent: Int
+  status: ProgressStatus!
+}
+
 enum LessonType {
   FILE
   LINK
@@ -922,6 +941,7 @@ type Query {
   courseFileUrl(assetId: String!): FileLink!
   courseGrades(courseId: String!, periodId: String!): [StudentGrade!]!
   coursePeriodGrades(courseId: String!, periodId: String!): [PeriodGradeRow!]!
+  courseProgress(courseId: String!, studentId: String): CourseProgress!
   courses(filter: CoursesFilter): [Course!]!
   currentAcademicYear: AcademicYear
   dashboardCalendar(month: String!): [CalendarEvent!]!

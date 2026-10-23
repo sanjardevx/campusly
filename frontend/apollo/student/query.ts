@@ -67,3 +67,63 @@ export const STUDENT_CALENDAR = graphql(`
     }
   }
 `);
+
+/** Course page: the weeks the teacher opened, their lessons, the course's published assignments */
+export const STUDENT_COURSE = graphql(`
+  query StudentCourse($courseId: String!) {
+    courseDetail(courseId: $courseId) {
+      id
+      title
+      subjectName
+      groupName
+      teachers {
+        role
+        firstName
+        lastName
+      }
+      modules {
+        id
+        title
+        order
+        startsAt
+        endsAt
+        lessons {
+          id
+          title
+          type
+          order
+          file {
+            id
+            name
+            mimeType
+            size
+            durationSec
+          }
+        }
+      }
+    }
+    courseAssignments(courseId: $courseId) {
+      id
+      moduleId
+      type
+      title
+      maxScore
+      dueAt
+      allowLate
+      gradesPublishedAt
+    }
+    courseProgress(courseId: $courseId) {
+      progress
+      lessons {
+        lessonId
+        status
+        percent
+      }
+      assignments {
+        assignmentId
+        status
+        score
+      }
+    }
+  }
+`);

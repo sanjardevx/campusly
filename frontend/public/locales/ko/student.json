@@ -84,5 +84,61 @@
       "wasDue": "마감일 {{date}}",
       "submit": "제출"
     }
+  },
+  "course": {
+    "back": "내 강좌",
+    "week": "{{week}}주차",
+    "instructor": "담당 교사",
+    "progress": "강좌 진도",
+    "complete": "{{percent}}% 완료",
+    "noLessons": "아직 수업이 없습니다",
+    "tabs": {
+      "lessons": "수업",
+      "assignments": "과제"
+    },
+    "announcements": "공지사항",
+    "current": "이번 주",
+    "earlier": "지난 주",
+    "done": "{{done}}/{{total}} 완료",
+    "empty": "선생님이 아직 주차를 열지 않았습니다.",
+    "weekEmpty": "이번 주에는 아직 내용이 없습니다.",
+    "noAssignments": "아직 과제가 없습니다.",
+    "minutes_other": "{{count}}분",
+    "dueAt": "마감 {{date}}",
+    "noDue": "마감 없음",
+    "kind": {
+      "VIDEO": "동영상",
+      "READING": "읽기",
+      "FILE": "파일",
+      "LINK": "링크",
+      "HOMEWORK": "숙제",
+      "QUIZ": "퀴즈",
+      "EXAM": "시험"
+    },
+    "lesson": {
+      "COMPLETED": "완료",
+      "IN_PROGRESS": "진행 중",
+      "NOT_STARTED": "시작 전",
+      "watched": "{{percent}}% 시청"
+    },
+    "work": {
+      "none": "미제출",
+      "SUBMITTED": "제출 완료",
+      "LATE": "지각 제출",
+      "RETURNED": "다시 제출 요청",
+      "GRADED": "채점 완료",
+      "MISSING": "미제출 (0점)",
+      "DRAFT": "미제출",
+      "exam": "시험일"
+    },
+    "action": {
+      "watch": "보기",
+      "resume": "이어 보기",
+      "open": "열기",
+      "submit": "제출",
+      "startQuiz": "퀴즈 시작",
+      "view": "보기"
+    },
+    "notFound": "이 강좌를 볼 수 없습니다."
   }
 }

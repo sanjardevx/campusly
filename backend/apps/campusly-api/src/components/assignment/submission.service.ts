@@ -12,6 +12,7 @@ import {
   AddSubmissionCommentInput,
   SubmitAssignmentInput,
 } from '../../libs/dto/assignment/submission.input';
+import { SubmissionStatus } from '../../libs/enums/assignment.enum';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { AccessPolicy } from '../auth/policies/access.policy';
@@ -54,6 +55,33 @@ export type SubmissionRow = Prisma.SubmissionGetPayload<{
 export interface AssignmentRules {
   maxAttempts: number;
   gradesPublishedAt: Date | null;
+}
+
+/** Students and parents see no score, feedback or teacher decision until grades are published */
+export function hidesGrades(
+  viewer: AuthUser,
+  gradesPublishedAt: Date | null,
+): boolean {
+  return (
+    (viewer.role === 'STUDENT' || viewer.role === 'PARENT') &&
+    !gradesPublishedAt
+  );
+}
+
+/**
+ * The status a viewer may see. Hidden: what the student did (submitted / late / nothing yet),
+ * not what the teacher decided (GRADED / MISSING would hint at the result).
+ */
+export function visibleSubmissionStatus(
+  status: SubmissionStatus,
+  lastAttempt: { isLate: boolean } | undefined,
+  hidden: boolean,
+): SubmissionStatus {
+  if (!hidden || (status !== 'GRADED' && status !== 'MISSING')) return status;
+  if (!lastAttempt) return SubmissionStatus.DRAFT;
+  return lastAttempt.isLate
+    ? SubmissionStatus.LATE
+    : SubmissionStatus.SUBMITTED;
 }
 
 /** Students submit (attempts, files, late), comments go both ways, parents only read */
@@ -260,16 +288,12 @@ export class SubmissionService {
     rules: AssignmentRules,
     viewer: AuthUser,
   ): Submission {
-    const hidden =
-      (viewer.role === 'STUDENT' || viewer.role === 'PARENT') &&
-      !rules.gradesPublishedAt;
-    // Hidden: what the student did (submitted / late / nothing yet), not what the teacher decided
-    const last = row.attempts.at(-1);
-    const shown = !last ? 'DRAFT' : last.isLate ? 'LATE' : 'SUBMITTED';
-    const status =
-      hidden && (row.status === 'GRADED' || row.status === 'MISSING')
-        ? shown
-        : row.status;
+    const hidden = hidesGrades(viewer, rules.gradesPublishedAt);
+    const status = visibleSubmissionStatus(
+      row.status,
+      row.attempts.at(-1),
+      hidden,
+    );
 
     return {
       id: row.id,
