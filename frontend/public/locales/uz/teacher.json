@@ -463,5 +463,49 @@
       "itemCount_one": "{{count}} ta ish",
       "itemCount_other": "{{count}} ta ish"
     }
+  },
+  "attendance": {
+    "title": "{{course}} — Davomat",
+    "noCourses": "Sizda faol kurs yo‘q.",
+    "prevDay": "Oldingi kun",
+    "nextDay": "Keyingi kun",
+    "pickDate": "Sanani tanlash",
+    "taken": "Olingan",
+    "notTaken": "Hali olinmagan",
+    "allPresent": "Hammasini “Keldi” qilish",
+    "status": {
+      "PRESENT": "Keldi",
+      "ABSENT": "Kelmadi",
+      "LATE": "Kechikdi",
+      "EXCUSED": "Sababli"
+    },
+    "letter": {
+      "PRESENT": "K",
+      "ABSENT": "Y",
+      "LATE": "Ke",
+      "EXCUSED": "S"
+    },
+    "defaultInfo": "Hamma oldindan “Keldi” — faqat istisnolarni belgilang.",
+    "filter": {
+      "ALL": "Hammasi ({{count}})",
+      "EXCEPTIONS": "Istisnolar ({{count}})",
+      "ABSENT": "Kelmadi ({{count}})",
+      "LATE": "Kechikdi ({{count}})",
+      "EXCUSED": "Sababli ({{count}})"
+    },
+    "search": "Ism yoki ID bo‘yicha qidirish",
+    "note": "Izoh",
+    "notePlaceholder": "Izoh (ixtiyoriy)",
+    "noteFor": "{{name}} uchun izoh",
+    "statusOf": "{{name}} davomati",
+    "noStudents": "Bu kursda o‘quvchi yo‘q.",
+    "footer": "Barcha {{count}} ta o‘quvchi · ID bo‘yicha",
+    "legend": "{{letter}} = {{status}} ({{count}})",
+    "unsaved_one": "{{count}} ta o‘zgarish saqlanmagan",
+    "unsaved_other": "{{count}} ta o‘zgarish saqlanmagan",
+    "notSavedYet": "Bu kun hali saqlanmagan",
+    "discard": "Bekor qilish",
+    "save": "Davomatni saqlash",
+    "saved": "Davomat saqlandi."
   }
 }

@@ -493,5 +493,51 @@
       "itemCount_many": "{{count}} работ",
       "itemCount_other": "{{count}} работы"
     }
+  },
+  "attendance": {
+    "title": "{{course}} — Посещаемость",
+    "noCourses": "У вас нет активных курсов.",
+    "prevDay": "Предыдущий день",
+    "nextDay": "Следующий день",
+    "pickDate": "Выбрать дату",
+    "taken": "Отмечено",
+    "notTaken": "Ещё не отмечено",
+    "allPresent": "Отметить всех присутствующими",
+    "status": {
+      "PRESENT": "Присутствует",
+      "ABSENT": "Отсутствует",
+      "LATE": "Опоздал",
+      "EXCUSED": "Уважительная"
+    },
+    "letter": {
+      "PRESENT": "П",
+      "ABSENT": "Н",
+      "LATE": "О",
+      "EXCUSED": "У"
+    },
+    "defaultInfo": "По умолчанию все присутствуют — отметьте только исключения.",
+    "filter": {
+      "ALL": "Все ({{count}})",
+      "EXCEPTIONS": "Исключения ({{count}})",
+      "ABSENT": "Отсутствуют ({{count}})",
+      "LATE": "Опоздали ({{count}})",
+      "EXCUSED": "Уважительные ({{count}})"
+    },
+    "search": "Поиск по имени или ID",
+    "note": "Заметка",
+    "notePlaceholder": "Заметка (необязательно)",
+    "noteFor": "Заметка: {{name}}",
+    "statusOf": "Посещаемость: {{name}}",
+    "noStudents": "В этом курсе нет учеников.",
+    "footer": "Все ученики ({{count}}) · по ID",
+    "legend": "{{letter}} = {{status}} ({{count}})",
+    "unsaved_one": "{{count}} изменение не сохранено",
+    "unsaved_few": "{{count}} изменения не сохранены",
+    "unsaved_many": "{{count}} изменений не сохранено",
+    "unsaved_other": "{{count}} изменения не сохранены",
+    "notSavedYet": "Этот день ещё не сохранён",
+    "discard": "Отменить",
+    "save": "Сохранить посещаемость",
+    "saved": "Посещаемость сохранена."
   }
 }

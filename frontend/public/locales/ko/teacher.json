@@ -448,5 +448,48 @@
       "namesBad": "모든 카테고리에 이름이 있어야 하며 이름은 서로 달라야 합니다.",
       "itemCount_other": "{{count}}개"
     }
+  },
+  "attendance": {
+    "title": "{{course}} — 출석",
+    "noCourses": "진행 중인 강좌가 없습니다.",
+    "prevDay": "이전 날",
+    "nextDay": "다음 날",
+    "pickDate": "날짜 선택",
+    "taken": "체크 완료",
+    "notTaken": "아직 체크하지 않음",
+    "allPresent": "모두 출석 처리",
+    "status": {
+      "PRESENT": "출석",
+      "ABSENT": "결석",
+      "LATE": "지각",
+      "EXCUSED": "공결"
+    },
+    "letter": {
+      "PRESENT": "출",
+      "ABSENT": "결",
+      "LATE": "지",
+      "EXCUSED": "공"
+    },
+    "defaultInfo": "기본값은 모두 출석입니다 — 예외만 표시하세요.",
+    "filter": {
+      "ALL": "전체 ({{count}})",
+      "EXCEPTIONS": "예외 ({{count}})",
+      "ABSENT": "결석 ({{count}})",
+      "LATE": "지각 ({{count}})",
+      "EXCUSED": "공결 ({{count}})"
+    },
+    "search": "이름 또는 ID로 검색",
+    "note": "메모",
+    "notePlaceholder": "메모 (선택)",
+    "noteFor": "{{name}} 메모",
+    "statusOf": "{{name}} 출석",
+    "noStudents": "이 강좌에 학생이 없습니다.",
+    "footer": "수강생 전체 {{count}}명 · 학생 ID순",
+    "legend": "{{letter}} = {{status}} ({{count}})",
+    "unsaved_other": "저장하지 않은 변경 {{count}}개",
+    "notSavedYet": "이 날은 아직 저장되지 않았습니다",
+    "discard": "취소",
+    "save": "출석 저장",
+    "saved": "출석을 저장했습니다."
   }
 }

@@ -208,3 +208,21 @@ export const PUBLISH_PERIOD_GRADES = graphql(`
     }
   }
 `);
+
+// ───────────────────────── attendance ─────────────────────────
+
+/** The whole day in one request: only exceptions are sent, the server makes the rest PRESENT */
+export const MARK_ATTENDANCE = graphql(`
+  mutation MarkAttendance($input: MarkAttendanceInput!) {
+    markAttendance(input: $input) {
+      courseId
+      date
+      isMarked
+      rows {
+        studentId
+        status
+        note
+      }
+    }
+  }
+`);

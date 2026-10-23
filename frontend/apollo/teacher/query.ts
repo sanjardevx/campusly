@@ -324,3 +324,22 @@ export const COURSE_ANNUAL_GRADES = graphql(`
     }
   }
 `);
+
+/** One course, one day: every active student; not taken yet → everyone PRESENT, isMarked false */
+export const TEACHER_ATTENDANCE = graphql(`
+  query TeacherAttendance($courseId: String!, $date: String!) {
+    courseAttendance(courseId: $courseId, date: $date) {
+      courseId
+      date
+      isMarked
+      rows {
+        studentId
+        loginId
+        firstName
+        lastName
+        status
+        note
+      }
+    }
+  }
+`);

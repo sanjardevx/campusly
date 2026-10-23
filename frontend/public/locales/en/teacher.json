@@ -463,5 +463,49 @@
       "itemCount_one": "{{count}} item",
       "itemCount_other": "{{count}} items"
     }
+  },
+  "attendance": {
+    "title": "{{course}} — Attendance",
+    "noCourses": "You have no active courses.",
+    "prevDay": "Previous day",
+    "nextDay": "Next day",
+    "pickDate": "Pick a date",
+    "taken": "Taken",
+    "notTaken": "Not taken yet",
+    "allPresent": "Mark all present",
+    "status": {
+      "PRESENT": "Present",
+      "ABSENT": "Absent",
+      "LATE": "Late",
+      "EXCUSED": "Excused"
+    },
+    "letter": {
+      "PRESENT": "P",
+      "ABSENT": "A",
+      "LATE": "L",
+      "EXCUSED": "E"
+    },
+    "defaultInfo": "Everyone is Present by default — mark only the exceptions.",
+    "filter": {
+      "ALL": "All ({{count}})",
+      "EXCEPTIONS": "Exceptions ({{count}})",
+      "ABSENT": "Absent ({{count}})",
+      "LATE": "Late ({{count}})",
+      "EXCUSED": "Excused ({{count}})"
+    },
+    "search": "Search by name or ID",
+    "note": "Note",
+    "notePlaceholder": "Optional note",
+    "noteFor": "Note for {{name}}",
+    "statusOf": "Attendance of {{name}}",
+    "noStudents": "No students in this course.",
+    "footer": "Showing all {{count}} enrolled students · sorted by student ID",
+    "legend": "{{letter}} = {{status}} ({{count}})",
+    "unsaved_one": "{{count}} change not saved",
+    "unsaved_other": "{{count}} changes not saved",
+    "notSavedYet": "This day is not saved yet",
+    "discard": "Discard",
+    "save": "Save attendance",
+    "saved": "Attendance saved."
   }
 }
