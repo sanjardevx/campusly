@@ -1,9 +1,10 @@
 import { useQuery } from '@apollo/client/react';
-import { Box, CircularProgress, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useTranslation } from 'next-i18next/pages';
 import { STUDENT_OVERVIEW } from '@/apollo/student/query';
 import { layoutFor } from '@/libs/components/layout';
 import { CourseCards } from '@/libs/components/student/home/CourseCards';
+import { MobileHome } from '@/libs/components/student/home/MobileHome';
 import { STITCH } from '@/libs/components/student/home/parts';
 import { StudentCalendar, ToDoCard } from '@/libs/components/student/home/SideCards';
 import { ThisWeek } from '@/libs/components/student/home/ThisWeek';
@@ -17,12 +18,16 @@ const partOfDay = (hour: number) => (hour < 12 ? 'morning' : hour < 18 ? 'aftern
 
 /**
  * Student home: Stitch "Student Dashboard (Compact eCampus)" in the main column (8/12) and a side
- * column like the admin dashboard: To Do and the month calendar (DECISIONS §10).
+ * column like the admin dashboard: To Do and the month calendar. A phone gets the simple
+ * MobileHome list instead (DECISIONS §10).
  */
 const Home: NextPageWithLayout = () => {
   const { t } = useTranslation('student');
   const { data } = useQuery(STUDENT_OVERVIEW, { fetchPolicy: 'cache-and-network' });
   const overview = data?.studentOverview;
+  // Same breakpoint as the phone shell (spruce header + tab bar)
+  const theme = useTheme();
+  const desktop = useMediaQuery(theme.breakpoints.up('md'));
 
   if (!overview) {
     return (
@@ -31,6 +36,8 @@ const Home: NextPageWithLayout = () => {
       </Box>
     );
   }
+
+  if (!desktop) return <MobileHome overview={overview} />;
 
   const { period } = overview;
   const due = overview.upcoming.filter((u) => !u.isDone).length;

@@ -22,8 +22,8 @@ type Work = Overview['upcoming'][number];
 /** Stitch shows a short list; the rest is one click away in the courses */
 const MAX_ROWS = 5;
 
-const LESSON_ICON = { VIDEO: PlayCircleOutlineIcon, READING: ArticleOutlinedIcon, FILE: DescriptionOutlinedIcon, LINK: LinkOutlinedIcon };
-const WORK_ICON = { HOMEWORK: AssignmentOutlinedIcon, QUIZ: TimerOutlinedIcon, EXAM: EventNoteOutlinedIcon };
+export const LESSON_ICON = { VIDEO: PlayCircleOutlineIcon, READING: ArticleOutlinedIcon, FILE: DescriptionOutlinedIcon, LINK: LinkOutlinedIcon };
+export const WORK_ICON = { HOMEWORK: AssignmentOutlinedIcon, QUIZ: TimerOutlinedIcon, EXAM: EventNoteOutlinedIcon };
 
 /** One Stitch row: icon tile, title + pill, a muted line, the action on the right */
 function Row({ icon, accent, title, pill, detail, action, index }: { icon: ReactNode; accent?: boolean; title: string; pill?: ReactNode; detail: string; action: ReactNode; index: number }) {
