@@ -11,7 +11,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { useTranslation } from 'next-i18next/pages';
 import type { AdminDashboardQuery } from '@/libs/gql/graphql';
 import { viz } from '@/libs/viz';
-import { fadeUp, useCountUp } from './motion';
+import { fadeUp, useCountUp } from '@/libs/components/dashboard/motion';
 
 type Dashboard = AdminDashboardQuery['adminDashboard'];
 type Tile = keyof typeof viz.tile;

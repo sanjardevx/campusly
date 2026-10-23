@@ -8,7 +8,7 @@ import { ATTENDANCE_OVERVIEW } from '@/apollo/admin/query';
 import type { AttendanceRange } from '@/libs/gql/graphql';
 import { formatDate } from '@/libs/i18n/format';
 import { viz } from '@/libs/viz';
-import { EASE_OUT, fadeUp, useCountUp } from './motion';
+import { EASE_OUT, fadeUp, useCountUp } from '@/libs/components/dashboard/motion';
 
 const RANGES: AttendanceRange[] = ['TODAY', 'WEEK', 'MONTH'];
 const STATUSES = ['present', 'late', 'excused', 'absent'] as const;

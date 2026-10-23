@@ -1,0 +1,96 @@
+{
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning, {{name}}",
+      "afternoon": "Good afternoon, {{name}}",
+      "evening": "Good evening, {{name}}"
+    },
+    "weekday": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "periodWeek": "{{period}}, week {{week}}",
+    "students_one": "{{count}} student",
+    "students_other": "{{count}} students",
+    "weekdayShort": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "today": {
+      "title": "Attendance today",
+      "all": "All attendance",
+      "holiday": "Today is a holiday ({{name}}). Take attendance only if a class took place.",
+      "empty": "No active courses yet.",
+      "taken": "Taken · {{marked}}/{{students}}",
+      "notTaken": "Not taken",
+      "take": "Take attendance",
+      "view": "View"
+    },
+    "grading": {
+      "title": "Needs grading",
+      "total_one": "{{count}} submission to grade",
+      "total_other": "{{count}} submissions to grade",
+      "empty": "All caught up: nothing to grade.",
+      "toGrade_one": "{{count}} to grade",
+      "toGrade_other": "{{count}} to grade",
+      "submitted": "{{submitted}}/{{students}} submitted",
+      "graded": "{{graded}}/{{students}} graded",
+      "due": "due {{date}}",
+      "dueLate": "was due {{date}} · late work allowed",
+      "closed": "closed {{date}}",
+      "ready": "Scores ready · not published",
+      "grade": "Grade",
+      "publish": "Review & publish"
+    },
+    "courses": {
+      "title": "My courses",
+      "empty": "No courses this year yet.",
+      "status": {
+        "DRAFT": "Draft",
+        "ACTIVE": "Active",
+        "ARCHIVED": "Archived"
+      },
+      "week": "Week {{week}}",
+      "course": "Course",
+      "gradebook": "Gradebook",
+      "attendance": "Attendance"
+    },
+    "questions": {
+      "title": "Unanswered questions",
+      "soon": "Coming soon",
+      "body": "Students’ questions about lessons will appear here once course Q&A is switched on."
+    },
+    "deadlines": {
+      "title": "Upcoming deadlines",
+      "empty": "Nothing due in the next two weeks.",
+      "kind": {
+        "ASSIGNMENT": "Assignment",
+        "DEADLINE": "School deadline",
+        "START": "Start",
+        "EVENT": "School event",
+        "SCHOOL": "School calendar",
+        "TERM_START": "{{name}} starts",
+        "TERM_END": "{{name}} ends"
+      }
+    },
+    "announcements": {
+      "title": "Recent announcements",
+      "all": "All announcements",
+      "empty": "You have not posted any announcements yet.",
+      "read": "{{reads}} / {{audience}} read",
+      "readCount_one": "{{count}} read",
+      "readCount_other": "{{count}} read",
+      "school": "Whole school"
+    }
+  }
+}

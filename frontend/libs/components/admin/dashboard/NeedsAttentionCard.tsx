@@ -3,7 +3,7 @@ import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import type { AdminDashboardQuery, AttentionPriority } from '@/libs/gql/graphql';
 import { viz } from '@/libs/viz';
-import { fadeUp } from './motion';
+import { fadeUp } from '@/libs/components/dashboard/motion';
 
 type Attention = AdminDashboardQuery['adminDashboard']['needsAttention'];
 

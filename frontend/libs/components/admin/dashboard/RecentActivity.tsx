@@ -10,7 +10,7 @@ import { useTranslation } from 'next-i18next/pages';
 import type { AdminDashboardQuery } from '@/libs/gql/graphql';
 import { formatLastSeen } from '@/libs/i18n/format';
 import { viz } from '@/libs/viz';
-import { fadeUp } from './motion';
+import { fadeUp } from '@/libs/components/dashboard/motion';
 
 type Activity = AdminDashboardQuery['adminDashboard']['recentActivity'];
 

@@ -13,7 +13,7 @@ import { ConfirmDialog } from '@/libs/components/admin/ConfirmDialog';
 import type { DashboardCalendarQuery, SchoolEventKind } from '@/libs/gql/graphql';
 import { viz } from '@/libs/viz';
 import { EventDrawer } from './EventDrawer';
-import { fadeUp } from './motion';
+import { fadeUp } from '@/libs/components/dashboard/motion';
 
 export type CalendarEvent = DashboardCalendarQuery['dashboardCalendar'][number];
 

@@ -7,7 +7,7 @@ import PersonAddAltOutlinedIcon from '@mui/icons-material/PersonAddAltOutlined';
 import CoPresentOutlinedIcon from '@mui/icons-material/CoPresentOutlined';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { useTranslation } from 'next-i18next/pages';
-import { fadeUp } from './motion';
+import { fadeUp } from '@/libs/components/dashboard/motion';
 
 interface Action {
   key: string;

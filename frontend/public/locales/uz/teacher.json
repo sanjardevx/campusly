@@ -1,0 +1,96 @@
+{
+  "dashboard": {
+    "greeting": {
+      "morning": "Xayrli tong, {{name}}",
+      "afternoon": "Xayrli kun, {{name}}",
+      "evening": "Xayrli kech, {{name}}"
+    },
+    "weekday": {
+      "0": "Yakshanba",
+      "1": "Dushanba",
+      "2": "Seshanba",
+      "3": "Chorshanba",
+      "4": "Payshanba",
+      "5": "Juma",
+      "6": "Shanba"
+    },
+    "periodWeek": "{{period}}, {{week}}-hafta",
+    "students_one": "{{count}} o‘quvchi",
+    "students_other": "{{count}} o‘quvchi",
+    "weekdayShort": {
+      "0": "Yak",
+      "1": "Dush",
+      "2": "Sesh",
+      "3": "Chor",
+      "4": "Pay",
+      "5": "Jum",
+      "6": "Shan"
+    },
+    "today": {
+      "title": "Bugungi davomat",
+      "all": "Barcha davomat",
+      "holiday": "Bugun dam olish kuni ({{name}}). Davomatni faqat dars bo‘lgan bo‘lsa oling.",
+      "empty": "Hali faol kurslar yo‘q.",
+      "taken": "Olingan · {{marked}}/{{students}}",
+      "notTaken": "Olinmagan",
+      "take": "Davomat olish",
+      "view": "Ko‘rish"
+    },
+    "grading": {
+      "title": "Baholash kerak",
+      "total_one": "Baholanadigan {{count}} ta ish",
+      "total_other": "Baholanadigan {{count}} ta ish",
+      "empty": "Hammasi baholangan.",
+      "toGrade_one": "{{count}} ta baholanmagan",
+      "toGrade_other": "{{count}} ta baholanmagan",
+      "submitted": "{{submitted}}/{{students}} topshirgan",
+      "graded": "{{graded}}/{{students}} baholangan",
+      "due": "muddat {{date}}",
+      "dueLate": "muddat {{date}} edi · kechikib topshirish mumkin",
+      "closed": "{{date}} yopilgan",
+      "ready": "Baholar tayyor · e’lon qilinmagan",
+      "grade": "Baholash",
+      "publish": "Ko‘rib, e’lon qilish"
+    },
+    "courses": {
+      "title": "Mening kurslarim",
+      "empty": "Bu yil hali kurslar yo‘q.",
+      "status": {
+        "DRAFT": "Qoralama",
+        "ACTIVE": "Faol",
+        "ARCHIVED": "Arxivda"
+      },
+      "week": "{{week}}-hafta",
+      "course": "Kurs",
+      "gradebook": "Jurnal",
+      "attendance": "Davomat"
+    },
+    "questions": {
+      "title": "Javobsiz savollar",
+      "soon": "Tez orada",
+      "body": "Kurs savol-javobi yoqilgach, o‘quvchilarning darslar bo‘yicha savollari shu yerda chiqadi."
+    },
+    "deadlines": {
+      "title": "Yaqin muddatlar",
+      "empty": "Keyingi ikki haftada muddat yo‘q.",
+      "kind": {
+        "ASSIGNMENT": "Topshiriq",
+        "DEADLINE": "Maktab muddati",
+        "START": "Boshlanish",
+        "EVENT": "Maktab tadbiri",
+        "SCHOOL": "Maktab taqvimi",
+        "TERM_START": "{{name}} boshlanadi",
+        "TERM_END": "{{name}} tugaydi"
+      }
+    },
+    "announcements": {
+      "title": "So‘nggi e’lonlar",
+      "all": "Barcha e’lonlar",
+      "empty": "Siz hali e’lon yozmagansiz.",
+      "read": "{{reads}} / {{audience}} o‘qigan",
+      "readCount_one": "{{count}} kishi o‘qigan",
+      "readCount_other": "{{count}} kishi o‘qigan",
+      "school": "Butun maktab"
+    }
+  }
+}

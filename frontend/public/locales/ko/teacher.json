@@ -1,0 +1,92 @@
+{
+  "dashboard": {
+    "greeting": {
+      "morning": "좋은 아침입니다, {{name}}님",
+      "afternoon": "안녕하세요, {{name}}님",
+      "evening": "좋은 저녁입니다, {{name}}님"
+    },
+    "weekday": {
+      "0": "일요일",
+      "1": "월요일",
+      "2": "화요일",
+      "3": "수요일",
+      "4": "목요일",
+      "5": "금요일",
+      "6": "토요일"
+    },
+    "periodWeek": "{{period}}, {{week}}주차",
+    "students_other": "학생 {{count}}명",
+    "weekdayShort": {
+      "0": "일",
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토"
+    },
+    "today": {
+      "title": "오늘의 출석",
+      "all": "전체 출석",
+      "holiday": "오늘은 휴일입니다 ({{name}}). 수업이 있었던 경우에만 출석을 체크하세요.",
+      "empty": "아직 진행 중인 강좌가 없습니다.",
+      "taken": "체크 완료 · {{marked}}/{{students}}",
+      "notTaken": "미체크",
+      "take": "출석 체크",
+      "view": "보기"
+    },
+    "grading": {
+      "title": "채점 필요",
+      "total_other": "채점할 제출물 {{count}}개",
+      "empty": "모두 채점했습니다.",
+      "toGrade_other": "채점 대기 {{count}}개",
+      "submitted": "{{submitted}}/{{students}} 제출",
+      "graded": "{{graded}}/{{students}} 채점",
+      "due": "마감 {{date}}",
+      "dueLate": "마감 {{date}} 지남 · 지각 제출 가능",
+      "closed": "{{date}} 마감됨",
+      "ready": "점수 준비됨 · 미공개",
+      "grade": "채점",
+      "publish": "검토 후 공개"
+    },
+    "courses": {
+      "title": "내 강좌",
+      "empty": "올해 강좌가 아직 없습니다.",
+      "status": {
+        "DRAFT": "초안",
+        "ACTIVE": "진행 중",
+        "ARCHIVED": "보관됨"
+      },
+      "week": "{{week}}주차",
+      "course": "강좌",
+      "gradebook": "성적부",
+      "attendance": "출석"
+    },
+    "questions": {
+      "title": "답변 대기 질문",
+      "soon": "준비 중",
+      "body": "강좌 Q&A가 켜지면 수업에 대한 학생들의 질문이 여기에 표시됩니다."
+    },
+    "deadlines": {
+      "title": "다가오는 마감",
+      "empty": "앞으로 2주 동안 마감이 없습니다.",
+      "kind": {
+        "ASSIGNMENT": "과제",
+        "DEADLINE": "학교 마감",
+        "START": "시작",
+        "EVENT": "학교 행사",
+        "SCHOOL": "학사 일정",
+        "TERM_START": "{{name}} 시작",
+        "TERM_END": "{{name}} 종료"
+      }
+    },
+    "announcements": {
+      "title": "최근 공지",
+      "all": "전체 공지",
+      "empty": "아직 작성한 공지가 없습니다.",
+      "read": "{{reads}} / {{audience}} 읽음",
+      "readCount_other": "{{count}}명 읽음",
+      "school": "전체 학교"
+    }
+  }
+}
