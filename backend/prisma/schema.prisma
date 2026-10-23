@@ -500,8 +500,9 @@ model Module {
   publishedAt DateTime? @db.Timestamptz(3)
   createdAt   DateTime  @default(now()) @db.Timestamptz(3)
 
-  course  Course   @relation(fields: [courseId], references: [id])
-  lessons Lesson[]
+  course      Course       @relation(fields: [courseId], references: [id])
+  lessons     Lesson[]
+  assignments Assignment[]
 
   @@index([courseId, order])
   @@map("modules")
@@ -572,6 +573,7 @@ model MediaAsset {
   lessonVideos    Lesson[]         @relation("LessonVideo")
   lessonResources LessonResource[] @relation("ResourceFile")
   submissionFiles SubmissionFile[]
+  assignmentFiles AssignmentFile[]
 
   @@index([ownerId])
   @@index([status, createdAt])
@@ -643,7 +645,9 @@ model GradeCategory {
 model Assignment {
   id                String         @id @default(uuid(7)) @db.Uuid
   courseId          String         @db.Uuid
-  /// The lesson (week) it belongs to, if any
+  /// The week it sits in on the course page (null = not in a week)
+  moduleId          String?        @db.Uuid
+  /// The lesson it belongs to, if any
   lessonId          String?        @db.Uuid
   categoryId        String         @db.Uuid
   type              AssignmentType
@@ -667,16 +671,36 @@ model Assignment {
   createdAt         DateTime       @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime       @updatedAt @db.Timestamptz(3)
 
-  course      Course        @relation(fields: [courseId], references: [id])
-  lesson      Lesson?       @relation(fields: [lessonId], references: [id])
-  category    GradeCategory @relation(fields: [categoryId], references: [id])
-  createdBy   User          @relation("AssignmentsCreated", fields: [createdById], references: [id])
+  course      Course           @relation(fields: [courseId], references: [id])
+  module      Module?          @relation(fields: [moduleId], references: [id])
+  lesson      Lesson?          @relation(fields: [lessonId], references: [id])
+  category    GradeCategory    @relation(fields: [categoryId], references: [id])
+  createdBy   User             @relation("AssignmentsCreated", fields: [createdById], references: [id])
   submissions Submission[]
+  files       AssignmentFile[]
 
   @@index([courseId, dueAt])
+  @@index([moduleId])
   @@index([categoryId])
   @@index([lessonId])
   @@map("assignments")
+}
+
+/// A file the teacher attaches to an assignment (worksheet, problems). Removing it sets removedAt.
+model AssignmentFile {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  assignmentId String    @db.Uuid
+  assetId      String    @db.Uuid
+  order        Int
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+  removedAt    DateTime? @db.Timestamptz(3)
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id])
+  asset      MediaAsset @relation(fields: [assetId], references: [id])
+
+  @@index([assignmentId])
+  @@index([assetId])
+  @@map("assignment_files")
 }
 
 /// One per student per assignment; attempts are kept separately

@@ -7,6 +7,7 @@ import {
 import type { Prisma } from '../../../../../../generated/prisma/client';
 import { PrismaService } from '../../../database/prisma.service';
 import { ErrorCode } from '../../../libs/enums/common.enum';
+import { ASSIGNMENT_INCLUDE } from '../../assignment/assignment.include';
 import type { AuthUser } from '../../../libs/types/auth';
 
 /**
@@ -124,7 +125,7 @@ export class AccessPolicy {
     const assignment = await this.prismaService.assignment.findUnique({
       where: { id: assignmentId },
       include: {
-        category: { select: { name: true } },
+        ...ASSIGNMENT_INCLUDE,
         course: { select: { status: true } },
       },
     });

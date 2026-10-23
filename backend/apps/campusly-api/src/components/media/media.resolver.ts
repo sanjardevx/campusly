@@ -1,6 +1,7 @@
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
+  FileLink,
   LessonVideo,
   MediaAsset,
   UploadTicket,
@@ -46,6 +47,16 @@ export class MediaResolver {
     @Args('assetId', ParseUUIDPipe) assetId: string,
   ): Promise<MediaAsset> {
     return this.mediaService.confirmUpload(user, assetId);
+  }
+
+  /** A lesson file or assignment attachment: every role, AccessPolicy decides (others: NOT_FOUND) */
+  @Roles(Role.ADMIN, Role.TEACHER, Role.STUDENT, Role.PARENT)
+  @Query(() => FileLink)
+  public courseFileUrl(
+    @CurrentUser() user: AuthUser,
+    @Args('assetId', ParseUUIDPipe) assetId: string,
+  ): Promise<FileLink> {
+    return this.mediaService.getCourseFileUrl(user, assetId);
   }
 
   /** Every role: AccessPolicy decides (not related or not published → NOT_FOUND) */

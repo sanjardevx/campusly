@@ -77,6 +77,7 @@ type Assignment {
   categoryName: String!
   courseId: String!
   dueAt: DateTime
+  files: [CourseFile!]!
   finalAnswer: String
   gradesPublishedAt: DateTime
   id: String!
@@ -84,6 +85,7 @@ type Assignment {
   lessonId: String
   maxAttempts: Int!
   maxScore: Float!
+  moduleId: String
   publishedAt: DateTime
   title: String!
   tutorMode: TutorMode!
@@ -270,6 +272,16 @@ type CourseDetail {
   title: String!
 }
 
+type CourseFile {
+  durationSec: Int
+  id: String!
+  kind: MediaKind!
+  mimeType: String!
+  name: String!
+  size: Float!
+  status: MediaStatus!
+}
+
 enum CourseStatus {
   ACTIVE
   ARCHIVED
@@ -317,11 +329,13 @@ input CreateAssignmentInput {
   categoryId: String
   courseId: String!
   dueAt: DateTime
+  fileAssetIds: [String!]
   finalAnswer: String
   instructions: String
   lessonId: String
   maxAttempts: Int
   maxScore: Float!
+  moduleId: String
   title: String!
   tutorMode: TutorMode
   type: AssignmentType!
@@ -442,6 +456,11 @@ enum DeadlineKind {
 enum Direction {
   ASC
   DESC
+}
+
+type FileLink {
+  expiresAt: DateTime!
+  url: String!
 }
 
 type GradeCategory {
@@ -565,6 +584,7 @@ type Lesson {
   body: String
   completionType: CompletionType!
   dueAt: DateTime
+  file: CourseFile
   id: String!
   moduleId: String!
   order: Int!
@@ -714,6 +734,7 @@ type Mutation {
   setCourseStudents(input: SetCourseStudentsInput!): Course!
   setCourseTeachers(input: SetCourseTeachersInput!): Course!
   setCurrentAcademicYear(id: String!): AcademicYear!
+  setLessonFile(input: SetLessonFileInput!): Lesson!
   setLessonVideo(input: SetLessonVideoInput!): Lesson!
   setPeriodFinalScore(input: SetPeriodFinalScoreInput!): PeriodGradeRow!
   submitAssignment(input: SubmitAssignmentInput!): Submission!
@@ -859,6 +880,7 @@ type Query {
   courseAssignments(courseId: String!): [Assignment!]!
   courseAttendance(courseId: String!, date: String!): CourseAttendance!
   courseDetail(courseId: String!): CourseDetail!
+  courseFileUrl(assetId: String!): FileLink!
   courseGrades(courseId: String!, periodId: String!): [StudentGrade!]!
   coursePeriodGrades(courseId: String!, periodId: String!): [PeriodGradeRow!]!
   courses(filter: CoursesFilter): [Course!]!
@@ -978,6 +1000,11 @@ input SetCourseStudentsInput {
 input SetCourseTeachersInput {
   courseId: String!
   teacherIds: [String!]!
+}
+
+input SetLessonFileInput {
+  assetId: String
+  lessonId: String!
 }
 
 input SetLessonVideoInput {
@@ -1164,12 +1191,14 @@ input UpdateAssignmentInput {
   allowLate: Boolean
   categoryId: String
   dueAt: DateTime
+  fileAssetIds: [String!]
   finalAnswer: String
   id: String!
   instructions: String
   lessonId: String
   maxAttempts: Int
   maxScore: Float
+  moduleId: String
   title: String
   tutorMode: TutorMode
 }

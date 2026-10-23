@@ -5,6 +5,7 @@ import {
   CreateModuleInput,
   PublishInput,
   ReorderInput,
+  SetLessonFileInput,
   SetLessonVideoInput,
   UpdateLessonInput,
   UpdateModuleInput,
@@ -87,6 +88,14 @@ export class ContentResolver {
     @Args('input') input: SetLessonVideoInput,
   ): Promise<Lesson> {
     return this.contentService.setLessonVideo(user, input);
+  }
+
+  @Mutation(() => Lesson)
+  public setLessonFile(
+    @CurrentUser() user: AuthUser,
+    @Args('input') input: SetLessonFileInput,
+  ): Promise<Lesson> {
+    return this.contentService.setLessonFile(user, input);
   }
 
   /** parentId = moduleId */

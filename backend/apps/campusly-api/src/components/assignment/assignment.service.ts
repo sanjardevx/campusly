@@ -16,12 +16,11 @@ import { AssignmentType } from '../../libs/enums/assignment.enum';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { AccessPolicy } from '../auth/policies/access.policy';
+import { isCourseUpload, toCourseFile } from '../media/course-file';
+import { ASSIGNMENT_INCLUDE } from './assignment.include';
 
-const WITH_CATEGORY = {
-  category: { select: { name: true } },
-} satisfies Prisma.AssignmentInclude;
 type AssignmentRow = Prisma.AssignmentGetPayload<{
-  include: typeof WITH_CATEGORY;
+  include: typeof ASSIGNMENT_INCLUDE;
 }>;
 
 /** Assignments of a course: teachers create and publish, students and parents read */
@@ -45,12 +44,18 @@ export class AssignmentService {
     if (input.lessonId) {
       await this.assertLessonOfCourse(input.lessonId, input.courseId);
     }
+    if (input.moduleId) {
+      await this.assertModuleOfCourse(input.moduleId, input.courseId);
+    }
+    const fileIds = input.fileAssetIds ?? [];
+    await this.assertCourseFiles(fileIds, input.courseId);
     // An exam is offline: it is graded, never submitted
     const isExam = input.type === AssignmentType.EXAM;
 
     const row = await this.prismaService.assignment.create({
       data: {
         courseId: input.courseId,
+        moduleId: input.moduleId,
         lessonId: input.lessonId,
         categoryId,
         type: input.type,
@@ -66,8 +71,11 @@ export class AssignmentService {
         tutorMode: input.tutorMode,
         finalAnswer: input.finalAnswer,
         createdById: user.id,
+        files: {
+          create: fileIds.map((assetId, order) => ({ assetId, order })),
+        },
       },
-      include: WITH_CATEGORY,
+      include: ASSIGNMENT_INCLUDE,
     });
     return toAssignment(row, user);
   }
@@ -103,25 +111,37 @@ export class AssignmentService {
     if (input.lessonId) {
       await this.assertLessonOfCourse(input.lessonId, before.courseId);
     }
+    if (input.moduleId) {
+      await this.assertModuleOfCourse(input.moduleId, before.courseId);
+    }
+    if (input.fileAssetIds) {
+      await this.assertCourseFiles(input.fileAssetIds, before.courseId);
+    }
     const isExam = before.type === AssignmentType.EXAM;
 
-    const row = await this.prismaService.assignment.update({
-      where: { id: before.id },
-      data: {
-        title: input.title?.trim(),
-        categoryId,
-        lessonId: input.lessonId,
-        instructions: input.instructions,
-        maxScore: input.maxScore,
-        dueAt: input.dueAt,
-        allowLate: input.allowLate,
-        // An exam stays offline whatever is sent
-        maxAttempts: isExam ? undefined : input.maxAttempts,
-        acceptedFileTypes: isExam ? undefined : input.acceptedFileTypes,
-        tutorMode: input.tutorMode,
-        finalAnswer: input.finalAnswer,
-      },
-      include: WITH_CATEGORY,
+    const row = await this.prismaService.$transaction(async (tx) => {
+      if (input.fileAssetIds) {
+        await this.syncFiles(tx, before.id, input.fileAssetIds);
+      }
+      return tx.assignment.update({
+        where: { id: before.id },
+        data: {
+          title: input.title?.trim(),
+          categoryId,
+          moduleId: input.moduleId,
+          lessonId: input.lessonId,
+          instructions: input.instructions,
+          maxScore: input.maxScore,
+          dueAt: input.dueAt,
+          allowLate: input.allowLate,
+          // An exam stays offline whatever is sent
+          maxAttempts: isExam ? undefined : input.maxAttempts,
+          acceptedFileTypes: isExam ? undefined : input.acceptedFileTypes,
+          tutorMode: input.tutorMode,
+          finalAnswer: input.finalAnswer,
+        },
+        include: ASSIGNMENT_INCLUDE,
+      });
     });
     return toAssignment(row, user);
   }
@@ -151,7 +171,7 @@ export class AssignmentService {
       data: {
         publishedAt: input.publish ? (input.publishAt ?? new Date()) : null,
       },
-      include: WITH_CATEGORY,
+      include: ASSIGNMENT_INCLUDE,
     });
     return toAssignment(row, user);
   }
@@ -182,7 +202,7 @@ export class AssignmentService {
         { dueAt: { sort: 'asc', nulls: 'last' } },
         { createdAt: 'asc' },
       ],
-      include: WITH_CATEGORY,
+      include: ASSIGNMENT_INCLUDE,
     });
     return rows.map((row) => toAssignment(row, user));
   }
@@ -217,6 +237,68 @@ export class AssignmentService {
     throw badRequest('Choose a grade category for this assignment');
   }
 
+  private async assertModuleOfCourse(moduleId: string, courseId: string) {
+    const found = await this.prismaService.module.count({
+      where: { id: moduleId, courseId },
+    });
+    if (!found) throw notFound('Week not found in this course');
+  }
+
+  /** Every id: a READY document or image uploaded for this course (another course's file: 404) */
+  private async assertCourseFiles(assetIds: string[], courseId: string) {
+    if (!assetIds.length) return;
+    const assets = await this.prismaService.mediaAsset.findMany({
+      where: { id: { in: assetIds } },
+      select: { s3Key: true, kind: true, status: true },
+    });
+    const ofCourse = assets.filter((a) => isCourseUpload(a.s3Key, courseId));
+    if (ofCourse.length !== assetIds.length) throw notFound('File not found');
+    const usable = ofCourse.every(
+      (a) =>
+        (a.kind === 'DOCUMENT' || a.kind === 'IMAGE') && a.status === 'READY',
+    );
+    if (!usable) {
+      throw badRequest('A file is not ready (finish the upload first)');
+    }
+  }
+
+  /**
+   * The new list wins: files left out get removedAt (no hard delete), new ones are added, and every
+   * attached file takes its place in the list's order.
+   */
+  private async syncFiles(
+    tx: Prisma.TransactionClient,
+    assignmentId: string,
+    assetIds: string[],
+  ) {
+    const current = await tx.assignmentFile.findMany({
+      where: { assignmentId, removedAt: null },
+    });
+    const keep = new Set(assetIds);
+    await tx.assignmentFile.updateMany({
+      where: {
+        id: {
+          in: current.filter((f) => !keep.has(f.assetId)).map((f) => f.id),
+        },
+      },
+      data: { removedAt: new Date() },
+    });
+    const byAsset = new Map(current.map((f) => [f.assetId, f]));
+    for (const [order, assetId] of assetIds.entries()) {
+      const file = byAsset.get(assetId);
+      if (file) {
+        await tx.assignmentFile.update({
+          where: { id: file.id },
+          data: { order },
+        });
+      } else {
+        await tx.assignmentFile.create({
+          data: { assignmentId, assetId, order },
+        });
+      }
+    }
+  }
+
   private async assertLessonOfCourse(lessonId: string, courseId: string) {
     const found = await this.prismaService.lesson.count({
       where: { id: lessonId, module: { courseId } },
@@ -234,6 +316,7 @@ export function toAssignment(row: AssignmentRow, viewer: AuthUser): Assignment {
   return {
     id: row.id,
     courseId: row.courseId,
+    moduleId: row.moduleId,
     lessonId: row.lessonId,
     categoryId: row.categoryId,
     categoryName: row.category.name,
@@ -249,6 +332,7 @@ export function toAssignment(row: AssignmentRow, viewer: AuthUser): Assignment {
     finalAnswer: isLearner(viewer) ? null : row.finalAnswer,
     publishedAt: row.publishedAt,
     gradesPublishedAt: row.gradesPublishedAt,
+    files: row.files.map((f) => toCourseFile(f.asset)),
   };
 }
 

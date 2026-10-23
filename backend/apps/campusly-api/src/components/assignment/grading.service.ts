@@ -16,6 +16,7 @@ import { ErrorCode } from '../../libs/enums/common.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { AuditService } from '../audit/audit.service';
 import { AccessPolicy } from '../auth/policies/access.policy';
+import { ASSIGNMENT_INCLUDE } from './assignment.include';
 import { toAssignment } from './assignment.service';
 import { SUBMISSION_INCLUDE, SubmissionService } from './submission.service';
 
@@ -237,7 +238,7 @@ export class GradingService {
       const updated = await tx.assignment.update({
         where: { id: assignment.id },
         data: { gradesPublishedAt: input.publish ? new Date() : null },
-        include: { category: { select: { name: true } } },
+        include: ASSIGNMENT_INCLUDE,
       });
       await this.auditService.log(tx, {
         actor: user,

@@ -1,5 +1,6 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { AssignmentType, TutorMode } from '../../enums/assignment.enum';
+import { CourseFile } from '../media/media';
 
 @ObjectType()
 export class Assignment {
@@ -10,6 +11,10 @@ export class Assignment {
   courseId: string;
 
   /** The lesson (week) it belongs to, if any */
+  /** The week it sits in on the course page */
+  @Field(() => String, { nullable: true })
+  moduleId: string | null;
+
   @Field(() => String, { nullable: true })
   lessonId: string | null;
 
@@ -62,4 +67,8 @@ export class Assignment {
   /** null = students and parents do not see scores yet */
   @Field(() => Date, { nullable: true })
   gradesPublishedAt: Date | null;
+
+  /** The teacher's attachments, in order; the link comes from `courseFileUrl` */
+  @Field(() => [CourseFile])
+  files: CourseFile[];
 }

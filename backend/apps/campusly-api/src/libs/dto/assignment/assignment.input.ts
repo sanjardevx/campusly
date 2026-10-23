@@ -17,7 +17,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { SUBMISSION_FILE_TYPES } from '../../config';
+import { MAX_ASSIGNMENT_FILES, SUBMISSION_FILE_TYPES } from '../../config';
 import { AssignmentType, TutorMode } from '../../enums/assignment.enum';
 
 /** Fields a teacher may change after creation (the type and course are fixed) */
@@ -29,10 +29,27 @@ class AssignmentFields {
   @IsUUID()
   categoryId?: string;
 
+  /** The week on the course page (a module of the same course) */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  moduleId?: string;
+
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsUUID()
   lessonId?: string;
+
+  /**
+   * The teacher's attachments, in order: the whole list (a file left out is removed). Each one
+   * must be a READY document or image uploaded for this course.
+   */
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsUUID('all', { each: true })
+  @ArrayUnique()
+  @ArrayMaxSize(MAX_ASSIGNMENT_FILES)
+  fileAssetIds?: string[];
 
   @Field(() => String, { nullable: true })
   @IsOptional()

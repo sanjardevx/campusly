@@ -590,6 +590,8 @@ interface SeededCourse {
   categories: Record<'HOMEWORK' | 'QUIZ' | 'EXAM', string>;
   /** lesson ids per week (index 0 = week 1) */
   lessonsByWeek: string[][];
+  /** module (week) ids, index 0 = week 1 */
+  moduleIds: string[];
 }
 
 async function seedCourses(
@@ -640,6 +642,7 @@ async function seedCourses(
     }
 
     const lessonsByWeek: string[][] = [];
+    const moduleIds: string[] = [];
     for (const [w, startsAt] of WEEK_STARTS.entries()) {
       const topic = TOPICS[p.subject][w];
       // Weeks that have started (plus next week) are published; later ones are still drafts
@@ -679,6 +682,7 @@ async function seedCourses(
         include: { lessons: { orderBy: { order: 'asc' } } },
       });
       lessonsByWeek.push(module.lessons.map((l) => l.id));
+      moduleIds.push(module.id);
 
       // Progress only for lessons of weeks that are already over or running
       if (startsAt <= TODAY) {
@@ -713,6 +717,7 @@ async function seedCourses(
       studentIds,
       categories,
       lessonsByWeek,
+      moduleIds,
     });
   }
   return courses;
@@ -794,6 +799,8 @@ async function seedAssignments(
       const assignment = await prisma.assignment.create({
         data: {
           courseId: course.id,
+          // The week it sits in on the course page
+          moduleId: course.moduleIds[item.week - 1],
           lessonId: course.lessonsByWeek[item.week - 1][1],
           categoryId: course.categories[item.type],
           type: item.type,

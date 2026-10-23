@@ -196,3 +196,16 @@ export class SetLessonVideoInput {
   @IsUUID()
   assetId?: string | null;
 }
+
+/** A FILE lesson's document (null removes it). The file must have been uploaded for this course. */
+@InputType()
+export class SetLessonFileInput {
+  @Field(() => String)
+  @IsUUID()
+  lessonId: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  assetId?: string;
+}

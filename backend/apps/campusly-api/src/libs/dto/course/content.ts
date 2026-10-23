@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { CompletionType, LessonType } from '../../enums/course.enum';
+import { CourseFile } from '../media/media';
 
 /**
  * publishedAt: null = draft, in the past = visible to students, in the future = scheduled.
@@ -25,6 +26,10 @@ export class Lesson {
   /** A READY video (VIDEO lessons); the link comes from `lessonVideo` */
   @Field(() => String, { nullable: true })
   videoAssetId: string | null;
+
+  /** The lesson's video (VIDEO) or file (FILE): name, size, length; null = none yet */
+  @Field(() => CourseFile, { nullable: true })
+  file: CourseFile | null;
 
   @Field(() => Date, { nullable: true })
   dueAt: Date | null;

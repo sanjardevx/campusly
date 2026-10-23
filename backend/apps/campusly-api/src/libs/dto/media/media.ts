@@ -70,3 +70,41 @@ export class LessonVideo {
   @Field(() => Int, { nullable: true })
   maxSeekSec: number | null;
 }
+
+/** A file on the course page (a lesson video or file, an assignment attachment), without a link */
+@ObjectType()
+export class CourseFile {
+  /** The MediaAsset id: `courseFileUrl(assetId)` gives the link, `lessonVideo` plays a video */
+  @Field(() => String)
+  id: string;
+
+  @Field(() => MediaKind)
+  kind: MediaKind;
+
+  @Field(() => MediaStatus)
+  status: MediaStatus;
+
+  @Field(() => String)
+  name: string;
+
+  @Field(() => String)
+  mimeType: string;
+
+  /** Bytes */
+  @Field(() => Float)
+  size: number;
+
+  /** Videos: the length read by the teacher's browser */
+  @Field(() => Int, { nullable: true })
+  durationSec: number | null;
+}
+
+/** A short-lived download link, made for each request and never stored */
+@ObjectType()
+export class FileLink {
+  @Field(() => String)
+  url: string;
+
+  @Field(() => Date)
+  expiresAt: Date;
+}

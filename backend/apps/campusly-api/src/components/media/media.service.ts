@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import {
+  FILE_URL_TTL_SEC,
   MAX_PENDING_UPLOADS,
   MIME_EXTENSIONS,
   UPLOAD_RULES,
@@ -15,6 +16,7 @@ import {
   VIDEO_URL_TTL_SEC,
 } from '../../libs/config';
 import {
+  FileLink,
   LessonVideo,
   MediaAsset,
   UploadTicket,
@@ -196,6 +198,52 @@ export class MediaService {
       where: { id: asset.id },
     });
     return toMediaAsset(ready);
+  }
+
+  /**
+   * A 15-minute link for a course file (a FILE lesson's document or an assignment attachment).
+   * Who may open it follows what they may see: the lesson or the assignment it is attached to
+   * (AccessPolicy). The uploader may always open their own file (the drawer, before saving).
+   */
+  public async getCourseFileUrl(
+    user: AuthUser,
+    assetId: string,
+  ): Promise<FileLink> {
+    const asset = await this.prismaService.mediaAsset.findUnique({
+      where: { id: assetId },
+    });
+    if (!asset?.s3Key || asset.status !== 'READY' || asset.kind === 'VIDEO') {
+      throw notFound('File not found');
+    }
+
+    if (asset.ownerId !== user.id) {
+      const [resource, attachment] = await Promise.all([
+        this.prismaService.lessonResource.findFirst({
+          where: { assetId },
+          select: { lessonId: true },
+        }),
+        this.prismaService.assignmentFile.findFirst({
+          where: { assetId, removedAt: null },
+          select: { assignmentId: true },
+        }),
+      ]);
+      // Each check throws NOT_FOUND for users who may not see the lesson / assignment
+      if (resource) {
+        await this.accessPolicy.assertCanViewLesson(user, resource.lessonId);
+      } else if (attachment) {
+        await this.accessPolicy.assertCanViewAssignment(
+          user,
+          attachment.assignmentId,
+        );
+      } else {
+        throw notFound('File not found');
+      }
+    }
+
+    return {
+      url: this.storageService.signedUrl(asset.s3Key, FILE_URL_TTL_SEC),
+      expiresAt: new Date(Date.now() + FILE_URL_TTL_SEC * 1000),
+    };
   }
 
   /** A fresh 3-hour link for a lesson video, only for users who may see the lesson */

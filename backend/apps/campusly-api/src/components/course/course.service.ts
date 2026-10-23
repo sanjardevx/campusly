@@ -20,7 +20,7 @@ import { AuditService } from '../audit/audit.service';
 import { AccessPolicy } from '../auth/policies/access.policy';
 import { EnrollmentService } from '../group/enrollment.service';
 import { SchoolService } from '../school/school.service';
-import { toModule } from './content.service';
+import { LESSON_INCLUDE, toModule } from './content.service';
 
 const COURSE_INCLUDE = {
   group: { select: { name: true } },
@@ -141,6 +141,7 @@ export class CourseService {
             lessons: {
               where: learner ? { publishedAt: { lte: now } } : {},
               orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+              include: LESSON_INCLUDE,
             },
           },
         },

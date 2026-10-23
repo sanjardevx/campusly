@@ -11,6 +11,7 @@ import {
   CreateModuleInput,
   PublishInput,
   ReorderInput,
+  SetLessonFileInput,
   SetLessonVideoInput,
   UpdateLessonInput,
   UpdateModuleInput,
@@ -20,13 +21,32 @@ import { CompletionType, LessonType } from '../../libs/enums/course.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { fromDbDate, toDbDate } from '../../libs/utils/date';
 import { AccessPolicy } from '../auth/policies/access.policy';
+import {
+  COURSE_FILE_SELECT,
+  isCourseUpload,
+  toCourseFile,
+} from '../media/course-file';
 
-type ModuleRow = Prisma.ModuleGetPayload<{ include: { lessons: true } }>;
-type LessonRow = Prisma.LessonGetPayload<object>;
+/** A lesson with its video (VIDEO) or its first file (FILE), for the course page */
+export const LESSON_INCLUDE = {
+  videoAsset: { select: COURSE_FILE_SELECT },
+  resources: {
+    where: { assetId: { not: null } },
+    orderBy: { order: 'asc' },
+    take: 1,
+    include: { asset: { select: COURSE_FILE_SELECT } },
+  },
+} satisfies Prisma.LessonInclude;
 
-const LESSONS_IN_ORDER = {
-  lessons: { orderBy: [{ order: 'asc' }, { createdAt: 'asc' }] },
+export const LESSONS_IN_ORDER = {
+  lessons: {
+    orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+    include: LESSON_INCLUDE,
+  },
 } satisfies Prisma.ModuleInclude;
+
+type ModuleRow = Prisma.ModuleGetPayload<{ include: typeof LESSONS_IN_ORDER }>;
+type LessonRow = Prisma.LessonGetPayload<{ include: typeof LESSON_INCLUDE }>;
 
 /**
  * Weeks (modules) and lessons of a course. Every change goes through AccessPolicy.assertTeacherOf:
@@ -166,6 +186,7 @@ export class ContentService {
         tutorNotes: input.tutorNotes,
         order: (last._max.order ?? 0) + 1,
       },
+      include: LESSON_INCLUDE,
     });
     return toLesson(lesson);
   }
@@ -189,6 +210,7 @@ export class ContentService {
         completionType: input.completionType,
         tutorNotes: input.tutorNotes,
       },
+      include: LESSON_INCLUDE,
     });
     return toLesson(lesson);
   }
@@ -202,6 +224,7 @@ export class ContentService {
     const lesson = await this.prismaService.lesson.update({
       where: { id: input.id },
       data: { publishedAt: publishedAt(input) },
+      include: LESSON_INCLUDE,
     });
     return toLesson(lesson);
   }
@@ -225,7 +248,7 @@ export class ContentService {
       const asset = await this.prismaService.mediaAsset.findUnique({
         where: { id: input.assetId },
       });
-      const ofThisCourse = !!asset?.s3Key?.startsWith(`raw/${courseId}/`);
+      const ofThisCourse = !!asset && isCourseUpload(asset.s3Key, courseId);
       if (!asset || !ofThisCourse) throw notFound('Video not found');
       if (asset.kind !== 'VIDEO' || asset.status !== 'READY') {
         throw badRequest('The video is not ready (finish the upload first)');
@@ -235,6 +258,60 @@ export class ContentService {
     const updated = await this.prismaService.lesson.update({
       where: { id: lesson.id },
       data: { videoAssetId: input.assetId ?? null },
+      include: LESSON_INCLUDE,
+    });
+    return toLesson(updated);
+  }
+
+  /**
+   * A FILE lesson's document: its first LessonResource points to the asset (null clears it, the row
+   * stays). Same rule as the video: only a READY document or image uploaded for this course.
+   */
+  public async setLessonFile(
+    user: AuthUser,
+    input: SetLessonFileInput,
+  ): Promise<Lesson> {
+    const lesson = await this.findLesson(input.lessonId);
+    const { courseId } = lesson.module;
+    await this.assertCanEdit(user, courseId);
+    if (lesson.type !== LessonType.FILE) {
+      throw badRequest('Only a file lesson can have a file');
+    }
+
+    let title = lesson.title;
+    if (input.assetId) {
+      const asset = await this.prismaService.mediaAsset.findUnique({
+        where: { id: input.assetId },
+      });
+      if (!asset || !isCourseUpload(asset.s3Key, courseId)) {
+        throw notFound('File not found');
+      }
+      if (
+        (asset.kind !== 'DOCUMENT' && asset.kind !== 'IMAGE') ||
+        asset.status !== 'READY'
+      ) {
+        throw badRequest('The file is not ready (finish the upload first)');
+      }
+      title = asset.originalName;
+    }
+
+    const first = await this.prismaService.lessonResource.findFirst({
+      where: { lessonId: lesson.id },
+      orderBy: { order: 'asc' },
+    });
+    if (first) {
+      await this.prismaService.lessonResource.update({
+        where: { id: first.id },
+        data: { assetId: input.assetId ?? null, title },
+      });
+    } else if (input.assetId) {
+      await this.prismaService.lessonResource.create({
+        data: { lessonId: lesson.id, assetId: input.assetId, title, order: 0 },
+      });
+    }
+    const updated = await this.prismaService.lesson.findUniqueOrThrow({
+      where: { id: lesson.id },
+      include: LESSON_INCLUDE,
     });
     return toLesson(updated);
   }
@@ -336,6 +413,12 @@ export function toLesson(lesson: LessonRow): Lesson {
     type: lesson.type,
     body: lesson.body,
     videoAssetId: lesson.videoAssetId,
+    file:
+      lesson.type === LessonType.VIDEO
+        ? lesson.videoAsset && toCourseFile(lesson.videoAsset)
+        : lesson.resources[0]?.asset
+          ? toCourseFile(lesson.resources[0].asset)
+          : null,
     dueAt: lesson.dueAt,
     completionType: lesson.completionType,
     tutorNotes: lesson.tutorNotes,

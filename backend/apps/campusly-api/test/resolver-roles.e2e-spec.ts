@@ -153,7 +153,9 @@ describe('Every GraphQL operation has a deliberate role rule', () => {
       .map((o) => o.name)
       .filter(
         (n) =>
-          !n.startsWith('my') && n !== 'lessonVideo' && n !== 'studentOverview',
+          !n.startsWith('my') &&
+          // Read-only queries open to parents (AccessPolicy decides per record)
+          !['lessonVideo', 'courseFileUrl', 'studentOverview'].includes(n),
       );
     // addSubmissionComment lets parents in only to answer FORBIDDEN for their own child
     expect(parentMutations).toEqual(['addSubmissionComment']);
