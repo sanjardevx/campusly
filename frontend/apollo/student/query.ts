@@ -127,3 +127,71 @@ export const STUDENT_COURSE = graphql(`
     }
   }
 `);
+
+/** Lesson page: the course's lessons in order (prev / next, week), the student's progress */
+export const STUDENT_LESSON = graphql(`
+  query StudentLesson($courseId: String!) {
+    courseDetail(courseId: $courseId) {
+      id
+      title
+      subjectName
+      teachers {
+        role
+        firstName
+        lastName
+      }
+      modules {
+        id
+        title
+        order
+        startsAt
+        endsAt
+        lessons {
+          id
+          title
+          type
+          body
+          order
+          completionType
+          file {
+            id
+            name
+            mimeType
+            size
+            durationSec
+          }
+        }
+      }
+    }
+    courseProgress(courseId: $courseId) {
+      progress
+      lessons {
+        lessonId
+        status
+        percent
+      }
+    }
+  }
+`);
+
+/** The 3-hour video link with the student's watch rule (DECISIONS §11) */
+export const LESSON_VIDEO = graphql(`
+  query LessonVideo($lessonId: String!) {
+    lessonVideo(lessonId: $lessonId) {
+      url
+      resumeAt
+      isLocked
+      maxSeekSec
+      watermark
+    }
+  }
+`);
+
+/** A 15-minute link to a lesson file */
+export const STUDENT_FILE_URL = graphql(`
+  query StudentFileUrl($assetId: String!) {
+    courseFileUrl(assetId: $assetId) {
+      url
+    }
+  }
+`);

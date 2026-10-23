@@ -105,7 +105,7 @@
     },
     "announcements": "E’lonlar",
     "current": "Joriy hafta",
-    "earlier": "O‘tgan haftalar",
+    "earlier": "Boshqa haftalar",
     "done": "{{done}}/{{total}} bajarildi",
     "empty": "O‘qituvchi hali birorta haftani ochmagan.",
     "weekEmpty": "Bu haftada hali hech narsa yo‘q.",
@@ -148,5 +148,50 @@
       "view": "Ko‘rish"
     },
     "notFound": "Bu kurs mavjud emas."
+  },
+  "lesson": {
+    "progress": "{{percent}}% bajarildi",
+    "type": {
+      "VIDEO": "Video dars",
+      "READING": "O‘qish",
+      "FILE": "Fayl",
+      "LINK": "Havola"
+    },
+    "duration": "Davomiyligi: {{time}}",
+    "taughtBy": "O‘qituvchi",
+    "overview": "Dars haqida",
+    "materials": "Materiallar",
+    "materialsHint": "Bu darsga oid fayllar.",
+    "download": "Yuklab olish",
+    "openLink": "Havolani ochish",
+    "prev": "Oldingi dars",
+    "next": "Keyingi dars",
+    "autoComplete": "90% ko‘rilganda avtomatik tugaydi",
+    "completed": "Tugatilgan",
+    "markDone": "Tugatildi deb belgilash",
+    "viewDone": "Ochilganda tugatilgan hisoblanadi",
+    "noVideo": "Video hali tayyor emas.",
+    "notFound": "Bu dars mavjud emas.",
+    "tutor": {
+      "title": "Study Tutor",
+      "soon": "Tez orada",
+      "body": "Dars bo‘yicha savol bering va bosqichma-bosqich maslahat oling. AI yordamchi tez orada qo‘shiladi."
+    },
+    "player": {
+      "play": "Ijro etish",
+      "pause": "Pauza",
+      "back10": "10 soniya orqaga",
+      "forward10": "10 soniya oldinga",
+      "mute": "Ovozni o‘chirish",
+      "unmute": "Ovozni yoqish",
+      "speed": "Tezlik",
+      "speedLocked": "Tezlik 90% ko‘rilgach ochiladi",
+      "fullscreen": "To‘liq ekran",
+      "exitFullscreen": "To‘liq ekrandan chiqish",
+      "resume": "{{time}} dan davom etish",
+      "resumeHint": "{{percent}}% ko‘rildi",
+      "seek": "Video joyi",
+      "locked": "90% ko‘rilgach oldinga o‘tish mumkin"
+    }
   }
 }

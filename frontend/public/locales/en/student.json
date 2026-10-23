@@ -105,7 +105,7 @@
     },
     "announcements": "Announcements",
     "current": "Current week",
-    "earlier": "Earlier weeks",
+    "earlier": "Other weeks",
     "done": "{{done}}/{{total}} done",
     "empty": "Your teacher has not opened any weeks yet.",
     "weekEmpty": "Nothing in this week yet.",
@@ -148,5 +148,50 @@
       "view": "View"
     },
     "notFound": "This course is not available."
+  },
+  "lesson": {
+    "progress": "{{percent}}% completed",
+    "type": {
+      "VIDEO": "Video lecture",
+      "READING": "Reading",
+      "FILE": "File",
+      "LINK": "Link"
+    },
+    "duration": "Duration: {{time}}",
+    "taughtBy": "Taught by",
+    "overview": "Lesson overview",
+    "materials": "Attached materials",
+    "materialsHint": "Notes and files for this lesson.",
+    "download": "Download",
+    "openLink": "Open link",
+    "prev": "Previous lesson",
+    "next": "Next lesson",
+    "autoComplete": "Completes automatically at 90% watched",
+    "completed": "Completed",
+    "markDone": "Mark as done",
+    "viewDone": "Marked as done when opened",
+    "noVideo": "The video is not ready yet.",
+    "notFound": "This lesson is not available.",
+    "tutor": {
+      "title": "Study Tutor",
+      "soon": "Coming soon",
+      "body": "Ask questions about this lesson and get step-by-step hints. The AI study tutor is on its way."
+    },
+    "player": {
+      "play": "Play",
+      "pause": "Pause",
+      "back10": "Back 10 seconds",
+      "forward10": "Forward 10 seconds",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "speed": "Playback speed",
+      "speedLocked": "Speed unlocks after you watch 90%",
+      "fullscreen": "Full screen",
+      "exitFullscreen": "Exit full screen",
+      "resume": "Resume from {{time}}",
+      "resumeHint": "{{percent}}% watched",
+      "seek": "Video position",
+      "locked": "You can skip ahead after watching 90%"
+    }
   }
 }
