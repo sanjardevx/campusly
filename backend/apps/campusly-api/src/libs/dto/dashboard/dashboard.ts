@@ -190,4 +190,11 @@ export class CalendarEvent {
   /** Set for the school's own events (they can be edited); null for term dates */
   @Field(() => String, { nullable: true })
   schoolEventId: string | null;
+
+  /** ASSIGNMENT only: where the student opens it */
+  @Field(() => String, { nullable: true })
+  courseId: string | null;
+
+  @Field(() => String, { nullable: true })
+  assignmentId: string | null;
 }

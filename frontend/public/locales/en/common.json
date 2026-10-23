@@ -67,7 +67,8 @@
       "STUDENT": "Student · ID {{id}}",
       "TEACHER": "Teacher",
       "PARENT": "Parent / Guardian",
-      "ADMIN": "School administrator"
+      "ADMIN": "School administrator",
+      "STUDENT_CLASS": "Grade {{className}} · ID {{id}}"
     },
     "footer": "Campusly · {{portal}} · {{year}}",
     "notifications": "Notifications",

@@ -9,6 +9,8 @@ export interface SessionUser {
   firstName: string;
   lastName: string;
   mustChangePassword: boolean;
+  /** Students: the current class ("9A"), for "Grade 9A · ID …" in the top bar */
+  className: string | null;
 }
 
 export interface AuthResult {

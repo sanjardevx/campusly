@@ -67,7 +67,8 @@
       "STUDENT": "O‘quvchi · ID {{id}}",
       "TEACHER": "O‘qituvchi",
       "PARENT": "Ota-ona / vasiy",
-      "ADMIN": "Maktab administratori"
+      "ADMIN": "Maktab administratori",
+      "STUDENT_CLASS": "{{className}}-sinf · ID {{id}}"
     },
     "footer": "Campusly · {{portal}} · {{year}}",
     "notifications": "Bildirishnomalar",

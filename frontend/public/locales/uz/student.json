@@ -1,0 +1,95 @@
+{
+  "home": {
+    "greeting": {
+      "morning": "Xayrli tong, {{name}}",
+      "afternoon": "Xayrli kun, {{name}}",
+      "evening": "Xayrli kech, {{name}}"
+    },
+    "dueThisWeek_one": "Bu hafta {{count}} ta topshiriq bor",
+    "dueThisWeek_other": "Bu hafta {{count}} ta topshiriq bor",
+    "nothingDue": "Bu hafta topshiradigan ish qolmadi",
+    "thisWeek": {
+      "title": "Bu hafta",
+      "subtitle": "Faol mavzular, yaqin muddatlar va kurs materiallari",
+      "pending_one": "{{count}} ta kutilmoqda",
+      "pending_other": "{{count}} ta kutilmoqda",
+      "empty": "Bu hafta davom ettiradigan dars ham, topshiriq ham yo‘q.",
+      "watched": "{{percent}}% ko‘rildi",
+      "minutes_one": "{{count}} daq",
+      "minutes_other": "{{count}} daq",
+      "dueToday": "Bugun topshiriladi",
+      "dueTomorrow": "Ertaga topshiriladi",
+      "dueIn_one": "{{count}} kundan keyin",
+      "dueIn_other": "{{count}} kundan keyin",
+      "dueAt": "Muddat: {{date}}",
+      "continue": "Davom etish",
+      "submit": "Topshirish",
+      "view": "Ko‘rish",
+      "startQuiz": "Testni boshlash"
+    },
+    "courses": {
+      "title": "Kurslarim",
+      "subtitle_one": "{{period}} · {{count}} ta faol kurs",
+      "subtitle_other": "{{period}} · {{count}} ta faol kurs",
+      "count_one": "{{count}} ta faol kurs",
+      "count_other": "{{count}} ta faol kurs",
+      "all": "Barcha kurslar",
+      "new_one": "{{count}} ta yangi",
+      "new_other": "{{count}} ta yangi",
+      "upToDate": "Hammasi ko‘rilgan",
+      "progress": "O‘quv dasturi",
+      "noLessons": "Hali dars yo‘q",
+      "empty": "Hali hech qaysi kursga yozilmagansiz."
+    },
+    "week": "{{week}}-hafta",
+    "calendar": {
+      "previous": "Oldingi oy",
+      "next": "Keyingi oy",
+      "hasEvents": "tadbir bor",
+      "onDay": "{{day}}-{{month}}",
+      "nothingThenNext": "Bu kunda hech narsa yo‘q · keyingilari",
+      "nothing": "Oy oxirigacha hech narsa rejalashtirilmagan",
+      "term": "Maktab taqvimi",
+      "title": "Kalendar",
+      "kind": {
+        "HOLIDAY": "Bayram / ta’til",
+        "EVENT": "Maktab tadbiri",
+        "DEADLINE": "Muddat",
+        "START": "Boshlanish",
+        "TERM_START": "{{name}} boshlanadi",
+        "TERM_END": "{{name}} tugaydi",
+        "ASSIGNMENT": "Topshiriq muddati"
+      },
+      "month": {
+        "1": "Yanvar",
+        "2": "Fevral",
+        "3": "Mart",
+        "4": "Aprel",
+        "5": "May",
+        "6": "Iyun",
+        "7": "Iyul",
+        "8": "Avgust",
+        "9": "Sentabr",
+        "10": "Oktabr",
+        "11": "Noyabr",
+        "12": "Dekabr"
+      },
+      "day": {
+        "1": "Du",
+        "2": "Se",
+        "3": "Ch",
+        "4": "Pa",
+        "5": "Ju",
+        "6": "Sh",
+        "7": "Ya"
+      }
+    },
+    "todo": {
+      "title": "Qilinadigan ishlar",
+      "subtitle": "Muddati o‘tgan, lekin hali qabul qilinadi",
+      "empty": "Muddati o‘tgan ish yo‘q. Barakalla!",
+      "wasDue": "Muddat edi: {{date}}",
+      "submit": "Topshirish"
+    }
+  }
+}

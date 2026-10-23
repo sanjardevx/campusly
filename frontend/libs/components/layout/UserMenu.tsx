@@ -5,12 +5,19 @@ import { useApolloClient } from '@apollo/client/react';
 import { Avatar, Box, ButtonBase, Divider, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'next-i18next/pages';
 import { logOut } from '@/libs/auth';
 import type { SessionUser } from '@/libs/auth/api';
 
 export const initialsOf = (u: { firstName: string; lastName: string }) =>
   `${u.firstName[0] ?? ''}${u.lastName[0] ?? ''}`.toUpperCase();
+
+/** The line under the name: "Grade 9A · ID 26100042" for a student in a class, else the role */
+export function userSubtitle(user: SessionUser, t: TFunction<'common'>): string {
+  if (user.role === 'STUDENT' && user.className) return t('shell.subtitle.STUDENT_CLASS', { className: user.className, id: user.loginId });
+  return t(`shell.subtitle.${user.role}`, { id: user.loginId });
+}
 
 /** Name, role line and initials (Stitch top bar); the avatar opens the account menu */
 export function UserMenu({ user }: { user: SessionUser }) {
@@ -29,7 +36,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
             {user.firstName} {user.lastName}
           </Typography>
           <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', lineHeight: 1.3 }}>
-            {t(`shell.subtitle.${user.role}`, { id: user.loginId })}
+            {userSubtitle(user, t)}
           </Typography>
         </Box>
         <Avatar sx={{ width: 36, height: 36, fontSize: '0.8125rem', fontWeight: 600, bgcolor: 'primary.main' }}>

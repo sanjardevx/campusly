@@ -1,0 +1,109 @@
+{
+  "home": {
+    "greeting": {
+      "morning": "Доброе утро, {{name}}",
+      "afternoon": "Добрый день, {{name}}",
+      "evening": "Добрый вечер, {{name}}"
+    },
+    "dueThisWeek_one": "На этой неделе {{count}} задание",
+    "dueThisWeek_few": "На этой неделе {{count}} задания",
+    "dueThisWeek_many": "На этой неделе {{count}} заданий",
+    "dueThisWeek_other": "На этой неделе {{count}} задания",
+    "nothingDue": "На этой неделе сдавать нечего",
+    "thisWeek": {
+      "title": "Эта неделя",
+      "subtitle": "Текущие темы, ближайшие сроки и материалы курсов",
+      "pending_one": "{{count}} ждёт",
+      "pending_few": "{{count}} ждут",
+      "pending_many": "{{count}} ждут",
+      "pending_other": "{{count}} ждут",
+      "empty": "На этой неделе нечего продолжать и сдавать.",
+      "watched": "Просмотрено {{percent}}%",
+      "minutes_one": "{{count}} мин",
+      "minutes_few": "{{count}} мин",
+      "minutes_many": "{{count}} мин",
+      "minutes_other": "{{count}} мин",
+      "dueToday": "Сдать сегодня",
+      "dueTomorrow": "Сдать завтра",
+      "dueIn_one": "Через {{count}} день",
+      "dueIn_few": "Через {{count}} дня",
+      "dueIn_many": "Через {{count}} дней",
+      "dueIn_other": "Через {{count}} дня",
+      "dueAt": "Срок: {{date}}",
+      "continue": "Продолжить",
+      "submit": "Сдать работу",
+      "view": "Открыть",
+      "startQuiz": "Начать тест"
+    },
+    "courses": {
+      "title": "Мои курсы",
+      "subtitle_one": "{{period}} · {{count}} активный курс",
+      "subtitle_few": "{{period}} · {{count}} активных курса",
+      "subtitle_many": "{{period}} · {{count}} активных курсов",
+      "subtitle_other": "{{period}} · {{count}} активных курса",
+      "count_one": "{{count}} активный курс",
+      "count_few": "{{count}} активных курса",
+      "count_many": "{{count}} активных курсов",
+      "count_other": "{{count}} активных курса",
+      "all": "Все курсы",
+      "new_one": "{{count}} новое",
+      "new_few": "{{count}} новых",
+      "new_many": "{{count}} новых",
+      "new_other": "{{count}} новых",
+      "upToDate": "Всё просмотрено",
+      "progress": "Прогресс по программе",
+      "noLessons": "Уроков пока нет",
+      "empty": "Вы пока не записаны ни на один курс."
+    },
+    "week": "Неделя {{week}}",
+    "calendar": {
+      "previous": "Предыдущий месяц",
+      "next": "Следующий месяц",
+      "hasEvents": "есть события",
+      "onDay": "{{day}} · {{month}}",
+      "nothingThenNext": "В этот день ничего · далее",
+      "nothing": "До конца месяца ничего не запланировано",
+      "term": "Школьный календарь",
+      "title": "Календарь",
+      "kind": {
+        "HOLIDAY": "Праздник / каникулы",
+        "EVENT": "Школьное событие",
+        "DEADLINE": "Срок",
+        "START": "Начало",
+        "TERM_START": "Начало: {{name}}",
+        "TERM_END": "Конец: {{name}}",
+        "ASSIGNMENT": "Срок задания"
+      },
+      "month": {
+        "1": "Январь",
+        "2": "Февраль",
+        "3": "Март",
+        "4": "Апрель",
+        "5": "Май",
+        "6": "Июнь",
+        "7": "Июль",
+        "8": "Август",
+        "9": "Сентябрь",
+        "10": "Октябрь",
+        "11": "Ноябрь",
+        "12": "Декабрь"
+      },
+      "day": {
+        "1": "Пн",
+        "2": "Вт",
+        "3": "Ср",
+        "4": "Чт",
+        "5": "Пт",
+        "6": "Сб",
+        "7": "Вс"
+      }
+    },
+    "todo": {
+      "title": "К выполнению",
+      "subtitle": "Срок прошёл, но работу ещё примут",
+      "empty": "Просроченных заданий нет. Отлично!",
+      "wasDue": "Срок был {{date}}",
+      "submit": "Сдать"
+    }
+  }
+}

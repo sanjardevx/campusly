@@ -13,6 +13,7 @@ import { ConfirmDialog } from '@/libs/components/admin/ConfirmDialog';
 import type { DashboardCalendarQuery, SchoolEventKind } from '@/libs/gql/graphql';
 import { viz } from '@/libs/viz';
 import { EventDrawer } from './EventDrawer';
+import { daysOf, isoDay, monthGrid, shiftMonth } from '@/libs/components/dashboard/calendar';
 import { fadeUp } from '@/libs/components/dashboard/motion';
 
 export type CalendarEvent = DashboardCalendarQuery['dashboardCalendar'][number];
@@ -20,29 +21,6 @@ export type CalendarEvent = DashboardCalendarQuery['dashboardCalendar'][number];
 const LEGEND: SchoolEventKind[] = ['HOLIDAY', 'EVENT', 'DEADLINE', 'START'];
 const UPCOMING = 4;
 
-const pad = (n: number) => String(n).padStart(2, '0');
-const isoDay = (y: number, m: number, d: number) => `${y}-${pad(m)}-${pad(d)}`;
-
-/** Monday-first weeks of a month; null = a cell outside the month */
-function monthGrid(year: number, month: number): (number | null)[] {
-  const first = new Date(year, month - 1, 1).getDay(); // 0 = Sunday
-  const days = new Date(year, month, 0).getDate();
-  const lead = (first + 6) % 7;
-  const cells = [...Array<null>(lead).fill(null), ...Array.from({ length: days }, (_, i) => i + 1)];
-  while (cells.length % 7) cells.push(null);
-  return cells;
-}
-
-/** Every day an event covers inside this month ("YYYY-MM-DD" compares as text) */
-function daysOf(event: CalendarEvent, year: number, month: number): string[] {
-  const last = new Date(year, month, 0).getDate();
-  const out: string[] = [];
-  for (let d = 1; d <= last; d++) {
-    const day = isoDay(year, month, d);
-    if (day >= event.startsOn && day <= event.endsOn) out.push(day);
-  }
-  return out;
-}
 
 /**
  * The school calendar for admins: holidays, school events, programme deadlines and starts
@@ -65,8 +43,7 @@ export function CalendarCard({ today, index }: { today: string; index: number })
   for (const e of events) for (const day of daysOf(e, y, m)) byDay.set(day, [...(byDay.get(day) ?? []), e]);
 
   const move = (step: number) => {
-    const d = new Date(y, m - 1 + step, 1);
-    const next = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+    const next = shiftMonth(month, step);
     setMonth(next);
     // Today when going back to this month, else the 1st
     setSelected(next === today.slice(0, 7) ? today : `${next}-01`);

@@ -178,6 +178,10 @@ export class StudentOverview {
   @Field(() => [UpcomingItem])
   upcoming: UpcomingItem[];
 
+  /** Past due, not handed in, and still open (late work allowed, grades not published) */
+  @Field(() => [UpcomingItem])
+  overdue: UpcomingItem[];
+
   @Field(() => [RecentGrade])
   recentGrades: RecentGrade[];
 

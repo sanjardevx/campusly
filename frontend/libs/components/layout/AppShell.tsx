@@ -24,12 +24,13 @@ import type { SessionUser } from '@/libs/auth/api';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
 import { TempPasswordBanner } from '@/libs/components/TempPasswordBanner';
 import type { Role } from '@/libs/gql/graphql';
+import { tokens } from '@/libs/theme';
 import { ChildSwitcher } from './ChildSwitcher';
 import { GlassTabBar } from './GlassTabBar';
 import { SPRING, useTapFirstIndex } from './motion';
 import { NAV, useActiveItem, useNavHref, type NavItem } from './nav';
 import { NotificationBell } from './NotificationBell';
-import { UserMenu } from './UserMenu';
+import { UserMenu, userSubtitle } from './UserMenu';
 import { useRoleGuard } from './useRoleGuard';
 import { YearPill } from './YearPill';
 
@@ -80,7 +81,7 @@ function DesktopShell({ user, desktop, children }: { user: SessionUser; desktop:
   const sidebar = <Sidebar role={user.role} onNavigate={() => setDrawer(false)} />;
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: canvasOf(user.role) }}>
       {desktop ? (
         <Box
           component="aside"
@@ -370,6 +371,9 @@ const SidebarLink = forwardRef<HTMLAnchorElement, SidebarLinkProps>(function Sid
 
 /* ---------- phone (student / parent) ---------- */
 
+/** Students get a slightly darker canvas (DECISIONS §10); staff and parents keep the chalk one */
+const canvasOf = (role: Role) => (role === 'STUDENT' ? tokens.studentCanvas : 'background.default');
+
 function PhoneShell({ user, children }: { user: SessionUser; children: ReactNode }) {
   const { t } = useTranslation('common');
   const navHref = useNavHref();
@@ -377,7 +381,7 @@ function PhoneShell({ user, children }: { user: SessionUser; children: ReactNode
   const announcements = items.find((i) => i.key === 'announcements');
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pb: 12 }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: canvasOf(user.role), pb: 12 }}>
       <Box component="header" sx={{ bgcolor: 'primary.main', color: '#fff', px: 2.5, pt: 3, pb: 3 }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
           <Typography
@@ -394,7 +398,7 @@ function PhoneShell({ user, children }: { user: SessionUser; children: ReactNode
           {user.firstName} {user.lastName}
         </Typography>
         <Typography sx={{ fontSize: '0.8125rem', opacity: 0.8 }}>
-          {t(`shell.subtitle.${user.role}`, { id: user.loginId })}
+          {userSubtitle(user, t)}
         </Typography>
       </Box>
 

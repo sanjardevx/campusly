@@ -20,6 +20,8 @@ export const viz = {
     START: '#1BAF7A',
     TERM_START: '#1BAF7A',
     TERM_END: '#EDA100',
+    // Student calendar: their own due work is a deadline too (still 4 colours; the row says which)
+    ASSIGNMENT: '#EDA100',
   },
   // KPI icon tiles: a soft tint behind a darker icon of the same hue (decoration, not data)
   tile: {

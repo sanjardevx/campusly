@@ -1,0 +1,88 @@
+{
+  "home": {
+    "greeting": {
+      "morning": "좋은 아침입니다, {{name}}님",
+      "afternoon": "안녕하세요, {{name}}님",
+      "evening": "좋은 저녁입니다, {{name}}님"
+    },
+    "dueThisWeek_other": "이번 주 마감 과제가 {{count}}개 있습니다",
+    "nothingDue": "이번 주에 제출할 과제가 없습니다",
+    "thisWeek": {
+      "title": "이번 주",
+      "subtitle": "진행 중인 단원, 다가오는 마감, 강좌 자료",
+      "pending_other": "{{count}}개 남음",
+      "empty": "이번 주에는 이어서 볼 수업도, 마감 과제도 없습니다.",
+      "watched": "{{percent}}% 시청",
+      "minutes_other": "{{count}}분",
+      "dueToday": "오늘 마감",
+      "dueTomorrow": "내일 마감",
+      "dueIn_other": "{{count}}일 후 마감",
+      "dueAt": "마감 {{date}}",
+      "continue": "이어 보기",
+      "submit": "과제 제출",
+      "view": "보기",
+      "startQuiz": "퀴즈 시작"
+    },
+    "courses": {
+      "title": "내 강좌",
+      "subtitle_other": "{{period}} · 수강 중인 강좌 {{count}}개",
+      "count_other": "수강 중인 강좌 {{count}}개",
+      "all": "전체 강좌 보기",
+      "new_other": "새 항목 {{count}}개",
+      "upToDate": "모두 확인함",
+      "progress": "학습 진도",
+      "noLessons": "아직 수업이 없습니다",
+      "empty": "아직 수강 중인 강좌가 없습니다."
+    },
+    "week": "{{week}}주차",
+    "calendar": {
+      "previous": "이전 달",
+      "next": "다음 달",
+      "hasEvents": "일정 있음",
+      "onDay": "{{month}} {{day}}일",
+      "nothingThenNext": "이 날은 일정 없음 · 다음 일정",
+      "nothing": "이번 달 남은 일정이 없습니다",
+      "term": "학사 일정",
+      "title": "캘린더",
+      "kind": {
+        "HOLIDAY": "휴일·방학",
+        "EVENT": "학교 행사",
+        "DEADLINE": "마감",
+        "START": "시작",
+        "TERM_START": "{{name}} 시작",
+        "TERM_END": "{{name}} 종료",
+        "ASSIGNMENT": "과제 마감"
+      },
+      "month": {
+        "1": "1월",
+        "2": "2월",
+        "3": "3월",
+        "4": "4월",
+        "5": "5월",
+        "6": "6월",
+        "7": "7월",
+        "8": "8월",
+        "9": "9월",
+        "10": "10월",
+        "11": "11월",
+        "12": "12월"
+      },
+      "day": {
+        "1": "월",
+        "2": "화",
+        "3": "수",
+        "4": "목",
+        "5": "금",
+        "6": "토",
+        "7": "일"
+      }
+    },
+    "todo": {
+      "title": "할 일",
+      "subtitle": "마감이 지났지만 아직 제출할 수 있는 과제",
+      "empty": "밀린 과제가 없습니다. 잘했어요!",
+      "wasDue": "마감일 {{date}}",
+      "submit": "제출"
+    }
+  }
+}

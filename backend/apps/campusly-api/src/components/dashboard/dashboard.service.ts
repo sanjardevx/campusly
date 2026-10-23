@@ -18,6 +18,7 @@ import {
 import {
   fromDbDate,
   startOfDayInZone,
+  periodWeek,
   toDbDate,
   todayInZone,
   weekDays,
@@ -200,6 +201,8 @@ export class DashboardService {
       endsOn: fromDbDate(e.endsOn),
       note: e.note,
       schoolEventId: e.id,
+      courseId: null,
+      assignmentId: null,
     }));
     for (const p of periods) {
       for (const [kind, day] of [
@@ -216,6 +219,8 @@ export class DashboardService {
             endsOn: date,
             note: null,
             schoolEventId: null,
+            courseId: null,
+            assignmentId: null,
           });
         }
       }
@@ -266,14 +271,7 @@ export class DashboardService {
       orderBy: { startsAt: 'desc' },
     });
     if (!period) return null;
-    const days = (a: Date, b: Date) =>
-      Math.floor((b.getTime() - a.getTime()) / DAY_MS);
-    const weeks = Math.ceil((days(period.startsAt, period.endsAt) + 1) / 7);
-    // In a break after the period the last week is shown, never "week 12 of 10"
-    const week = Math.min(
-      weeks,
-      Math.floor(days(period.startsAt, day) / 7) + 1,
-    );
+    const { week, weeks } = periodWeek(period.startsAt, period.endsAt, today);
     const view: DashboardPeriod = {
       id: period.id,
       name: period.name,

@@ -3,10 +3,19 @@ import type { Prisma } from '../../../../../generated/prisma/client';
 import { PrismaService } from '../../database/prisma.service';
 import { Child, StudentOverview } from '../../libs/dto/overview/overview';
 import type { AuthUser } from '../../libs/types/auth';
-import { toDbDate, todayInZone } from '../../libs/utils/date';
+import {
+  fromDbDate,
+  periodWeek,
+  startOfDayInZone,
+  toDbDate,
+  todayInZone,
+} from '../../libs/utils/date';
+import { CalendarEvent } from '../../libs/dto/dashboard/dashboard';
+import { CalendarEventKind } from '../../libs/enums/dashboard.enum';
 import { AnnouncementService } from '../announcement/announcement.service';
 import { summarizeAttendance } from '../attendance/attendance.service';
 import { AccessPolicy } from '../auth/policies/access.policy';
+import { DashboardService } from '../dashboard/dashboard.service';
 import { STUDENT_SELECT } from '../grade/grade.service';
 import { PeriodGradeService } from '../grade/period-grade.service';
 import { SchoolService } from '../school/school.service';
@@ -31,6 +40,7 @@ export class OverviewService {
     private readonly periodGradeService: PeriodGradeService,
     private readonly announcementService: AnnouncementService,
     private readonly schoolService: SchoolService,
+    private readonly dashboardService: DashboardService,
   ) {}
 
   public async getStudentOverview(
@@ -102,6 +112,7 @@ export class OverviewService {
       lessons,
       newAssignments,
       unread,
+      overdue,
     ] = await Promise.all([
       this.prismaService.attendanceRecord.findMany({
         where: { studentId: id, session: { courseId: { in: courseIds } } },
@@ -215,6 +226,23 @@ export class OverviewService {
         },
         select: { courseId: true },
       }),
+      this.prismaService.assignment.findMany({
+        where: {
+          courseId: { in: courseIds },
+          publishedAt: { lte: now },
+          dueAt: { lt: now },
+          allowLate: true,
+          gradesPublishedAt: null,
+          submissions: {
+            none: {
+              studentId: id,
+              OR: [{ attempts: { some: {} } }, { status: 'GRADED' }],
+            },
+          },
+        },
+        orderBy: [{ dueAt: 'asc' }, { title: 'asc' }],
+        include: { course: { select: { title: true } } },
+      }),
     ]);
 
     const courseRows = [];
@@ -271,11 +299,7 @@ export class OverviewService {
         ? {
             id: period.id,
             name: period.name,
-            week:
-              Math.floor(
-                (toDbDate(today).getTime() - period.startsAt.getTime()) /
-                  (7 * DAY_MS),
-              ) + 1,
+            week: periodWeek(period.startsAt, period.endsAt, today).week,
           }
         : null,
       courses: courseRows,
@@ -312,6 +336,15 @@ export class OverviewService {
             (sub._count.attempts > 0 || sub.status === 'GRADED'),
         };
       }),
+      overdue: overdue.map((a) => ({
+        assignmentId: a.id,
+        courseId: a.courseId,
+        courseTitle: a.course.title,
+        title: a.title,
+        type: a.type,
+        dueAt: a.dueAt!,
+        isDone: false,
+      })),
       recentGrades: graded.map((s) => {
         const score = Number(s.score);
         const maxScore = Number(s.assignment.maxScore);
@@ -327,6 +360,58 @@ export class OverviewService {
       }),
       announcements,
     };
+  }
+
+  /**
+   * The student's month (month: "YYYY-MM"): the school calendar (holidays, events, term dates, the
+   * same rows admins see) plus the due days of the student's own published assignments.
+   */
+  public async getStudentCalendar(
+    user: AuthUser,
+    month: string,
+    studentId?: string,
+  ): Promise<CalendarEvent[]> {
+    const id = await this.accessPolicy.resolveStudentScope(user, studentId);
+    // Checks the month format too
+    const school = await this.dashboardService.getCalendar(month);
+
+    const { timezone } = await this.schoolService.getSettings();
+    const [y, m] = month.split('-').map(Number);
+    const next = fromDbDate(new Date(Date.UTC(y, m, 1)));
+    const assignments = await this.prismaService.assignment.findMany({
+      where: {
+        course: {
+          status: 'ACTIVE',
+          enrollments: { some: { studentId: id, status: 'ACTIVE' } },
+        },
+        publishedAt: { lte: new Date() },
+        // The month's days in the school timezone
+        dueAt: {
+          gte: startOfDayInZone(`${month}-01`, timezone),
+          lt: startOfDayInZone(next, timezone),
+        },
+      },
+      orderBy: [{ dueAt: 'asc' }, { title: 'asc' }],
+      include: { course: { select: { title: true } } },
+    });
+
+    const due: CalendarEvent[] = assignments.map((a) => {
+      const day = todayInZone(timezone, a.dueAt!);
+      return {
+        id: a.id,
+        kind: CalendarEventKind.ASSIGNMENT,
+        title: a.title,
+        startsOn: day,
+        endsOn: day,
+        note: a.course.title,
+        schoolEventId: null,
+        courseId: a.courseId,
+        assignmentId: a.id,
+      };
+    });
+    return [...school, ...due].sort((a, b) =>
+      a.startsOn.localeCompare(b.startsOn),
+    );
   }
 
   /** A parent's children (active links), for the child switcher */

@@ -14,5 +14,7 @@ import { TeacherDashboardService } from './teacher-dashboard.service';
     TeacherDashboardResolver,
     TeacherDashboardService,
   ],
+  // The student calendar shows the same school dates
+  exports: [DashboardService],
 })
 export class DashboardModule {}

@@ -20,6 +20,7 @@ export const tokens = {
   error: '#BA1A1A',
   errorTint: '#FFDAD6',
   background: '#F8F8F6', // chalk canvas
+  studentCanvas: '#EFF5F0', // student portal: Stitch surface-container-low, a little darker so cards stand out
   surface: '#FFFFFF', // cards, sheets
   recessed: '#F1F2EE', // rubric tables, side panels inside a card
   border: '#E3E5DF', // card and section rules

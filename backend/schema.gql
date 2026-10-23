@@ -187,6 +187,8 @@ type AttentionStudent {
 }
 
 type CalendarEvent {
+  assignmentId: String
+  courseId: String
   endsOn: String!
   id: String!
   kind: CalendarEventKind!
@@ -197,6 +199,7 @@ type CalendarEvent {
 }
 
 enum CalendarEventKind {
+  ASSIGNMENT
   DEADLINE
   EVENT
   HOLIDAY
@@ -934,6 +937,7 @@ type Query {
   mySubmission(assignmentId: String!, studentId: String): Submission
   periods(academicYearId: String!): [Period!]!
   schoolSettings: SchoolSettings!
+  studentCalendar(month: String!, studentId: String): [CalendarEvent!]!
   studentOverview(studentId: String): StudentOverview!
   subjects(includeArchived: Boolean): [Subject!]!
   teacherDashboard: TeacherDashboard!
@@ -1083,6 +1087,7 @@ type StudentOverview {
   attendance: AttendanceSummary!
   continueLessons: [ContinueLesson!]!
   courses: [OverviewCourse!]!
+  overdue: [UpcomingItem!]!
   period: OverviewPeriod
   recentGrades: [RecentGrade!]!
   student: OverviewStudent!

@@ -226,7 +226,11 @@ describe('studentOverview and myChildren (e2e)', () => {
     const assignment = async (
       title: string,
       dueInDays: number,
-      opts: { published?: boolean; gradesPublished?: boolean } = {},
+      opts: {
+        published?: boolean;
+        gradesPublished?: boolean;
+        allowLate?: boolean;
+      } = {},
     ) =>
       (
         await prisma.assignment.create({
@@ -238,6 +242,7 @@ describe('studentOverview and myChildren (e2e)', () => {
             maxScore: 10,
             dueAt: new Date(now + dueInDays * DAY),
             acceptedFileTypes: [],
+            allowLate: opts.allowLate ?? true,
             publishedAt: opts.published === false ? null : new Date(now - DAY),
             gradesPublishedAt: opts.gradesPublished
               ? new Date(now - 1000)
@@ -254,6 +259,8 @@ describe('studentOverview and myChildren (e2e)', () => {
     const handedIn = await assignment('Due in 3 days', 3);
     await assignment('Due in 10 days', 10);
     await assignment('Draft due tomorrow', 1, { published: false });
+    await assignment('Missed, late work allowed', -3);
+    await assignment('Missed, closed', -3, { allowLate: false });
 
     await prisma.submission.createMany({
       data: [
@@ -400,6 +407,7 @@ describe('studentOverview and myChildren (e2e)', () => {
     const res = await gql<{
       studentOverview: {
         period: { week: number };
+        overdue: { title: string }[];
         continueLessons: {
           title: string;
           durationSec: number;
@@ -410,6 +418,7 @@ describe('studentOverview and myChildren (e2e)', () => {
     }>(
       `{ studentOverview {
         period { week }
+        overdue { title }
         continueLessons { title durationSec percent }
         courses { progress newCount }
       } }`,
@@ -419,12 +428,14 @@ describe('studentOverview and myChildren (e2e)', () => {
     const o = res.data!.studentOverview;
     // The period started 30 days ago → week 5
     expect(o.period.week).toBe(5);
+    // Still open only: graded, closed (no late work) and handed-in ones are not To Do
+    expect(o.overdue).toEqual([{ title: 'Missed, late work allowed' }]);
     // 270 of 600 s; the lesson in the hidden week is not offered
     expect(o.continueLessons).toEqual([
       { title: 'Half watched', durationSec: 600, percent: 45 },
     ]);
-    // 1 of 3 visible lessons done. New: 1 lesson today + 2 assignments not handed in + 1 unread announcement
-    expect(o.courses).toEqual([{ progress: 33, newCount: 4 }]);
+    // 1 of 3 visible lessons done. New: 1 lesson today + 4 assignments not handed in + 1 unread announcement
+    expect(o.courses).toEqual([{ progress: 33, newCount: 6 }]);
   });
 
   it('a classmate gets their own progress, not Aziz’s', async () => {
@@ -440,6 +451,85 @@ describe('studentOverview and myChildren (e2e)', () => {
     );
     expect(res.data!.studentOverview.continueLessons).toEqual([]);
     expect(res.data!.studentOverview.courses[0].progress).toBe(0);
+  });
+
+  it('sign-in tells the top bar a student’s class ("Grade 9A · ID …"), nobody else’s', async () => {
+    const signIn = async (key: Key) =>
+      (
+        (
+          await request(app.getHttpServer())
+            .post('/auth/login')
+            .send({ loginId: `e2e-overview-${key}`, password: PASSWORD })
+        ).body as { user: { className: string | null } }
+      ).user.className;
+    expect(await signIn('sA')).toBe('E2E-OV9A');
+    expect(await signIn('tA')).toBeNull();
+  });
+
+  // ───────────── studentCalendar: school dates + the student's own deadlines ─────────────
+  const CALENDAR = `query($m: String!, $s: String) { studentCalendar(month: $m, studentId: $s) {
+    kind title startsOn note courseId assignmentId
+  } }`;
+  type CalendarRow = {
+    kind: string;
+    title: string;
+    note: string | null;
+    courseId: string | null;
+  };
+  const thisMonth = () => todayInZone('Asia/Tashkent').slice(0, 7);
+  const calendar = async (as: Key, studentId?: string) =>
+    (
+      await gql<{ studentCalendar: CalendarRow[] }>(
+        CALENDAR,
+        { m: thisMonth(), s: studentId },
+        as,
+      )
+    ).data?.studentCalendar ?? [];
+
+  it('studentCalendar: the student’s published deadlines (not drafts) with the course', async () => {
+    // The month "Due in 3 days" falls in (school timezone), so the test works on any day
+    const at = new Date(Date.now() + 3 * DAY);
+    const month = todayInZone('Asia/Tashkent', at).slice(0, 7);
+    const res = await gql<{ studentCalendar: CalendarRow[] }>(
+      CALENDAR,
+      { m: month },
+      'sA',
+    );
+    const rows = res.data!.studentCalendar.filter(
+      (r) => r.kind === 'ASSIGNMENT',
+    );
+    expect(rows.map((r) => r.title)).toContain('Due in 3 days');
+    expect(rows.map((r) => r.title)).not.toContain('Draft due tomorrow');
+    for (const r of rows) {
+      expect(r.note).toBe(`${TAG} A`);
+      expect(r.courseId).toBe(course.A);
+    }
+  });
+
+  it('studentCalendar: a parent sees the chosen child’s deadlines only', async () => {
+    const sB = (await calendar('pA', id.sB)).filter(
+      (r) => r.kind === 'ASSIGNMENT',
+    );
+    expect(sB.every((r) => r.courseId === course.B)).toBe(true);
+  });
+
+  const calendarTable: [string, Key, () => string | undefined, string][] = [
+    ['parent: someone else’s child', 'pA', () => id.sA2, 'NOT_FOUND'],
+    ['teacher: any calendar', 'tA', () => id.sA, 'FORBIDDEN'],
+    ['admin: a chosen student', 'admin', () => id.sA, 'OK'],
+  ];
+  it.each(calendarTable)(
+    'studentCalendar %s → %s',
+    async (_name, as, studentId, expected) => {
+      const body = await gql(CALENDAR, { m: thisMonth(), s: studentId() }, as);
+      expect(code(body) ?? 'OK').toBe(expected);
+    },
+  );
+
+  it('studentCalendar rejects a bad month', async () => {
+    expect(code(await gql(CALENDAR, { m: '2026-13' }, 'sA'))).toBe(
+      'BAD_REQUEST',
+    );
   });
 
   it('myChildren: the parent’s children for the switcher', async () => {

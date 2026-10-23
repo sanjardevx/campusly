@@ -1,0 +1,95 @@
+{
+  "home": {
+    "greeting": {
+      "morning": "Good morning, {{name}}",
+      "afternoon": "Good afternoon, {{name}}",
+      "evening": "Good evening, {{name}}"
+    },
+    "dueThisWeek_one": "You have {{count}} thing due this week",
+    "dueThisWeek_other": "You have {{count}} things due this week",
+    "nothingDue": "Nothing left to hand in this week",
+    "thisWeek": {
+      "title": "This week",
+      "subtitle": "Active modules, impending checkpoints, and course references",
+      "pending_one": "{{count}} Pending",
+      "pending_other": "{{count}} Pending",
+      "empty": "Nothing to continue and nothing due this week.",
+      "watched": "{{percent}}% watched",
+      "minutes_one": "{{count}} min",
+      "minutes_other": "{{count}} min",
+      "dueToday": "Due today",
+      "dueTomorrow": "Due tomorrow",
+      "dueIn_one": "Due in {{count}} day",
+      "dueIn_other": "Due in {{count}} days",
+      "dueAt": "Due {{date}}",
+      "continue": "Continue",
+      "submit": "Submit Work",
+      "view": "View",
+      "startQuiz": "Start Quiz"
+    },
+    "courses": {
+      "title": "My Courses",
+      "subtitle_one": "{{period}} · {{count}} Active Course Enrolment",
+      "subtitle_other": "{{period}} · {{count}} Active Course Enrolments",
+      "count_one": "{{count}} Active Course Enrolment",
+      "count_other": "{{count}} Active Course Enrolments",
+      "all": "View all courses",
+      "new_one": "{{count}} new",
+      "new_other": "{{count}} new",
+      "upToDate": "Up to date",
+      "progress": "Curriculum progress",
+      "noLessons": "No lessons yet",
+      "empty": "You are not enrolled in any course yet."
+    },
+    "week": "Week {{week}}",
+    "calendar": {
+      "previous": "Previous month",
+      "next": "Next month",
+      "hasEvents": "has events",
+      "onDay": "{{day}} {{month}}",
+      "nothingThenNext": "Nothing on this day · coming up",
+      "nothing": "Nothing planned for the rest of the month",
+      "term": "School calendar",
+      "title": "Calendar",
+      "kind": {
+        "HOLIDAY": "Holiday",
+        "EVENT": "School event",
+        "DEADLINE": "Deadline",
+        "START": "Start",
+        "TERM_START": "{{name}} starts",
+        "TERM_END": "{{name}} ends",
+        "ASSIGNMENT": "Due work"
+      },
+      "month": {
+        "1": "January",
+        "2": "February",
+        "3": "March",
+        "4": "April",
+        "5": "May",
+        "6": "June",
+        "7": "July",
+        "8": "August",
+        "9": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December"
+      },
+      "day": {
+        "1": "Mo",
+        "2": "Tu",
+        "3": "We",
+        "4": "Th",
+        "5": "Fr",
+        "6": "Sa",
+        "7": "Su"
+      }
+    },
+    "todo": {
+      "title": "To do",
+      "subtitle": "Past the deadline, late work still accepted",
+      "empty": "Nothing overdue. Well done!",
+      "wasDue": "Was due {{date}}",
+      "submit": "Submit"
+    }
+  }
+}

@@ -29,6 +29,8 @@ export interface AuthResult {
     firstName: string;
     lastName: string;
     mustChangePassword: boolean;
+    /** Students: the current class ("9A") for the top bar; null for other roles */
+    className: string | null;
   };
   /** Shown as a banner while a temporary password is in use */
   tempPasswordWarning?: { usesLeft: number; expiresAt: string };

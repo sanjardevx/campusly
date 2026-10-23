@@ -67,7 +67,8 @@
       "STUDENT": "학생 · ID {{id}}",
       "TEACHER": "교사",
       "PARENT": "학부모 / 보호자",
-      "ADMIN": "학교 관리자"
+      "ADMIN": "학교 관리자",
+      "STUDENT_CLASS": "{{className}}반 · ID {{id}}"
     },
     "footer": "Campusly · {{portal}} · {{year}}",
     "notifications": "알림",

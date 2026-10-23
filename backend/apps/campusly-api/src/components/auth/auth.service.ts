@@ -259,9 +259,20 @@ export class AuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         mustChangePassword: user.mustChangePassword,
+        className: await this.currentClass(user),
       },
       ...(tempPasswordWarning && { tempPasswordWarning }),
     };
+  }
+
+  /** "Grade 9A · ID …" in the top bar: the class a student is in now */
+  private async currentClass(user: SessionUser): Promise<string | null> {
+    if (user.role !== 'STUDENT') return null;
+    const membership = await this.prismaService.groupMember.findFirst({
+      where: { studentId: user.id, leftAt: null },
+      select: { group: { select: { name: true } } },
+    });
+    return membership?.group.name ?? null;
   }
 
   /** Also used after a password change, to replace a token that still has the `pwc` flag */

@@ -73,6 +73,21 @@ export function weekDays(day: string): string[] {
   );
 }
 
+/**
+ * Week number of a period and how many weeks it has (week 1 starts on its first day). In a break
+ * after the period the last week is shown, never "week 12 of 10".
+ */
+export function periodWeek(startsAt: Date, endsAt: Date, day: string) {
+  const days = (a: Date, b: Date) =>
+    Math.floor((b.getTime() - a.getTime()) / 86_400_000);
+  const weeks = Math.ceil((days(startsAt, endsAt) + 1) / 7);
+  const week = Math.min(
+    weeks,
+    Math.floor(days(startsAt, toDbDate(day)) / 7) + 1,
+  );
+  return { week, weeks };
+}
+
 /** "2026-10-31" → "2026-11-01" */
 export function nextDay(day: string): string {
   return fromDbDate(new Date(toDbDate(day).getTime() + 86_400_000));
