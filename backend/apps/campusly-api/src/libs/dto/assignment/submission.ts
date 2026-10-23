@@ -88,6 +88,10 @@ export class Submission {
   @Field(() => Date, { nullable: true })
   gradedAt: Date | null;
 
+  /** Who gave the current score ("Last modified by …"); hidden like the score until published */
+  @Field(() => String, { nullable: true })
+  gradedByName: string | null;
+
   /** How many more times the student may submit */
   @Field(() => Int)
   attemptsLeft: number;

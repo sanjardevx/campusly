@@ -1060,6 +1060,7 @@ type Submission {
   comments: [SubmissionComment!]!
   feedback: String
   gradedAt: DateTime
+  gradedByName: String
   id: String!
   score: Float
   status: SubmissionStatus!

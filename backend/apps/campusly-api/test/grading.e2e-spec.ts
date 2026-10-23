@@ -25,6 +25,7 @@ interface Sub {
   score: number | null;
   feedback: string | null;
   attemptsLeft: number;
+  gradedByName: string | null;
 }
 
 describe('Grading: gradebook, grade, return, zeros, publish (e2e)', () => {
@@ -43,7 +44,7 @@ describe('Grading: gradebook, grade, return, zeros, publish (e2e)', () => {
   }
   const code = (body: GqlBody<unknown>) => body.errors?.[0].extensions.code;
 
-  const SUB = 'status score feedback attemptsLeft';
+  const SUB = 'status score feedback attemptsLeft gradedByName';
   const BOOK = `query($a: String!) { assignmentSubmissions(assignmentId: $a) { firstName submission { ${SUB} } } }`;
   const GRADE = `mutation($i: GradeSubmissionInput!) { gradeSubmission(input: $i) { ${SUB} } }`;
   const RETURN = `mutation($i: ReturnSubmissionInput!) { returnSubmission(input: $i) { ${SUB} } }`;
@@ -242,6 +243,8 @@ describe('Grading: gradebook, grade, return, zeros, publish (e2e)', () => {
       status: 'GRADED',
       score: 18,
       feedback: 'Score 18',
+      // "Last modified by …" on the grading page
+      gradedByName: `Teacher ${TAG}`,
     });
     expect(code(await grade(id.sA, 25))).toBe('BAD_REQUEST');
     expect(code(await grade(id.sB, 10))).toBe('NOT_FOUND');
@@ -279,6 +282,7 @@ describe('Grading: gradebook, grade, return, zeros, publish (e2e)', () => {
       status: 'SUBMITTED',
       score: null,
       feedback: null,
+      gradedByName: null,
     });
     await gql(PUBLISH, { i: { assignmentId: a.hw, publish: true } });
     expect(await mine('sA')).toMatchObject({ status: 'GRADED', score: 19 });

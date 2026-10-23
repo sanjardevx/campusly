@@ -43,6 +43,7 @@ export const SUBMISSION_INCLUDE = {
       author: { select: { firstName: true, lastName: true, role: true } },
     },
   },
+  gradedBy: { select: { firstName: true, lastName: true } },
 } satisfies Prisma.SubmissionInclude;
 
 export type SubmissionRow = Prisma.SubmissionGetPayload<{
@@ -279,6 +280,10 @@ export class SubmissionService {
       score: hidden || row.score === null ? null : Number(row.score),
       feedback: hidden ? null : row.feedback,
       gradedAt: hidden ? null : row.gradedAt,
+      gradedByName:
+        hidden || !row.gradedBy
+          ? null
+          : `${row.gradedBy.firstName} ${row.gradedBy.lastName}`,
       attemptsLeft:
         row.status === 'RETURNED'
           ? Math.max(1, rules.maxAttempts - row.attempts.length)
