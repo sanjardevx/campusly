@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
 import {
   Alert,
@@ -7,22 +7,15 @@ import {
   Chip,
   CircularProgress,
   FormControlLabel,
-  IconButton,
   MenuItem,
   Radio,
   RadioGroup,
   Select,
   Stack,
   Switch,
-  TextField,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
-import FormatBoldIcon from '@mui/icons-material/FormatBold';
-import FormatItalicIcon from '@mui/icons-material/FormatItalic';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import LinkIcon from '@mui/icons-material/Link';
 import { useTranslation } from 'next-i18next/pages';
 import { SCHOOL_SETTINGS } from '@/apollo/app/query';
 import { CREATE_ASSIGNMENT, PUBLISH_ASSIGNMENT, UPDATE_ASSIGNMENT } from '@/apollo/teacher/mutation';
@@ -34,6 +27,7 @@ import { utcToZoned, zonedToUtc } from '@/libs/timezone';
 import { UPLOAD_LIMITS } from '@/libs/upload';
 import type { Assignment, Week } from './model';
 import { formatSize } from './model';
+import { MarkdownField } from './MarkdownField';
 import { UploadBox, type AttachedFile } from './UploadBox';
 
 /** File types a student may hand in (the server's SUBMISSION_FILE_TYPES); JPG and PNG go together */
@@ -69,7 +63,6 @@ export function HomeworkDrawer({
   const client = useApolloClient();
   const { data: settings } = useQuery(SCHOOL_SETTINGS);
   const zone = settings?.schoolSettings.timezone ?? 'Asia/Tashkent';
-  const text = useRef<HTMLTextAreaElement>(null);
 
   const [form, setForm] = useState(() => ({
     title: assignment?.title ?? '',
@@ -99,20 +92,6 @@ export function HomeworkDrawer({
   const scoreOk = Number.isFinite(score) && score >= 0.5 && score <= 1000;
   const valid = form.title.trim().length > 0 && scoreOk && (isExam || form.types.length > 0) && !uploading;
   const weekLabel = week?.title.split(':')[0];
-
-  /** Wrap the selection in Markdown marks (or put them at the cursor) */
-  const mark = (before: string, after = '', placeholder = '') => {
-    const el = text.current;
-    if (!el) return;
-    const { selectionStart: s, selectionEnd: e, value } = el;
-    const chosen = value.slice(s, e) || placeholder;
-    const next = value.slice(0, s) + before + chosen + after + value.slice(e);
-    setForm((f) => ({ ...f, instructions: next }));
-    requestAnimationFrame(() => {
-      el.focus();
-      el.setSelectionRange(s + before.length, s + before.length + chosen.length);
-    });
-  };
 
   const toggleType = (values: string[]) =>
     setForm((f) => {
@@ -190,41 +169,12 @@ export function HomeworkDrawer({
         />
         <Box>
           {label('course.homework.instructions')}
-          {/* Minimal formatting toolbar: it writes Markdown into the text */}
-          <Stack direction="row" sx={{ gap: 0.25, p: 0.5, border: 1, borderBottom: 0, borderColor: 'divider', borderRadius: '8px 8px 0 0', bgcolor: 'background.default' }}>
-            <Tooltip title={t('course.homework.bold')}>
-              <IconButton size="small" onClick={() => mark('**', '**', t('course.homework.boldText'))} aria-label={t('course.homework.bold')}>
-                <FormatBoldIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('course.homework.italic')}>
-              <IconButton size="small" onClick={() => mark('_', '_', t('course.homework.italicText'))} aria-label={t('course.homework.italic')}>
-                <FormatItalicIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Box sx={{ width: '1px', bgcolor: 'divider', mx: 0.5, my: 0.75 }} />
-            <Tooltip title={t('course.homework.list')}>
-              <IconButton size="small" onClick={() => mark('\n- ', '', t('course.homework.listText'))} aria-label={t('course.homework.list')}>
-                <FormatListBulletedIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('course.homework.link')}>
-              <IconButton size="small" onClick={() => mark('[', '](https://)', t('course.homework.linkText'))} aria-label={t('course.homework.link')}>
-                <LinkIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-          <TextField
-            inputRef={text}
+          <MarkdownField
             value={form.instructions}
-            onChange={(e) => setForm({ ...form, instructions: e.target.value })}
-            multiline
-            minRows={3}
-            fullWidth
-            size="small"
+            onChange={(instructions) => setForm((f) => ({ ...f, instructions }))}
+            label={t('course.homework.instructions')}
             placeholder={t('course.homework.instructionsHint')}
-            slotProps={{ htmlInput: { maxLength: 20_000, 'aria-label': t('course.homework.instructions') } }}
-            sx={{ '& .MuiOutlinedInput-root': { borderTopLeftRadius: 0, borderTopRightRadius: 0 } }}
+            maxLength={20_000}
           />
         </Box>
         <Box>

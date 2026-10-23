@@ -226,3 +226,32 @@ export const MARK_ATTENDANCE = graphql(`
     }
   }
 `);
+
+// ───────────────────────── announcements ─────────────────────────
+
+/** One announcement per chosen course, all or nothing (one transaction on the server) */
+export const CREATE_COURSE_ANNOUNCEMENTS = graphql(`
+  mutation CreateCourseAnnouncements($input: CreateCourseAnnouncementsInput!) {
+    createCourseAnnouncements(input: $input) {
+      id
+    }
+  }
+`);
+
+export const UPDATE_ANNOUNCEMENT = graphql(`
+  mutation UpdateAnnouncement($input: UpdateAnnouncementInput!) {
+    updateAnnouncement(input: $input) {
+      id
+      isPinned
+    }
+  }
+`);
+
+/** Taken down for everyone (status ARCHIVED, audited); never deleted */
+export const ARCHIVE_ANNOUNCEMENT = graphql(`
+  mutation ArchiveAnnouncement($id: String!) {
+    archiveAnnouncement(id: $id) {
+      id
+    }
+  }
+`);

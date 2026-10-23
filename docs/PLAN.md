@@ -187,11 +187,11 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 11 (L) — Teacher UI
 
-- [ ] Dashboard: "Attendance to take", "Needs grading", my courses, recent announcements.
-- [ ] Course edit mode: weeks, lessons, upload video/file (with upload/processing states), New Homework drawer.
-- [ ] Grading table + single-submission view + publish grades.
-- [ ] Gradebook (category weights modal, quarter tabs, publish quarter grades).
-- [ ] Attendance page, announcements page + drawer.
+- [x] Dashboard: "Attendance to take", "Needs grading", my courses, recent announcements.
+- [x] Course edit mode: weeks, lessons, upload video/file (with upload/processing states), New Homework drawer.
+- [x] Grading table + single-submission view + publish grades.
+- [x] Gradebook (category weights modal, quarter tabs, publish quarter grades).
+- [x] Attendance page, announcements page + drawer.
 
 ---
 

@@ -343,3 +343,34 @@ export const TEACHER_ATTENDANCE = graphql(`
     }
   }
 `);
+
+/** Teacher announcements page: what the teacher may see, pinned first, with read receipts */
+export const TEACHER_ANNOUNCEMENTS = graphql(`
+  query TeacherAnnouncements($input: AnnouncementsInquiry) {
+    announcements(input: $input) {
+      total
+      list {
+        id
+        title
+        body
+        courseId
+        courseTitle
+        isPinned
+        publishedAt
+        authorName
+        authorRole
+        audience
+        studentReads
+        files {
+          id
+          kind
+          status
+          name
+          mimeType
+          size
+          durationSec
+        }
+      }
+    }
+  }
+`);
