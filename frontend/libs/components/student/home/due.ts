@@ -26,6 +26,16 @@ export function formatDueAt(dueAt: string, locale = 'en'): string {
   return `${local} (${school} ${SCHOOL_TIMEZONE.split('/').pop()})`;
 }
 
+/** The deadline as the school sees it ("Oct 24, 11:59 PM"), for lines that already say "Tashkent time" */
+export function formatInSchool(iso: string, locale = 'en'): string {
+  const at = new Date(iso);
+  if (locale === 'uz') {
+    const part = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-GB', { timeZone: SCHOOL_TIMEZONE, ...o }).format(at);
+    return `${part({ day: '2-digit' })}.${part({ month: '2-digit' })} ${clock(at, SCHOOL_TIMEZONE)}`;
+  }
+  return new Intl.DateTimeFormat(locale, { timeZone: SCHOOL_TIMEZONE, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(at);
+}
+
 /** Student pages built in the next steps */
 export const studentHref = {
   course: (courseId: string) => `/student/courses/${courseId}`,

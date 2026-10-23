@@ -1,4 +1,5 @@
 import type { ApolloClient } from '@apollo/client';
+import { CREATE_SUBMISSION_UPLOAD } from '@/apollo/student/mutation';
 import { CONFIRM_UPLOAD, CREATE_UPLOAD } from '@/apollo/teacher/mutation';
 import type { MediaKind } from '@/libs/gql/graphql';
 
@@ -88,6 +89,43 @@ export async function uploadCourseFile(
     variables: { input: { courseId, kind, fileName: file.name, mimeType: file.type, size: file.size, durationSec } },
   });
   const ticket = data!.createUpload;
+  onPhase('UPLOADING', 0);
+  await put(ticket.uploadUrl, file, (p) => onPhase('UPLOADING', p), signal);
+  onPhase('CHECKING');
+  await client.mutate({ mutation: CONFIRM_UPLOAD, variables: { assetId: ticket.assetId } });
+  onPhase('READY');
+  return ticket.assetId;
+}
+
+/** "pdf" → "application/pdf": an assignment lists the extensions it accepts (server MIME_EXTENSIONS) */
+export const MIME_BY_EXTENSION: Record<string, string> = {
+  pdf: 'application/pdf',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  jpg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+};
+
+/**
+ * A student's file for one assignment: the same three steps as uploadCourseFile, but the ticket
+ * comes from createSubmissionUpload, so the file can only be attached to this assignment.
+ */
+export async function uploadSubmissionFile(
+  client: ApolloClient,
+  assignmentId: string,
+  file: File,
+  onPhase: (phase: UploadPhase, percent?: number) => void,
+  signal?: AbortSignal,
+): Promise<string> {
+  const kind = kindOf(file);
+  if (kind !== 'DOCUMENT' && kind !== 'IMAGE') throw new Error('FILE_TYPE');
+  onPhase('PREPARING');
+  const { data } = await client.mutate({
+    mutation: CREATE_SUBMISSION_UPLOAD,
+    variables: { input: { assignmentId, kind, fileName: file.name, mimeType: file.type, size: file.size } },
+  });
+  const ticket = data!.createSubmissionUpload;
   onPhase('UPLOADING', 0);
   await put(ticket.uploadUrl, file, (p) => onPhase('UPLOADING', p), signal);
   onPhase('CHECKING');

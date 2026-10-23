@@ -193,5 +193,98 @@
       "seek": "Video joyi",
       "locked": "90% ko‘rilgach oldinga o‘tish mumkin"
     }
+  },
+  "homework": {
+    "label": "Topshiriq",
+    "download": "Yuklab olish",
+    "status": {
+      "title": "Topshirish holati",
+      "attempt": "{{n}}-urinish",
+      "submission": "Topshirish holati",
+      "grading": "Baholash holati",
+      "due": "Muddat",
+      "maxScore": "Maksimal ball",
+      "accepted": "Qabul qilinadigan fayllar",
+      "remaining": "Qolgan vaqt",
+      "modified": "Oxirgi o‘zgarish",
+      "files": "Yuklangan fayllar",
+      "comments": "Izohlar"
+    },
+    "state": {
+      "none": "Topshirilmagan",
+      "SUBMITTED": "Baholashga topshirildi",
+      "LATE": "Kech topshirildi",
+      "RETURNED": "Qayta ishlashga qaytarildi",
+      "GRADED": "Baholashga topshirildi",
+      "MISSING": "Topshirilmagan",
+      "DRAFT": "Topshirilmagan"
+    },
+    "grading": {
+      "graded": "Baholangan",
+      "notGraded": "Baholanmagan",
+      "exam": "Offline imtihon: darsda baholanadi"
+    },
+    "points_one": "{{count}} ball",
+    "points_other": "{{count}} ball",
+    "schoolTime": "{{date}} (Toshkent vaqti)",
+    "noDue": "Muddatsiz",
+    "upTo": "{{size}} gacha",
+    "left": "{{time}} qoldi",
+    "overdue": "Muddatdan {{time}} o‘tdi",
+    "early": "Muddatdan {{time}} oldin topshirildi",
+    "late": "{{time}} kech topshirildi",
+    "closed": "Yopilgan: baholar e’lon qilingan",
+    "days_one": "{{count}} kun",
+    "days_other": "{{count}} kun",
+    "hours_one": "{{count}} soat",
+    "hours_other": "{{count}} soat",
+    "mins_one": "{{count}} daqiqa",
+    "mins_other": "{{count}} daqiqa",
+    "commentsCount": "Izohlar ({{count}})",
+    "commentPlaceholder": "O‘qituvchiga izoh yozing…",
+    "send": "Yuborish",
+    "upload": {
+      "title": "Fayllarni yuklash",
+      "drop": "Faylni shu yerga tashlang yoki",
+      "browse": "tanlang",
+      "hint": "Qabul qilinadi: {{types}} · {{size}} gacha · ko‘pi bilan {{max}} ta fayl",
+      "PREPARING": "Tayyorlanmoqda…",
+      "UPLOADING": "Yuklanmoqda {{percent}}%",
+      "CHECKING": "Tekshirilmoqda…",
+      "READY": "Yuklandi",
+      "FAILED": "Yuklab bo‘lmadi",
+      "remove": "Faylni olib tashlash",
+      "FILE_TYPE": "Bu turdagi fayl qabul qilinmaydi.",
+      "FILE_TOO_LARGE": "Fayl {{size}} dan katta.",
+      "s3": "Yuklash uzilib qoldi. Qayta urinib ko‘ring."
+    },
+    "text": {
+      "label": "Matnli javob / izoh (ixtiyoriy)",
+      "placeholder": "Qo‘shimcha izoh, formulalar yoki o‘qituvchiga savol…"
+    },
+    "draftSaved": "Qoralama {{time}} da saqlandi",
+    "draftHint": "Faqat shu qurilmada saqlanadi",
+    "saveDraft": "Qoralamani saqlash",
+    "submit": "Topshirish",
+    "submitting": "Topshirilmoqda…",
+    "submitted": "Topshirildi",
+    "empty": "Avval fayl qo‘shing yoki javob yozing.",
+    "edit": "Javobni o‘zgartirish",
+    "cancelEdit": "Bekor qilish",
+    "attemptsLeft_one": "{{count}} ta urinish qoldi",
+    "attemptsLeft_other": "{{count}} ta urinish qoldi",
+    "lateWarning": "Muddatdan ({{date}}) keyin yangi urinish kech deb belgilanadi.",
+    "noLate": "Muddat o‘tgan, kech topshiriq qabul qilinmaydi.",
+    "feedback": {
+      "title": "Baho va izoh",
+      "grade": "Baho",
+      "gradedOn": "Baholangan sana",
+      "gradedBy": "Baholagan",
+      "comments": "O‘qituvchi izohi"
+    },
+    "tutor": "Study Tutor'dan maslahat so‘rash",
+    "qa": "Q&A'da savol berish",
+    "soon": "Tez orada",
+    "notFound": "Bu topshiriq mavjud emas."
   }
 }

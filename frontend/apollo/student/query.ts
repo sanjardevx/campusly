@@ -195,3 +195,68 @@ export const STUDENT_FILE_URL = graphql(`
     }
   }
 `);
+
+/** Homework page: the assignment, its course (breadcrumb, week) and the student's own submission */
+export const STUDENT_ASSIGNMENT = graphql(`
+  query StudentAssignment($courseId: String!, $assignmentId: String!) {
+    courseDetail(courseId: $courseId) {
+      id
+      title
+      subjectName
+      modules {
+        id
+        order
+      }
+    }
+    assignment(id: $assignmentId) {
+      id
+      courseId
+      moduleId
+      type
+      title
+      instructions
+      maxScore
+      dueAt
+      allowLate
+      maxAttempts
+      acceptedFileTypes
+      gradesPublishedAt
+      files {
+        id
+        name
+        mimeType
+        size
+      }
+    }
+    mySubmission(assignmentId: $assignmentId) {
+      id
+      status
+      submittedAt
+      score
+      feedback
+      gradedAt
+      gradedByName
+      attemptsLeft
+      attempts {
+        number
+        text
+        isLate
+        submittedAt
+        files {
+          assetId
+          originalName
+          mimeType
+          size
+          url
+        }
+      }
+      comments {
+        id
+        authorName
+        authorRole
+        body
+        createdAt
+      }
+    }
+  }
+`);

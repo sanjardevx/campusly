@@ -185,5 +185,93 @@
       "seek": "재생 위치",
       "locked": "90% 시청 후 앞으로 건너뛸 수 있습니다"
     }
+  },
+  "homework": {
+    "label": "과제",
+    "download": "다운로드",
+    "status": {
+      "title": "제출 상태",
+      "attempt": "{{n}}번째 제출",
+      "submission": "제출 상태",
+      "grading": "채점 상태",
+      "due": "마감일",
+      "maxScore": "만점",
+      "accepted": "제출 가능한 파일",
+      "remaining": "남은 시간",
+      "modified": "최종 수정",
+      "files": "제출한 파일",
+      "comments": "제출 댓글"
+    },
+    "state": {
+      "none": "제출하지 않음",
+      "SUBMITTED": "채점 대기",
+      "LATE": "지각 제출",
+      "RETURNED": "다시 제출 요청",
+      "GRADED": "채점 대기",
+      "MISSING": "미제출",
+      "DRAFT": "제출하지 않음"
+    },
+    "grading": {
+      "graded": "채점 완료",
+      "notGraded": "채점 전",
+      "exam": "오프라인 시험: 수업 중 채점"
+    },
+    "points_other": "{{count}}점",
+    "schoolTime": "{{date}} (타슈켄트 시간)",
+    "noDue": "마감 없음",
+    "upTo": "최대 {{size}}",
+    "left": "{{time}} 남음",
+    "overdue": "마감 {{time}} 지남",
+    "early": "마감 {{time}} 전에 제출",
+    "late": "{{time}} 늦게 제출",
+    "closed": "마감됨: 성적 공개됨",
+    "days_other": "{{count}}일",
+    "hours_other": "{{count}}시간",
+    "mins_other": "{{count}}분",
+    "commentsCount": "댓글 ({{count}})",
+    "commentPlaceholder": "선생님께 댓글을 남기세요…",
+    "send": "보내기",
+    "upload": {
+      "title": "파일 제출",
+      "drop": "파일을 여기로 끌어다 놓거나",
+      "browse": "찾아보기",
+      "hint": "가능: {{types}} · 최대 {{size}} · 최대 {{max}}개",
+      "PREPARING": "준비 중…",
+      "UPLOADING": "업로드 중 {{percent}}%",
+      "CHECKING": "확인 중…",
+      "READY": "업로드됨",
+      "FAILED": "업로드 실패",
+      "remove": "파일 제거",
+      "FILE_TYPE": "이 형식의 파일은 제출할 수 없습니다.",
+      "FILE_TOO_LARGE": "파일이 {{size}}보다 큽니다.",
+      "s3": "업로드가 중단되었습니다. 다시 시도하세요."
+    },
+    "text": {
+      "label": "텍스트 답변 / 메모 (선택)",
+      "placeholder": "메모, 수식 또는 선생님께 질문을 남기세요…"
+    },
+    "draftSaved": "{{time}}에 임시 저장됨",
+    "draftHint": "이 기기에만 저장됩니다",
+    "saveDraft": "임시 저장",
+    "submit": "제출",
+    "submitting": "제출 중…",
+    "submitted": "제출 완료",
+    "empty": "먼저 파일을 추가하거나 답을 작성하세요.",
+    "edit": "제출 수정",
+    "cancelEdit": "취소",
+    "attemptsLeft_other": "남은 제출 {{count}}회",
+    "lateWarning": "마감({{date}}) 이후의 새 제출은 지각으로 표시됩니다.",
+    "noLate": "마감이 지났고 지각 제출은 받지 않습니다.",
+    "feedback": {
+      "title": "피드백",
+      "grade": "점수",
+      "gradedOn": "채점일",
+      "gradedBy": "채점자",
+      "comments": "선생님 코멘트"
+    },
+    "tutor": "Study Tutor에게 힌트 요청",
+    "qa": "Q&A에 질문하기",
+    "soon": "곧 제공",
+    "notFound": "이 과제를 볼 수 없습니다."
   }
 }

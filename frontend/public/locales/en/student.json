@@ -193,5 +193,98 @@
       "seek": "Video position",
       "locked": "You can skip ahead after watching 90%"
     }
+  },
+  "homework": {
+    "label": "Assignment",
+    "download": "Download",
+    "status": {
+      "title": "Submission status",
+      "attempt": "Attempt {{n}}",
+      "submission": "Submission status",
+      "grading": "Grading status",
+      "due": "Due date",
+      "maxScore": "Max score",
+      "accepted": "Accepted files",
+      "remaining": "Time remaining",
+      "modified": "Last modified",
+      "files": "File submissions",
+      "comments": "Submission comments"
+    },
+    "state": {
+      "none": "No submission",
+      "SUBMITTED": "Submitted for grading",
+      "LATE": "Submitted late",
+      "RETURNED": "Returned for redo",
+      "GRADED": "Submitted for grading",
+      "MISSING": "Missing",
+      "DRAFT": "No submission"
+    },
+    "grading": {
+      "graded": "Graded",
+      "notGraded": "Not graded",
+      "exam": "Offline exam: graded in class"
+    },
+    "points_one": "{{count}} point",
+    "points_other": "{{count}} points",
+    "schoolTime": "{{date}} (Tashkent time)",
+    "noDue": "No due date",
+    "upTo": "up to {{size}}",
+    "left": "{{time}} left",
+    "overdue": "Overdue by {{time}}",
+    "early": "Submitted {{time}} early",
+    "late": "Submitted {{time}} late",
+    "closed": "Closed: grades are published",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "mins_one": "{{count}} min",
+    "mins_other": "{{count}} mins",
+    "commentsCount": "Comments ({{count}})",
+    "commentPlaceholder": "Write a comment for your teacher…",
+    "send": "Send",
+    "upload": {
+      "title": "File submissions",
+      "drop": "Drag and drop your file here or",
+      "browse": "click to browse",
+      "hint": "Accepted: {{types}} · up to {{size}} · at most {{max}} files",
+      "PREPARING": "Preparing…",
+      "UPLOADING": "Uploading {{percent}}%",
+      "CHECKING": "Checking…",
+      "READY": "Uploaded",
+      "FAILED": "Upload failed",
+      "remove": "Remove file",
+      "FILE_TYPE": "This file type is not accepted here.",
+      "FILE_TOO_LARGE": "The file is larger than {{size}}.",
+      "s3": "The upload was interrupted. Try again."
+    },
+    "text": {
+      "label": "Online text / commentary (optional)",
+      "placeholder": "Add optional notes, equation references, or questions for your teacher…"
+    },
+    "draftSaved": "Draft saved at {{time}}",
+    "draftHint": "Saved on this device only",
+    "saveDraft": "Save draft",
+    "submit": "Submit",
+    "submitting": "Submitting…",
+    "submitted": "Submitted",
+    "empty": "Add a file or write an answer first.",
+    "edit": "Edit submission",
+    "cancelEdit": "Cancel",
+    "attemptsLeft_one": "{{count}} attempt left",
+    "attemptsLeft_other": "{{count}} attempts left",
+    "lateWarning": "After the due date ({{date}}), a new attempt is marked late.",
+    "noLate": "The due date has passed and late work is not accepted.",
+    "feedback": {
+      "title": "Feedback",
+      "grade": "Grade",
+      "gradedOn": "Graded on",
+      "gradedBy": "Graded by",
+      "comments": "Feedback comments"
+    },
+    "tutor": "Ask Study Tutor for a hint",
+    "qa": "Ask a question in Q&A",
+    "soon": "Coming soon",
+    "notFound": "This assignment is not available."
   }
 }
