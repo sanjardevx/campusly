@@ -17,6 +17,7 @@ import { OverviewResolver } from '../src/components/overview/overview.resolver';
 import { ProgressResolver } from '../src/components/progress/progress.resolver';
 import { SchoolEventResolver } from '../src/components/school/school-event.resolver';
 import { SchoolResolver } from '../src/components/school/school.resolver';
+import { TeacherDashboardResolver } from '../src/components/dashboard/teacher-dashboard.resolver';
 import { UserAdminResolver } from '../src/components/user/user-admin.resolver';
 import { UserResolver } from '../src/components/user/user.resolver';
 import {
@@ -48,6 +49,7 @@ const RESOLVERS = [
   SchoolEventResolver,
   SchoolResolver,
   SubmissionResolver,
+  TeacherDashboardResolver,
   UserAdminResolver,
   UserResolver,
 ];
@@ -135,6 +137,14 @@ describe('Every GraphQL operation has a deliberate role rule', () => {
       ].includes(o.resolver),
     );
     for (const op of adminOnly) expect(op.roles).toEqual([Role.ADMIN]);
+  });
+
+  it('the teacher dashboard is for teachers only', () => {
+    const teacherOnly = ops.filter(
+      (o) => o.resolver === 'TeacherDashboardResolver',
+    );
+    expect(teacherOnly.map((o) => o.name)).toEqual(['teacherDashboard']);
+    for (const op of teacherOnly) expect(op.roles).toEqual([Role.TEACHER]);
   });
 
   it('parents never write: no mutation lists PARENT except the read-only comment check', () => {

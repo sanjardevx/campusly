@@ -154,6 +154,7 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - Late submissions are allowed until grades are published (if `allowLate`). "Give 0 to not submitted" sets `MISSING`.
 - Attendance is per **course session** (`ClassSession` by date), not per school day. Default status is `PRESENT`; teachers mark exceptions.
 - **Admin dashboard "needs attention" is about attendance only** (current period, up to today): below 75 % → HIGH, 75–85 % → MEDIUM, 85–90 % → LOW. A rate needs at least 5 marks. Counted on the server (`groupBy`); the list shows the 5 lowest rates.
+- **Teacher dashboard** (no timetable): "Attendance today" lists all of the teacher's active courses with today's state (taken / not taken; a HOLIDAY event today shows "no classes"), without periods, times or rooms. "Needs grading" = submitted / late work not graded yet (an exam past its date: students without a score), plus assignments fully graded but not published. Read receipts on the teacher's own announcements count the course's active students. The Stitch "Unanswered questions" card stays as a coming-soon card until the Q&A phase.
 - **School calendar** (`SchoolEvent`, admin dashboard): holidays (one day or a range), school events, programme deadlines and start dates, added by admins; term starts / ends come from `Period`. Course deadlines are not on it (they stay in the courses). Edit and archive only (no hard delete), every change audited; a range is at most 92 days.
 
 ## 11. Media
@@ -220,3 +221,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-23 | Admin dashboard: KPI tiles with month-over-month change, attendance donut (today / week / month), "needs attention", month calendar, recent activity from the audit log; website blocks hidden until the CMS phase |
 | 2026-10-23 | Developer's choice: "needs attention" is attendance only (75 / 85 / 90 %); the admin calendar holds the school's own events — new `SchoolEvent` table (holiday, event, deadline, start), so the admin part of the calendar moves into the MVP; students' / parents' calendar stays a later phase |
 | 2026-10-23 | Data colour palette and dashboard motion rules added to §13 |
+| 2026-10-23 | Teacher dashboard without a timetable: "Attendance today" shows all of the teacher's active courses with today's state; Q&A card shown as coming soon (developer's choice) |

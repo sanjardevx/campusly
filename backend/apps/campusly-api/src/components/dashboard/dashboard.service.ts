@@ -255,8 +255,11 @@ export class DashboardService {
       : null;
   }
 
-  /** The leaf period today is in (same rule as the student overview), with its week number */
-  private async currentPeriod(academicYearId: string, today: string) {
+  /**
+   * The leaf period today is in (same rule as the student overview), with its week number.
+   * Public: the teacher dashboard shows the same "Quarter 1 · week 7".
+   */
+  public async currentPeriod(academicYearId: string, today: string) {
     const day = toDbDate(today);
     const period = await this.prismaService.period.findFirst({
       where: { academicYearId, children: { none: {} }, startsAt: { lte: day } },

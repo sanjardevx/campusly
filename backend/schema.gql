@@ -430,6 +430,15 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+enum DeadlineKind {
+  ASSIGNMENT
+  DEADLINE
+  EVENT
+  START
+  TERM_END
+  TERM_START
+}
+
 enum Direction {
   ASC
   DESC
@@ -466,6 +475,21 @@ type GradebookRow {
   loginId: String!
   studentId: String!
   submission: Submission
+}
+
+type GradingItem {
+  allowLate: Boolean!
+  assignmentId: String!
+  courseId: String!
+  courseTitle: String!
+  dueAt: DateTime
+  graded: Int!
+  readyToPublish: Boolean!
+  students: Int!
+  submitted: Int!
+  title: String!
+  toGrade: Int!
+  type: AssignmentType!
 }
 
 type Group {
@@ -854,6 +878,7 @@ type Query {
   schoolSettings: SchoolSettings!
   studentOverview(studentId: String): StudentOverview!
   subjects(includeArchived: Boolean): [Subject!]!
+  teacherDashboard: TeacherDashboard!
   teachingCourses: [Course!]!
   users(input: UsersInquiry!): Users!
 }
@@ -1052,6 +1077,51 @@ input SubmitAssignmentInput {
   assetIds: [String!]
   assignmentId: String!
   text: String
+}
+
+type TeacherAnnouncement {
+  audience: Int
+  courseTitle: String
+  id: String!
+  publishedAt: DateTime!
+  reads: Int!
+  title: String!
+}
+
+type TeacherCourse {
+  id: String!
+  status: CourseStatus!
+  students: Int!
+  title: String!
+  week: Int
+}
+
+type TeacherDashboard {
+  announcements: [TeacherAnnouncement!]!
+  courses: [TeacherCourse!]!
+  deadlines: [TeacherDeadline!]!
+  grading: [GradingItem!]!
+  holiday: String
+  period: DashboardPeriod
+  toGradeTotal: Int!
+  today: String!
+  todayCourses: [TodayCourse!]!
+}
+
+type TeacherDeadline {
+  courseTitles: [String!]!
+  date: String!
+  dueAt: DateTime
+  id: String!
+  kind: DeadlineKind!
+  title: String!
+}
+
+type TodayCourse {
+  courseId: String!
+  marked: Int!
+  students: Int!
+  title: String!
 }
 
 type TotalCounter {

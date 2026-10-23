@@ -26,3 +26,14 @@ export enum AttentionPriority {
   LOW = 'LOW',
 }
 registerEnumType(AttentionPriority, { name: 'AttentionPriority' });
+
+/** A row of the teacher's "Upcoming deadlines": their own assignment or a school calendar date */
+export enum DeadlineKind {
+  ASSIGNMENT = 'ASSIGNMENT',
+  DEADLINE = 'DEADLINE',
+  START = 'START',
+  EVENT = 'EVENT',
+  TERM_START = 'TERM_START',
+  TERM_END = 'TERM_END',
+}
+registerEnumType(DeadlineKind, { name: 'DeadlineKind' });
