@@ -235,6 +235,17 @@ enum CompletionType {
   VIEW
 }
 
+type ContinueLesson {
+  courseId: String!
+  courseTitle: String!
+  durationSec: Int
+  lessonId: String!
+  percent: Float
+  subjectName: String!
+  title: String!
+  type: LessonType!
+}
+
 type Course {
   academicYearId: String!
   gradeCategories: [GradeCategory!]!
@@ -793,6 +804,8 @@ type OverviewCourse {
   courseId: String!
   isPublished: Boolean!
   mark: Int
+  newCount: Int!
+  progress: Float
   score: Float
   subjectName: String!
   teacherName: String
@@ -802,6 +815,7 @@ type OverviewCourse {
 type OverviewPeriod {
   id: String!
   name: String!
+  week: Int!
 }
 
 type OverviewStudent {
@@ -1067,6 +1081,7 @@ type StudentGrade {
 type StudentOverview {
   announcements: Announcements!
   attendance: AttendanceSummary!
+  continueLessons: [ContinueLesson!]!
   courses: [OverviewCourse!]!
   period: OverviewPeriod
   recentGrades: [RecentGrade!]!

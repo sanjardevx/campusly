@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import type { Prisma } from '../../../../../generated/prisma/client';
 import { PrismaService } from '../../database/prisma.service';
 import { Child, StudentOverview } from '../../libs/dto/overview/overview';
 import type { AuthUser } from '../../libs/types/auth';
@@ -14,6 +15,9 @@ const DAY_MS = 86_400_000;
 /** "Due soon" on the home page */
 const UPCOMING_DAYS = 7;
 const RECENT_GRADES = 5;
+/** "New" on a course card: published in the last 7 days */
+const NEW_DAYS = 7;
+const CONTINUE_LESSONS = 3;
 
 /**
  * The student / parent home page in one query. One access check (resolveStudentScope), then
@@ -73,14 +77,32 @@ export class OverviewService {
     const now = new Date();
 
     const { timezone } = await this.schoolService.getSettings();
+    const today = todayInZone(timezone);
     const period = courses.length
-      ? await this.currentPeriod(
-          courses[0].academicYearId,
-          todayInZone(timezone),
-        )
+      ? await this.currentPeriod(courses[0].academicYearId, today)
       : null;
 
-    const [records, upcoming, graded, announcements] = await Promise.all([
+    // What a learner may open: a published lesson in a visible, published week
+    const visibleLesson: Prisma.LessonWhereInput = {
+      publishedAt: { lte: now },
+      module: {
+        courseId: { in: courseIds },
+        isHidden: false,
+        publishedAt: { lte: now },
+      },
+    };
+    const newSince = new Date(now.getTime() - NEW_DAYS * DAY_MS);
+
+    const [
+      records,
+      upcoming,
+      graded,
+      announcements,
+      started,
+      lessons,
+      newAssignments,
+      unread,
+    ] = await Promise.all([
       this.prismaService.attendanceRecord.findMany({
         where: { studentId: id, session: { courseId: { in: courseIds } } },
         select: { status: true, session: { select: { courseId: true } } },
@@ -133,6 +155,66 @@ export class OverviewService {
         },
       }),
       this.announcementService.getAnnouncements(user, { limit: 3 }),
+      this.prismaService.lessonProgress.findMany({
+        where: { studentId: id, status: 'IN_PROGRESS', lesson: visibleLesson },
+        orderBy: { updatedAt: 'desc' },
+        take: CONTINUE_LESSONS,
+        select: {
+          maxPositionSec: true,
+          lesson: {
+            select: {
+              id: true,
+              title: true,
+              type: true,
+              videoAsset: { select: { durationSec: true } },
+              module: {
+                select: {
+                  course: {
+                    select: {
+                      id: true,
+                      title: true,
+                      subject: { select: { name: true } },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+      // Progress and "new lessons": every visible lesson with this student's status
+      this.prismaService.lesson.findMany({
+        where: visibleLesson,
+        select: {
+          publishedAt: true,
+          module: { select: { courseId: true } },
+          progress: { where: { studentId: id }, select: { status: true } },
+        },
+      }),
+      // New and not handed in yet (a returned redo counts as handed in: it is not new)
+      this.prismaService.assignment.findMany({
+        where: {
+          courseId: { in: courseIds },
+          publishedAt: { gte: newSince, lte: now },
+          submissions: {
+            none: {
+              studentId: id,
+              OR: [{ attempts: { some: {} } }, { status: 'GRADED' }],
+            },
+          },
+        },
+        select: { courseId: true },
+      }),
+      // The viewer's own reads: a parent reading does not mark it for the child
+      this.prismaService.announcement.findMany({
+        where: {
+          courseId: { in: courseIds },
+          status: 'ACTIVE',
+          publishedAt: { lte: now },
+          reads: { none: { userId: user.id } },
+        },
+        select: { courseId: true },
+      }),
     ]);
 
     const courseRows = [];
@@ -145,6 +227,15 @@ export class OverviewService {
           )
         : null;
       const owner = course.teachers[0]?.teacher;
+      const own = lessons.filter((l) => l.module.courseId === course.id);
+      const completed = own.filter(
+        (l) => l.progress[0]?.status === 'COMPLETED',
+      ).length;
+      const newLessons = own.filter(
+        (l) =>
+          l.publishedAt! >= newSince &&
+          (l.progress[0]?.status ?? 'NOT_STARTED') === 'NOT_STARTED',
+      ).length;
       courseRows.push({
         courseId: course.id,
         title: course.title,
@@ -158,6 +249,13 @@ export class OverviewService {
             .filter((r) => r.session.courseId === course.id)
             .map((r) => r.status),
         ).rate,
+        progress: own.length
+          ? Math.round((completed / own.length) * 100)
+          : null,
+        newCount:
+          newLessons +
+          newAssignments.filter((a) => a.courseId === course.id).length +
+          unread.filter((a) => a.courseId === course.id).length,
       });
     }
 
@@ -169,9 +267,35 @@ export class OverviewService {
         lastName: student.lastName,
         className: student.groupMemberships[0]?.group.name ?? null,
       },
-      period: period ? { id: period.id, name: period.name } : null,
+      period: period
+        ? {
+            id: period.id,
+            name: period.name,
+            week:
+              Math.floor(
+                (toDbDate(today).getTime() - period.startsAt.getTime()) /
+                  (7 * DAY_MS),
+              ) + 1,
+          }
+        : null,
       courses: courseRows,
       attendance: summarizeAttendance(records.map((r) => r.status)),
+      continueLessons: started.map(({ lesson, maxPositionSec }) => {
+        const { course } = lesson.module;
+        const durationSec = lesson.videoAsset?.durationSec ?? null;
+        return {
+          lessonId: lesson.id,
+          courseId: course.id,
+          courseTitle: course.title,
+          subjectName: course.subject.name,
+          title: lesson.title,
+          type: lesson.type,
+          durationSec,
+          percent: durationSec
+            ? Math.min(100, Math.round((maxPositionSec / durationSec) * 100))
+            : null,
+        };
+      }),
       upcoming: upcoming.map((a) => {
         const sub = a.submissions[0];
         return {

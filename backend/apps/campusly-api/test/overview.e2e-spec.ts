@@ -91,6 +91,12 @@ describe('studentOverview and myChildren (e2e)', () => {
       where: { assignment: { course: courses } },
     });
     await prisma.assignment.deleteMany({ where: { course: courses } });
+    await prisma.lessonProgress.deleteMany({
+      where: { lesson: { module: { course: courses } } },
+    });
+    await prisma.lesson.deleteMany({ where: { module: { course: courses } } });
+    await prisma.module.deleteMany({ where: { course: courses } });
+    await prisma.mediaAsset.deleteMany({ where: { ownerId: { in: ids } } });
     await prisma.gradeCategory.deleteMany({ where: { course: courses } });
     await prisma.enrollment.deleteMany({ where: { course: courses } });
     await prisma.courseTeacher.deleteMany({ where: { course: courses } });
@@ -289,6 +295,70 @@ describe('studentOverview and myChildren (e2e)', () => {
         body: 'Text',
       },
     });
+
+    // Lessons: a visible week (done, half watched, new today), a hidden week, a draft lesson
+    const video = await prisma.mediaAsset.create({
+      data: {
+        ownerId: id.tA,
+        kind: 'VIDEO',
+        originalName: 'lesson.mp4',
+        mimeType: 'video/mp4',
+        size: 1000n,
+        status: 'READY',
+        durationSec: 600,
+        s3Key: `raw/${course.A}/overview-${Date.now()}.mp4`,
+      },
+    });
+    const week = async (order: number, isHidden: boolean) =>
+      (
+        await prisma.module.create({
+          data: {
+            courseId: course.A,
+            title: `Week ${order}`,
+            order,
+            isHidden,
+            publishedAt: new Date(now - 20 * DAY),
+          },
+        })
+      ).id;
+    const visible = await week(1, false);
+    const hiddenWeek = await week(2, true);
+    const lesson = async (
+      title: string,
+      moduleId: string,
+      publishedAt: Date | null,
+      videoAssetId?: string,
+    ) =>
+      (
+        await prisma.lesson.create({
+          data: {
+            moduleId,
+            title,
+            type: videoAssetId ? 'VIDEO' : 'READING',
+            order: 1,
+            publishedAt,
+            videoAssetId,
+          },
+        })
+      ).id;
+    const old = new Date(now - 10 * DAY);
+    const done = await lesson('Done lesson', visible, old);
+    const half = await lesson('Half watched', visible, old, video.id);
+    await lesson('New today', visible, new Date(now - 3600_000));
+    const inHidden = await lesson('In a hidden week', hiddenWeek, old);
+    await lesson('Draft lesson', visible, null);
+    await prisma.lessonProgress.createMany({
+      data: [
+        { studentId: id.sA, lessonId: done, status: 'COMPLETED' },
+        {
+          studentId: id.sA,
+          lessonId: half,
+          status: 'IN_PROGRESS',
+          maxPositionSec: 270,
+        },
+        { studentId: id.sA, lessonId: inHidden, status: 'IN_PROGRESS' },
+      ],
+    });
   });
 
   afterAll(async () => {
@@ -324,6 +394,52 @@ describe('studentOverview and myChildren (e2e)', () => {
     expect(o.announcements.list.map((a) => a.title)).toContain(
       `${TAG} Quiz on Friday`,
     );
+  });
+
+  it('student home: week number, "continue" lessons, course progress and new items', async () => {
+    const res = await gql<{
+      studentOverview: {
+        period: { week: number };
+        continueLessons: {
+          title: string;
+          durationSec: number;
+          percent: number;
+        }[];
+        courses: { progress: number | null; newCount: number }[];
+      };
+    }>(
+      `{ studentOverview {
+        period { week }
+        continueLessons { title durationSec percent }
+        courses { progress newCount }
+      } }`,
+      {},
+      'sA',
+    );
+    const o = res.data!.studentOverview;
+    // The period started 30 days ago → week 5
+    expect(o.period.week).toBe(5);
+    // 270 of 600 s; the lesson in the hidden week is not offered
+    expect(o.continueLessons).toEqual([
+      { title: 'Half watched', durationSec: 600, percent: 45 },
+    ]);
+    // 1 of 3 visible lessons done. New: 1 lesson today + 2 assignments not handed in + 1 unread announcement
+    expect(o.courses).toEqual([{ progress: 33, newCount: 4 }]);
+  });
+
+  it('a classmate gets their own progress, not Aziz’s', async () => {
+    const res = await gql<{
+      studentOverview: {
+        continueLessons: unknown[];
+        courses: { progress: number | null }[];
+      };
+    }>(
+      `{ studentOverview { continueLessons { title } courses { progress } } }`,
+      {},
+      'sA2',
+    );
+    expect(res.data!.studentOverview.continueLessons).toEqual([]);
+    expect(res.data!.studentOverview.courses[0].progress).toBe(0);
   });
 
   it('myChildren: the parent’s children for the switcher', async () => {

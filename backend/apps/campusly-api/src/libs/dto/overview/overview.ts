@@ -2,6 +2,7 @@ import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { Announcements } from '../announcement/announcement';
 import { AttendanceSummary } from '../attendance/attendance';
 import { AssignmentType } from '../../enums/assignment.enum';
+import { LessonType } from '../../enums/course.enum';
 import { ParentRelation } from '../../enums/user.enum';
 
 @ObjectType()
@@ -30,6 +31,10 @@ export class OverviewPeriod {
 
   @Field(() => String)
   name: string;
+
+  /** Week of the period today is in (1 = the first week), school timezone */
+  @Field(() => Int)
+  week: number;
 }
 
 @ObjectType()
@@ -59,6 +64,43 @@ export class OverviewCourse {
 
   @Field(() => Float, { nullable: true })
   attendanceRate: number | null;
+
+  /** Completed lessons / published lessons in visible weeks; null when there are none */
+  @Field(() => Float, { nullable: true })
+  progress: number | null;
+
+  /** Unread announcements + lessons / assignments published in the last 7 days, not opened yet */
+  @Field(() => Int)
+  newCount: number;
+}
+
+/** A lesson the student started and has not completed ("Continue") */
+@ObjectType()
+export class ContinueLesson {
+  @Field(() => String)
+  lessonId: string;
+
+  @Field(() => String)
+  courseId: string;
+
+  @Field(() => String)
+  courseTitle: string;
+
+  @Field(() => String)
+  subjectName: string;
+
+  @Field(() => String)
+  title: string;
+
+  @Field(() => LessonType)
+  type: LessonType;
+
+  @Field(() => Int, { nullable: true })
+  durationSec: number | null;
+
+  /** Furthest point reached, % of the video; null without a video length */
+  @Field(() => Float, { nullable: true })
+  percent: number | null;
 }
 
 /** Due in the next 7 days */
@@ -128,6 +170,10 @@ export class StudentOverview {
   /** All courses together */
   @Field(() => AttendanceSummary)
   attendance: AttendanceSummary;
+
+  /** Started, not completed (latest first) */
+  @Field(() => [ContinueLesson])
+  continueLessons: ContinueLesson[];
 
   @Field(() => [UpcomingItem])
   upcoming: UpcomingItem[];
