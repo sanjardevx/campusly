@@ -5,6 +5,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
 import { setupApp } from '../src/app.setup';
+import { StorageService } from '../src/components/media/storage.service';
 import { PrismaService } from '../src/database/prisma.service';
 
 // Needs Docker Postgres + Redis. Year "E2E Announce": course A (teacher tA, student sA,
@@ -86,9 +87,14 @@ describe('Announcements: who sees, who writes, read receipts (e2e)', () => {
         ],
       },
     });
+    await prisma.announcementFile.deleteMany({
+      where: { announcement: { title: { startsWith: TAG } } },
+    });
+    await prisma.auditLog.deleteMany({ where: { actorId: { in: ids } } });
     await prisma.announcement.deleteMany({
       where: { title: { startsWith: TAG } },
     });
+    await prisma.mediaAsset.deleteMany({ where: { ownerId: { in: ids } } });
     await prisma.enrollment.deleteMany({ where: { course: courses } });
     await prisma.courseTeacher.deleteMany({ where: { course: courses } });
     await prisma.course.deleteMany({ where: courses });
@@ -99,9 +105,14 @@ describe('Announcements: who sees, who writes, read receipts (e2e)', () => {
   }
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      // courseFileUrl signs a link: no AWS needed in the test
+      .overrideProvider(StorageService)
+      .useValue({
+        isEnabled: true,
+        signedUrl: (key: string) => `https://fake-cdn.test/${key}`,
+      })
+      .compile();
     app = moduleRef.createNestApplication();
     setupApp(app);
     await app.init();
@@ -251,5 +262,107 @@ describe('Announcements: who sees, who writes, read receipts (e2e)', () => {
     // Not visible to the viewer → does not exist
     expect(code(await gql(READ, { id: ann.B }, 'sA'))).toBe('NOT_FOUND');
     expect(code(await gql(READ, { id: ann.C }, 'sA'))).toBe('NOT_FOUND');
+  });
+
+  describe('teacher page: several courses, files, audience, search, archive', () => {
+    const MULTI = `mutation($i: CreateCourseAnnouncementsInput!) { createCourseAnnouncements(input: $i) { id courseTitle files { id name } } }`;
+    const ARCHIVE = `mutation($id: String!) { archiveAnnouncement(id: $id) { id } }`;
+    const FULL = `query($i: AnnouncementsInquiry) { announcements(input: $i) { list { id title audience studentReads } } }`;
+    const URL_Q = `query($a: String!) { courseFileUrl(assetId: $a) { url } }`;
+    let file = '';
+    let posted = '';
+
+    beforeAll(async () => {
+      const asset = await prisma.mediaAsset.create({
+        data: {
+          ownerId: id.tA,
+          kind: 'DOCUMENT',
+          originalName: 'Topics.pdf',
+          mimeType: 'application/pdf',
+          size: 1000n,
+          status: 'READY',
+        },
+      });
+      file = (
+        await prisma.mediaAsset.update({
+          where: { id: asset.id },
+          data: { s3Key: `raw/${course.A}/${asset.id}.pdf` },
+        })
+      ).id;
+    });
+
+    const multi = (as: Key, courseIds: string[], extra: object = {}) =>
+      gql<{
+        createCourseAnnouncements: {
+          id: string;
+          courseTitle: string;
+          files: { name: string }[];
+        }[];
+      }>(
+        MULTI,
+        {
+          i: {
+            courseIds,
+            title: `${TAG} Topics`,
+            body: 'Review sheet attached',
+            ...extra,
+          },
+        },
+        as,
+      );
+
+    it('one row per course, with the file; a course the teacher does not teach → nothing is created', async () => {
+      const res = await multi('tA', [course.A], { fileAssetIds: [file] });
+      posted = res.data!.createCourseAnnouncements[0].id;
+      expect(
+        res.data!.createCourseAnnouncements[0].files.map((f) => f.name),
+      ).toEqual(['Topics.pdf']);
+
+      expect(code(await multi('tA', [course.A, course.B]))).toBe('NOT_FOUND');
+      expect(code(await multi('sA', [course.A]))).toBe('FORBIDDEN');
+      // Another teacher cannot attach tA's file
+      expect(
+        code(await multi('tB', [course.B], { fileAssetIds: [file] })),
+      ).toBe('NOT_FOUND');
+      expect(
+        await prisma.announcement.count({ where: { title: `${TAG} Topics` } }),
+      ).toBe(1);
+    });
+
+    it('staff see audience and how many students read it; search finds by text', async () => {
+      await gql(READ, { id: posted }, 'sA');
+      await gql(READ, { id: posted }, 'pA'); // a parent's read is not a student read
+      const res = await gql<{
+        announcements: {
+          list: { id: string; audience: number; studentReads: number }[];
+        };
+      }>(FULL, { i: { courseId: course.A, search: 'review SHEET' } }, 'tA');
+      expect(res.data!.announcements.list).toEqual([
+        { id: posted, title: `${TAG} Topics`, audience: 1, studentReads: 1 },
+      ]);
+    });
+
+    it('the file opens for the course’s student, not for another student', async () => {
+      expect(code(await gql(URL_Q, { a: file }, 'sA'))).toBeUndefined();
+      expect(code(await gql(URL_Q, { a: file }, 'sB'))).toBe('NOT_FOUND');
+    });
+
+    it('archive: only the course’s teacher; then nobody sees it and it cannot be edited; audited', async () => {
+      expect(code(await gql(ARCHIVE, { id: posted }, 'tB'))).toBe('NOT_FOUND');
+      expect(code(await gql(ARCHIVE, { id: posted }, 'sA'))).toBe('FORBIDDEN');
+      expect(code(await gql(ARCHIVE, { id: posted }, 'tA'))).toBeUndefined();
+      expect(await mine('sA')).not.toContain('Topics');
+      expect(code(await gql(URL_Q, { a: file }, 'sA'))).toBe('NOT_FOUND');
+      expect(
+        code(
+          await gql(UPDATE, { i: { id: posted, title: `${TAG} Again` } }, 'tA'),
+        ),
+      ).toBe('NOT_FOUND');
+      expect(
+        await prisma.auditLog.count({
+          where: { action: 'announcement.archive', entityId: posted },
+        }),
+      ).toBe(1);
+    });
   });
 });

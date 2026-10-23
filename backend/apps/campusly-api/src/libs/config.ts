@@ -201,6 +201,8 @@ export const SUBMISSION_FILE_TYPES = [
 export const FILE_URL_TTL_SEC = 15 * 60;
 /** Files a teacher attaches to one assignment */
 export const MAX_ASSIGNMENT_FILES = 5;
+/** Files on one announcement */
+export const MAX_ANNOUNCEMENT_FILES = 5;
 /** Files per submission attempt */
 export const MAX_SUBMISSION_FILES = 10;
 /** Default grade category for a new assignment, by type (the school default categories) */

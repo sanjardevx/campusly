@@ -44,17 +44,20 @@ type AdminDashboard {
 }
 
 type Announcement {
+  audience: Int
   authorName: String!
   authorRole: Role!
   body: String!
   courseId: String
   courseTitle: String
   eventDate: String
+  files: [CourseFile!]!
   id: String!
   isPinned: Boolean!
   isRead: Boolean!
   publishedAt: DateTime!
   readCount: Int
+  studentReads: Int
   title: String!
 }
 
@@ -68,6 +71,7 @@ input AnnouncementsInquiry {
   courseId: String
   limit: Int
   page: Int
+  search: String
 }
 
 type Assignment {
@@ -339,6 +343,14 @@ input CreateAssignmentInput {
   title: String!
   tutorMode: TutorMode
   type: AssignmentType!
+}
+
+input CreateCourseAnnouncementsInput {
+  body: String!
+  courseIds: [String!]!
+  fileAssetIds: [String!]
+  isPinned: Boolean
+  title: String!
 }
 
 input CreateCourseInput {
@@ -700,6 +712,7 @@ input MoveStudentInput {
 
 type Mutation {
   addSubmissionComment(input: AddSubmissionCommentInput!): Submission!
+  archiveAnnouncement(id: String!): Announcement!
   archiveSchoolEvent(id: String!): SchoolEvent!
   blockUser(userId: String!): Boolean!
   changePassword(input: ChangePasswordInput!): AccessToken!
@@ -709,6 +722,7 @@ type Mutation {
   createAnnouncement(input: CreateAnnouncementInput!): Announcement!
   createAssignment(input: CreateAssignmentInput!): Assignment!
   createCourse(input: CreateCourseInput!): Course!
+  createCourseAnnouncements(input: CreateCourseAnnouncementsInput!): [Announcement!]!
   createGroup(input: CreateGroupInput!): Group!
   createLesson(input: CreateLessonInput!): Lesson!
   createModule(input: CreateModuleInput!): Module!
@@ -1195,6 +1209,7 @@ input UpdateAcademicYearInput {
 input UpdateAnnouncementInput {
   body: String
   eventDate: String
+  fileAssetIds: [String!]
   id: String!
   isPinned: Boolean
   title: String

@@ -217,7 +217,7 @@ export class MediaService {
     }
 
     if (asset.ownerId !== user.id) {
-      const [resource, attachment] = await Promise.all([
+      const [resource, attachment, notice] = await Promise.all([
         this.prismaService.lessonResource.findFirst({
           where: { assetId },
           select: { lessonId: true },
@@ -225,6 +225,19 @@ export class MediaService {
         this.prismaService.assignmentFile.findFirst({
           where: { assetId, removedAt: null },
           select: { assignmentId: true },
+        }),
+        this.prismaService.announcementFile.findFirst({
+          where: { assetId, removedAt: null },
+          select: {
+            announcement: {
+              select: {
+                courseId: true,
+                status: true,
+                publishedAt: true,
+                course: { select: { status: true } },
+              },
+            },
+          },
         }),
       ]);
       // Each check throws NOT_FOUND for users who may not see the lesson / assignment
@@ -235,6 +248,19 @@ export class MediaService {
           user,
           attachment.assignmentId,
         );
+      } else if (notice) {
+        // The same rule as the announcement list: active, published, a course the user may see
+        const a = notice.announcement;
+        const learner = user.role === 'STUDENT' || user.role === 'PARENT';
+        if (a.status !== 'ACTIVE' || a.publishedAt > new Date()) {
+          throw notFound('File not found');
+        }
+        if (a.courseId) {
+          await this.accessPolicy.assertCanViewCourse(user, a.courseId);
+          if (learner && a.course?.status === 'DRAFT') {
+            throw notFound('File not found');
+          }
+        }
       } else {
         throw notFound('File not found');
       }

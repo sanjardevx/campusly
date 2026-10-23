@@ -7,6 +7,7 @@ import {
 import {
   AnnouncementsInquiry,
   CreateAnnouncementInput,
+  CreateCourseAnnouncementsInput,
   UpdateAnnouncementInput,
 } from '../../libs/dto/announcement/announcement.input';
 import { Role } from '../../libs/enums/user.enum';
@@ -43,6 +44,26 @@ export class AnnouncementResolver {
     @Args('input') input: CreateAnnouncementInput,
   ): Promise<Announcement> {
     return this.announcementService.createAnnouncement(user, input);
+  }
+
+  /** The teacher's drawer: one announcement per chosen course (each course checked) */
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @Mutation(() => [Announcement])
+  public createCourseAnnouncements(
+    @CurrentUser() user: AuthUser,
+    @Args('input') input: CreateCourseAnnouncementsInput,
+  ): Promise<Announcement[]> {
+    return this.announcementService.createCourseAnnouncements(user, input);
+  }
+
+  /** Taken down for everyone; the row stays and the change is audited */
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @Mutation(() => Announcement)
+  public archiveAnnouncement(
+    @CurrentUser() user: AuthUser,
+    @Args('id', ParseUUIDPipe) id: string,
+  ): Promise<Announcement> {
+    return this.announcementService.archiveAnnouncement(user, id);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)

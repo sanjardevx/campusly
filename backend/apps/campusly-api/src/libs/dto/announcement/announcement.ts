@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Role } from '../../enums/user.enum';
+import { CourseFile } from '../media/media';
 
 @ObjectType()
 export class Announcement {
@@ -43,6 +44,17 @@ export class Announcement {
   /** Read receipts for teachers and admins; null for students and parents */
   @Field(() => Int, { nullable: true })
   readCount: number | null;
+
+  /** Staff only: the course's active students, and how many of them opened it ("52 / 56 read") */
+  @Field(() => Int, { nullable: true })
+  audience: number | null;
+
+  @Field(() => Int, { nullable: true })
+  studentReads: number | null;
+
+  /** Attachments, in order; the link comes from `courseFileUrl` */
+  @Field(() => [CourseFile])
+  files: CourseFile[];
 }
 
 @ObjectType()

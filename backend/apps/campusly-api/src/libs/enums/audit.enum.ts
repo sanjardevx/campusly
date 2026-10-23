@@ -23,6 +23,7 @@ export enum AuditAction {
   COURSE_TEACHERS = 'course.setTeachers',
   COURSE_STUDENTS = 'course.setStudents',
   COURSE_GRADE_CATEGORIES = 'course.gradeCategories',
+  ANNOUNCEMENT_ARCHIVE = 'announcement.archive',
   SUBMISSION_GRADE = 'submission.grade',
   SUBMISSION_RETURN = 'submission.return',
   ASSIGNMENT_ZERO_MISSING = 'assignment.zeroMissing',

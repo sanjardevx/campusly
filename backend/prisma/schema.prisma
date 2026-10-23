@@ -569,11 +569,12 @@ model MediaAsset {
   createdAt    DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
 
-  owner           User             @relation("UploadedAssets", fields: [ownerId], references: [id])
-  lessonVideos    Lesson[]         @relation("LessonVideo")
-  lessonResources LessonResource[] @relation("ResourceFile")
-  submissionFiles SubmissionFile[]
-  assignmentFiles AssignmentFile[]
+  owner             User               @relation("UploadedAssets", fields: [ownerId], references: [id])
+  lessonVideos      Lesson[]           @relation("LessonVideo")
+  lessonResources   LessonResource[]   @relation("ResourceFile")
+  submissionFiles   SubmissionFile[]
+  assignmentFiles   AssignmentFile[]
+  announcementFiles AnnouncementFile[]
 
   @@index([ownerId])
   @@index([status, createdAt])
@@ -856,24 +857,44 @@ enum NotificationType {
 
 /// courseId = null → school-wide announcement
 model Announcement {
-  id          String    @id @default(uuid(7)) @db.Uuid
-  courseId    String?   @db.Uuid
-  authorId    String    @db.Uuid
+  id          String       @id @default(uuid(7)) @db.Uuid
+  courseId    String?      @db.Uuid
+  authorId    String       @db.Uuid
   title       String
   body        String
-  isPinned    Boolean   @default(false)
+  isPinned    Boolean      @default(false)
   /// Optional event day shown on the calendar
-  eventDate   DateTime? @db.Date
-  publishedAt DateTime  @default(now()) @db.Timestamptz(3)
-  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime  @updatedAt @db.Timestamptz(3)
+  eventDate   DateTime?    @db.Date
+  /// ARCHIVED = taken down: nobody sees it, the row stays (no hard deletes)
+  status      RecordStatus @default(ACTIVE)
+  publishedAt DateTime     @default(now()) @db.Timestamptz(3)
+  createdAt   DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(3)
 
   course Course?            @relation(fields: [courseId], references: [id])
   author User               @relation("AnnouncementsAuthored", fields: [authorId], references: [id])
   reads  AnnouncementRead[]
+  files  AnnouncementFile[]
 
   @@index([courseId, publishedAt])
   @@map("announcements")
+}
+
+/// A file attached to an announcement (like AssignmentFile). Removing it sets removedAt.
+model AnnouncementFile {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  announcementId String    @db.Uuid
+  assetId        String    @db.Uuid
+  order          Int
+  createdAt      DateTime  @default(now()) @db.Timestamptz(3)
+  removedAt      DateTime? @db.Timestamptz(3)
+
+  announcement Announcement @relation(fields: [announcementId], references: [id])
+  asset        MediaAsset   @relation(fields: [assetId], references: [id])
+
+  @@index([announcementId])
+  @@index([assetId])
+  @@map("announcement_files")
 }
 
 model AnnouncementRead {
