@@ -275,5 +275,112 @@
       "status": "상태",
       "gradesPublished": "성적 공개됨"
     }
+  },
+  "grading": {
+    "state": {
+      "SUBMITTED": "제출함",
+      "GRADED": "채점됨",
+      "LATE": "지각",
+      "NOT_SUBMITTED": "미제출",
+      "MISSING": "미제출 (0)",
+      "RETURNED": "재제출 요청",
+      "lateBy": "지각 +{{time}}",
+      "examGraded": "채점됨",
+      "examWaiting": "미채점"
+    },
+    "changedAfter": "채점 후 변경됨",
+    "due": "마감 {{date}} ({{zone}} 시간)",
+    "maxScore": "만점 {{score}}",
+    "lateOn": "지각 제출: 허용 (성적 공개 전까지)",
+    "lateOff": "지각 제출: 불가",
+    "resubmissions": "재제출: 최대 {{count}}회",
+    "zip": "전체 다운로드 (ZIP)",
+    "zipping": "다운로드 중 {{done}} / {{total}}…",
+    "zipFailed": "파일을 다운로드하지 못했습니다. 다시 시도하거나 하나씩 여세요.",
+    "zero": "미제출자에게 0점",
+    "publish": "성적 공개",
+    "unpublish": "성적 다시 숨기기",
+    "publishedNote": "성적이 공개되었습니다 ({{date}}): 학생과 학부모가 점수와 코멘트를 볼 수 있습니다. 지금 변경하면 바로 보입니다.",
+    "zeroDone_other": "학생 {{count}}명에게 0점을 주었습니다.",
+    "publishedDone": "성적을 공개했습니다.",
+    "unpublishedDone": "성적을 다시 숨겼습니다.",
+    "tally": {
+      "submitted": "제출: {{count}}",
+      "late": "지각: {{count}}",
+      "notSubmitted": "미제출: {{count}}",
+      "notGraded": "미채점: {{count}}",
+      "graded": "채점: {{graded}} / {{total}}"
+    },
+    "progress": "{{graded}} / {{total}} 채점 ({{percent}}%)",
+    "filter": {
+      "ALL": "전체 ({{count}})",
+      "NEEDS_GRADING": "채점 필요 ({{count}})",
+      "GRADED": "채점됨 ({{count}})",
+      "NOT_SUBMITTED": "미제출 ({{count}})",
+      "LATE": "지각 ({{count}})"
+    },
+    "search": "학생 이름 또는 ID로 찾기…",
+    "perPage": "페이지당:",
+    "col": {
+      "id": "학생 ID",
+      "name": "이름",
+      "status": "상태",
+      "submitted": "제출 시각",
+      "grade": "점수"
+    },
+    "empty": "해당하는 학생이 없습니다.",
+    "confirm": {
+      "zero": {
+        "title": "미제출자에게 0점을 줄까요?",
+        "body": "아무것도 제출하지 않은 학생 {{count}}명에게 0점(미제출)이 기록됩니다. 성적을 공개한 뒤에 학생에게 보입니다.",
+        "action": "0점 주기"
+      },
+      "publish": {
+        "title": "성적을 공개할까요?",
+        "body": "학생과 학부모가 점수와 코멘트를 보게 됩니다 ({{total}}명 중 {{graded}}명 채점). 채점하지 않은 과제는 점수 없이 남습니다.",
+        "action": "공개"
+      },
+      "unpublish": {
+        "title": "성적을 다시 숨길까요?",
+        "body": "다시 공개할 때까지 학생과 학부모는 점수를 볼 수 없습니다.",
+        "action": "숨기기"
+      }
+    },
+    "back": "전체 제출물",
+    "studentN": "학생 {{n}}",
+    "ofN": "/ {{total}}",
+    "previous": "이전",
+    "next": "다음",
+    "examNoFile": "오프라인 시험: 여기서는 제출하지 않습니다. 시험지의 점수를 입력하세요.",
+    "nothingYet": "아직 제출한 것이 없습니다. 종이 과제라면 점수를 입력할 수 있습니다.",
+    "download": "다운로드",
+    "openTab": "새 탭에서 열기",
+    "noPreview": "{{type}} 파일은 미리보기가 없습니다. 다운로드해서 확인하세요.",
+    "answerText": "답안 텍스트",
+    "historyHint": "제출 기록",
+    "previousAttempts_other": "이전 제출 ({{count}})",
+    "attemptN": "{{n}}차 제출",
+    "details": "제출 정보",
+    "early": "{{time}} 일찍",
+    "late": "{{time}} 늦게",
+    "attempts": "제출 횟수",
+    "attemptsOf": "{{max}}회 중 {{used}}회",
+    "dueDate": "마감일",
+    "grade": "점수",
+    "comment": "코멘트 (선택)",
+    "note": "학생은 성적을 공개한 뒤에만 점수와 코멘트를 볼 수 있습니다.",
+    "noteLive": "성적이 공개된 상태입니다: 학생에게 바로 보입니다.",
+    "saveNext": "저장 후 다음 학생",
+    "save": "저장",
+    "returnRedo": "재제출 요청",
+    "modifiedBy": "마지막 수정: {{name}}",
+    "saved": "저장했습니다.",
+    "returned": "반환했습니다: 학생이 다시 업로드할 수 있습니다.",
+    "time": {
+      "today": "오늘 {{time}}",
+      "yesterday": "어제",
+      "daysAgo_other": "{{count}}일 전",
+      "weeksAgo_other": "{{count}}주 전"
+    }
   }
 }

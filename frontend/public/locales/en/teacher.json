@@ -284,5 +284,116 @@
       "status": "Status",
       "gradesPublished": "Grades published"
     }
+  },
+  "grading": {
+    "state": {
+      "SUBMITTED": "Submitted",
+      "GRADED": "Graded",
+      "LATE": "Late",
+      "NOT_SUBMITTED": "Not submitted",
+      "MISSING": "Missing (0)",
+      "RETURNED": "Returned for redo",
+      "lateBy": "Late +{{time}}",
+      "examGraded": "Graded",
+      "examWaiting": "Not graded"
+    },
+    "changedAfter": "Changed after grading",
+    "due": "Due {{date}} ({{zone}} time)",
+    "maxScore": "Max score {{score}}",
+    "lateOn": "Late submissions: on (until grades are published)",
+    "lateOff": "Late submissions: off",
+    "resubmissions": "Resubmissions: up to {{count}}",
+    "zip": "Download all (ZIP)",
+    "zipping": "Downloading {{done}} / {{total}}…",
+    "zipFailed": "Could not download the files. Try again, or open them one by one.",
+    "zero": "Give 0 to not submitted",
+    "publish": "Publish grades",
+    "unpublish": "Hide grades again",
+    "publishedNote": "Grades are published ({{date}}): students and parents see scores and comments. Changes you make now are visible at once.",
+    "zeroDone_one": "{{count}} student got 0.",
+    "zeroDone_other": "{{count}} students got 0.",
+    "publishedDone": "Grades published.",
+    "unpublishedDone": "Grades are hidden again.",
+    "tally": {
+      "submitted": "Submitted: {{count}}",
+      "late": "Late: {{count}}",
+      "notSubmitted": "Not submitted: {{count}}",
+      "notGraded": "Not graded: {{count}}",
+      "graded": "Graded: {{graded}} / {{total}}"
+    },
+    "progress": "{{graded}} / {{total}} graded ({{percent}}%)",
+    "filter": {
+      "ALL": "All ({{count}})",
+      "NEEDS_GRADING": "Needs grading ({{count}})",
+      "GRADED": "Graded ({{count}})",
+      "NOT_SUBMITTED": "Not submitted ({{count}})",
+      "LATE": "Late ({{count}})"
+    },
+    "search": "Filter by student or ID…",
+    "perPage": "Per page:",
+    "col": {
+      "id": "Student ID",
+      "name": "Name",
+      "status": "Status",
+      "submitted": "Submitted",
+      "grade": "Grade"
+    },
+    "empty": "No students match.",
+    "confirm": {
+      "zero": {
+        "title": "Give 0 to not submitted?",
+        "body": "{{count}} students who handed in nothing get 0 (Missing). Students see it only after you publish grades.",
+        "action": "Give 0"
+      },
+      "publish": {
+        "title": "Publish grades?",
+        "body": "Students and parents will see scores and comments ({{graded}} of {{total}} graded). Ungraded work stays without a score.",
+        "action": "Publish"
+      },
+      "unpublish": {
+        "title": "Hide grades again?",
+        "body": "Students and parents stop seeing the scores until you publish again.",
+        "action": "Hide grades"
+      }
+    },
+    "back": "All submissions",
+    "studentN": "Student {{n}}",
+    "ofN": "of {{total}}",
+    "previous": "Previous",
+    "next": "Next",
+    "examNoFile": "Offline exam: nothing is handed in here. Enter the score from the paper.",
+    "nothingYet": "Nothing handed in yet. You can still enter a score (work on paper).",
+    "download": "Download",
+    "openTab": "Open in new tab",
+    "noPreview": "No preview for {{type}}. Download it to read.",
+    "answerText": "Answer text",
+    "historyHint": "Submission history",
+    "previousAttempts_one": "Previous attempts ({{count}})",
+    "previousAttempts_other": "Previous attempts ({{count}})",
+    "attemptN": "Attempt {{n}}",
+    "details": "Submission details",
+    "early": "{{time}} early",
+    "late": "{{time}} late",
+    "attempts": "Attempts",
+    "attemptsOf": "{{used}} of {{max}}",
+    "dueDate": "Due date",
+    "grade": "Grade",
+    "comment": "Comment (optional)",
+    "note": "Students see grades and comments only after you publish grades.",
+    "noteLive": "Grades are published: the student sees this change at once.",
+    "saveNext": "Save and next student",
+    "save": "Save",
+    "returnRedo": "Return for redo",
+    "modifiedBy": "Last modified by {{name}}",
+    "saved": "Saved.",
+    "returned": "Returned: the student can upload again.",
+    "time": {
+      "today": "Today, {{time}}",
+      "yesterday": "Yesterday",
+      "daysAgo_one": "{{count}} day ago",
+      "daysAgo_other": "{{count}} days ago",
+      "weeksAgo_one": "{{count}} week ago",
+      "weeksAgo_other": "{{count}} weeks ago"
+    }
   }
 }

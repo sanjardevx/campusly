@@ -284,5 +284,116 @@
       "status": "Holat",
       "gradesPublished": "Baholar e’lon qilingan"
     }
+  },
+  "grading": {
+    "state": {
+      "SUBMITTED": "Topshirgan",
+      "GRADED": "Baholangan",
+      "LATE": "Kechikkan",
+      "NOT_SUBMITTED": "Topshirmagan",
+      "MISSING": "Topshirmagan (0)",
+      "RETURNED": "Qayta ishlashga qaytarilgan",
+      "lateBy": "Kechikkan +{{time}}",
+      "examGraded": "Baholangan",
+      "examWaiting": "Baholanmagan"
+    },
+    "changedAfter": "Baholangandan keyin o‘zgargan",
+    "due": "Muddat {{date}} ({{zone}} vaqti)",
+    "maxScore": "Maksimal ball {{score}}",
+    "lateOn": "Kechikib topshirish: mumkin (baholar e’lon qilinguncha)",
+    "lateOff": "Kechikib topshirish: yo‘q",
+    "resubmissions": "Qayta topshirish: {{count}} martagacha",
+    "zip": "Hammasini yuklab olish (ZIP)",
+    "zipping": "Yuklanmoqda {{done}} / {{total}}…",
+    "zipFailed": "Fayllarni yuklab bo‘lmadi. Qayta urinib ko‘ring yoki bittalab oching.",
+    "zero": "Topshirmaganlarga 0 qo‘yish",
+    "publish": "Baholarni e’lon qilish",
+    "unpublish": "Baholarni yana yashirish",
+    "publishedNote": "Baholar e’lon qilingan ({{date}}): o‘quvchi va ota-onalar ball va izohlarni ko‘radi. Hozirgi o‘zgarishlar darhol ko‘rinadi.",
+    "zeroDone_one": "{{count}} ta o‘quvchiga 0 qo‘yildi.",
+    "zeroDone_other": "{{count}} ta o‘quvchiga 0 qo‘yildi.",
+    "publishedDone": "Baholar e’lon qilindi.",
+    "unpublishedDone": "Baholar yana yashirildi.",
+    "tally": {
+      "submitted": "Topshirgan: {{count}}",
+      "late": "Kechikkan: {{count}}",
+      "notSubmitted": "Topshirmagan: {{count}}",
+      "notGraded": "Baholanmagan: {{count}}",
+      "graded": "Baholangan: {{graded}} / {{total}}"
+    },
+    "progress": "{{graded}} / {{total}} baholangan ({{percent}}%)",
+    "filter": {
+      "ALL": "Hammasi ({{count}})",
+      "NEEDS_GRADING": "Baholash kerak ({{count}})",
+      "GRADED": "Baholangan ({{count}})",
+      "NOT_SUBMITTED": "Topshirmagan ({{count}})",
+      "LATE": "Kechikkan ({{count}})"
+    },
+    "search": "O‘quvchi yoki ID bo‘yicha…",
+    "perPage": "Sahifada:",
+    "col": {
+      "id": "O‘quvchi ID",
+      "name": "Ism",
+      "status": "Holat",
+      "submitted": "Topshirilgan",
+      "grade": "Baho"
+    },
+    "empty": "Mos o‘quvchi yo‘q.",
+    "confirm": {
+      "zero": {
+        "title": "Topshirmaganlarga 0 qo‘yilsinmi?",
+        "body": "Hech narsa topshirmagan {{count}} ta o‘quvchiga 0 (Topshirmagan) qo‘yiladi. O‘quvchilar buni baholar e’lon qilingandan keyin ko‘radi.",
+        "action": "0 qo‘yish"
+      },
+      "publish": {
+        "title": "Baholar e’lon qilinsinmi?",
+        "body": "O‘quvchi va ota-onalar ball va izohlarni ko‘radi ({{total}} tadan {{graded}} tasi baholangan). Baholanmagan ishlar ballsiz qoladi.",
+        "action": "E’lon qilish"
+      },
+      "unpublish": {
+        "title": "Baholar yana yashirilsinmi?",
+        "body": "Qayta e’lon qilmaguningizcha o‘quvchi va ota-onalar ballarni ko‘rmaydi.",
+        "action": "Yashirish"
+      }
+    },
+    "back": "Barcha topshiriqlar",
+    "studentN": "{{n}}-o‘quvchi",
+    "ofN": "/ {{total}}",
+    "previous": "Oldingi",
+    "next": "Keyingi",
+    "examNoFile": "Oflayn imtihon: bu yerda hech narsa topshirilmaydi. Ballni qog‘ozdan kiriting.",
+    "nothingYet": "Hali hech narsa topshirilmagan. Ballni baribir kiritishingiz mumkin (qog‘ozdagi ish).",
+    "download": "Yuklab olish",
+    "openTab": "Yangi oynada ochish",
+    "noPreview": "{{type}} uchun ko‘rinish yo‘q. O‘qish uchun yuklab oling.",
+    "answerText": "Javob matni",
+    "historyHint": "Topshirish tarixi",
+    "previousAttempts_one": "Oldingi urinishlar ({{count}})",
+    "previousAttempts_other": "Oldingi urinishlar ({{count}})",
+    "attemptN": "{{n}}-urinish",
+    "details": "Topshiriq ma’lumoti",
+    "early": "{{time}} erta",
+    "late": "{{time}} kech",
+    "attempts": "Urinishlar",
+    "attemptsOf": "{{max}} tadan {{used}}",
+    "dueDate": "Muddat",
+    "grade": "Baho",
+    "comment": "Izoh (ixtiyoriy)",
+    "note": "O‘quvchilar baho va izohlarni faqat baholar e’lon qilingandan keyin ko‘radi.",
+    "noteLive": "Baholar e’lon qilingan: o‘quvchi bu o‘zgarishni darhol ko‘radi.",
+    "saveNext": "Saqlash va keyingi o‘quvchi",
+    "save": "Saqlash",
+    "returnRedo": "Qayta ishlashga qaytarish",
+    "modifiedBy": "Oxirgi o‘zgartirgan: {{name}}",
+    "saved": "Saqlandi.",
+    "returned": "Qaytarildi: o‘quvchi yana yuklay oladi.",
+    "time": {
+      "today": "Bugun, {{time}}",
+      "yesterday": "Kecha",
+      "daysAgo_one": "{{count}} kun oldin",
+      "daysAgo_other": "{{count}} kun oldin",
+      "weeksAgo_one": "{{count}} hafta oldin",
+      "weeksAgo_other": "{{count}} hafta oldin"
+    }
   }
 }

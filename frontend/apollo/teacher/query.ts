@@ -180,3 +180,57 @@ export const TEACHER_LESSON_VIDEO = graphql(`
     }
   }
 `);
+
+/** The grading page header: one assignment (the server checks the teacher may see it) */
+export const GRADING_ASSIGNMENT = graphql(`
+  query GradingAssignment($id: String!) {
+    assignment(id: $id) {
+      id
+      courseId
+      type
+      title
+      instructions
+      maxScore
+      dueAt
+      allowLate
+      maxAttempts
+      publishedAt
+      gradesPublishedAt
+    }
+  }
+`);
+
+/** Every active student of the course with their submission (attempts, signed file links) */
+export const ASSIGNMENT_SUBMISSIONS = graphql(`
+  query AssignmentSubmissions($assignmentId: String!) {
+    assignmentSubmissions(assignmentId: $assignmentId) {
+      studentId
+      loginId
+      firstName
+      lastName
+      submission {
+        id
+        status
+        score
+        feedback
+        submittedAt
+        gradedAt
+        gradedByName
+        attemptsLeft
+        attempts {
+          number
+          text
+          isLate
+          submittedAt
+          files {
+            assetId
+            originalName
+            mimeType
+            size
+            url
+          }
+        }
+      }
+    }
+  }
+`);

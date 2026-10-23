@@ -141,3 +141,45 @@ export const PUBLISH_ASSIGNMENT = graphql(`
     }
   }
 `);
+
+// ───────────────────────── grading ─────────────────────────
+
+/** Saved at once, but students see it only after publishGrades (one mapper hides it) */
+export const GRADE_SUBMISSION = graphql(`
+  mutation GradeSubmission($input: GradeSubmissionInput!) {
+    gradeSubmission(input: $input) {
+      id
+      status
+      score
+      feedback
+      gradedAt
+      gradedByName
+    }
+  }
+`);
+
+/** "Please redo": one more attempt for the student, the score is cleared */
+export const RETURN_SUBMISSION = graphql(`
+  mutation ReturnSubmission($input: ReturnSubmissionInput!) {
+    returnSubmission(input: $input) {
+      id
+      status
+    }
+  }
+`);
+
+/** After the deadline: 0 (MISSING) for every student who handed in nothing; returns how many */
+export const GIVE_ZERO_TO_MISSING = graphql(`
+  mutation GiveZeroToMissing($assignmentId: String!) {
+    giveZeroToMissing(assignmentId: $assignmentId)
+  }
+`);
+
+export const PUBLISH_GRADES = graphql(`
+  mutation PublishGrades($input: PublishGradesInput!) {
+    publishGrades(input: $input) {
+      id
+      gradesPublishedAt
+    }
+  }
+`);
