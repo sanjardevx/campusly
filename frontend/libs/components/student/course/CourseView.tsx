@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Card, Link, Stack, Tab, Tabs, Typography } from '@mui/material';
@@ -12,7 +12,7 @@ import { useTranslation } from 'next-i18next/pages';
 import { ProgressBar, STITCH, SoftPill, enter, pressSx } from '@/libs/components/student/home/parts';
 import { dayRange } from '@/libs/components/teacher/course/model';
 import type { StudentCourseQuery } from '@/libs/gql/graphql';
-import { arrangeWeeks, isDone, rowsOf, topicOf, type Row, type StudentWeek } from './model';
+import { arrangeWeeks, isDone, revealOpened, rowsOf, topicOf, type Row, type StudentWeek } from './model';
 import { useRowView, type RowView } from './useRowView';
 
 /** Stitch "Algebra · Grade 9A (eCampus View)" on a wide screen (DECISIONS §10) */
@@ -20,7 +20,7 @@ export function CourseView({ data }: { data: StudentCourseQuery }) {
   const { t } = useTranslation('student');
   const [tab, setTab] = useState<'lessons' | 'assignments'>('lessons');
   const { courseDetail: course, courseAssignments: assignments, courseProgress: progress } = data;
-  const { current, isCurrent, open, earlier } = arrangeWeeks(course.modules);
+  const { current, isCurrent, others } = arrangeWeeks(course.modules);
   const owner = course.teachers.find((x) => x.role === 'OWNER') ?? course.teachers[0];
   // Still to hand in (an offline exam has nothing to hand in; published grades close the work)
   const toDo = assignments.filter((a) => {
@@ -121,16 +121,13 @@ export function CourseView({ data }: { data: StudentCourseQuery }) {
         ) : (
           <Stack spacing={3}>
             {current && <WeekCard week={current} rows={rows(current)} courseId={course.id} isCurrent={isCurrent} accent index={1} />}
-            {open.map((week, i) => (
-              <WeekCard key={week.id} week={week} rows={rows(week)} courseId={course.id} index={2 + i} />
-            ))}
-            {earlier.length > 0 && (
+            {others.length > 0 && (
               <Stack spacing={1.25}>
                 <Typography sx={{ px: 0.5, fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'text.secondary' }}>
                   {t('course.earlier')}
                 </Typography>
-                {earlier.map((week, i) => (
-                  <EarlierWeek key={week.id} week={week} rows={rows(week)} courseId={course.id} index={2 + open.length + i} />
+                {others.map((week, i) => (
+                  <EarlierWeek key={week.id} week={week} rows={rows(week)} courseId={course.id} index={2 + i} />
                 ))}
               </Stack>
             )}
@@ -267,16 +264,19 @@ function RowLine({ v }: { v: RowView }) {
   );
 }
 
-/** A finished week: one line with "N/N done", rows on demand */
+/** Any other week: one line with "N/N done", rows on demand (scrolled into view when opened) */
 function EarlierWeek({ week, rows, courseId, index }: { week: StudentWeek; rows: Row[]; courseId: string; index: number }) {
   const { t } = useTranslation('student');
+  const box = useRef<HTMLDivElement>(null);
   const { locale } = useRouter();
   const done = rows.filter(isDone).length;
   const all = rows.length > 0 && done === rows.length;
   return (
     <Accordion
+      ref={box}
       disableGutters
       elevation={0}
+      slotProps={{ transition: { onEntered: () => revealOpened(box.current) } }}
       sx={{ borderRadius: '10px !important', border: 1, borderColor: STITCH.outline, boxShadow: STITCH.rowShadow, overflow: 'hidden', '&::before': { display: 'none' }, ...enter(index) }}
     >
       <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: 2, '& .MuiAccordionSummary-content': { my: 1.25, alignItems: 'center', gap: 1.5, minWidth: 0 } }}>

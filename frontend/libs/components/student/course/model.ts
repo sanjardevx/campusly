@@ -1,5 +1,5 @@
 import type { StudentCourseQuery } from '@/libs/gql/graphql';
-import { weekState, type WeekState } from '@/libs/components/teacher/course/model';
+import { weekState } from '@/libs/components/teacher/course/model';
 
 export type StudentCourse = StudentCourseQuery['courseDetail'];
 export type StudentWeek = StudentCourse['modules'][number];
@@ -35,22 +35,27 @@ export function isDone(row: Row): boolean {
 }
 
 /**
- * Page order (DECISIONS §10): the week to work in first, then later weeks the teacher already opened
- * and undated ones in course order, then earlier weeks (most recent first, collapsed).
- * Between weeks (a weekend, a holiday, after the last week) the latest started week stays open,
- * so the page never opens with everything folded; `isCurrent` says whether today is inside it.
+ * Page order (DECISIONS §10): the week to work in is pinned on top — today's week, or between weeks
+ * (weekend, holiday, after the last week) the latest started one — and it moves by itself when a
+ * new week starts. Every other week follows in course order (Week 1, 2, 3 …), collapsed.
  */
 export function arrangeWeeks(weeks: StudentWeek[]) {
-  const withState = [...weeks].sort((a, b) => a.order - b.order).map((w) => ({ week: w, state: weekState(w) as WeekState }));
-  const past = withState.filter((w) => w.state === 'PAST').map((w) => w.week);
-  const today = withState.find((w) => w.state === 'CURRENT')?.week ?? null;
-  const latest = today ?? past.at(-1) ?? null;
-  return {
-    current: latest,
-    isCurrent: !!today,
-    open: withState.filter((w) => w.state === 'FUTURE' || w.state === 'UNDATED').map((w) => w.week),
-    earlier: past.filter((w) => w !== latest).reverse(),
-  };
+  const sorted = [...weeks].sort((a, b) => a.order - b.order);
+  const today = sorted.find((w) => weekState(w) === 'CURRENT') ?? null;
+  const latest = today ?? sorted.filter((w) => weekState(w) === 'PAST').at(-1) ?? null;
+  return { current: latest, isCurrent: !!today, others: sorted.filter((w) => w !== latest) };
+}
+
+/**
+ * After a week opens: if its rows end below the screen (or under the phone's floating tab bar),
+ * scroll so the week's header sits under the top bar (a jump when the OS asks for reduced motion).
+ */
+export function revealOpened(el: HTMLElement | null, topBar = 80, bottomBar = 0) {
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  if (rect.bottom <= window.innerHeight - bottomBar) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top: window.scrollY + rect.top - topBar, behavior: reduce ? 'auto' : 'smooth' });
 }
 
 /** The week's topic without a repeated "Week 7:" at the start (the header already says the week) */

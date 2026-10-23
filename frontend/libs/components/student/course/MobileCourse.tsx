@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Box, ButtonBase, Collapse, Stack, Tab, Tabs, Typography } from '@mui/material';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import { useTranslation } from 'next-i18next/pages';
 import { Heading, TapRow } from '@/libs/components/student/home/MobileHome';
 import { ProgressBar, STITCH, SoftPill } from '@/libs/components/student/home/parts';
 import type { StudentCourseQuery } from '@/libs/gql/graphql';
-import { arrangeWeeks, isDone, rowsOf, topicOf, type Row, type StudentWeek } from './model';
+import { arrangeWeeks, isDone, revealOpened, rowsOf, topicOf, type Row, type StudentWeek } from './model';
 import { useRowView } from './useRowView';
 
 /** The course on a phone: kept simple like the phone home — a short header, two tabs, tappable rows */
@@ -13,7 +13,7 @@ export function MobileCourse({ data }: { data: StudentCourseQuery }) {
   const { t } = useTranslation('student');
   const [tab, setTab] = useState<'lessons' | 'assignments'>('lessons');
   const { courseDetail: course, courseAssignments: assignments, courseProgress: progress } = data;
-  const { current, isCurrent, open, earlier } = arrangeWeeks(course.modules);
+  const { current, isCurrent, others } = arrangeWeeks(course.modules);
   const owner = course.teachers.find((x) => x.role === 'OWNER') ?? course.teachers[0];
   const rows = (week: StudentWeek) => rowsOf(week, assignments, progress);
   const allWork: Row[] = [...assignments]
@@ -58,7 +58,7 @@ export function MobileCourse({ data }: { data: StudentCourseQuery }) {
         <Typography sx={{ px: 0.5, fontSize: '0.875rem', color: 'text.secondary' }}>{t('course.empty')}</Typography>
       ) : (
         <>
-          {[current, ...open].filter((w): w is StudentWeek => !!w).map((week) => (
+          {[current].filter((w): w is StudentWeek => !!w).map((week) => (
             <Box component="section" key={week.id}>
               <Heading
                 title={t('course.week', { week: week.order })}
@@ -67,11 +67,11 @@ export function MobileCourse({ data }: { data: StudentCourseQuery }) {
               <RowStack rows={rows(week)} courseId={course.id} empty={t('course.weekEmpty')} />
             </Box>
           ))}
-          {earlier.length > 0 && (
+          {others.length > 0 && (
             <Box component="section">
               <Heading title={t('course.earlier')} />
               <Stack spacing={1}>
-                {earlier.map((week) => (
+                {others.map((week) => (
                   <EarlierWeek key={week.id} week={week} rows={rows(week)} courseId={course.id} />
                 ))}
               </Stack>
@@ -100,9 +100,10 @@ function RowStack({ rows, courseId, empty }: { rows: Row[]; courseId: string; em
 function EarlierWeek({ week, rows, courseId }: { week: StudentWeek; rows: Row[]; courseId: string }) {
   const { t } = useTranslation('student');
   const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
   const done = rows.filter(isDone).length;
   return (
-    <Box>
+    <Box ref={box}>
       <ButtonBase
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
@@ -116,7 +117,7 @@ function EarlierWeek({ week, rows, courseId }: { week: StudentWeek; rows: Row[];
           <ExpandMoreRoundedIcon sx={{ color: 'text.secondary', transition: 'transform 200ms ease', transform: open ? 'rotate(180deg)' : 'none' }} />
         </Stack>
       </ButtonBase>
-      <Collapse in={open} unmountOnExit>
+      <Collapse in={open} unmountOnExit onEntered={() => revealOpened(box.current, 16, 104)}>
         <Box sx={{ pt: 1 }}>
           <RowStack rows={rows} courseId={courseId} empty={t('course.weekEmpty')} />
         </Box>
