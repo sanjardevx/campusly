@@ -58,7 +58,28 @@ type Documents = {
     "\n  query UnreadAnnouncements {\n    announcements(input: { limit: 1 }) {\n      unread\n    }\n  }\n": typeof types.UnreadAnnouncementsDocument,
     "\n  query Periods($academicYearId: String!) {\n    periods(academicYearId: $academicYearId) {\n      id\n      name\n      kind\n      order\n      startsAt\n      endsAt\n      parentId\n    }\n  }\n": typeof types.PeriodsDocument,
     "\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n": typeof types.SchoolSettingsDocument,
+    "\n  mutation CreateModule($input: CreateModuleInput!) {\n    createModule(input: $input) {\n      id\n    }\n  }\n": typeof types.CreateModuleDocument,
+    "\n  mutation UpdateModule($input: UpdateModuleInput!) {\n    updateModule(input: $input) {\n      id\n      isHidden\n    }\n  }\n": typeof types.UpdateModuleDocument,
+    "\n  mutation PublishModule($input: PublishInput!) {\n    publishModule(input: $input) {\n      id\n      publishedAt\n    }\n  }\n": typeof types.PublishModuleDocument,
+    "\n  mutation ReorderModules($input: ReorderInput!) {\n    reorderModules(input: $input) {\n      id\n      order\n    }\n  }\n": typeof types.ReorderModulesDocument,
+    "\n  mutation CreateLesson($input: CreateLessonInput!) {\n    createLesson(input: $input) {\n      id\n    }\n  }\n": typeof types.CreateLessonDocument,
+    "\n  mutation UpdateLesson($input: UpdateLessonInput!) {\n    updateLesson(input: $input) {\n      id\n    }\n  }\n": typeof types.UpdateLessonDocument,
+    "\n  mutation PublishLesson($input: PublishInput!) {\n    publishLesson(input: $input) {\n      id\n      publishedAt\n    }\n  }\n": typeof types.PublishLessonDocument,
+    "\n  mutation ReorderLessons($input: ReorderInput!) {\n    reorderLessons(input: $input) {\n      id\n    }\n  }\n": typeof types.ReorderLessonsDocument,
+    "\n  mutation SetLessonVideo($input: SetLessonVideoInput!) {\n    setLessonVideo(input: $input) {\n      id\n    }\n  }\n": typeof types.SetLessonVideoDocument,
+    "\n  mutation SetLessonFile($input: SetLessonFileInput!) {\n    setLessonFile(input: $input) {\n      id\n    }\n  }\n": typeof types.SetLessonFileDocument,
+    "\n  mutation CreateUpload($input: CreateUploadInput!) {\n    createUpload(input: $input) {\n      assetId\n      uploadUrl\n    }\n  }\n": typeof types.CreateUploadDocument,
+    "\n  mutation ConfirmUpload($assetId: String!) {\n    confirmUpload(assetId: $assetId) {\n      id\n      status\n      originalName\n      size\n    }\n  }\n": typeof types.ConfirmUploadDocument,
+    "\n  mutation CreateAssignment($input: CreateAssignmentInput!) {\n    createAssignment(input: $input) {\n      id\n    }\n  }\n": typeof types.CreateAssignmentDocument,
+    "\n  mutation UpdateAssignment($input: UpdateAssignmentInput!) {\n    updateAssignment(input: $input) {\n      id\n    }\n  }\n": typeof types.UpdateAssignmentDocument,
+    "\n  mutation PublishAssignment($input: PublishInput!) {\n    publishAssignment(input: $input) {\n      id\n      publishedAt\n    }\n  }\n": typeof types.PublishAssignmentDocument,
     "\n  query TeacherDashboard {\n    teacherDashboard {\n      today\n      period {\n        id\n        name\n        week\n        weeks\n      }\n      holiday\n      todayCourses {\n        courseId\n        title\n        students\n        marked\n      }\n      toGradeTotal\n      grading {\n        assignmentId\n        courseId\n        courseTitle\n        title\n        type\n        toGrade\n        submitted\n        graded\n        students\n        dueAt\n        allowLate\n        readyToPublish\n      }\n      courses {\n        id\n        title\n        status\n        students\n        week\n      }\n      deadlines {\n        id\n        kind\n        title\n        courseTitles\n        date\n        dueAt\n      }\n      announcements {\n        id\n        title\n        courseTitle\n        publishedAt\n        reads\n        audience\n      }\n    }\n  }\n": typeof types.TeacherDashboardDocument,
+    "\n  query TeachingCourses {\n    teachingCourses {\n      id\n      title\n      status\n      studentCount\n      groupName\n      subjectName\n    }\n  }\n": typeof types.TeachingCoursesDocument,
+    "\n  query TeacherCourse($courseId: String!) {\n    courseDetail(courseId: $courseId) {\n      id\n      title\n      status\n      academicYearId\n      groupName\n      subjectName\n      studentCount\n      modules {\n        id\n        title\n        order\n        startsAt\n        endsAt\n        isHidden\n        publishedAt\n        lessons {\n          id\n          moduleId\n          title\n          type\n          body\n          dueAt\n          order\n          publishedAt\n          videoAssetId\n          file {\n            id\n            kind\n            status\n            name\n            mimeType\n            size\n            durationSec\n          }\n        }\n      }\n    }\n  }\n": typeof types.TeacherCourseDocument,
+    "\n  query CourseAssignments($courseId: String!) {\n    courseAssignments(courseId: $courseId) {\n      id\n      moduleId\n      type\n      title\n      instructions\n      maxScore\n      dueAt\n      allowLate\n      maxAttempts\n      acceptedFileTypes\n      publishedAt\n      gradesPublishedAt\n      files {\n        id\n        kind\n        status\n        name\n        mimeType\n        size\n        durationSec\n      }\n    }\n  }\n": typeof types.CourseAssignmentsDocument,
+    "\n  query CoursePeriods($academicYearId: String!) {\n    periods(academicYearId: $academicYearId) {\n      id\n      name\n      parentId\n      startsAt\n      endsAt\n    }\n  }\n": typeof types.CoursePeriodsDocument,
+    "\n  query CourseFileUrl($assetId: String!) {\n    courseFileUrl(assetId: $assetId) {\n      url\n    }\n  }\n": typeof types.CourseFileUrlDocument,
+    "\n  query TeacherLessonVideo($lessonId: String!) {\n    lessonVideo(lessonId: $lessonId) {\n      url\n    }\n  }\n": typeof types.TeacherLessonVideoDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input) {\n      accessToken\n    }\n  }\n": typeof types.ChangePasswordDocument,
     "\n  query Me {\n    me {\n      id\n      loginId\n      role\n      firstName\n      lastName\n      locale\n      mustChangePassword\n    }\n  }\n": typeof types.MeDocument,
     "\n  query MyChildren {\n    myChildren {\n      id\n      loginId\n      firstName\n      lastName\n      className\n    }\n  }\n": typeof types.MyChildrenDocument,
@@ -108,7 +129,28 @@ const documents: Documents = {
     "\n  query UnreadAnnouncements {\n    announcements(input: { limit: 1 }) {\n      unread\n    }\n  }\n": types.UnreadAnnouncementsDocument,
     "\n  query Periods($academicYearId: String!) {\n    periods(academicYearId: $academicYearId) {\n      id\n      name\n      kind\n      order\n      startsAt\n      endsAt\n      parentId\n    }\n  }\n": types.PeriodsDocument,
     "\n  query SchoolSettings {\n    schoolSettings {\n      schoolName\n      timezone\n      defaultLocale\n      defaultHomeworkWeight\n      defaultQuizWeight\n      defaultExamWeight\n      mark5MinPercent\n      mark4MinPercent\n      mark3MinPercent\n      contactPhone\n      officeHours\n      telegramUrl\n      telegramBotUrl\n      tempPasswordUses\n      tempPasswordDays\n    }\n  }\n": types.SchoolSettingsDocument,
+    "\n  mutation CreateModule($input: CreateModuleInput!) {\n    createModule(input: $input) {\n      id\n    }\n  }\n": types.CreateModuleDocument,
+    "\n  mutation UpdateModule($input: UpdateModuleInput!) {\n    updateModule(input: $input) {\n      id\n      isHidden\n    }\n  }\n": types.UpdateModuleDocument,
+    "\n  mutation PublishModule($input: PublishInput!) {\n    publishModule(input: $input) {\n      id\n      publishedAt\n    }\n  }\n": types.PublishModuleDocument,
+    "\n  mutation ReorderModules($input: ReorderInput!) {\n    reorderModules(input: $input) {\n      id\n      order\n    }\n  }\n": types.ReorderModulesDocument,
+    "\n  mutation CreateLesson($input: CreateLessonInput!) {\n    createLesson(input: $input) {\n      id\n    }\n  }\n": types.CreateLessonDocument,
+    "\n  mutation UpdateLesson($input: UpdateLessonInput!) {\n    updateLesson(input: $input) {\n      id\n    }\n  }\n": types.UpdateLessonDocument,
+    "\n  mutation PublishLesson($input: PublishInput!) {\n    publishLesson(input: $input) {\n      id\n      publishedAt\n    }\n  }\n": types.PublishLessonDocument,
+    "\n  mutation ReorderLessons($input: ReorderInput!) {\n    reorderLessons(input: $input) {\n      id\n    }\n  }\n": types.ReorderLessonsDocument,
+    "\n  mutation SetLessonVideo($input: SetLessonVideoInput!) {\n    setLessonVideo(input: $input) {\n      id\n    }\n  }\n": types.SetLessonVideoDocument,
+    "\n  mutation SetLessonFile($input: SetLessonFileInput!) {\n    setLessonFile(input: $input) {\n      id\n    }\n  }\n": types.SetLessonFileDocument,
+    "\n  mutation CreateUpload($input: CreateUploadInput!) {\n    createUpload(input: $input) {\n      assetId\n      uploadUrl\n    }\n  }\n": types.CreateUploadDocument,
+    "\n  mutation ConfirmUpload($assetId: String!) {\n    confirmUpload(assetId: $assetId) {\n      id\n      status\n      originalName\n      size\n    }\n  }\n": types.ConfirmUploadDocument,
+    "\n  mutation CreateAssignment($input: CreateAssignmentInput!) {\n    createAssignment(input: $input) {\n      id\n    }\n  }\n": types.CreateAssignmentDocument,
+    "\n  mutation UpdateAssignment($input: UpdateAssignmentInput!) {\n    updateAssignment(input: $input) {\n      id\n    }\n  }\n": types.UpdateAssignmentDocument,
+    "\n  mutation PublishAssignment($input: PublishInput!) {\n    publishAssignment(input: $input) {\n      id\n      publishedAt\n    }\n  }\n": types.PublishAssignmentDocument,
     "\n  query TeacherDashboard {\n    teacherDashboard {\n      today\n      period {\n        id\n        name\n        week\n        weeks\n      }\n      holiday\n      todayCourses {\n        courseId\n        title\n        students\n        marked\n      }\n      toGradeTotal\n      grading {\n        assignmentId\n        courseId\n        courseTitle\n        title\n        type\n        toGrade\n        submitted\n        graded\n        students\n        dueAt\n        allowLate\n        readyToPublish\n      }\n      courses {\n        id\n        title\n        status\n        students\n        week\n      }\n      deadlines {\n        id\n        kind\n        title\n        courseTitles\n        date\n        dueAt\n      }\n      announcements {\n        id\n        title\n        courseTitle\n        publishedAt\n        reads\n        audience\n      }\n    }\n  }\n": types.TeacherDashboardDocument,
+    "\n  query TeachingCourses {\n    teachingCourses {\n      id\n      title\n      status\n      studentCount\n      groupName\n      subjectName\n    }\n  }\n": types.TeachingCoursesDocument,
+    "\n  query TeacherCourse($courseId: String!) {\n    courseDetail(courseId: $courseId) {\n      id\n      title\n      status\n      academicYearId\n      groupName\n      subjectName\n      studentCount\n      modules {\n        id\n        title\n        order\n        startsAt\n        endsAt\n        isHidden\n        publishedAt\n        lessons {\n          id\n          moduleId\n          title\n          type\n          body\n          dueAt\n          order\n          publishedAt\n          videoAssetId\n          file {\n            id\n            kind\n            status\n            name\n            mimeType\n            size\n            durationSec\n          }\n        }\n      }\n    }\n  }\n": types.TeacherCourseDocument,
+    "\n  query CourseAssignments($courseId: String!) {\n    courseAssignments(courseId: $courseId) {\n      id\n      moduleId\n      type\n      title\n      instructions\n      maxScore\n      dueAt\n      allowLate\n      maxAttempts\n      acceptedFileTypes\n      publishedAt\n      gradesPublishedAt\n      files {\n        id\n        kind\n        status\n        name\n        mimeType\n        size\n        durationSec\n      }\n    }\n  }\n": types.CourseAssignmentsDocument,
+    "\n  query CoursePeriods($academicYearId: String!) {\n    periods(academicYearId: $academicYearId) {\n      id\n      name\n      parentId\n      startsAt\n      endsAt\n    }\n  }\n": types.CoursePeriodsDocument,
+    "\n  query CourseFileUrl($assetId: String!) {\n    courseFileUrl(assetId: $assetId) {\n      url\n    }\n  }\n": types.CourseFileUrlDocument,
+    "\n  query TeacherLessonVideo($lessonId: String!) {\n    lessonVideo(lessonId: $lessonId) {\n      url\n    }\n  }\n": types.TeacherLessonVideoDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input) {\n      accessToken\n    }\n  }\n": types.ChangePasswordDocument,
     "\n  query Me {\n    me {\n      id\n      loginId\n      role\n      firstName\n      lastName\n      locale\n      mustChangePassword\n    }\n  }\n": types.MeDocument,
     "\n  query MyChildren {\n    myChildren {\n      id\n      loginId\n      firstName\n      lastName\n      className\n    }\n  }\n": types.MyChildrenDocument,
@@ -307,7 +349,91 @@ export function graphql(source: "\n  query SchoolSettings {\n    schoolSettings 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation CreateModule($input: CreateModuleInput!) {\n    createModule(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreateModule($input: CreateModuleInput!) {\n    createModule(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateModule($input: UpdateModuleInput!) {\n    updateModule(input: $input) {\n      id\n      isHidden\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateModule($input: UpdateModuleInput!) {\n    updateModule(input: $input) {\n      id\n      isHidden\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation PublishModule($input: PublishInput!) {\n    publishModule(input: $input) {\n      id\n      publishedAt\n    }\n  }\n"): (typeof documents)["\n  mutation PublishModule($input: PublishInput!) {\n    publishModule(input: $input) {\n      id\n      publishedAt\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ReorderModules($input: ReorderInput!) {\n    reorderModules(input: $input) {\n      id\n      order\n    }\n  }\n"): (typeof documents)["\n  mutation ReorderModules($input: ReorderInput!) {\n    reorderModules(input: $input) {\n      id\n      order\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateLesson($input: CreateLessonInput!) {\n    createLesson(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreateLesson($input: CreateLessonInput!) {\n    createLesson(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateLesson($input: UpdateLessonInput!) {\n    updateLesson(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateLesson($input: UpdateLessonInput!) {\n    updateLesson(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation PublishLesson($input: PublishInput!) {\n    publishLesson(input: $input) {\n      id\n      publishedAt\n    }\n  }\n"): (typeof documents)["\n  mutation PublishLesson($input: PublishInput!) {\n    publishLesson(input: $input) {\n      id\n      publishedAt\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ReorderLessons($input: ReorderInput!) {\n    reorderLessons(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation ReorderLessons($input: ReorderInput!) {\n    reorderLessons(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetLessonVideo($input: SetLessonVideoInput!) {\n    setLessonVideo(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation SetLessonVideo($input: SetLessonVideoInput!) {\n    setLessonVideo(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetLessonFile($input: SetLessonFileInput!) {\n    setLessonFile(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation SetLessonFile($input: SetLessonFileInput!) {\n    setLessonFile(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateUpload($input: CreateUploadInput!) {\n    createUpload(input: $input) {\n      assetId\n      uploadUrl\n    }\n  }\n"): (typeof documents)["\n  mutation CreateUpload($input: CreateUploadInput!) {\n    createUpload(input: $input) {\n      assetId\n      uploadUrl\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ConfirmUpload($assetId: String!) {\n    confirmUpload(assetId: $assetId) {\n      id\n      status\n      originalName\n      size\n    }\n  }\n"): (typeof documents)["\n  mutation ConfirmUpload($assetId: String!) {\n    confirmUpload(assetId: $assetId) {\n      id\n      status\n      originalName\n      size\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateAssignment($input: CreateAssignmentInput!) {\n    createAssignment(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation CreateAssignment($input: CreateAssignmentInput!) {\n    createAssignment(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateAssignment($input: UpdateAssignmentInput!) {\n    updateAssignment(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateAssignment($input: UpdateAssignmentInput!) {\n    updateAssignment(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation PublishAssignment($input: PublishInput!) {\n    publishAssignment(input: $input) {\n      id\n      publishedAt\n    }\n  }\n"): (typeof documents)["\n  mutation PublishAssignment($input: PublishInput!) {\n    publishAssignment(input: $input) {\n      id\n      publishedAt\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query TeacherDashboard {\n    teacherDashboard {\n      today\n      period {\n        id\n        name\n        week\n        weeks\n      }\n      holiday\n      todayCourses {\n        courseId\n        title\n        students\n        marked\n      }\n      toGradeTotal\n      grading {\n        assignmentId\n        courseId\n        courseTitle\n        title\n        type\n        toGrade\n        submitted\n        graded\n        students\n        dueAt\n        allowLate\n        readyToPublish\n      }\n      courses {\n        id\n        title\n        status\n        students\n        week\n      }\n      deadlines {\n        id\n        kind\n        title\n        courseTitles\n        date\n        dueAt\n      }\n      announcements {\n        id\n        title\n        courseTitle\n        publishedAt\n        reads\n        audience\n      }\n    }\n  }\n"): (typeof documents)["\n  query TeacherDashboard {\n    teacherDashboard {\n      today\n      period {\n        id\n        name\n        week\n        weeks\n      }\n      holiday\n      todayCourses {\n        courseId\n        title\n        students\n        marked\n      }\n      toGradeTotal\n      grading {\n        assignmentId\n        courseId\n        courseTitle\n        title\n        type\n        toGrade\n        submitted\n        graded\n        students\n        dueAt\n        allowLate\n        readyToPublish\n      }\n      courses {\n        id\n        title\n        status\n        students\n        week\n      }\n      deadlines {\n        id\n        kind\n        title\n        courseTitles\n        date\n        dueAt\n      }\n      announcements {\n        id\n        title\n        courseTitle\n        publishedAt\n        reads\n        audience\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query TeachingCourses {\n    teachingCourses {\n      id\n      title\n      status\n      studentCount\n      groupName\n      subjectName\n    }\n  }\n"): (typeof documents)["\n  query TeachingCourses {\n    teachingCourses {\n      id\n      title\n      status\n      studentCount\n      groupName\n      subjectName\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query TeacherCourse($courseId: String!) {\n    courseDetail(courseId: $courseId) {\n      id\n      title\n      status\n      academicYearId\n      groupName\n      subjectName\n      studentCount\n      modules {\n        id\n        title\n        order\n        startsAt\n        endsAt\n        isHidden\n        publishedAt\n        lessons {\n          id\n          moduleId\n          title\n          type\n          body\n          dueAt\n          order\n          publishedAt\n          videoAssetId\n          file {\n            id\n            kind\n            status\n            name\n            mimeType\n            size\n            durationSec\n          }\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query TeacherCourse($courseId: String!) {\n    courseDetail(courseId: $courseId) {\n      id\n      title\n      status\n      academicYearId\n      groupName\n      subjectName\n      studentCount\n      modules {\n        id\n        title\n        order\n        startsAt\n        endsAt\n        isHidden\n        publishedAt\n        lessons {\n          id\n          moduleId\n          title\n          type\n          body\n          dueAt\n          order\n          publishedAt\n          videoAssetId\n          file {\n            id\n            kind\n            status\n            name\n            mimeType\n            size\n            durationSec\n          }\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CourseAssignments($courseId: String!) {\n    courseAssignments(courseId: $courseId) {\n      id\n      moduleId\n      type\n      title\n      instructions\n      maxScore\n      dueAt\n      allowLate\n      maxAttempts\n      acceptedFileTypes\n      publishedAt\n      gradesPublishedAt\n      files {\n        id\n        kind\n        status\n        name\n        mimeType\n        size\n        durationSec\n      }\n    }\n  }\n"): (typeof documents)["\n  query CourseAssignments($courseId: String!) {\n    courseAssignments(courseId: $courseId) {\n      id\n      moduleId\n      type\n      title\n      instructions\n      maxScore\n      dueAt\n      allowLate\n      maxAttempts\n      acceptedFileTypes\n      publishedAt\n      gradesPublishedAt\n      files {\n        id\n        kind\n        status\n        name\n        mimeType\n        size\n        durationSec\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CoursePeriods($academicYearId: String!) {\n    periods(academicYearId: $academicYearId) {\n      id\n      name\n      parentId\n      startsAt\n      endsAt\n    }\n  }\n"): (typeof documents)["\n  query CoursePeriods($academicYearId: String!) {\n    periods(academicYearId: $academicYearId) {\n      id\n      name\n      parentId\n      startsAt\n      endsAt\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CourseFileUrl($assetId: String!) {\n    courseFileUrl(assetId: $assetId) {\n      url\n    }\n  }\n"): (typeof documents)["\n  query CourseFileUrl($assetId: String!) {\n    courseFileUrl(assetId: $assetId) {\n      url\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query TeacherLessonVideo($lessonId: String!) {\n    lessonVideo(lessonId: $lessonId) {\n      url\n    }\n  }\n"): (typeof documents)["\n  query TeacherLessonVideo($lessonId: String!) {\n    lessonVideo(lessonId: $lessonId) {\n      url\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

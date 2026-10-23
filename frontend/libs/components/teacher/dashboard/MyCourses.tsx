@@ -6,16 +6,19 @@ import type { TeacherDashboardQuery } from '@/libs/gql/graphql';
 import { Pill } from './parts';
 
 type Dashboard = TeacherDashboardQuery['teacherDashboard'];
+type CourseCard = Pick<Dashboard['courses'][number], 'id' | 'title' | 'status' | 'students' | 'week'>;
 
-/** Stitch "My courses": a card per course with its three pages */
-export function MyCourses({ courses, index }: { courses: Dashboard['courses']; index: number }) {
+/** Stitch "My courses": a card per course with its three pages (also the My Courses page) */
+export function MyCourses({ courses, index, hideTitle }: { courses: CourseCard[]; index: number; hideTitle?: boolean }) {
   const { t } = useTranslation('teacher');
 
   return (
     <Box component="section" sx={fadeUp(index)}>
-      <Typography component="h2" sx={{ fontSize: '1rem', fontWeight: 700, mb: 1.5 }}>
-        {t('dashboard.courses.title')}
-      </Typography>
+      {!hideTitle && (
+        <Typography component="h2" sx={{ fontSize: '1rem', fontWeight: 700, mb: 1.5 }}>
+          {t('dashboard.courses.title')}
+        </Typography>
+      )}
       {courses.length === 0 ? (
         <Card variant="outlined" sx={{ borderRadius: '12px', p: 4, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
