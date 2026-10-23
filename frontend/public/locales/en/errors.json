@@ -29,5 +29,6 @@
   "PERIOD_OVERLAP": "These dates overlap another period of the same kind.",
   "INTERNAL_SERVER_ERROR": "Something went wrong on our side. Please try again.",
   "NETWORK_ERROR": "Cannot reach the server. Check your internet connection.",
-  "UNKNOWN": "Something went wrong. Please try again."
+  "UNKNOWN": "Something went wrong. Please try again.",
+  "CATEGORY_NAME_TAKEN": "Two categories have the same name."
 }

@@ -183,3 +183,28 @@ export const PUBLISH_GRADES = graphql(`
     }
   }
 `);
+
+// ───────────────────────── gradebook ─────────────────────────
+
+/** The weights modal: the whole list (every category, weights add up to 100) */
+export const SET_GRADE_CATEGORIES = graphql(`
+  mutation SetGradeCategories($input: SetGradeCategoriesInput!) {
+    setGradeCategories(input: $input) {
+      id
+      name
+      weight
+      order
+    }
+  }
+`);
+
+/** Snapshot every student's quarter grade: students and parents see this number from now on */
+export const PUBLISH_PERIOD_GRADES = graphql(`
+  mutation PublishPeriodGrades($input: PublishPeriodGradesInput!) {
+    publishPeriodGrades(input: $input) {
+      studentId
+      isPublished
+      publishedAt
+    }
+  }
+`);

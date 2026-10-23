@@ -127,6 +127,7 @@ export const COURSE_ASSIGNMENTS = graphql(`
     courseAssignments(courseId: $courseId) {
       id
       moduleId
+      categoryId
       type
       title
       instructions
@@ -230,6 +231,95 @@ export const ASSIGNMENT_SUBMISSIONS = graphql(`
             url
           }
         }
+      }
+    }
+  }
+`);
+
+/** Gradebook course picker: the teacher's courses with their categories (weights modal) */
+export const GRADEBOOK_COURSES = graphql(`
+  query GradebookCourses {
+    teachingCourses {
+      id
+      title
+      status
+      academicYearId
+      studentCount
+      gradeCategories {
+        id
+        name
+        weight
+        order
+      }
+    }
+  }
+`);
+
+/** One period of the class: each student's % per category (published grades only) and the mark */
+export const COURSE_GRADES = graphql(`
+  query GradebookGrades($courseId: String!, $periodId: String!) {
+    courseGrades(courseId: $courseId, periodId: $periodId) {
+      studentId
+      loginId
+      firstName
+      lastName
+      percent
+      mark
+      categories {
+        categoryId
+        name
+        weight
+        percent
+        count
+        earned
+        possible
+      }
+      items {
+        assignmentId
+        title
+        categoryName
+        type
+        score
+        maxScore
+        status
+        dueAt
+      }
+    }
+  }
+`);
+
+/** Published quarter grades (snapshot, "changed since") for the same period */
+export const COURSE_PERIOD_GRADES = graphql(`
+  query GradebookPeriodGrades($courseId: String!, $periodId: String!) {
+    coursePeriodGrades(courseId: $courseId, periodId: $periodId) {
+      studentId
+      isPublished
+      publishedAt
+      isOutdated
+      score
+    }
+  }
+`);
+
+/** "Final" tab: every student's quarters and the annual grade */
+export const COURSE_ANNUAL_GRADES = graphql(`
+  query GradebookAnnualGrades($courseId: String!) {
+    courseAnnualGrades(courseId: $courseId) {
+      periods {
+        periodId
+        periodName
+        score
+        mark
+        isPublished
+      }
+      annual {
+        studentId
+        loginId
+        firstName
+        lastName
+        score
+        mark
+        finalScore
       }
     }
   }

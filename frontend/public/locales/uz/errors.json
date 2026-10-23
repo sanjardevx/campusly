@@ -29,5 +29,6 @@
   "PERIOD_OVERLAP": "Bu sanalar shu turdagi boshqa davr bilan ustma-ust tushadi.",
   "INTERNAL_SERVER_ERROR": "Bizda xatolik yuz berdi. Qayta urinib ko‘ring.",
   "NETWORK_ERROR": "Serverga ulanib bo‘lmadi. Internetni tekshiring.",
-  "UNKNOWN": "Xatolik yuz berdi. Qayta urinib ko‘ring."
+  "UNKNOWN": "Xatolik yuz berdi. Qayta urinib ko‘ring.",
+  "CATEGORY_NAME_TAKEN": "Ikkita kategoriyaning nomi bir xil."
 }
