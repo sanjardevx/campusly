@@ -356,6 +356,115 @@ describe('Period grades: live → snapshot → override → annual (e2e)', () =>
     expect((await mine('pA')).annual.score).toBe(80);
   });
 
+  it('courseAnnualGrades: every student of the class, their periods and annual grade', async () => {
+    const ANNUAL = `query($c: String!) { courseAnnualGrades(courseId: $c) { periods { ${ROW} } annual { ${ROW} } } }`;
+    const res = await gql<{
+      courseAnnualGrades: { periods: Row[]; annual: Row }[];
+    }>(ANNUAL, { c: course.A });
+    expect(
+      res.data!.courseAnnualGrades.map((r) => [
+        r.annual.firstName,
+        r.periods.length,
+        r.annual.score,
+      ]),
+    ).toEqual([
+      // Aziz: the manual annual override; Bobur: only Q1 has a published score (50 %)
+      ['Aziz', 2, 80],
+      ['Bobur', 2, 50],
+    ]);
+    expect(code(await gql(ANNUAL, { c: course.A }, 'tB'))).toBe('NOT_FOUND');
+    expect(code(await gql(ANNUAL, { c: course.A }, 'sA'))).toBe('FORBIDDEN');
+  });
+
+  describe('setGradeCategories (the weights modal)', () => {
+    const SET = `mutation($i: SetGradeCategoriesInput!) { setGradeCategories(input: $i) { id name weight order } }`;
+    let homeworkId: string;
+    const set = (categories: object[], as: Key = 'tA', courseId = course.A) =>
+      gql<{
+        setGradeCategories: { id: string; name: string; weight: number }[];
+      }>(SET, { i: { courseId, categories } }, as);
+
+    beforeAll(async () => {
+      homeworkId = (
+        await prisma.gradeCategory.findFirstOrThrow({
+          where: { courseId: course.A },
+        })
+      ).id;
+    });
+
+    it('renames, changes the weight and adds a category; audited', async () => {
+      const res = await set([
+        { id: homeworkId, name: 'Homework', weight: 60 },
+        { name: 'Exams', weight: 40 },
+      ]);
+      expect(
+        res.data!.setGradeCategories.map((c) => [c.name, c.weight]),
+      ).toEqual([
+        ['Homework', 60],
+        ['Exams', 40],
+      ]);
+      expect(
+        await prisma.auditLog.count({
+          where: { action: 'course.gradeCategories', actorId: id.tA },
+        }),
+      ).toBe(1);
+    });
+
+    /** Every category of course A as it is now, with the given weights (in order) */
+    const current = async (weights: number[]) =>
+      (
+        await prisma.gradeCategory.findMany({
+          where: { courseId: course.A },
+          orderBy: { order: 'asc' },
+        })
+      ).map((c, i) => ({
+        id: c.id,
+        name: c.name,
+        weight: weights[i],
+      }));
+
+    it.each([
+      [
+        'weights that do not add up to 100',
+        () => current([50, 40]),
+        'tA',
+        'WEIGHTS_SUM',
+      ],
+      [
+        'an existing category left out',
+        () => Promise.resolve([{ name: 'Only new', weight: 100 }]),
+        'tA',
+        'BAD_REQUEST',
+      ],
+      [
+        'two categories with one name',
+        async () => [
+          ...(await current([50, 40])),
+          { name: 'homework ', weight: 10 },
+        ],
+        'tA',
+        'CATEGORY_NAME_TAKEN',
+      ],
+      ['the foreign teacher', () => current([60, 40]), 'tB', 'NOT_FOUND'],
+      ['a student', () => current([60, 40]), 'sA', 'FORBIDDEN'],
+    ] as const)('%s → %s', async (_name, categories, as, expected) => {
+      expect(code(await set(await categories(), as))).toBe(expected);
+    });
+    it('a category of another course → NOT_FOUND', async () => {
+      const foreign = await prisma.gradeCategory.findFirstOrThrow({
+        where: { courseId: course.B },
+      });
+      const current = await prisma.gradeCategory.findMany({
+        where: { courseId: course.A },
+      });
+      const body = await set([
+        ...current.map((c) => ({ id: c.id, name: c.name, weight: c.weight })),
+        { id: foreign.id, name: 'X', weight: 0 },
+      ]);
+      expect(code(body)).toBe('NOT_FOUND');
+    });
+  });
+
   // ───────────── isolation: who → which period grades → expected ─────────────
   const table: [string, Key, () => Promise<GqlBody<unknown>>, string][] = [
     [

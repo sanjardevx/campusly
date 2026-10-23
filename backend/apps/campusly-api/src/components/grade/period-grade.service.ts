@@ -164,6 +164,60 @@ export class PeriodGradeService {
     });
   }
 
+  /**
+   * Gradebook "Final" tab: every active student's period grades and annual grade. Each period is
+   * computed once for the whole class (not student by student).
+   */
+  public async getCourseAnnualGrades(
+    user: AuthUser,
+    courseId: string,
+  ): Promise<MyPeriodGrades[]> {
+    await this.accessPolicy.assertTeacherOf(user, courseId);
+    const course = await this.prismaService.course.findUniqueOrThrow({
+      where: { id: courseId },
+      select: { academicYearId: true },
+    });
+    const [students, periods, snapshots, settings] = await Promise.all([
+      this.activeStudents(courseId),
+      this.prismaService.period.findMany({
+        where: {
+          academicYearId: course.academicYearId,
+          children: { none: {} },
+        },
+        orderBy: [{ startsAt: 'asc' }, { order: 'asc' }],
+      }),
+      this.prismaService.periodGrade.findMany({ where: { courseId } }),
+      this.schoolService.getSettings(),
+    ]);
+    const live = await Promise.all(
+      periods.map((p) => this.gradeService.compute(courseId, p.id, students)),
+    );
+
+    return students.map((student) => {
+      const mine = snapshots.filter((s) => s.studentId === student.id);
+      const rows = periods.map((period, i) =>
+        toRow(
+          student,
+          period,
+          mine.find((s) => s.periodId === period.id) ?? null,
+          live[i].find((g) => g.studentId === student.id)?.percent ?? null,
+          true,
+          settings,
+        ),
+      );
+      return {
+        periods: rows,
+        annual: annualRow(
+          student,
+          rows,
+          mine.find((s) => s.periodId === null) ?? null,
+          true,
+          settings,
+        ),
+      };
+    });
+  }
+
   /** Student: own. Parent: a child. Admin: any student of the course. */
   public async getMyPeriodGrades(
     user: AuthUser,
@@ -237,35 +291,10 @@ export class PeriodGradeService {
       rows.push(toRow(student, period, snap, live.percent, staff, settings));
     }
 
-    // Annual: the override, or the average of the published periods
     const annualSnap = snapshots.find((s) => s.periodId === null) ?? null;
-    const published = rows.filter((r) => r.isPublished && r.score !== null);
-    const average = published.length
-      ? round2(
-          published.reduce((sum, r) => sum + r.score!, 0) / published.length,
-        )
-      : null;
-    const override = num(annualSnap?.finalScore);
-    const annualScore = override ?? average;
-
     return {
       periods: rows,
-      annual: {
-        periodId: null,
-        periodName: 'Annual',
-        studentId: student.id,
-        loginId: student.loginId,
-        firstName: student.firstName,
-        lastName: student.lastName,
-        score: annualScore,
-        mark: toMark(annualScore, settings),
-        isPublished: annualScore !== null,
-        publishedAt: annualSnap?.publishedAt ?? null,
-        livePercent: null,
-        computedScore: staff ? average : null,
-        finalScore: staff ? override : null,
-        isOutdated: false,
-      },
+      annual: annualRow(student, rows, annualSnap, staff, settings),
     };
   }
 
@@ -349,4 +378,36 @@ async function upsertRow(
 
 function notFound(message: string) {
   return new NotFoundException({ code: ErrorCode.NOT_FOUND, message });
+}
+
+/** Annual: the override, or the average of the published periods */
+function annualRow(
+  student: StudentRef,
+  rows: PeriodGradeRow[],
+  annualSnap: SnapshotRow | null,
+  staff: boolean,
+  thresholds: Parameters<typeof toMark>[1],
+): PeriodGradeRow {
+  const published = rows.filter((r) => r.isPublished && r.score !== null);
+  const average = published.length
+    ? round2(published.reduce((sum, r) => sum + r.score!, 0) / published.length)
+    : null;
+  const override = num(annualSnap?.finalScore);
+  const annualScore = override ?? average;
+  return {
+    periodId: null,
+    periodName: 'Annual',
+    studentId: student.id,
+    loginId: student.loginId,
+    firstName: student.firstName,
+    lastName: student.lastName,
+    score: annualScore,
+    mark: toMark(annualScore, thresholds),
+    isPublished: annualScore !== null,
+    publishedAt: annualSnap?.publishedAt ?? null,
+    livePercent: null,
+    computedScore: staff ? average : null,
+    finalScore: staff ? override : null,
+    isOutdated: false,
+  };
 }

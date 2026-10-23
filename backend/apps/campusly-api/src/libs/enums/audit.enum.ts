@@ -22,6 +22,7 @@ export enum AuditAction {
   COURSE_UPDATE = 'course.update',
   COURSE_TEACHERS = 'course.setTeachers',
   COURSE_STUDENTS = 'course.setStudents',
+  COURSE_GRADE_CATEGORIES = 'course.gradeCategories',
   SUBMISSION_GRADE = 'submission.grade',
   SUBMISSION_RETURN = 'submission.return',
   ASSIGNMENT_ZERO_MISSING = 'assignment.zeroMissing',

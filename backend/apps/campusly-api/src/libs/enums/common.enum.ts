@@ -33,6 +33,8 @@ export enum ErrorCode {
   MARK_THRESHOLDS_ORDER = 'MARK_THRESHOLDS_ORDER',
   /** Homework + Quizzes + Exams must be 100 */
   WEIGHTS_SUM = 'WEIGHTS_SUM',
+  /** Two grade categories of one course with the same name */
+  CATEGORY_NAME_TAKEN = 'CATEGORY_NAME_TAKEN',
   /** The end date is not after the start date */
   DATES_ORDER = 'DATES_ORDER',
   YEAR_OVERLAP = 'YEAR_OVERLAP',

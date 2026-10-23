@@ -470,6 +470,12 @@ type GradeCategory {
   weight: Int!
 }
 
+input GradeCategoryInput {
+  id: String
+  name: String!
+  weight: Int!
+}
+
 type GradeItem {
   assignmentId: String!
   categoryName: String!
@@ -734,6 +740,7 @@ type Mutation {
   setCourseStudents(input: SetCourseStudentsInput!): Course!
   setCourseTeachers(input: SetCourseTeachersInput!): Course!
   setCurrentAcademicYear(id: String!): AcademicYear!
+  setGradeCategories(input: SetGradeCategoriesInput!): [GradeCategory!]!
   setLessonFile(input: SetLessonFileInput!): Lesson!
   setLessonVideo(input: SetLessonVideoInput!): Lesson!
   setPeriodFinalScore(input: SetPeriodFinalScoreInput!): PeriodGradeRow!
@@ -877,6 +884,7 @@ type Query {
   assignmentSubmissions(assignmentId: String!): [GradebookRow!]!
   attendanceJournal(courseId: String!, from: String!, to: String!): AttendanceJournal!
   attendanceOverview(range: AttendanceRange!): AttendanceOverview!
+  courseAnnualGrades(courseId: String!): [MyPeriodGrades!]!
   courseAssignments(courseId: String!): [Assignment!]!
   courseAttendance(courseId: String!, date: String!): CourseAttendance!
   courseDetail(courseId: String!): CourseDetail!
@@ -1000,6 +1008,11 @@ input SetCourseStudentsInput {
 input SetCourseTeachersInput {
   courseId: String!
   teacherIds: [String!]!
+}
+
+input SetGradeCategoriesInput {
+  categories: [GradeCategoryInput!]!
+  courseId: String!
 }
 
 input SetLessonFileInput {

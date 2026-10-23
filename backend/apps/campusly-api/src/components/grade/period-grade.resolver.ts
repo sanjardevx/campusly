@@ -46,6 +46,16 @@ export class PeriodGradeResolver {
     return this.periodGradeService.setPeriodFinalScore(user, input);
   }
 
+  /** Gradebook "Final" tab: every student's periods and annual grade */
+  @Roles(Role.ADMIN, Role.TEACHER)
+  @Query(() => [MyPeriodGrades])
+  public courseAnnualGrades(
+    @CurrentUser() user: AuthUser,
+    @Args('courseId', ParseUUIDPipe) courseId: string,
+  ): Promise<MyPeriodGrades[]> {
+    return this.periodGradeService.getCourseAnnualGrades(user, courseId);
+  }
+
   /** Student: own. Parent: a child (studentId optional with one child). Admin: any student. */
   @Roles(Role.STUDENT, Role.PARENT, Role.ADMIN)
   @Query(() => MyPeriodGrades)

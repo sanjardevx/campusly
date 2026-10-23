@@ -1,5 +1,18 @@
-import { Field, Float, InputType } from '@nestjs/graphql';
-import { IsNumber, IsOptional, IsUUID, Max, Min } from 'class-validator';
+import { Field, Float, InputType, Int } from '@nestjs/graphql';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 
 @InputType()
 export class PublishPeriodGradesInput {
@@ -36,4 +49,40 @@ export class SetPeriodFinalScoreInput {
   @Min(0)
   @Max(100)
   finalScore?: number | null;
+}
+
+/** One category in the weights modal: an existing one (id) or a new one (no id) */
+@InputType()
+export class GradeCategoryInput {
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  id?: string;
+
+  @Field(() => String)
+  @IsString()
+  @Length(1, 40)
+  name: string;
+
+  /** Percent of the period grade; 0 switches a category off (it is never deleted) */
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  @Max(100)
+  weight: number;
+}
+
+/** The course's whole list, in order: every existing category must be in it, weights add up to 100 */
+@InputType()
+export class SetGradeCategoriesInput {
+  @Field(() => String)
+  @IsUUID()
+  courseId: string;
+
+  @Field(() => [GradeCategoryInput])
+  @ValidateNested({ each: true })
+  @Type(() => GradeCategoryInput)
+  @ArrayMinSize(1)
+  @ArrayMaxSize(8)
+  categories: GradeCategoryInput[];
 }
