@@ -283,7 +283,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 }
 
 /** A file to open: the teacher's (signed link made on click) or the student's own (link given) */
-function FileChip({ assetId, url, name, mimeType, size }: { assetId?: string; url?: string | null; name: string; mimeType: string; size: number }) {
+export function FileChip({ assetId, url, name, mimeType, size }: { assetId?: string; url?: string | null; name: string; mimeType: string; size: number }) {
   const { t } = useTranslation('student');
   const [getUrl, { loading }] = useLazyQuery(STUDENT_FILE_URL, { fetchPolicy: 'network-only' });
   const open = async () => {
@@ -311,7 +311,7 @@ function FileChip({ assetId, url, name, mimeType, size }: { assetId?: string; ur
 }
 
 /** A disabled "coming soon" link (Study Tutor, Q&A wait for their phases) */
-function Soon({ icon, label }: { icon: ReactNode; label: string }) {
+export function Soon({ icon, label }: { icon: ReactNode; label: string }) {
   const { t } = useTranslation('student');
   return (
     <Stack direction="row" aria-disabled sx={{ alignItems: 'center', gap: 1, color: 'text.disabled', '& svg': { fontSize: 18 } }}>

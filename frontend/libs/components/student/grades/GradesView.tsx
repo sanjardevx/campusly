@@ -8,7 +8,7 @@ import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownR
 import { useTranslation } from 'next-i18next/pages';
 import { MY_PERIOD_GRADES } from '@/apollo/student/query';
 import { formatInSchool, studentHref } from '@/libs/components/student/home/due';
-import { STITCH, SoftPill, enter, pressSx } from '@/libs/components/student/home/parts';
+import { STITCH, SegmentedTabs, SoftPill, enter, pressSx } from '@/libs/components/student/home/parts';
 import type { GradeItemState, MyGradesQuery } from '@/libs/gql/graphql';
 
 type Grades = MyGradesQuery['myGrades'];
@@ -34,36 +34,7 @@ const STATE_TONE: Record<GradeItemState, 'mint' | 'peach' | 'neutral'> = {
 export function PeriodTabs({ periods, value, onChange }: { periods: Grades['periods']; value: string; onChange: (id: string) => void }) {
   const { t } = useTranslation('student');
   const tabs = [...periods.map((p) => ({ id: p.id, label: p.name })), { id: FINAL, label: t('grades.final') }];
-  return (
-    <Stack role="tablist" direction="row" sx={{ gap: 0.5, p: 0.5, borderRadius: 2, bgcolor: '#EFF5F0', border: 1, borderColor: STITCH.outline, overflowX: 'auto', maxWidth: '100%', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-      {tabs.map((tab) => {
-        const active = tab.id === value;
-        return (
-          <ButtonBase
-            key={tab.id}
-            role="tab"
-            aria-selected={active}
-            onClick={() => onChange(tab.id)}
-            sx={{
-              px: 1.75,
-              py: 0.75,
-              borderRadius: 1.5,
-              whiteSpace: 'nowrap',
-              fontSize: '0.84375rem',
-              fontWeight: active ? 600 : 500,
-              color: active ? STITCH.ink : 'text.secondary',
-              bgcolor: active ? '#fff' : 'transparent',
-              boxShadow: active ? STITCH.rowShadow : 'none',
-              transition: 'background-color 150ms ease, color 150ms ease',
-              '&:hover': { color: 'text.primary' },
-            }}
-          >
-            {tab.label}
-          </ButtonBase>
-        );
-      })}
-    </Stack>
-  );
+  return <SegmentedTabs tabs={tabs} value={value} onChange={onChange} />;
 }
 
 /** "91.4%" with the 5-point mark beside it (DECISIONS §10) and "Not final" while it can change */

@@ -331,5 +331,29 @@
       "UPCOMING": "Kelgusi",
       "NOT_GRADED": "Baholanmagan"
     }
+  },
+  "announcements": {
+    "title": "E'lonlar",
+    "subtitle": "O'qituvchilaringiz va maktabingizdan",
+    "tabs": {
+      "all": "Hammasi ({{count}})",
+      "unread": "O'qilmagan ({{count}})",
+      "school": "Maktab ({{count}})"
+    },
+    "course": "Kurs",
+    "allCourses": "Barcha kurslar",
+    "search": "E'lonlardan qidirish",
+    "pinned": "Qadalgan",
+    "school": "Maktab",
+    "schoolAdmin": "Maktab ma'muriyati",
+    "unreadDot": "O'qilmagan",
+    "ask": "Bu haqda savol berish",
+    "collapse": "Yig'ish",
+    "markAll": "Hammasini o'qilgan deb belgilash",
+    "showing": "{{total}} tadan {{shown}} tasi ko'rsatilmoqda",
+    "loadMore": "Yana yuklash",
+    "none": "Hozircha e'lonlar yo'q.",
+    "noMatch": "Qidiruvga mos e'lon topilmadi.",
+    "allRead": "Hammasini o'qib chiqdingiz."
   }
 }

@@ -134,6 +134,18 @@ export class AnnouncementsInquiry {
   @IsUUID()
   courseId?: string;
 
+  /** The "Unread" tab: only what the viewer has not opened yet */
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  unreadOnly?: boolean;
+
+  /** The "School" tab: only school-wide announcements */
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  schoolOnly?: boolean;
+
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()

@@ -58,6 +58,7 @@ const RESOLVERS = [
 const ANY_SIGNED_IN = new Set([
   'announcements', // school-wide + the viewer's courses
   'markAnnouncementRead',
+  'markAllAnnouncementsRead', // visibleTo(user): own scope only
   'assignment', // assertCanViewAssignment
   'courseAssignments', // assertCanViewCourse
   'courseDetail', // assertCanViewCourse

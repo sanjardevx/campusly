@@ -62,7 +62,9 @@ type Announcement {
 }
 
 type Announcements {
+  all: Int!
   list: [Announcement!]!
+  school: Int!
   total: Int!
   unread: Int!
 }
@@ -71,7 +73,9 @@ input AnnouncementsInquiry {
   courseId: String
   limit: Int
   page: Int
+  schoolOnly: Boolean
   search: String
+  unreadOnly: Boolean
 }
 
 type Assignment {
@@ -781,6 +785,7 @@ type Mutation {
   importStudents(csv: String!, skipErrors: Boolean! = false): ImportResult!
   linkParent(input: ParentInput!, studentId: String!): LoginSlip!
   logRecordExport(input: RecordExportInput!): Boolean!
+  markAllAnnouncementsRead: Int!
   markAnnouncementRead(id: String!): Announcement!
   markAttendance(input: MarkAttendanceInput!): CourseAttendance!
   moveStudent(input: MoveStudentInput!): Group!

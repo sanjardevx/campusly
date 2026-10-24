@@ -197,10 +197,10 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 12 (S) — Student UI
 
-- [ ] Dashboard: "This week", To Do, my courses with progress.
-- [ ] Course page (weeks), lesson page with video player (resume, progress heartbeat, ID watermark).
-- [ ] Homework page (not submitted / submitted / graded states, upload).
-- [ ] Grades page (quarters + final, % and 5-point mark), announcements.
+- [x] Dashboard: "This week", To Do, my courses with progress.
+- [x] Course page (weeks), lesson page with video player (resume, progress heartbeat, ID watermark).
+- [x] Homework page (not submitted / submitted / graded states, upload).
+- [x] Grades page (quarters + final, % and 5-point mark), announcements.
 
 ---
 

@@ -331,5 +331,29 @@
       "UPCOMING": "Upcoming",
       "NOT_GRADED": "Not graded"
     }
+  },
+  "announcements": {
+    "title": "Announcements",
+    "subtitle": "From your teachers and your school",
+    "tabs": {
+      "all": "All ({{count}})",
+      "unread": "Unread ({{count}})",
+      "school": "School ({{count}})"
+    },
+    "course": "Course",
+    "allCourses": "All courses",
+    "search": "Search announcements",
+    "pinned": "Pinned",
+    "school": "School",
+    "schoolAdmin": "School administration",
+    "unreadDot": "Unread",
+    "ask": "Ask a question about this",
+    "collapse": "Collapse",
+    "markAll": "Mark all as read",
+    "showing": "Showing {{shown}} of {{total}} updates",
+    "loadMore": "Load more",
+    "none": "No announcements yet.",
+    "noMatch": "No announcements match your search.",
+    "allRead": "You're all caught up."
   }
 }

@@ -1,5 +1,5 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   Announcement,
   Announcements,
@@ -34,6 +34,14 @@ export class AnnouncementResolver {
     @Args('id', ParseUUIDPipe) id: string,
   ): Promise<Announcement> {
     return this.announcementService.markAnnouncementRead(user, id);
+  }
+
+  /** Every role: only what the viewer may see (scope from the DB, no IDs from the client) */
+  @Mutation(() => Int)
+  public markAllAnnouncementsRead(
+    @CurrentUser() user: AuthUser,
+  ): Promise<number> {
+    return this.announcementService.markAllAnnouncementsRead(user);
   }
 
   /** School-wide: admins. A course: its teachers (checked in the service). */

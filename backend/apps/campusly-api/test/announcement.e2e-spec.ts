@@ -264,6 +264,62 @@ describe('Announcements: who sees, who writes, read receipts (e2e)', () => {
     expect(code(await gql(READ, { id: ann.C }, 'sA'))).toBe('NOT_FOUND');
   });
 
+  it('student tabs: unread / school filters with counts; mark all reads only what the viewer sees', async () => {
+    const TABS = `query($i: AnnouncementsInquiry) { announcements(input: $i) { total all unread school list { id } } }`;
+    type Tabs = {
+      announcements: {
+        total: number;
+        all: number;
+        unread: number;
+        school: number;
+        list: { id: string }[];
+      };
+    };
+    // search = TAG: the seed's own announcements stay out of the counts
+    const tabs = async (as: Key, extra: object = {}) =>
+      (await gql<Tabs>(TABS, { i: { search: TAG, ...extra } }, as)).data!
+        .announcements;
+
+    // sA: school trip (unread) + course A (read in the test above)
+    expect(await tabs('sA')).toMatchObject({
+      total: 2,
+      all: 2,
+      unread: 1,
+      school: 1,
+    });
+    const unreadTab = await tabs('sA', { unreadOnly: true });
+    expect(unreadTab.list.map((x) => x.id)).toEqual([ann.school]);
+    // The tab narrows `total`, never the tab counts
+    expect(unreadTab).toMatchObject({ total: 1, all: 2, unread: 1 });
+    expect(
+      (await tabs('sA', { schoolOnly: true })).list.map((x) => x.id),
+    ).toEqual([ann.school]);
+    expect(
+      (await tabs('sA', { schoolOnly: true, courseId: course.A })).total,
+    ).toBe(0);
+
+    const MARK_ALL = `mutation { markAllAnnouncementsRead }`;
+    const marked = await gql<{ markAllAnnouncementsRead: number }>(
+      MARK_ALL,
+      {},
+      'sA',
+    );
+    expect(marked.data!.markAllAnnouncementsRead).toBeGreaterThanOrEqual(1);
+    expect((await tabs('sA')).unread).toBe(0);
+    // Foreign course (B) and draft course (C): no read rows were made for sA
+    expect(
+      await prisma.announcementRead.count({
+        where: { userId: id.sA, announcementId: { in: [ann.B, ann.C] } },
+      }),
+    ).toBe(0);
+    // Another student's reads are untouched; a second click adds nothing
+    expect((await tabs('sB')).unread).toBe(2);
+    expect(
+      (await gql<{ markAllAnnouncementsRead: number }>(MARK_ALL, {}, 'sA'))
+        .data!.markAllAnnouncementsRead,
+    ).toBe(0);
+  });
+
   describe('teacher page: several courses, files, audience, search, archive', () => {
     const MULTI = `mutation($i: CreateCourseAnnouncementsInput!) { createCourseAnnouncements(input: $i) { id courseTitle files { id name } } }`;
     const ARCHIVE = `mutation($id: String!) { archiveAnnouncement(id: $id) { id } }`;

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, ButtonBase, Stack, Typography } from '@mui/material';
 import { keyframes } from '@mui/material/styles';
 import { EASE_OUT, fadeUp } from '@/libs/components/dashboard/motion';
 
@@ -121,5 +121,40 @@ export function SectionTitle({ title, subtitle }: { title: string; subtitle: str
       </Typography>
       <Typography sx={{ fontSize: '0.84375rem', lineHeight: '1.375rem', color: 'text.secondary' }}>{subtitle}</Typography>
     </Box>
+  );
+}
+
+/** Stitch's segmented control: quarter tabs on Grades, All / Unread / School on Announcements */
+export function SegmentedTabs({ tabs, value, onChange }: { tabs: { id: string; label: ReactNode }[]; value: string; onChange: (id: string) => void }) {
+  return (
+    <Stack role="tablist" direction="row" sx={{ gap: 0.5, p: 0.5, borderRadius: 2, bgcolor: '#EFF5F0', border: 1, borderColor: STITCH.outline, overflowX: 'auto', maxWidth: '100%', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+      {tabs.map((tab) => {
+        const active = tab.id === value;
+        return (
+          <ButtonBase
+            key={tab.id}
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(tab.id)}
+            sx={{
+              px: 1.75,
+              py: 0.75,
+              borderRadius: 1.5,
+              whiteSpace: 'nowrap',
+              fontSize: '0.84375rem',
+              fontWeight: active ? 600 : 500,
+              fontVariantNumeric: 'tabular-nums',
+              color: active ? STITCH.ink : 'text.secondary',
+              bgcolor: active ? '#fff' : 'transparent',
+              boxShadow: active ? STITCH.rowShadow : 'none',
+              transition: 'background-color 150ms ease, color 150ms ease',
+              '&:hover': { color: 'text.primary' },
+            }}
+          >
+            {tab.label}
+          </ButtonBase>
+        );
+      })}
+    </Stack>
   );
 }

@@ -57,3 +57,20 @@ export const ADD_SUBMISSION_COMMENT = graphql(`
     }
   }
 `);
+
+/** Opening a card marks it read (twice is fine on the server) */
+export const MARK_ANNOUNCEMENT_READ = graphql(`
+  mutation MarkAnnouncementRead($id: String!) {
+    markAnnouncementRead(id: $id) {
+      id
+      isRead
+    }
+  }
+`);
+
+/** "Mark all as read": everything the viewer may see; returns how many were new */
+export const MARK_ALL_ANNOUNCEMENTS_READ = graphql(`
+  mutation MarkAllAnnouncementsRead {
+    markAllAnnouncementsRead
+  }
+`);

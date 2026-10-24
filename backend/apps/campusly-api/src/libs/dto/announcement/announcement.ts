@@ -62,10 +62,19 @@ export class Announcements {
   @Field(() => [Announcement])
   list: Announcement[];
 
+  /** Matching the whole input, tab included ("Showing 10 of 24") */
   @Field(() => Int)
   total: number;
 
-  /** Not read by the viewer, in the whole list (not only this page) */
+  /** Tab counts — course filter and search apply, the tab does not: All (n) */
+  @Field(() => Int)
+  all: number;
+
+  /** Unread (n): not read by the viewer, in the whole list (not only this page) */
   @Field(() => Int)
   unread: number;
+
+  /** School (n): school-wide ones */
+  @Field(() => Int)
+  school: number;
 }

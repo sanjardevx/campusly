@@ -315,5 +315,29 @@
       "UPCOMING": "예정",
       "NOT_GRADED": "채점 전"
     }
+  },
+  "announcements": {
+    "title": "공지사항",
+    "subtitle": "선생님과 학교에서 온 소식",
+    "tabs": {
+      "all": "전체 ({{count}})",
+      "unread": "읽지 않음 ({{count}})",
+      "school": "학교 ({{count}})"
+    },
+    "course": "과목",
+    "allCourses": "모든 과목",
+    "search": "공지사항 검색",
+    "pinned": "고정됨",
+    "school": "학교",
+    "schoolAdmin": "학교 행정실",
+    "unreadDot": "읽지 않음",
+    "ask": "이 공지에 대해 질문하기",
+    "collapse": "접기",
+    "markAll": "모두 읽음으로 표시",
+    "showing": "{{total}}개 중 {{shown}}개 표시",
+    "loadMore": "더 보기",
+    "none": "아직 공지사항이 없습니다.",
+    "noMatch": "검색과 일치하는 공지사항이 없습니다.",
+    "allRead": "모두 읽었습니다."
   }
 }

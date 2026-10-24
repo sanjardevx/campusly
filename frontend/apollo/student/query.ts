@@ -319,3 +319,32 @@ export const MY_PERIOD_GRADES = graphql(`
     }
   }
 `);
+
+/** Announcements page: one tab at a time (unreadOnly / schoolOnly), the tab counts come with it */
+export const STUDENT_ANNOUNCEMENTS = graphql(`
+  query StudentAnnouncements($input: AnnouncementsInquiry) {
+    announcements(input: $input) {
+      total
+      all
+      unread
+      school
+      list {
+        id
+        title
+        body
+        courseId
+        courseTitle
+        isPinned
+        publishedAt
+        authorName
+        isRead
+        files {
+          id
+          name
+          mimeType
+          size
+        }
+      }
+    }
+  }
+`);

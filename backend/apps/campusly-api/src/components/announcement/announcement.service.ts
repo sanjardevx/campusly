@@ -188,7 +188,7 @@ export class AnnouncementService {
     const page = input.page ?? 1;
     const limit = input.limit ?? 20;
     // The scope is one AND item: a filter from the client can never widen it
-    const where: Prisma.AnnouncementWhereInput = {
+    const base: Prisma.AnnouncementWhereInput = {
       AND: [
         this.visibleTo(user),
         input.courseId ? { courseId: input.courseId } : {},
@@ -206,25 +206,66 @@ export class AnnouncementService {
           : {},
       ],
     };
+    const notRead = { reads: { none: { userId: user.id } } };
+    // The tab narrows the list; the tab counts are taken on `base`
+    const where: Prisma.AnnouncementWhereInput = {
+      AND: [
+        base,
+        input.unreadOnly ? notRead : {},
+        input.schoolOnly ? { courseId: null } : {},
+      ],
+    };
 
-    const [total, unread, rows] = await this.prismaService.$transaction([
-      this.prismaService.announcement.count({ where }),
-      this.prismaService.announcement.count({
-        where: { AND: [where, { reads: { none: { userId: user.id } } }] },
-      }),
-      this.prismaService.announcement.findMany({
-        where,
-        orderBy: [{ isPinned: 'desc' }, { publishedAt: 'desc' }, { id: 'asc' }],
-        skip: (page - 1) * limit,
-        take: limit,
-        include: {
-          ...INCLUDE,
-          reads: { where: { userId: user.id }, select: { userId: true } },
-        },
-      }),
-    ]);
+    const [total, all, unread, school, rows] =
+      await this.prismaService.$transaction([
+        this.prismaService.announcement.count({ where }),
+        this.prismaService.announcement.count({ where: base }),
+        this.prismaService.announcement.count({
+          where: { AND: [base, notRead] },
+        }),
+        this.prismaService.announcement.count({
+          where: { AND: [base, { courseId: null }] },
+        }),
+        this.prismaService.announcement.findMany({
+          where,
+          orderBy: [
+            { isPinned: 'desc' },
+            { publishedAt: 'desc' },
+            { id: 'asc' },
+          ],
+          skip: (page - 1) * limit,
+          take: limit,
+          include: {
+            ...INCLUDE,
+            reads: { where: { userId: user.id }, select: { userId: true } },
+          },
+        }),
+      ]);
     const read = new Set(rows.filter((r) => r.reads.length).map((r) => r.id));
-    return { total, unread, list: await this.withAudience(rows, user, read) };
+    return {
+      total,
+      all,
+      unread,
+      school,
+      list: await this.withAudience(rows, user, read),
+    };
+  }
+
+  /** "Mark all as read": every announcement the viewer may see; returns how many were new */
+  public async markAllAnnouncementsRead(user: AuthUser): Promise<number> {
+    const unread = await this.prismaService.announcement.findMany({
+      where: {
+        AND: [this.visibleTo(user), { reads: { none: { userId: user.id } } }],
+      },
+      select: { id: true },
+    });
+    if (!unread.length) return 0;
+    // skipDuplicates: a parallel click or another tab may have added some rows already
+    const { count } = await this.prismaService.announcementRead.createMany({
+      data: unread.map((a) => ({ announcementId: a.id, userId: user.id })),
+      skipDuplicates: true,
+    });
+    return count;
   }
 
   /** Twice is fine: one row per user (composite key) */
