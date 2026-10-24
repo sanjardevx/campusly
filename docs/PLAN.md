@@ -206,9 +206,9 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 13 (S) — Parent UI, landing, mobile
 
-- [ ] Parent dashboard with child switcher (child in URL), grades, attendance, missing assignments, announcements.
-- [ ] Logged-out home: mini landing + login + per-role "Demo login" buttons (`DEMO_MODE`).
-- [ ] Mobile pass for student and parent pages.
+- [x] Parent dashboard with child switcher (child in URL), grades, attendance, missing assignments, announcements.
+- [x] Logged-out home: mini landing + login + per-role "Demo login" buttons (`DEMO_MODE`).
+- [x] Mobile pass for student and parent pages.
 - [ ] Domain DNS ready.
 
 ---

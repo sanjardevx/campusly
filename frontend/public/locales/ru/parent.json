@@ -49,6 +49,23 @@
       "school": "Школа",
       "empty": "Объявлений пока нет.",
       "hotline": "Канцелярия школы"
+    },
+    "mobile": {
+      "attendance": "Посещаемость",
+      "average": "Средний",
+      "missing": "Не сдано",
+      "lessons_one": "{{count}} урок",
+      "lessons_few": "{{count}} урока",
+      "lessons_many": "{{count}} уроков",
+      "lessons_other": "{{count}} урока",
+      "dueWeek": "Сдать на этой неделе",
+      "items_one": "{{count}} задание",
+      "items_few": "{{count}} задания",
+      "items_many": "{{count}} заданий",
+      "items_other": "{{count}} задания",
+      "nothingDue": "В ближайшие 7 дней сдавать нечего.",
+      "submitted": "Сдано",
+      "notSubmitted": "Не сдано"
     }
   },
   "attendance": {

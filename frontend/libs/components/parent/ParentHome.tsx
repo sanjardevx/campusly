@@ -12,6 +12,7 @@ import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { SCHOOL_SETTINGS } from '@/apollo/app/query';
 import { fadeUp, useCountUp } from '@/libs/components/dashboard/motion';
+import { formatInSchool } from '@/libs/components/student/home/due';
 import { STITCH, SoftPill } from '@/libs/components/student/home/parts';
 import type { ParentHomeQuery } from '@/libs/gql/graphql';
 import { viz } from '@/libs/viz';
@@ -315,5 +316,115 @@ function Kpi({
       <Typography sx={{ fontSize: '2.25rem', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, fontVariantNumeric: 'proportional-nums', color: value == null ? 'text.disabled' : 'text.primary' }}>{text}</Typography>
       <Typography sx={{ fontSize: '0.8125rem', color: 'text.secondary' }}>{footer}</Typography>
     </Card>
+  );
+}
+
+/** Rows of "Due this week" on the phone home */
+const MOBILE_DUE_ROWS = 5;
+
+/**
+ * Stitch "Parent Mobile: Home", kept simple: the child line, three small tiles (attendance, average,
+ * missing), this week's work with its state and the latest published grades. The child switcher and
+ * the bell are in the phone shell; announcements have their own tab.
+ */
+export function ParentMobileHome({ data, child }: { data: Home; child: string }) {
+  const { t } = useTranslation('parent');
+  const { locale } = useRouter();
+  const { studentOverview: overview, myGrades: grades } = data;
+  const { student } = overview;
+  const graded = grades.courses.filter((c) => c.percent != null);
+  const average = graded.length ? Math.round((graded.reduce((n, c) => n + c.percent!, 0) / graded.length) * 10) / 10 : null;
+  const missing = grades.courses.flatMap((c) => c.items.filter(isMissing).map(() => c.subjectName));
+  const { attendance } = grades;
+
+  const tile = (label: string, value: string, note: string, warn = false) => (
+    <Card variant="outlined" sx={{ borderRadius: '12px', p: 1.5, minWidth: 0 }}>
+      <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: warn ? 'warning.dark' : 'text.secondary' }}>{label}</Typography>
+      <Typography sx={{ fontSize: '1.375rem', fontWeight: 700, letterSpacing: '-0.02em', color: warn ? 'warning.dark' : 'text.primary', fontVariantNumeric: 'tabular-nums' }}>{value}</Typography>
+      <Typography noWrap sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+        {note}
+      </Typography>
+    </Card>
+  );
+
+  return (
+    <Stack spacing={2}>
+      <Box>
+        <Typography sx={{ fontSize: '1.25rem', fontWeight: 700 }}>
+          {student.firstName} {student.lastName}
+        </Typography>
+        <Typography sx={{ fontSize: '0.8125rem', color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
+          {student.className ? t('home.classId', { className: student.className, id: student.loginId }) : t('home.id', { id: student.loginId })}
+          {overview.period ? ` · ${t('home.periodWeek', { period: overview.period.name, week: overview.period.week })}` : ''}
+        </Typography>
+      </Box>
+
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 1 }}>
+        {tile(t('home.mobile.attendance'), pct(attendance.rate), attendance.total ? t('home.mobile.lessons', { count: attendance.total }) : '—')}
+        {tile(t('home.mobile.average'), pct(average), grades.period?.name ?? '—')}
+        {tile(t('home.mobile.missing'), String(grades.missing), missing[0] ?? t('home.kpi.nothingMissing'), grades.missing > 0)}
+      </Box>
+
+      <Card variant="outlined" sx={{ borderRadius: '12px' }}>
+        <Stack direction="row" sx={{ px: 2, pt: 1.75, pb: 1.25, justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <Typography component="h2" sx={{ fontWeight: 700 }}>
+            {t('home.mobile.dueWeek')}
+          </Typography>
+          <Typography sx={{ fontSize: '0.8125rem', color: 'text.secondary' }}>{t('home.mobile.items', { count: overview.upcoming.length })}</Typography>
+        </Stack>
+        {overview.upcoming.length === 0 ? (
+          <Typography sx={{ px: 2, pb: 2, fontSize: '0.875rem', color: 'text.secondary' }}>{t('home.mobile.nothingDue')}</Typography>
+        ) : (
+          <Stack sx={{ '& > *': { borderTop: 1, borderColor: '#ECEEE8' } }}>
+            {/* The nearest five; the count above says how many there are */}
+            {overview.upcoming.slice(0, MOBILE_DUE_ROWS).map((u) => (
+              <Stack key={u.assignmentId} direction="row" sx={{ px: 2, py: 1.25, gap: 1.5, justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography noWrap sx={{ fontSize: '0.9375rem', fontWeight: 500 }}>
+                    {u.title}
+                  </Typography>
+                  <Typography noWrap sx={{ fontSize: '0.75rem', color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
+                    {u.courseTitle} · {formatInSchool(u.dueAt, locale)}
+                  </Typography>
+                </Box>
+                <SoftPill tone={u.isDone ? 'mint' : 'neutral'}>{u.isDone ? t('home.mobile.submitted') : t('home.mobile.notSubmitted')}</SoftPill>
+              </Stack>
+            ))}
+          </Stack>
+        )}
+      </Card>
+
+      <Card variant="outlined" sx={{ borderRadius: '12px' }}>
+        <Stack direction="row" sx={{ px: 2, pt: 1.75, pb: 1.25, justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <Typography component="h2" sx={{ fontWeight: 700 }}>
+            {t('home.recent.title')}
+          </Typography>
+          <Link component={NextLink} href={parentHref('/parent/grades', child)} underline="hover" sx={{ fontSize: '0.8125rem', fontWeight: 600 }}>
+            {t('home.grades.all')}
+          </Link>
+        </Stack>
+        {overview.recentGrades.length === 0 ? (
+          <Typography sx={{ px: 2, pb: 2, fontSize: '0.875rem', color: 'text.secondary' }}>{t('home.recent.empty')}</Typography>
+        ) : (
+          <Stack sx={{ '& > *': { borderTop: 1, borderColor: '#ECEEE8' } }}>
+            {overview.recentGrades.map((g) => (
+              <Box key={g.assignmentId} sx={{ px: 2, py: 1.25 }}>
+                <Stack direction="row" sx={{ justifyContent: 'space-between', gap: 1.5 }}>
+                  <Typography sx={{ fontSize: '0.9375rem', minWidth: 0 }}>
+                    {g.courseTitle} · {g.title}
+                  </Typography>
+                  <Typography sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+                    {g.score}/{g.maxScore}
+                  </Typography>
+                </Stack>
+                <Typography sx={{ mt: 0.25, fontSize: '0.8125rem', color: 'text.secondary', fontStyle: g.feedback ? 'italic' : 'normal' }}>
+                  {g.feedback ? `“${g.feedback}”` : shortDate(g.publishedAt, locale)}
+                </Typography>
+              </Box>
+            ))}
+          </Stack>
+        )}
+      </Card>
+    </Stack>
   );
 }

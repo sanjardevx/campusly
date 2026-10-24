@@ -43,6 +43,19 @@
       "school": "Maktab",
       "empty": "Hozircha e'lonlar yo'q.",
       "hotline": "Maktab ofisi"
+    },
+    "mobile": {
+      "attendance": "Davomat",
+      "average": "O'rtacha",
+      "missing": "Topshirilmagan",
+      "lessons_one": "{{count}} ta dars",
+      "lessons_other": "{{count}} ta dars",
+      "dueWeek": "Shu hafta muddati",
+      "items_one": "{{count}} ta",
+      "items_other": "{{count}} ta",
+      "nothingDue": "Keyingi 7 kunda muddatli ish yo'q.",
+      "submitted": "Topshirilgan",
+      "notSubmitted": "Topshirilmagan"
     }
   },
   "attendance": {

@@ -19,6 +19,13 @@ export const PARENT_HOME = graphql(`
         name
         week
       }
+      upcoming {
+        assignmentId
+        courseTitle
+        title
+        dueAt
+        isDone
+      }
       recentGrades {
         assignmentId
         courseTitle

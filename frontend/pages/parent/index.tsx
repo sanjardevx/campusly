@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client/react';
-import { Alert, Box, Card, CircularProgress, Typography } from '@mui/material';
+import { Alert, Box, Card, CircularProgress, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useTranslation } from 'next-i18next/pages';
 import { PARENT_HOME } from '@/apollo/parent/query';
 import { MY_CHILDREN } from '@/apollo/user/query';
 import { layoutFor } from '@/libs/components/layout';
-import { ParentHome } from '@/libs/components/parent/ParentHome';
+import { ParentHome, ParentMobileHome } from '@/libs/components/parent/ParentHome';
 import { errorCode } from '@/libs/errors';
 import { useErrorText } from '@/libs/i18n';
 import { withTranslations } from '@/libs/i18n/server';
@@ -18,6 +18,8 @@ const Home: NextPageWithLayout = () => {
   const { t } = useTranslation('parent');
   const errorText = useErrorText();
   const router = useRouter();
+  const theme = useTheme();
+  const phone = !useMediaQuery(theme.breakpoints.up('md'));
   const { data: kids } = useQuery(MY_CHILDREN);
   const child = typeof router.query.child === 'string' ? router.query.child : undefined;
   const { data, previousData, error } = useQuery(PARENT_HOME, { variables: { studentId: child ?? '' }, skip: !child, fetchPolicy: 'cache-and-network' });
@@ -38,7 +40,8 @@ const Home: NextPageWithLayout = () => {
       </Box>
     );
   }
-  return <ParentHome data={home} child={child} />;
+  // Phones get the simpler Stitch "Parent Mobile: Home" list (DECISIONS §10)
+  return phone ? <ParentMobileHome data={home} child={child} /> : <ParentHome data={home} child={child} />;
 };
 
 Home.getLayout = layoutFor('PARENT');

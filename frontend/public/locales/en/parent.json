@@ -43,6 +43,19 @@
       "school": "School",
       "empty": "No announcements yet.",
       "hotline": "School office"
+    },
+    "mobile": {
+      "attendance": "Attendance",
+      "average": "Average",
+      "missing": "Missing",
+      "lessons_one": "{{count}} lesson",
+      "lessons_other": "{{count}} lessons",
+      "dueWeek": "Due this week",
+      "items_one": "{{count}} item",
+      "items_other": "{{count}} items",
+      "nothingDue": "Nothing due in the next 7 days.",
+      "submitted": "Submitted",
+      "notSubmitted": "Not submitted"
     }
   },
   "attendance": {
