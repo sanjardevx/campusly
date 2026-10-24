@@ -17,6 +17,11 @@ const envSchema = z
     JWT_REFRESH_SECRET: z.string().min(32),
     FRONTEND_URL: z.url(),
     PORT_API: z.coerce.number().int().positive().default(3000),
+    // Public demo (DECISIONS §12): "Demo login" buttons sign in as the seeded isDemo accounts
+    DEMO_MODE: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((v) => v === 'true'),
 
     // Media (S3 + CloudFront). All or nothing: without them uploads and videos are off (CI, tests).
     AWS_REGION: z.string().default('eu-central-1'),
@@ -94,6 +99,8 @@ export const REFRESH_TTL_DAYS = {
 } as const;
 /** Login rate limit: failed attempts per window */
 export const LOGIN_LIMIT = { perLoginId: 5, perIp: 30, windowSec: 15 * 60 };
+/** Demo sign-ins per IP in 15 minutes (each one makes a refresh-token row) */
+export const DEMO_LIMIT = { perIp: 20, windowSec: 15 * 60 };
 /** A just-rotated refresh token still works this long (two tabs refreshing at the same time) */
 export const REFRESH_GRACE_SEC = 10;
 /**

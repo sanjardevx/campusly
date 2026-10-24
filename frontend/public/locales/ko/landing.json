@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "title": "Campusly · 학습 포털",
+    "description": "Campusly School 학생, 학부모, 교사를 위한 수업, 과제, 성적, 출석."
+  },
+  "nav": {
+    "signIn": "로그인"
+  },
+  "hero": {
+    "eyebrow": "Campusly School · 학습 포털",
+    "title": "수업, 과제, 성적을 한곳에서.",
+    "subtitle": "영상 수업, 피드백이 있는 과제, 성적과 출석 — Campusly School 학생, 학부모, 교사를 위해.",
+    "studentParent": "학생·학부모 로그인",
+    "teacher": "교사 로그인"
+  },
+  "demo": {
+    "eyebrow": "체험하기",
+    "title": "데모 열기",
+    "subtitle": "가상의 학교 데이터로 각 역할을 둘러보세요. 비밀번호가 필요 없습니다.",
+    "open": "데모 열기",
+    "opening": "여는 중…",
+    "note": "데모 데이터는 모두가 함께 사용합니다. 비밀번호 변경, 사용자 관리, 파일 업로드는 꺼져 있습니다.",
+    "role": {
+      "STUDENT": {
+        "name": "학생",
+        "text": "이번 주 수업과 과제, 과목 진도와 성적."
+      },
+      "PARENT": {
+        "name": "학부모",
+        "text": "자녀 두 명: 성적, 출석, 미제출 과제, 공지사항."
+      },
+      "TEACHER": {
+        "name": "교사",
+        "text": "과목과 주차, 채점, 성적부, 출석."
+      },
+      "ADMIN": {
+        "name": "관리자",
+        "text": "사용자, 학급과 과목, 학교 설정과 기록."
+      }
+    }
+  },
+  "features": {
+    "eyebrow": "주요 기능",
+    "title": "학교생활에 필요한 모든 것을 온라인으로",
+    "lessons": {
+      "title": "영상 수업",
+      "text": "멈춘 곳부터 이어서 보고, 주차별로 따라가세요."
+    },
+    "homework": {
+      "title": "과제와 피드백",
+      "text": "파일을 제출하고 점수와 교사의 코멘트를 확인하세요."
+    },
+    "progress": {
+      "title": "성적과 출석",
+      "text": "공개된 과제로 계산한 분기 성적, 모든 출석 기록."
+    },
+    "parents": {
+      "title": "학부모용",
+      "text": "한 계정으로 자녀별 학습 현황을 확인하세요."
+    }
+  },
+  "footer": {
+    "copy": "© {{year}} {{school}}",
+    "office": "학교 행정실"
+  }
+}

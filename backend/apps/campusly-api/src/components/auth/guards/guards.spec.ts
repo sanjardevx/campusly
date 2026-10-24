@@ -76,6 +76,7 @@ describe('JwtAuthGuard', () => {
       role: 'STUDENT',
       sessionId: 's1',
       mustChangePassword: false,
+      isDemo: false,
     });
   });
 
@@ -101,6 +102,7 @@ describe('RolesGuard', () => {
       role,
       sessionId: 's1',
       mustChangePassword: false,
+      isDemo: false,
     };
     return context;
   };

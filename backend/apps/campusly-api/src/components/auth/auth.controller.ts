@@ -10,6 +10,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import type { CookieOptions, Request, Response } from 'express';
 import { Env, REFRESH_COOKIE } from '../../libs/config';
+import { DemoLoginInput } from '../../libs/dto/auth/demo-login.input';
 import { LoginInput } from '../../libs/dto/auth/login.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import type { AuthResult } from '../../libs/types/auth';
@@ -36,6 +37,22 @@ export class AuthController {
   ): Promise<AuthResult> {
     this.assertTrustedOrigin(req);
     const signIn = await this.authService.login(input, this.client(req));
+    return this.respond(res, signIn);
+  }
+
+  /** Landing page "Demo login" (only with DEMO_MODE=true): the same cookie + token as a real login */
+  @Post('demo')
+  @HttpCode(200)
+  public async demo(
+    @Body() input: DemoLoginInput,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResult> {
+    this.assertTrustedOrigin(req);
+    const signIn = await this.authService.demoLogin(
+      input.role,
+      this.client(req),
+    );
     return this.respond(res, signIn);
   }
 

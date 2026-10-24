@@ -185,7 +185,8 @@ Later phases add: quiz tables (`QuizQuestion`, `QuizAttempt`, `QuizAnswer`), tut
 - `api.campusly.uz` — API (EC2). `media.campusly.uz` — CloudFront. `no-reply@campusly.uz` — SES.
 - Domains live only in env (`FRONTEND_URL`, `CORS_ORIGINS`, ...).
 - AWS region: **`eu-central-1` (Frankfurt)** for every resource (S3, CloudFront origin, EC2, RDS, SES, Bedrock) — the closest full-service region to Tashkent. Account: root has MFA and no access keys; daily work uses an IAM admin user with MFA; budgets: zero-spend alert + monthly $35.
-- Demo: seed data only, `noindex`, demo accounts flagged `isDemo` (cannot change password, create users or upload), nightly reset by the batch app.
+- Demo: seed data only, `noindex`, demo accounts flagged `isDemo` (cannot change password, create users or upload), nightly reset by the batch app. `POST /auth/demo { role }` signs in as the seeded `isDemo` account of that role (no password; 404 unless `DEMO_MODE=true`; 20 per IP per 15 min; no temp-password banner). The access token carries `demo: true`, and the global `JwtAuthGuard` answers `DEMO_READ_ONLY` for operations marked `@NotForDemo()` (changePassword, every admin user mutation); uploads were already refused. The seed flags `simon`, `26200001`, `26100042`, `901112233` as demo only when `DEMO_MODE=true`, so local accounts stay normal. The frontend shows the buttons with `NEXT_PUBLIC_DEMO_MODE=true`. Nightly reset is still to do (batch).
+- **Landing page** (`/`, logged out): Stitch "Campusly Public" hero style (campus photo under a spruce wash — the one gradient outside the tab bar, as on the public site), the two sign-in doors, on the demo server one "Demo login" card per role, four feature tiles, school name and office phone. A signed-in visitor goes to their home.
 - School timezone `Asia/Tashkent` drives business rules (deadlines, attendance date, daily limits). The UI shows the viewer's timezone, with Tashkent time next to deadlines.
 
 ## 13. Design
@@ -249,3 +250,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-24 | Parent dashboard reuses `studentOverview` + `myGrades` with `studentId` (no parent-only API); attendance shown as lessons, not school days; help icon and footer links left out until their features exist |
 | 2026-10-24 | Parent Grades / Announcements reuse the student pages with `studentId`; announcements and "Mark all as read" are per child, not across all children |
 | 2026-10-24 | Parent attendance: one `studentAttendance` query per quarter; desktop adds a course table and filters, the phone keeps the simple Stitch list — developer's choice ("mobile simpler") |
+| 2026-10-24 | Demo login: no password, token flag + `@NotForDemo()` instead of DB checks, demo accounts flagged by the seed only with `DEMO_MODE=true`; landing hero uses the public site's photo wash |

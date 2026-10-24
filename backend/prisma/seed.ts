@@ -428,6 +428,15 @@ function tempPasswordFields(temp: TempPassword | undefined) {
   }
 }
 
+// DEMO_MODE=true (the public demo server): one showcase account per role opens from the landing
+// page's "Demo login" (DECISIONS §12). Locally these stay normal accounts.
+const DEMO_ACCOUNTS = new Set(
+  process.env.DEMO_MODE === 'true'
+    ? ['simon', '26200001', '26100042', '901112233']
+    : [],
+);
+const isDemo = (loginId: string) => DEMO_ACCOUNTS.has(loginId);
+
 async function seedUsers(groups: Record<string, string>) {
   // Hash once: bcrypt is slow on purpose, and every demo account shares the password
   const passwordHash = await bcrypt.hash(SEED_PASSWORD, 10);
@@ -437,6 +446,7 @@ async function seedUsers(groups: Record<string, string>) {
       loginId: 'simon',
       role: 'ADMIN',
       passwordHash,
+      isDemo: isDemo('simon'),
       firstName: 'Simon',
       lastName: '',
     },
@@ -469,6 +479,7 @@ async function seedUsers(groups: Record<string, string>) {
         ...t,
         role: 'TEACHER',
         passwordHash,
+        isDemo: isDemo(t.loginId),
         teacherProfile: { create: { title } },
       },
     });
@@ -483,6 +494,7 @@ async function seedUsers(groups: Record<string, string>) {
         role: 'STUDENT',
         status: s.status ?? 'ACTIVE',
         passwordHash,
+        isDemo: isDemo(s.loginId),
         ...tempPasswordFields(s.temp),
         firstName: s.firstName,
         lastName: s.lastName,
@@ -507,6 +519,7 @@ async function seedUsers(groups: Record<string, string>) {
         loginId: p.phone, // parent login ID = last 9 digits of the phone
         role: 'PARENT',
         passwordHash,
+        isDemo: isDemo(p.phone),
         firstName: p.firstName,
         lastName: p.lastName,
         parentProfile: { create: { phone: `+998${p.phone}` } },

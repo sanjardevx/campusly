@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "title": "Campusly · Learning portal",
+    "description": "Lessons, homework, grades and attendance for Campusly School students, parents and teachers."
+  },
+  "nav": {
+    "signIn": "Sign in"
+  },
+  "hero": {
+    "eyebrow": "Campusly School · Learning portal",
+    "title": "Lessons, homework and grades in one calm place.",
+    "subtitle": "Video lessons, homework with feedback, grades and attendance — for students, parents and teachers of Campusly School.",
+    "studentParent": "Student & parent sign in",
+    "teacher": "Teacher sign in"
+  },
+  "demo": {
+    "eyebrow": "Try it",
+    "title": "Open the demo",
+    "subtitle": "Look around as each role with made-up school data. No password needed.",
+    "open": "Open demo",
+    "opening": "Opening…",
+    "note": "Everyone shares the demo data. Changing passwords, managing users and uploading files are turned off.",
+    "role": {
+      "STUDENT": {
+        "name": "Student",
+        "text": "This week's lessons and homework, course progress and grades."
+      },
+      "PARENT": {
+        "name": "Parent",
+        "text": "Two children: grades, attendance, missing work and announcements."
+      },
+      "TEACHER": {
+        "name": "Teacher",
+        "text": "Courses and weeks, grading, gradebook and attendance."
+      },
+      "ADMIN": {
+        "name": "Admin",
+        "text": "Users, classes and courses, school settings and records."
+      }
+    }
+  },
+  "features": {
+    "eyebrow": "What is inside",
+    "title": "Everything a school day needs online",
+    "lessons": {
+      "title": "Video lessons",
+      "text": "Watch, resume where you stopped, and keep up week by week."
+    },
+    "homework": {
+      "title": "Homework & feedback",
+      "text": "Hand in files, see the score and the teacher's comment."
+    },
+    "progress": {
+      "title": "Grades & attendance",
+      "text": "Quarter grades from published work, every marked lesson."
+    },
+    "parents": {
+      "title": "For parents",
+      "text": "Follow each child's progress from one account."
+    }
+  },
+  "footer": {
+    "copy": "© {{year}} {{school}}",
+    "office": "School office"
+  }
+}

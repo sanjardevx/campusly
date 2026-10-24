@@ -14,6 +14,8 @@ export enum ErrorCode {
   /** Unique value already used (e.g. a phone or login ID) */
   CONFLICT = 'CONFLICT',
   RATE_LIMITED = 'RATE_LIMITED',
+  /** A demo account tried something demos may not do (change password, manage users, upload) */
+  DEMO_READ_ONLY = 'DEMO_READ_ONLY',
   /** S3 / CloudFront are not configured on this server (local run without AWS, CI) */
   MEDIA_DISABLED = 'MEDIA_DISABLED',
   // CSV import: the whole file is refused (row problems are ImportIssueCode instead)

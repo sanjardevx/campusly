@@ -4,8 +4,10 @@ import {
   HttpStatus,
   Injectable,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcryptjs';
 import { createHash, randomBytes } from 'node:crypto';
@@ -14,6 +16,8 @@ import type { Prisma } from '../../../../../generated/prisma/client';
 import { PrismaService } from '../../database/prisma.service';
 import { RedisService } from '../../database/redis.service';
 import {
+  DEMO_LIMIT,
+  Env,
   LOGIN_LIMIT,
   REFRESH_GRACE_SEC,
   REFRESH_TTL_DAYS,
@@ -49,6 +53,7 @@ interface SessionUser {
   firstName: string;
   lastName: string;
   mustChangePassword: boolean;
+  isDemo: boolean;
   tempPasswordUsesLeft: number | null;
   tempPasswordExpiresAt: Date | null;
 }
@@ -64,6 +69,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
+    private readonly config: ConfigService<Env, true>,
   ) {}
 
   // ─────────────────────────── login ───────────────────────────
@@ -118,6 +124,64 @@ export class AuthService {
       ),
       refresh,
     };
+  }
+
+  // ──────────────────────── demo login ────────────────────────
+
+  /**
+   * "Demo login" on the landing page (DECISIONS §12): signs in as the seeded demo account of that
+   * role, no password. Off unless DEMO_MODE=true (then it "does not exist": 404). Limited per IP.
+   */
+  public async demoLogin(
+    role: Role,
+    client: ClientInfo,
+  ): Promise<SignInResult> {
+    if (!this.config.get('DEMO_MODE', { infer: true })) {
+      throw new NotFoundException({
+        code: ErrorCode.NOT_FOUND,
+        message: 'Demo is off',
+      });
+    }
+    const key = `demo:ip:${client.ip}`;
+    // The window starts at the first demo sign-in from this IP
+    const count = await this.redisService.incr(key);
+    if (count === 1) await this.redisService.expire(key, DEMO_LIMIT.windowSec);
+    if (count > DEMO_LIMIT.perIp) {
+      throw new HttpException(
+        {
+          code: ErrorCode.RATE_LIMITED,
+          message: 'Too many demo sign-ins. Try again in 15 minutes.',
+        },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+
+    const user = await this.prismaService.user.findFirst({
+      where: { role, isDemo: true, status: 'ACTIVE' },
+      orderBy: { loginId: 'asc' },
+    });
+    if (!user) {
+      throw new NotFoundException({
+        code: ErrorCode.NOT_FOUND,
+        message: 'No demo account for this role',
+      });
+    }
+    const sessionId = uuidv7();
+    const refresh = await this.createRefreshToken(
+      this.prismaService,
+      user.id,
+      user.role,
+      sessionId,
+      client,
+    );
+    // No temporary-password banner or forced change in the demo
+    const demo = {
+      ...user,
+      mustChangePassword: false,
+      tempPasswordUsesLeft: null,
+      tempPasswordExpiresAt: null,
+    };
+    return { result: await this.buildResult(demo, sessionId), refresh };
   }
 
   // ────────────────────────── refresh ──────────────────────────
@@ -251,6 +315,7 @@ export class AuthService {
         role: user.role,
         sessionId,
         mustChangePassword: user.mustChangePassword,
+        isDemo: user.isDemo,
       }),
       user: {
         id: user.id,
@@ -281,12 +346,14 @@ export class AuthService {
     role: Role;
     sessionId: string;
     mustChangePassword: boolean;
+    isDemo?: boolean;
   }): Promise<string> {
     const payload: JwtPayload = {
       sub: session.userId,
       role: session.role,
       sid: session.sessionId,
       ...(session.mustChangePassword && { pwc: true as const }),
+      ...(session.isDemo && { demo: true as const }),
     };
     return this.jwtService.signAsync(payload);
   }

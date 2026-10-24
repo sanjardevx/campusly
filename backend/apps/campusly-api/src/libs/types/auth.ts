@@ -9,6 +9,8 @@ export interface JwtPayload {
   sid: string;
   /** "password change required": only me / changePassword / logout are allowed */
   pwc?: true;
+  /** A demo account: @NotForDemo() operations answer DEMO_READ_ONLY */
+  demo?: true;
 }
 
 /** The signed-in user that guards put on req.user */
@@ -17,6 +19,7 @@ export interface AuthUser {
   role: Role;
   sessionId: string;
   mustChangePassword: boolean;
+  isDemo: boolean;
 }
 
 /** Response of POST /auth/login and POST /auth/refresh */

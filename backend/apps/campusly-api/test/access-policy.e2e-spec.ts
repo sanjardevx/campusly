@@ -28,6 +28,7 @@ describe('AccessPolicy isolation table (e2e)', () => {
     role,
     sessionId: 'e2e',
     mustChangePassword: false,
+    isDemo: false,
   });
 
   /** Runs a policy check and turns the result into OK / NOT_FOUND / FORBIDDEN */

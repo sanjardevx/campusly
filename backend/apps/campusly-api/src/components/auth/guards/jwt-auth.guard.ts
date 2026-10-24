@@ -12,6 +12,7 @@ import type { JwtPayload } from '../../../libs/types/auth';
 import {
   ALLOW_PASSWORD_CHANGE,
   IS_PUBLIC,
+  NOT_FOR_DEMO,
 } from '../decorators/auth.decorators';
 import { getRequest } from './request.util';
 
@@ -49,6 +50,7 @@ export class JwtAuthGuard implements CanActivate {
       role: payload.role,
       sessionId: payload.sid,
       mustChangePassword: payload.pwc === true,
+      isDemo: payload.demo === true,
     };
 
     // Temporary password limit reached: only "set a new password" related calls work
@@ -59,6 +61,16 @@ export class JwtAuthGuard implements CanActivate {
       throw new ForbiddenException({
         code: ErrorCode.PASSWORD_CHANGE_REQUIRED,
         message: 'Please set a new password first',
+      });
+    }
+    // The public demo is shared by everyone: it may look and click, not lock others out
+    if (
+      payload.demo &&
+      this.reflector.getAllAndOverride<boolean>(NOT_FOR_DEMO, targets)
+    ) {
+      throw new ForbiddenException({
+        code: ErrorCode.DEMO_READ_ONLY,
+        message: 'Not available in the demo',
       });
     }
     return true;

@@ -1,7 +1,9 @@
 import type { ApolloClient } from '@apollo/client';
 import { sessionReadyVar, tempPasswordWarningVar, userVar } from '@/apollo/store';
+import type { Role } from '@/libs/gql/graphql';
 import {
   type AuthResult,
+  demoRequest,
   loginRequest,
   logoutRequest,
   refreshRequest,
@@ -39,6 +41,14 @@ export async function logIn(
   const result = await loginRequest(loginId, password);
   applyAuthResult(result);
   pendingPassword = result.user.mustChangePassword ? password : null;
+  return result.user;
+}
+
+/** "Demo login" on the landing page: same session as a real sign-in, no password typed */
+export async function logInDemo(role: Role): Promise<SessionUser> {
+  const result = await demoRequest(role);
+  applyAuthResult(result);
+  pendingPassword = null;
   return result.user;
 }
 

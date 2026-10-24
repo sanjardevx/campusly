@@ -79,6 +79,7 @@ export class UserService {
         role: user.role,
         sessionId: authUser.sessionId,
         mustChangePassword: false,
+        isDemo: authUser.isDemo,
       }),
     };
   }

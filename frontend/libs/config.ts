@@ -3,5 +3,8 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
 export const API_GRAPHQL_URL = `${API_URL}/graphql`;
 
+/** Public demo server: the landing page shows "Demo login" buttons (the API checks its own DEMO_MODE) */
+export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
 /** Business dates ("today", the current quarter) use the school's timezone (DECISIONS §5) */
 export const SCHOOL_TIMEZONE = 'Asia/Tashkent';

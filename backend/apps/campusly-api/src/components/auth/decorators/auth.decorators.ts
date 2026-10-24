@@ -10,6 +10,7 @@ import { getRequest } from '../guards/request.util';
 export const IS_PUBLIC = 'isPublic';
 export const ROLES = 'roles';
 export const ALLOW_PASSWORD_CHANGE = 'allowPasswordChange';
+export const NOT_FOR_DEMO = 'notForDemo';
 
 /** Open endpoint: no access token needed (login, refresh, health). Replaces Nestar's WithoutGuard. */
 export const Public = () => SetMetadata(IS_PUBLIC, true);
@@ -20,6 +21,9 @@ export const Roles = (...roles: Role[]) => SetMetadata(ROLES, roles);
 /** Still allowed while the user must set a new password (me, changePassword) */
 export const AllowPasswordChange = () =>
   SetMetadata(ALLOW_PASSWORD_CHANGE, true);
+
+/** Demo accounts may not call this (DECISIONS §12: no password change, no user management) */
+export const NotForDemo = () => SetMetadata(NOT_FOR_DEMO, true);
 
 /**
  * The signed-in user from req.user (Nestar's @AuthMember read req.body.authMember;

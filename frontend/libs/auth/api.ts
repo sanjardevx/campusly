@@ -58,6 +58,9 @@ async function post<T>(path: string, body?: object): Promise<T> {
 export const loginRequest = (loginId: string, password: string) =>
   post<AuthResult>('login', { loginId, password });
 
+/** Landing page "Demo login": the server picks the demo account of that role */
+export const demoRequest = (role: Role) => post<AuthResult>('demo', { role });
+
 export const refreshRequest = () => post<AuthResult>('refresh');
 
 export const logoutRequest = () => post<void>('logout');

@@ -5,6 +5,7 @@ import type { AuthUser } from '../../libs/types/auth';
 import {
   AllowPasswordChange,
   CurrentUser,
+  NotForDemo,
 } from '../auth/decorators/auth.decorators';
 import { UserService } from './user.service';
 
@@ -22,6 +23,7 @@ export class UserResolver {
   }
 
   @AllowPasswordChange()
+  @NotForDemo()
   @Mutation(() => AccessToken)
   public changePassword(
     @CurrentUser() user: AuthUser,
