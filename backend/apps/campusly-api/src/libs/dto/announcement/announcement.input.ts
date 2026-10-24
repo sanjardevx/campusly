@@ -134,6 +134,12 @@ export class AnnouncementsInquiry {
   @IsUUID()
   courseId?: string;
 
+  /** Parent: one child's view (school-wide + that child's courses); checked with resolveStudentScope */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  studentId?: string;
+
   /** The "Unread" tab: only what the viewer has not opened yet */
   @Field(() => Boolean, { nullable: true })
   @IsOptional()

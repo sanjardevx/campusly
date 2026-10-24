@@ -263,8 +263,8 @@ export const STUDENT_ASSIGNMENT = graphql(`
 
 /** Grades page: one period (null = the current one) with every course and assignment */
 export const MY_GRADES = graphql(`
-  query MyGrades($periodId: String) {
-    myGrades(periodId: $periodId) {
+  query MyGrades($periodId: String, $studentId: String) {
+    myGrades(periodId: $periodId, studentId: $studentId) {
       periods {
         id
         name
@@ -302,8 +302,8 @@ export const MY_GRADES = graphql(`
 
 /** Final tab: one course's quarters and its annual grade */
 export const MY_PERIOD_GRADES = graphql(`
-  query MyPeriodGrades($courseId: String!) {
-    myPeriodGrades(courseId: $courseId) {
+  query MyPeriodGrades($courseId: String!, $studentId: String) {
+    myPeriodGrades(courseId: $courseId, studentId: $studentId) {
       periods {
         periodId
         periodName
@@ -320,7 +320,7 @@ export const MY_PERIOD_GRADES = graphql(`
   }
 `);
 
-/** Announcements page: one tab at a time (unreadOnly / schoolOnly), the tab counts come with it */
+/** Announcements page (student; parent with input.studentId): one tab at a time, the tab counts come with it */
 export const STUDENT_ANNOUNCEMENTS = graphql(`
   query StudentAnnouncements($input: AnnouncementsInquiry) {
     announcements(input: $input) {

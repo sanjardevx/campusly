@@ -72,3 +72,15 @@ export const PARENT_HOME = graphql(`
     }
   }
 `);
+
+/** The child's courses, for the course filter on the parent's Announcements page */
+export const PARENT_CHILD_COURSES = graphql(`
+  query ParentChildCourses($studentId: String!) {
+    studentOverview(studentId: $studentId) {
+      courses {
+        courseId
+        title
+      }
+    }
+  }
+`);

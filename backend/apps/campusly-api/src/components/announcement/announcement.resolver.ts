@@ -36,12 +36,18 @@ export class AnnouncementResolver {
     return this.announcementService.markAnnouncementRead(user, id);
   }
 
-  /** Every role: only what the viewer may see (scope from the DB, no IDs from the client) */
+  /** Every role: only what the viewer may see. Parent: one child (studentId, checked in the service). */
   @Mutation(() => Int)
   public markAllAnnouncementsRead(
     @CurrentUser() user: AuthUser,
+    @Args(
+      'studentId',
+      { nullable: true },
+      new ParseUUIDPipe({ optional: true }),
+    )
+    studentId?: string,
   ): Promise<number> {
-    return this.announcementService.markAllAnnouncementsRead(user);
+    return this.announcementService.markAllAnnouncementsRead(user, studentId);
   }
 
   /** School-wide: admins. A course: its teachers (checked in the service). */

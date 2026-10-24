@@ -1,4 +1,4 @@
-import { Fragment, useState, type ReactNode } from 'react';
+import { Fragment, createContext, useContext, useState, type ReactNode } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client/react';
@@ -16,6 +16,12 @@ type CourseRow = Grades['courses'][number];
 type Item = CourseRow['items'][number];
 
 export const FINAL = 'final';
+
+/**
+ * Whose grades: the student's own (no studentId) or a parent's child. A parent cannot open the
+ * student's assignment pages, so the items are plain text for them.
+ */
+export const GradesViewer = createContext<{ studentId?: string }>({});
 
 const pct = (n: number | null | undefined) => (n == null ? '—' : `${Number.isInteger(n) ? n : n.toFixed(1)}%`);
 
@@ -155,6 +161,7 @@ function ScoreCell({ item }: { item: Item }) {
 /** The quarter's assignments of one course: score, state, the teacher's feedback (published only) */
 function ItemsTable({ course, periodName }: { course: CourseRow; periodName: string }) {
   const { t } = useTranslation('student');
+  const { studentId } = useContext(GradesViewer);
   const { locale } = useRouter();
   const head = { py: 1, px: 1.75, fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary', textAlign: 'left' as const };
   const cell = { py: 1.25, px: 1.75, fontSize: '0.84375rem', verticalAlign: 'top' as const };
@@ -196,9 +203,13 @@ function ItemsTable({ course, periodName }: { course: CourseRow; periodName: str
               {course.items.map((item) => (
                 <Box component="tr" key={item.assignmentId} sx={{ borderTop: 1, borderColor: STITCH.outlineSoft }}>
                   <Box component="td" sx={{ ...cell, fontWeight: 500 }}>
-                    <Link component={NextLink} href={studentHref.assignment(course.courseId, item.assignmentId)} underline="hover" color="inherit">
-                      {item.title}
-                    </Link>
+                    {studentId ? (
+                      item.title
+                    ) : (
+                      <Link component={NextLink} href={studentHref.assignment(course.courseId, item.assignmentId)} underline="hover" color="inherit">
+                        {item.title}
+                      </Link>
+                    )}
                   </Box>
                   <Box component="td" sx={{ ...cell, color: 'text.secondary', whiteSpace: 'nowrap' }}>
                     {item.dueAt ? formatInSchool(item.dueAt, locale) : '—'}
@@ -257,7 +268,8 @@ export function FinalTable({ data }: { data: Grades }) {
 }
 
 function FinalRow({ course, periods }: { course: CourseRow; periods: Grades['periods'] }) {
-  const { data } = useQuery(MY_PERIOD_GRADES, { variables: { courseId: course.courseId }, fetchPolicy: 'cache-and-network' });
+  const { studentId } = useContext(GradesViewer);
+  const { data } = useQuery(MY_PERIOD_GRADES, { variables: { courseId: course.courseId, studentId }, fetchPolicy: 'cache-and-network' });
   const rows = data?.myPeriodGrades;
   const cell = { py: 1.5, px: 2 };
   const wait = <Skeleton width={56} sx={{ ml: 'auto' }} />;
@@ -309,7 +321,7 @@ export function QuarterList({ data }: { data: Grades }) {
               <Stack sx={{ px: 2, pb: 1.5, '& > * + *': { borderTop: 1, borderColor: STITCH.outlineSoft } }}>
                 {c.items.length === 0 && <Typography sx={{ py: 1, fontSize: '0.84375rem', color: 'text.secondary' }}>{t('grades.items.none')}</Typography>}
                 {c.items.map((item) => (
-                  <Link key={item.assignmentId} component={NextLink} href={studentHref.assignment(c.courseId, item.assignmentId)} underline="none" color="inherit" sx={{ py: 1.25 }}>
+                  <ItemLink key={item.assignmentId} href={studentHref.assignment(c.courseId, item.assignmentId)}>
                     <Stack direction="row" sx={{ justifyContent: 'space-between', gap: 1, alignItems: 'center' }}>
                       <Box sx={{ minWidth: 0 }}>
                         <Typography noWrap sx={{ fontSize: '0.875rem', fontWeight: 500 }}>
@@ -324,7 +336,7 @@ export function QuarterList({ data }: { data: Grades }) {
                       )}
                     </Stack>
                     {item.feedback && <Typography sx={{ mt: 0.5, fontSize: '0.8125rem', color: 'text.secondary' }}>{item.feedback}</Typography>}
-                  </Link>
+                  </ItemLink>
                 ))}
               </Stack>
             </Collapse>
@@ -332,6 +344,17 @@ export function QuarterList({ data }: { data: Grades }) {
         );
       })}
     </Stack>
+  );
+}
+
+/** A phone-list row: opens the assignment for the student, plain for a parent */
+function ItemLink({ href, children }: { href: string; children: ReactNode }) {
+  const { studentId } = useContext(GradesViewer);
+  if (studentId) return <Box sx={{ py: 1.25 }}>{children}</Box>;
+  return (
+    <Link component={NextLink} href={href} underline="none" color="inherit" sx={{ py: 1.25 }}>
+      {children}
+    </Link>
   );
 }
 

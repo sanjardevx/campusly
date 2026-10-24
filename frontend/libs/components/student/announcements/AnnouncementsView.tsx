@@ -35,9 +35,10 @@ function shortDate(iso: string, locale = 'en') {
 /**
  * Stitch "Announcements (Student Portal)" (DECISIONS §10): All / Unread / School tabs with counts,
  * course filter, search, pinned first; a card opens to the full text and files (opening marks it
- * read), "Mark all as read", 10 at a time with "Load more".
+ * read), "Mark all as read", 10 at a time with "Load more". A parent passes the chosen child
+ * (studentId): school-wide plus that child's courses.
  */
-export function AnnouncementsView({ courses }: { courses: { id: string; title: string }[] }) {
+export function AnnouncementsView({ courses, studentId }: { courses: { id: string; title: string }[]; studentId?: string }) {
   const { t } = useTranslation('student');
   const errorText = useErrorText();
   const { locale } = useRouter();
@@ -48,7 +49,7 @@ export function AnnouncementsView({ courses }: { courses: { id: string; title: s
   const [limit, setLimit] = useState(PAGE);
   const [open, setOpen] = useState<string | null>(null);
 
-  const input = { courseId: courseId || undefined, search: query || undefined, unreadOnly: tab === 'unread' || undefined, schoolOnly: tab === 'school' || undefined, limit };
+  const input = { studentId, courseId: courseId || undefined, search: query || undefined, unreadOnly: tab === 'unread' || undefined, schoolOnly: tab === 'school' || undefined, limit };
   const { data, previousData, error, loading } = useQuery(STUDENT_ANNOUNCEMENTS, { variables: { input }, fetchPolicy: 'cache-and-network' });
   const result = (data ?? previousData)?.announcements;
 
@@ -172,7 +173,7 @@ export function AnnouncementsView({ courses }: { courses: { id: string; title: s
             onClick={async () => {
               setActionError(null);
               try {
-                await markAll();
+                await markAll({ variables: { studentId } });
               } catch (err) {
                 setActionError(errorText(errorCode(err)));
               }

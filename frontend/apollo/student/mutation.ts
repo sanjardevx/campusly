@@ -70,7 +70,7 @@ export const MARK_ANNOUNCEMENT_READ = graphql(`
 
 /** "Mark all as read": everything the viewer may see; returns how many were new */
 export const MARK_ALL_ANNOUNCEMENTS_READ = graphql(`
-  mutation MarkAllAnnouncementsRead {
-    markAllAnnouncementsRead
+  mutation MarkAllAnnouncementsRead($studentId: String) {
+    markAllAnnouncementsRead(studentId: $studentId)
   }
 `);

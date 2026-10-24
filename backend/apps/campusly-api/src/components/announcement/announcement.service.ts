@@ -187,10 +187,12 @@ export class AnnouncementService {
     }
     const page = input.page ?? 1;
     const limit = input.limit ?? 20;
+    const child = await this.childFilter(user, input.studentId);
     // The scope is one AND item: a filter from the client can never widen it
     const base: Prisma.AnnouncementWhereInput = {
       AND: [
         this.visibleTo(user),
+        child,
         input.courseId ? { courseId: input.courseId } : {},
         input.search?.trim()
           ? {
@@ -251,11 +253,19 @@ export class AnnouncementService {
     };
   }
 
-  /** "Mark all as read": every announcement the viewer may see; returns how many were new */
-  public async markAllAnnouncementsRead(user: AuthUser): Promise<number> {
+  /** "Mark all as read": every announcement the viewer may see (a parent: of one child); returns how many were new */
+  public async markAllAnnouncementsRead(
+    user: AuthUser,
+    studentId?: string,
+  ): Promise<number> {
+    const child = await this.childFilter(user, studentId);
     const unread = await this.prismaService.announcement.findMany({
       where: {
-        AND: [this.visibleTo(user), { reads: { none: { userId: user.id } } }],
+        AND: [
+          this.visibleTo(user),
+          child,
+          { reads: { none: { userId: user.id } } },
+        ],
       },
       select: { id: true },
     });
@@ -309,6 +319,28 @@ export class AnnouncementService {
               this.accessPolicy.courseScope(user),
               learner ? { status: { not: 'DRAFT' } } : {},
             ],
+          },
+        },
+      ],
+    };
+  }
+
+  /**
+   * A parent with several children looks at one child at a time (?child=): school-wide plus that
+   * child's courses. resolveStudentScope checks the link (someone else's child → NOT_FOUND).
+   */
+  private async childFilter(
+    user: AuthUser,
+    studentId?: string,
+  ): Promise<Prisma.AnnouncementWhereInput> {
+    if (!studentId) return {};
+    const id = await this.accessPolicy.resolveStudentScope(user, studentId);
+    return {
+      OR: [
+        { courseId: null },
+        {
+          course: {
+            enrollments: { some: { studentId: id, status: 'ACTIVE' } },
           },
         },
       ],

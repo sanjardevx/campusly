@@ -320,6 +320,34 @@ describe('Announcements: who sees, who writes, read receipts (e2e)', () => {
     ).toBe(0);
   });
 
+  it('parent page: one child at a time (studentId); someone else’s child → NOT_FOUND', async () => {
+    const titles = async (as: Key, studentId: string) =>
+      (await list(as, { search: TAG, studentId, limit: 100 })).list.map((x) =>
+        x.title.replace(`${TAG} `, ''),
+      );
+    expect(await titles('pA', id.sA)).toEqual([
+      'School trip',
+      'Quiz on Friday',
+    ]);
+    expect(code(await gql(LIST, { i: { studentId: id.sB } }, 'pA'))).toBe(
+      'NOT_FOUND',
+    );
+    // A student's studentId is ignored: always their own view
+    expect(await titles('sB', id.sA)).toEqual(['School trip', 'B news']);
+
+    const MARK_ALL = `mutation($s: String) { markAllAnnouncementsRead(studentId: $s) }`;
+    expect(code(await gql(MARK_ALL, { s: id.sB }, 'pA'))).toBe('NOT_FOUND');
+    await gql(MARK_ALL, { s: id.sA }, 'pA');
+    expect((await list('pA', { search: TAG, studentId: id.sA })).unread).toBe(
+      0,
+    );
+    expect(
+      await prisma.announcementRead.count({
+        where: { userId: id.pA, announcementId: { in: [ann.B, ann.C] } },
+      }),
+    ).toBe(0);
+  });
+
   describe('teacher page: several courses, files, audience, search, archive', () => {
     const MULTI = `mutation($i: CreateCourseAnnouncementsInput!) { createCourseAnnouncements(input: $i) { id courseTitle files { id name } } }`;
     const ARCHIVE = `mutation($id: String!) { archiveAnnouncement(id: $id) { id } }`;
