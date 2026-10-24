@@ -153,6 +153,10 @@ export class RecentGrade {
 
   @Field(() => Date)
   publishedAt: Date;
+
+  /** The teacher's comment (grades are published, so it may be shown) */
+  @Field(() => String, { nullable: true })
+  feedback: string | null;
 }
 
 /** The student / parent home page in one query */
@@ -304,6 +308,10 @@ export class MyGrades {
   /** All courses together, this period */
   @Field(() => Float, { nullable: true })
   attendanceRate: number | null;
+
+  /** The same marks counted ("32 of 34 lessons · 2 excused" on the parent home) */
+  @Field(() => AttendanceSummary)
+  attendance: AttendanceSummary;
 
   @Field(() => Int)
   missing: number;

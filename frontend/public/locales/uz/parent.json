@@ -1,0 +1,48 @@
+{
+  "home": {
+    "periodWeek": "{{period}} · {{week}}-hafta",
+    "classId": "{{className}}-sinf · ID {{id}}",
+    "id": "ID {{id}}",
+    "noChildren": "Bu hisobga hali farzand bog'lanmagan. Iltimos, maktab ofisiga murojaat qiling.",
+    "kpi": {
+      "attendance": "Chorak davomati",
+      "attendanceNote": "{{total}} ta dars belgilangan · {{absent}} ta kelmagan · {{excused}} ta sababli",
+      "noMarks": "Hali davomat belgilanmagan",
+      "missing": "Topshirilmagan vazifalar",
+      "more_one": "yana {{count}} ta",
+      "more_other": "yana {{count}} ta",
+      "nothingMissing": "Hammasi topshirilgan",
+      "average": "O'rtacha ball",
+      "acrossCourses_one": "{{count}} ta kurs bo'yicha",
+      "acrossCourses_other": "{{count}} ta kurs bo'yicha",
+      "noGrades": "Hali e'lon qilingan baho yo'q"
+    },
+    "grades": {
+      "eyebrow": "O'quv natijalari",
+      "title": "Chorak baholari",
+      "all": "Barcha baholar",
+      "course": "Kurs",
+      "teacher": "O'qituvchi",
+      "grade": "Baho",
+      "missing_one": "{{count}} ta topshirilmagan",
+      "missing_other": "{{count}} ta topshirilmagan",
+      "mark": "· {{mark}}",
+      "notFinal": "Yakuniy emas",
+      "empty": "Bu chorakda kurs yo'q.",
+      "noPeriod": "O'quv yili hali boshlanmagan."
+    },
+    "recent": {
+      "eyebrow": "Joriy baholash",
+      "title": "So'nggi baholar",
+      "empty": "Hali e'lon qilingan baho yo'q."
+    },
+    "news": {
+      "eyebrow": "Maktab hayoti",
+      "title": "E'lonlar",
+      "all": "Barcha e'lonlar",
+      "school": "Maktab",
+      "empty": "Hozircha e'lonlar yo'q.",
+      "hotline": "Maktab ofisi"
+    }
+  }
+}

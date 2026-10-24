@@ -649,6 +649,7 @@ describe('studentOverview and myChildren (e2e)', () => {
   // ───────────── myGrades: the Grades page in one query ─────────────
   const GRADES = `query($p: String, $s: String) { myGrades(periodId: $p, studentId: $s) {
     periods { name } period { id name } attendanceRate missing
+    attendance { total absent rate }
     courses { title teacherName percent mark isFinal attendanceRate missing
       items { title state score feedback } }
   } }`;
@@ -656,6 +657,7 @@ describe('studentOverview and myChildren (e2e)', () => {
     periods: { name: string }[];
     period: { id: string; name: string } | null;
     attendanceRate: number | null;
+    attendance: { total: number; absent: number; rate: number | null };
     missing: number;
     courses: {
       title: string;
@@ -716,6 +718,22 @@ describe('studentOverview and myChildren (e2e)', () => {
       'Due in 10 days': ['UPCOMING', null, null],
     });
     expect(g.missing).toBe(3);
+    // The parent home's "N of M lessons": the same marks as the rate
+    expect(g.attendance).toEqual({ total: 2, absent: 1, rate: 50 });
+
+    // Parent home "Recent grades": the published comment only
+    const recent = await gql<{
+      studentOverview: {
+        recentGrades: { title: string; feedback: string | null }[];
+      };
+    }>(
+      `query($s: String) { studentOverview(studentId: $s) { recentGrades { title feedback } } }`,
+      { s: id.sA },
+      'pA',
+    );
+    expect(recent.data!.studentOverview.recentGrades).toEqual([
+      { title: 'Graded yesterday', feedback: 'Well done' },
+    ]);
   });
 
   it('myGrades: another quarter shows its own (empty) work', async () => {

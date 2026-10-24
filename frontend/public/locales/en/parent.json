@@ -1,0 +1,48 @@
+{
+  "home": {
+    "periodWeek": "{{period}} · Week {{week}}",
+    "classId": "Grade {{className}} · ID {{id}}",
+    "id": "ID {{id}}",
+    "noChildren": "No children are linked to this account yet. Please contact the school office.",
+    "kpi": {
+      "attendance": "Quarter attendance",
+      "attendanceNote": "{{total}} lessons marked · {{absent}} absent · {{excused}} excused",
+      "noMarks": "No attendance marked yet",
+      "missing": "Missing assignments",
+      "more_one": "+{{count}} more",
+      "more_other": "+{{count}} more",
+      "nothingMissing": "Nothing missing",
+      "average": "Average score",
+      "acrossCourses_one": "Across {{count}} course",
+      "acrossCourses_other": "Across {{count}} courses",
+      "noGrades": "No published grades yet"
+    },
+    "grades": {
+      "eyebrow": "Curriculum performance",
+      "title": "Quarter grades",
+      "all": "All grades",
+      "course": "Course",
+      "teacher": "Teacher",
+      "grade": "Grade",
+      "missing_one": "{{count}} missing",
+      "missing_other": "{{count}} missing",
+      "mark": "· {{mark}}",
+      "notFinal": "Not final",
+      "empty": "No courses this quarter.",
+      "noPeriod": "The school year has not started yet."
+    },
+    "recent": {
+      "eyebrow": "Continuous assessment",
+      "title": "Recent grades",
+      "empty": "No published grades yet."
+    },
+    "news": {
+      "eyebrow": "Administration & life",
+      "title": "Announcements",
+      "all": "All announcements",
+      "school": "School",
+      "empty": "No announcements yet.",
+      "hotline": "School office"
+    }
+  }
+}

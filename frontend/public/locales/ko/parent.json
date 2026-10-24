@@ -1,0 +1,45 @@
+{
+  "home": {
+    "periodWeek": "{{period}} · {{week}}주차",
+    "classId": "{{className}}반 · ID {{id}}",
+    "id": "ID {{id}}",
+    "noChildren": "이 계정에 연결된 자녀가 아직 없습니다. 학교 행정실에 문의해 주세요.",
+    "kpi": {
+      "attendance": "분기 출석률",
+      "attendanceNote": "출석 체크 {{total}}회 · 결석 {{absent}}회 · 인정 결석 {{excused}}회",
+      "noMarks": "아직 출석 기록이 없습니다",
+      "missing": "미제출 과제",
+      "more_other": "외 {{count}}개",
+      "nothingMissing": "미제출 과제 없음",
+      "average": "평균 점수",
+      "acrossCourses_other": "{{count}}개 과목 기준",
+      "noGrades": "아직 공개된 성적이 없습니다"
+    },
+    "grades": {
+      "eyebrow": "학업 성취",
+      "title": "분기 성적",
+      "all": "전체 성적",
+      "course": "과목",
+      "teacher": "담당 교사",
+      "grade": "성적",
+      "missing_other": "미제출 {{count}}개",
+      "mark": "· {{mark}}",
+      "notFinal": "확정 전",
+      "empty": "이번 분기에 과목이 없습니다.",
+      "noPeriod": "학년도가 아직 시작되지 않았습니다."
+    },
+    "recent": {
+      "eyebrow": "수시 평가",
+      "title": "최근 성적",
+      "empty": "아직 공개된 성적이 없습니다."
+    },
+    "news": {
+      "eyebrow": "학교 생활",
+      "title": "공지사항",
+      "all": "전체 공지사항",
+      "school": "학교",
+      "empty": "아직 공지사항이 없습니다.",
+      "hotline": "학교 행정실"
+    }
+  }
+}

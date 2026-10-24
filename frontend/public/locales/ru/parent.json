@@ -1,0 +1,54 @@
+{
+  "home": {
+    "periodWeek": "{{period}} · Неделя {{week}}",
+    "classId": "{{className}} класс · ID {{id}}",
+    "id": "ID {{id}}",
+    "noChildren": "К этой учётной записи пока не привязан ни один ребёнок. Обратитесь в школу.",
+    "kpi": {
+      "attendance": "Посещаемость за четверть",
+      "attendanceNote": "Отмечено уроков: {{total}} · пропуски: {{absent}} · по уважительной: {{excused}}",
+      "noMarks": "Посещаемость ещё не отмечена",
+      "missing": "Несданные задания",
+      "more_one": "ещё {{count}}",
+      "more_few": "ещё {{count}}",
+      "more_many": "ещё {{count}}",
+      "more_other": "ещё {{count}}",
+      "nothingMissing": "Всё сдано",
+      "average": "Средний балл",
+      "acrossCourses_one": "По {{count}} курсу",
+      "acrossCourses_few": "По {{count}} курсам",
+      "acrossCourses_many": "По {{count}} курсам",
+      "acrossCourses_other": "По {{count}} курсам",
+      "noGrades": "Опубликованных оценок пока нет"
+    },
+    "grades": {
+      "eyebrow": "Успеваемость",
+      "title": "Оценки за четверть",
+      "all": "Все оценки",
+      "course": "Курс",
+      "teacher": "Учитель",
+      "grade": "Оценка",
+      "missing_one": "{{count}} не сдано",
+      "missing_few": "{{count}} не сдано",
+      "missing_many": "{{count}} не сдано",
+      "missing_other": "{{count}} не сдано",
+      "mark": "· {{mark}}",
+      "notFinal": "Не итоговая",
+      "empty": "В этой четверти нет курсов.",
+      "noPeriod": "Учебный год ещё не начался."
+    },
+    "recent": {
+      "eyebrow": "Текущий контроль",
+      "title": "Последние оценки",
+      "empty": "Опубликованных оценок пока нет."
+    },
+    "news": {
+      "eyebrow": "Жизнь школы",
+      "title": "Объявления",
+      "all": "Все объявления",
+      "school": "Школа",
+      "empty": "Объявлений пока нет.",
+      "hotline": "Канцелярия школы"
+    }
+  }
+}

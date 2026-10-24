@@ -356,6 +356,7 @@ export class OverviewService {
           maxScore,
           percent: Math.round((score / maxScore) * 10_000) / 100,
           publishedAt: s.assignment.gradesPublishedAt!,
+          feedback: s.feedback,
         };
       }),
       announcements,

@@ -76,6 +76,7 @@ export class StudentGradesService {
         periods: [],
         period: null,
         attendanceRate: null,
+        attendance: summarizeAttendance([]),
         missing: 0,
         courses: [],
       };
@@ -107,6 +108,7 @@ export class StudentGradesService {
         periods: periodList,
         period: null,
         attendanceRate: null,
+        attendance: summarizeAttendance([]),
         missing: 0,
         courses: [],
       };
@@ -176,10 +178,12 @@ export class StudentGradesService {
       });
     }
 
+    const attendance = summarizeAttendance(records.map((r) => r.status));
     return {
       periods: periodList,
       period: { id: period.id, name: period.name },
-      attendanceRate: summarizeAttendance(records.map((r) => r.status)).rate,
+      attendanceRate: attendance.rate,
+      attendance,
       missing: rows.reduce((n, r) => n + r.missing, 0),
       courses: rows,
     };
