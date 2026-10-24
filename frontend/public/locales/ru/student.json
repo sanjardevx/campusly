@@ -312,5 +312,56 @@
     "qa": "Задать вопрос в Q&A",
     "soon": "Скоро",
     "notFound": "Это задание недоступно."
+  },
+  "grades": {
+    "title": "Оценки и успеваемость",
+    "summary": "Посещаемость {{rate}} · {{missing}}",
+    "missing_one": "{{count}} несданное задание",
+    "missing_few": "{{count}} несданных задания",
+    "missing_many": "{{count}} несданных заданий",
+    "missing_other": "{{count}} несданного задания",
+    "final": "Итог",
+    "empty": "За эту четверть оценок пока нет.",
+    "noPeriods": "Учебный год ещё не начался.",
+    "col": {
+      "course": "Курс",
+      "teacher": "Учитель",
+      "grade": "Оценка за четверть",
+      "attendance": "Посещаемость",
+      "missing": "Не сдано",
+      "actions": "Действия",
+      "annual": "Годовая"
+    },
+    "missingPill_one": "{{count}} не сдано",
+    "missingPill_few": "{{count}} не сдано",
+    "missingPill_many": "{{count}} не сдано",
+    "missingPill_other": "{{count}} не сдано",
+    "notFinal": "Не итоговая",
+    "view": "Подробнее",
+    "hide": "Скрыть",
+    "items": {
+      "title": "{{course}}: задания и контрольные",
+      "count_one": "{{period}} · {{count}} работа",
+      "count_few": "{{period}} · {{count}} работы",
+      "count_many": "{{period}} · {{count}} работ",
+      "count_other": "{{period}} · {{count}} работы",
+      "name": "Задание",
+      "date": "Дата",
+      "score": "Балл",
+      "status": "Статус",
+      "feedback": "Комментарий учителя",
+      "none": "В этой четверти заданий нет.",
+      "notPublished": "Ещё не опубликовано",
+      "due": "Срок: {{date}}"
+    },
+    "state": {
+      "GRADED": "Оценено",
+      "MISSING": "Не сдано (0)",
+      "SUBMITTED": "Сдано",
+      "NOT_SUBMITTED": "Не сдано",
+      "DUE_SOON": "Скоро срок",
+      "UPCOMING": "Предстоит",
+      "NOT_GRADED": "Не оценено"
+    }
   }
 }

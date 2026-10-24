@@ -260,3 +260,62 @@ export const STUDENT_ASSIGNMENT = graphql(`
     }
   }
 `);
+
+/** Grades page: one period (null = the current one) with every course and assignment */
+export const MY_GRADES = graphql(`
+  query MyGrades($periodId: String) {
+    myGrades(periodId: $periodId) {
+      periods {
+        id
+        name
+      }
+      period {
+        id
+        name
+      }
+      attendanceRate
+      missing
+      courses {
+        courseId
+        title
+        subjectName
+        teacherName
+        percent
+        mark
+        isFinal
+        attendanceRate
+        missing
+        items {
+          assignmentId
+          title
+          type
+          dueAt
+          maxScore
+          state
+          score
+          feedback
+        }
+      }
+    }
+  }
+`);
+
+/** Final tab: one course's quarters and its annual grade */
+export const MY_PERIOD_GRADES = graphql(`
+  query MyPeriodGrades($courseId: String!) {
+    myPeriodGrades(courseId: $courseId) {
+      periods {
+        periodId
+        periodName
+        score
+        mark
+        isPublished
+      }
+      annual {
+        score
+        mark
+        isPublished
+      }
+    }
+  }
+`);

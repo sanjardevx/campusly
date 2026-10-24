@@ -526,6 +526,16 @@ type GradeItem {
   type: AssignmentType!
 }
 
+enum GradeItemState {
+  DUE_SOON
+  GRADED
+  MISSING
+  NOT_GRADED
+  NOT_SUBMITTED
+  SUBMITTED
+  UPCOMING
+}
+
 input GradeSubmissionInput {
   assignmentId: String!
   feedback: String
@@ -808,6 +818,38 @@ type Mutation {
   updateSubject(input: UpdateSubjectInput!): Subject!
 }
 
+type MyCourseGrades {
+  attendanceRate: Float
+  courseId: String!
+  isFinal: Boolean!
+  items: [MyGradeItem!]!
+  mark: Int
+  missing: Int!
+  percent: Float
+  subjectName: String!
+  teacherName: String
+  title: String!
+}
+
+type MyGradeItem {
+  assignmentId: String!
+  dueAt: DateTime
+  feedback: String
+  maxScore: Float!
+  score: Float
+  state: GradeItemState!
+  title: String!
+  type: AssignmentType!
+}
+
+type MyGrades {
+  attendanceRate: Float
+  courses: [MyCourseGrades!]!
+  missing: Int!
+  period: PeriodRef
+  periods: [PeriodRef!]!
+}
+
 type MyPeriodGrades {
   annual: PeriodGradeRow!
   periods: [PeriodGradeRow!]!
@@ -904,6 +946,11 @@ enum PeriodKind {
   SEMESTER
 }
 
+type PeriodRef {
+  id: String!
+  name: String!
+}
+
 enum ProgressStatus {
   COMPLETED
   IN_PROGRESS
@@ -953,6 +1000,7 @@ type Query {
   myChildren: [Child!]!
   myCourseGrade(courseId: String!, periodId: String!, studentId: String): StudentGrade!
   myCourses(studentId: String): [Course!]!
+  myGrades(periodId: String, studentId: String): MyGrades!
   myPeriodGrades(courseId: String!, studentId: String): MyPeriodGrades!
   mySubmission(assignmentId: String!, studentId: String): Submission
   periods(academicYearId: String!): [Period!]!

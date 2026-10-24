@@ -646,6 +646,114 @@ describe('studentOverview and myChildren (e2e)', () => {
     },
   );
 
+  // ───────────── myGrades: the Grades page in one query ─────────────
+  const GRADES = `query($p: String, $s: String) { myGrades(periodId: $p, studentId: $s) {
+    periods { name } period { id name } attendanceRate missing
+    courses { title teacherName percent mark isFinal attendanceRate missing
+      items { title state score feedback } }
+  } }`;
+  type GradesResult = {
+    periods: { name: string }[];
+    period: { id: string; name: string } | null;
+    attendanceRate: number | null;
+    missing: number;
+    courses: {
+      title: string;
+      teacherName: string | null;
+      percent: number | null;
+      isFinal: boolean;
+      attendanceRate: number | null;
+      missing: number;
+      items: {
+        title: string;
+        state: string;
+        score: number | null;
+        feedback: string | null;
+      }[];
+    }[];
+  };
+  const grades = (as: Key, vars: { p?: string; s?: string } = {}) =>
+    gql<{ myGrades: GradesResult }>(GRADES, vars, as);
+
+  it('myGrades: the current quarter, live % (not final), every assignment with its state; feedback only when published', async () => {
+    await prisma.submission.updateMany({
+      where: { studentId: id.sA, assignment: { title: 'Graded yesterday' } },
+      data: { feedback: 'Well done' },
+    });
+    await prisma.submission.updateMany({
+      where: {
+        studentId: id.sA,
+        assignment: { title: 'Graded, not published' },
+      },
+      data: { feedback: 'Not for students yet' },
+    });
+    const g = (await grades('sA')).data!.myGrades;
+    expect(g.periods.map((p) => p.name)).toEqual([
+      'Earlier quarter',
+      'This quarter',
+    ]);
+    expect(g.period?.name).toBe('This quarter');
+    expect(g.courses.map((c) => c.title)).toEqual([`${TAG} A`]);
+    const [a] = g.courses;
+    expect(a).toMatchObject({
+      teacherName: `Nilufar ${TAG}`,
+      percent: 80,
+      isFinal: false,
+      attendanceRate: 50,
+      missing: 3,
+    });
+    const state = Object.fromEntries(
+      a.items.map((i) => [i.title, [i.state, i.score, i.feedback]]),
+    );
+    expect(state).toEqual({
+      'Missed, late work allowed': ['NOT_SUBMITTED', null, null],
+      'Missed, closed': ['NOT_SUBMITTED', null, null],
+      // Graded by the teacher but not published: no score, no feedback, no hint
+      'Graded, not published': ['NOT_SUBMITTED', null, null],
+      'Graded yesterday': ['GRADED', 8, 'Well done'],
+      'Due tomorrow': ['DUE_SOON', null, null],
+      'Due in 3 days': ['SUBMITTED', null, null],
+      'Due in 10 days': ['UPCOMING', null, null],
+    });
+    expect(g.missing).toBe(3);
+  });
+
+  it('myGrades: another quarter shows its own (empty) work', async () => {
+    const all = (await grades('sA')).data!.myGrades;
+    const earlier = await prisma.period.findFirstOrThrow({
+      where: { name: 'Earlier quarter', academicYear: { name: TAG } },
+    });
+    const g = (await grades('sA', { p: earlier.id })).data!.myGrades;
+    expect(g.period?.name).toBe('Earlier quarter');
+    expect(g.courses[0].items).toEqual([]);
+    expect(all.period?.id).not.toBe(earlier.id);
+  });
+
+  const gradesTable: [string, Key, () => { p?: string; s?: string }, string][] =
+    [
+      ['parent: own child', 'pA', () => ({ s: id.sA }), 'OK'],
+      [
+        'parent: someone else’s child',
+        'pA',
+        () => ({ s: id.sA2 }),
+        'NOT_FOUND',
+      ],
+      ['teacher: any', 'tA', () => ({ s: id.sA }), 'FORBIDDEN'],
+      ['admin: a chosen student', 'admin', () => ({ s: id.sA }), 'OK'],
+      [
+        'student: a period of another year',
+        'sA',
+        () => ({ p: '01a00000-0000-7000-8000-000000000000' }),
+        'NOT_FOUND',
+      ],
+    ];
+  it.each(gradesTable)(
+    'myGrades %s → %s',
+    async (_name, as, vars, expected) => {
+      expect(code(await grades(as, vars())) ?? 'OK').toBe(expected);
+    },
+  );
+
   it('myChildren: the parent’s children for the switcher', async () => {
     const res = await gql<{
       myChildren: { firstName: string; className: string | null }[];

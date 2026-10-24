@@ -273,5 +273,47 @@
     "qa": "Q&A에 질문하기",
     "soon": "곧 제공",
     "notFound": "이 과제를 볼 수 없습니다."
+  },
+  "grades": {
+    "title": "성적 및 학업 현황",
+    "summary": "출석률 {{rate}} · {{missing}}",
+    "missing_other": "미제출 과제 {{count}}개",
+    "final": "최종",
+    "empty": "이 분기에는 아직 성적이 없습니다.",
+    "noPeriods": "학년도가 아직 시작되지 않았습니다.",
+    "col": {
+      "course": "강좌",
+      "teacher": "교사",
+      "grade": "분기 성적",
+      "attendance": "출석률",
+      "missing": "미제출",
+      "actions": "작업",
+      "annual": "연간"
+    },
+    "missingPill_other": "미제출 {{count}}",
+    "notFinal": "확정 전",
+    "view": "자세히",
+    "hide": "접기",
+    "items": {
+      "title": "{{course}} 과제 및 평가",
+      "count_other": "{{period}} · {{count}}개",
+      "name": "과제",
+      "date": "날짜",
+      "score": "점수",
+      "status": "상태",
+      "feedback": "선생님 코멘트",
+      "none": "이 분기에는 과제가 없습니다.",
+      "notPublished": "아직 공개되지 않음",
+      "due": "마감 {{date}}"
+    },
+    "state": {
+      "GRADED": "채점 완료",
+      "MISSING": "미제출 (0점)",
+      "SUBMITTED": "제출 완료",
+      "NOT_SUBMITTED": "미제출",
+      "DUE_SOON": "마감 임박",
+      "UPCOMING": "예정",
+      "NOT_GRADED": "채점 전"
+    }
   }
 }

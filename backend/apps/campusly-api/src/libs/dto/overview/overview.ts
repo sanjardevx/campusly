@@ -3,6 +3,7 @@ import { Announcements } from '../announcement/announcement';
 import { AttendanceSummary } from '../attendance/attendance';
 import { AssignmentType } from '../../enums/assignment.enum';
 import { LessonType } from '../../enums/course.enum';
+import { GradeItemState } from '../../enums/grade.enum';
 import { ParentRelation } from '../../enums/user.enum';
 
 @ObjectType()
@@ -210,4 +211,103 @@ export class Child {
 
   @Field(() => ParentRelation)
   relation: ParentRelation;
+}
+
+/** A period in the gradebook tabs */
+@ObjectType()
+export class PeriodRef {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => String)
+  name: string;
+}
+
+/** One assignment in the student's gradebook */
+@ObjectType()
+export class MyGradeItem {
+  @Field(() => String)
+  assignmentId: string;
+
+  @Field(() => String)
+  title: string;
+
+  @Field(() => AssignmentType)
+  type: AssignmentType;
+
+  @Field(() => Date, { nullable: true })
+  dueAt: Date | null;
+
+  @Field(() => Float)
+  maxScore: number;
+
+  @Field(() => GradeItemState)
+  state: GradeItemState;
+
+  /** Only once the grades are published */
+  @Field(() => Float, { nullable: true })
+  score: number | null;
+
+  @Field(() => String, { nullable: true })
+  feedback: string | null;
+}
+
+/** One course row of the gradebook in one period */
+@ObjectType()
+export class MyCourseGrades {
+  @Field(() => String)
+  courseId: string;
+
+  @Field(() => String)
+  title: string;
+
+  @Field(() => String)
+  subjectName: string;
+
+  @Field(() => String, { nullable: true })
+  teacherName: string | null;
+
+  /** The published snapshot, or the live % from published grades */
+  @Field(() => Float, { nullable: true })
+  percent: number | null;
+
+  @Field(() => Int, { nullable: true })
+  mark: number | null;
+
+  /** false = live, can still change ("Not final") */
+  @Field(() => Boolean)
+  isFinal: boolean;
+
+  /** This course, this period */
+  @Field(() => Float, { nullable: true })
+  attendanceRate: number | null;
+
+  /** Past due and not handed in, or a published "missing" zero */
+  @Field(() => Int)
+  missing: number;
+
+  @Field(() => [MyGradeItem])
+  items: MyGradeItem[];
+}
+
+/** The student's gradebook for one period, in one query */
+@ObjectType()
+export class MyGrades {
+  /** The year's quarters (leaf periods), for the tabs */
+  @Field(() => [PeriodRef])
+  periods: PeriodRef[];
+
+  /** The period shown: the one asked for, else the current one; null before the year starts */
+  @Field(() => PeriodRef, { nullable: true })
+  period: PeriodRef | null;
+
+  /** All courses together, this period */
+  @Field(() => Float, { nullable: true })
+  attendanceRate: number | null;
+
+  @Field(() => Int)
+  missing: number;
+
+  @Field(() => [MyCourseGrades])
+  courses: MyCourseGrades[];
 }

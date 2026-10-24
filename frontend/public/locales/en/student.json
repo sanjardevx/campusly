@@ -286,5 +286,50 @@
     "qa": "Ask a question in Q&A",
     "soon": "Coming soon",
     "notFound": "This assignment is not available."
+  },
+  "grades": {
+    "title": "Grades & Academic Progress",
+    "summary": "Attendance {{rate}} · {{missing}}",
+    "missing_one": "{{count}} missing assignment",
+    "missing_other": "{{count}} missing assignments",
+    "final": "Final",
+    "empty": "No grades yet for this period.",
+    "noPeriods": "The school year has not started yet.",
+    "col": {
+      "course": "Course",
+      "teacher": "Teacher",
+      "grade": "Quarter grade",
+      "attendance": "Attendance",
+      "missing": "Missing",
+      "actions": "Actions",
+      "annual": "Annual"
+    },
+    "missingPill_one": "{{count}} missing",
+    "missingPill_other": "{{count}} missing",
+    "notFinal": "Not final",
+    "view": "View details",
+    "hide": "Hide details",
+    "items": {
+      "title": "{{course}} assignments & assessments",
+      "count_one": "{{period}} · {{count}} item",
+      "count_other": "{{period}} · {{count}} items",
+      "name": "Assignment",
+      "date": "Date",
+      "score": "Score",
+      "status": "Status",
+      "feedback": "Teacher feedback",
+      "none": "No assignments in this period.",
+      "notPublished": "Not published yet",
+      "due": "Due {{date}}"
+    },
+    "state": {
+      "GRADED": "Graded",
+      "MISSING": "Missing",
+      "SUBMITTED": "Submitted",
+      "NOT_SUBMITTED": "Not submitted",
+      "DUE_SOON": "Due soon",
+      "UPCOMING": "Upcoming",
+      "NOT_GRADED": "Not graded"
+    }
   }
 }

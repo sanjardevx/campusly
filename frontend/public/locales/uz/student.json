@@ -286,5 +286,50 @@
     "qa": "Q&A'da savol berish",
     "soon": "Tez orada",
     "notFound": "Bu topshiriq mavjud emas."
+  },
+  "grades": {
+    "title": "Baholar va o‘zlashtirish",
+    "summary": "Davomat {{rate}} · {{missing}}",
+    "missing_one": "{{count}} ta topshirilmagan ish",
+    "missing_other": "{{count}} ta topshirilmagan ish",
+    "final": "Yakuniy",
+    "empty": "Bu chorakda hali baho yo‘q.",
+    "noPeriods": "O‘quv yili hali boshlanmagan.",
+    "col": {
+      "course": "Kurs",
+      "teacher": "O‘qituvchi",
+      "grade": "Chorak bahosi",
+      "attendance": "Davomat",
+      "missing": "Topshirilmagan",
+      "actions": "Amallar",
+      "annual": "Yillik"
+    },
+    "missingPill_one": "{{count}} ta",
+    "missingPill_other": "{{count}} ta",
+    "notFinal": "Yakuniy emas",
+    "view": "Batafsil",
+    "hide": "Yopish",
+    "items": {
+      "title": "{{course}}: topshiriqlar va nazoratlar",
+      "count_one": "{{period}} · {{count}} ta",
+      "count_other": "{{period}} · {{count}} ta",
+      "name": "Topshiriq",
+      "date": "Sana",
+      "score": "Ball",
+      "status": "Holat",
+      "feedback": "O‘qituvchi izohi",
+      "none": "Bu chorakda topshiriq yo‘q.",
+      "notPublished": "Hali e’lon qilinmagan",
+      "due": "Muddat: {{date}}"
+    },
+    "state": {
+      "GRADED": "Baholangan",
+      "MISSING": "Topshirilmagan (0)",
+      "SUBMITTED": "Topshirilgan",
+      "NOT_SUBMITTED": "Topshirilmagan",
+      "DUE_SOON": "Muddati yaqin",
+      "UPCOMING": "Kelgusi",
+      "NOT_GRADED": "Baholanmagan"
+    }
   }
 }

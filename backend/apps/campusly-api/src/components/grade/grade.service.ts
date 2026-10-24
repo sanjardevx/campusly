@@ -15,6 +15,20 @@ export interface StudentRef {
   lastName: string;
 }
 
+/**
+ * A period's moments: its calendar days in the school's timezone (a quarter ending on 31 Oct ends
+ * at 1 Nov 00:00 Tashkent). An assignment is in the period when its dueAt is in [from, until).
+ */
+export function periodWindow(
+  period: { startsAt: Date; endsAt: Date },
+  timezone: string,
+) {
+  return {
+    from: startOfDayInZone(fromDbDate(period.startsAt), timezone),
+    until: startOfDayInZone(nextDay(fromDbDate(period.endsAt)), timezone),
+  };
+}
+
 export const STUDENT_SELECT = {
   id: true,
   loginId: true,
@@ -99,14 +113,7 @@ export class GradeService {
 
     // Period days are calendar days in the school's timezone; dueAt is a UTC moment
     const settings = await this.schoolService.getSettings();
-    const from = startOfDayInZone(
-      fromDbDate(period.startsAt),
-      settings.timezone,
-    );
-    const until = startOfDayInZone(
-      nextDay(fromDbDate(period.endsAt)),
-      settings.timezone,
-    );
+    const { from, until } = periodWindow(period, settings.timezone);
 
     const [categories, assignments] = await Promise.all([
       this.prismaService.gradeCategory.findMany({
