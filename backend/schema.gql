@@ -133,6 +133,15 @@ type AttendanceJournalRow {
   studentId: String!
 }
 
+type AttendanceLesson {
+  courseId: String!
+  courseTitle: String!
+  date: String!
+  note: String
+  status: AttendanceStatus!
+  teacherName: String
+}
+
 input AttendanceMarkInput {
   note: String
   status: AttendanceStatus!
@@ -282,6 +291,14 @@ type CourseAttendance {
   isMarked: Boolean!
   lessonId: String
   rows: [AttendanceRow!]!
+}
+
+type CourseAttendanceRow {
+  courseId: String!
+  subjectName: String!
+  summary: AttendanceSummary!
+  teacherName: String
+  title: String!
 }
 
 type CourseDetail {
@@ -929,6 +946,14 @@ type Period {
   startsAt: String!
 }
 
+type PeriodAttendance {
+  courses: [CourseAttendanceRow!]!
+  lessons: [AttendanceLesson!]!
+  period: PeriodRef
+  periods: [PeriodRef!]!
+  summary: AttendanceSummary!
+}
+
 type PeriodGradeRow {
   computedScore: Float
   finalScore: Float
@@ -1012,6 +1037,7 @@ type Query {
   mySubmission(assignmentId: String!, studentId: String): Submission
   periods(academicYearId: String!): [Period!]!
   schoolSettings: SchoolSettings!
+  studentAttendance(periodId: String, studentId: String): PeriodAttendance!
   studentCalendar(month: String!, studentId: String): [CalendarEvent!]!
   studentOverview(studentId: String): StudentOverview!
   subjects(includeArchived: Boolean): [Subject!]!

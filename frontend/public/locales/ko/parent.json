@@ -41,5 +41,29 @@
       "empty": "아직 공지사항이 없습니다.",
       "hotline": "학교 행정실"
     }
+  },
+  "attendance": {
+    "title": "출석",
+    "subtitle": "이번 분기의 모든 출석 기록",
+    "periodRate": "{{period}} 출석률",
+    "attended": "수업 {{total}}회 중 {{attended}}회 출석",
+    "noMarks": "아직 출석 기록이 없습니다",
+    "course": "과목",
+    "allCourses": "모든 과목",
+    "rate": "출석률",
+    "status": {
+      "PRESENT": "출석",
+      "LATE": "지각",
+      "EXCUSED": "인정 결석",
+      "ABSENT": "결석"
+    },
+    "lessons": "수업",
+    "onlyMissed": "지각·결석만 보기",
+    "recent": "최근 수업",
+    "seeAll": "수업 더 보기",
+    "moreDays": "날짜 더 보기 ({{total}}일 중 {{shown}}일)",
+    "none": "이번 분기에 아직 출석 기록이 없습니다.",
+    "noMatch": "조건에 맞는 수업이 없습니다.",
+    "noPeriod": "학년도가 아직 시작되지 않았습니다."
   }
 }

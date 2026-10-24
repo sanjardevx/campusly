@@ -161,6 +161,7 @@ describe('Every GraphQL operation has a deliberate role rule', () => {
             'courseFileUrl',
             'studentOverview',
             'studentCalendar',
+            'studentAttendance',
             'courseProgress',
           ].includes(n),
       );

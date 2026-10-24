@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import {
   MyCourseGrades,
@@ -6,10 +6,9 @@ import {
   MyGrades,
 } from '../../libs/dto/overview/overview';
 import { SubmissionStatus } from '../../libs/enums/assignment.enum';
-import { ErrorCode } from '../../libs/enums/common.enum';
 import { GradeItemState } from '../../libs/enums/grade.enum';
 import type { AuthUser } from '../../libs/types/auth';
-import { toDbDate, todayInZone } from '../../libs/utils/date';
+import { todayInZone } from '../../libs/utils/date';
 import {
   hidesGrades,
   visibleSubmissionStatus,
@@ -17,6 +16,7 @@ import {
 import { summarizeAttendance } from '../attendance/attendance.service';
 import { AccessPolicy } from '../auth/policies/access.policy';
 import { STUDENT_SELECT, periodWindow } from '../grade/grade.service';
+import { yearPeriods } from './periods';
 import { PeriodGradeService } from '../grade/period-grade.service';
 import { SchoolService } from '../school/school.service';
 
@@ -84,24 +84,12 @@ export class StudentGradesService {
 
     const { timezone } = await this.schoolService.getSettings();
     const today = todayInZone(timezone);
-    // The year's quarters (leaf periods), like the teacher's gradebook tabs
-    const periods = await this.prismaService.period.findMany({
-      where: {
-        academicYearId: courses[0].academicYearId,
-        children: { none: {} },
-      },
-      orderBy: [{ startsAt: 'asc' }, { order: 'asc' }],
-    });
-    const period = periodId
-      ? periods.find((p) => p.id === periodId)
-      : ([...periods].reverse().find((p) => p.startsAt <= toDbDate(today)) ??
-        periods[0]);
-    if (periodId && !period) {
-      throw new NotFoundException({
-        code: ErrorCode.NOT_FOUND,
-        message: 'Period not found in this academic year',
-      });
-    }
+    const { periods, period } = await yearPeriods(
+      this.prismaService,
+      courses[0].academicYearId,
+      today,
+      periodId,
+    );
     const periodList = periods.map((p) => ({ id: p.id, name: p.name }));
     if (!period) {
       return {

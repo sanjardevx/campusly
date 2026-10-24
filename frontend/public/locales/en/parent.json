@@ -44,5 +44,29 @@
       "empty": "No announcements yet.",
       "hotline": "School office"
     }
+  },
+  "attendance": {
+    "title": "Attendance",
+    "subtitle": "Every marked lesson of the quarter",
+    "periodRate": "{{period}} attendance",
+    "attended": "{{attended}} of {{total}} lessons attended",
+    "noMarks": "No lessons marked yet",
+    "course": "Course",
+    "allCourses": "All courses",
+    "rate": "Rate",
+    "status": {
+      "PRESENT": "Present",
+      "LATE": "Late",
+      "EXCUSED": "Excused",
+      "ABSENT": "Absent"
+    },
+    "lessons": "Lessons",
+    "onlyMissed": "Only late or absent",
+    "recent": "Recent lessons",
+    "seeAll": "See more lessons",
+    "moreDays": "Show more days ({{shown}} of {{total}})",
+    "none": "No lessons marked this quarter yet.",
+    "noMatch": "No lessons match these filters.",
+    "noPeriod": "The school year has not started yet."
   }
 }

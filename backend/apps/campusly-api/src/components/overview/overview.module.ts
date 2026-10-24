@@ -6,6 +6,7 @@ import { GradeModule } from '../grade/grade.module';
 import { SchoolModule } from '../school/school.module';
 import { OverviewResolver } from './overview.resolver';
 import { OverviewService } from './overview.service';
+import { StudentAttendanceService } from './student-attendance.service';
 import { StudentGradesService } from './student-grades.service';
 
 @Module({
@@ -16,6 +17,11 @@ import { StudentGradesService } from './student-grades.service';
     SchoolModule,
     DashboardModule,
   ],
-  providers: [OverviewResolver, OverviewService, StudentGradesService],
+  providers: [
+    OverviewResolver,
+    OverviewService,
+    StudentGradesService,
+    StudentAttendanceService,
+  ],
 })
 export class OverviewModule {}

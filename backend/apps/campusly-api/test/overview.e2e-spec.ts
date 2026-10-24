@@ -772,6 +772,68 @@ describe('studentOverview and myChildren (e2e)', () => {
     },
   );
 
+  // ───────────── studentAttendance: the Attendance page ─────────────
+  const ATTENDANCE = `query($p: String, $s: String) { studentAttendance(periodId: $p, studentId: $s) {
+    period { name } summary { total absent rate }
+    courses { title summary { total rate } }
+    lessons { courseTitle teacherName status }
+  } }`;
+  type AttendanceResult = {
+    period: { name: string } | null;
+    summary: { total: number; absent: number; rate: number | null };
+    courses: {
+      title: string;
+      summary: { total: number; rate: number | null };
+    }[];
+    lessons: {
+      courseTitle: string;
+      teacherName: string | null;
+      status: string;
+    }[];
+  };
+  const attendance = (as: Key, vars: { p?: string; s?: string } = {}) =>
+    gql<{ studentAttendance: AttendanceResult }>(ATTENDANCE, vars, as);
+
+  it('studentAttendance: this quarter, per course and every lesson (newest first); a parent sees the same', async () => {
+    const own = (await attendance('sA')).data!.studentAttendance;
+    expect(own.period?.name).toBe('This quarter');
+    expect(own.summary).toEqual({ total: 2, absent: 1, rate: 50 });
+    // The draft course is left out, like on the other pages
+    expect(own.courses).toEqual([
+      { title: `${TAG} A`, summary: { total: 2, rate: 50 } },
+    ]);
+    expect(own.lessons).toEqual([
+      {
+        courseTitle: `${TAG} A`,
+        teacherName: `Nilufar ${TAG}`,
+        status: 'ABSENT',
+      },
+      {
+        courseTitle: `${TAG} A`,
+        teacherName: `Nilufar ${TAG}`,
+        status: 'PRESENT',
+      },
+    ]);
+    const parent = (await attendance('pA', { s: id.sA })).data!
+      .studentAttendance;
+    expect(parent).toEqual(own);
+
+    const earlier = await prisma.period.findFirstOrThrow({
+      where: { name: 'Earlier quarter', academicYear: { name: TAG } },
+    });
+    const before = (await attendance('sA', { p: earlier.id })).data!
+      .studentAttendance;
+    expect(before.lessons).toEqual([]);
+    expect(before.summary.rate).toBeNull();
+  });
+
+  it.each(gradesTable)(
+    'studentAttendance %s → %s',
+    async (_name, as, vars, expected) => {
+      expect(code(await attendance(as, vars())) ?? 'OK').toBe(expected);
+    },
+  );
+
   it('myChildren: the parent’s children for the switcher', async () => {
     const res = await gql<{
       myChildren: { firstName: string; className: string | null }[];

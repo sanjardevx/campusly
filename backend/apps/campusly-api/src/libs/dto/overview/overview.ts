@@ -1,6 +1,7 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { Announcements } from '../announcement/announcement';
 import { AttendanceSummary } from '../attendance/attendance';
+import { AttendanceStatus } from '../../enums/attendance.enum';
 import { AssignmentType } from '../../enums/assignment.enum';
 import { LessonType } from '../../enums/course.enum';
 import { GradeItemState } from '../../enums/grade.enum';
@@ -318,4 +319,65 @@ export class MyGrades {
 
   @Field(() => [MyCourseGrades])
   courses: MyCourseGrades[];
+}
+
+/** One course's marks in the period (Attendance page) */
+@ObjectType()
+export class CourseAttendanceRow {
+  @Field(() => String)
+  courseId: string;
+
+  @Field(() => String)
+  title: string;
+
+  @Field(() => String)
+  subjectName: string;
+
+  @Field(() => String, { nullable: true })
+  teacherName: string | null;
+
+  @Field(() => AttendanceSummary)
+  summary: AttendanceSummary;
+}
+
+/** One marked lesson: a course session on a date and the student's status */
+@ObjectType()
+export class AttendanceLesson {
+  /** "YYYY-MM-DD" (school calendar date) */
+  @Field(() => String)
+  date: string;
+
+  @Field(() => String)
+  courseId: string;
+
+  @Field(() => String)
+  courseTitle: string;
+
+  @Field(() => String, { nullable: true })
+  teacherName: string | null;
+
+  @Field(() => AttendanceStatus)
+  status: AttendanceStatus;
+
+  @Field(() => String, { nullable: true })
+  note: string | null;
+}
+
+/** The Attendance page (student / parent): one period, all courses, newest lesson first */
+@ObjectType()
+export class PeriodAttendance {
+  @Field(() => [PeriodRef])
+  periods: PeriodRef[];
+
+  @Field(() => PeriodRef, { nullable: true })
+  period: PeriodRef | null;
+
+  @Field(() => AttendanceSummary)
+  summary: AttendanceSummary;
+
+  @Field(() => [CourseAttendanceRow])
+  courses: CourseAttendanceRow[];
+
+  @Field(() => [AttendanceLesson])
+  lessons: AttendanceLesson[];
 }

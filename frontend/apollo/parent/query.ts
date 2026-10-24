@@ -84,3 +84,49 @@ export const PARENT_CHILD_COURSES = graphql(`
     }
   }
 `);
+
+/** Attendance page: one quarter (default: the current one) for the chosen child */
+export const PARENT_ATTENDANCE = graphql(`
+  query ParentAttendance($studentId: String!, $periodId: String) {
+    studentAttendance(studentId: $studentId, periodId: $periodId) {
+      periods {
+        id
+        name
+      }
+      period {
+        id
+        name
+      }
+      summary {
+        total
+        present
+        late
+        excused
+        absent
+        rate
+      }
+      courses {
+        courseId
+        title
+        subjectName
+        teacherName
+        summary {
+          total
+          present
+          late
+          excused
+          absent
+          rate
+        }
+      }
+      lessons {
+        date
+        courseId
+        courseTitle
+        teacherName
+        status
+        note
+      }
+    }
+  }
+`);

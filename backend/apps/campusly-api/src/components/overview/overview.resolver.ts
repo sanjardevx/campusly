@@ -4,12 +4,14 @@ import { CalendarEvent } from '../../libs/dto/dashboard/dashboard';
 import {
   Child,
   MyGrades,
+  PeriodAttendance,
   StudentOverview,
 } from '../../libs/dto/overview/overview';
 import { Role } from '../../libs/enums/user.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { CurrentUser, Roles } from '../auth/decorators/auth.decorators';
 import { OverviewService } from './overview.service';
+import { StudentAttendanceService } from './student-attendance.service';
 import { StudentGradesService } from './student-grades.service';
 
 @Resolver()
@@ -17,6 +19,7 @@ export class OverviewResolver {
   constructor(
     private readonly overviewService: OverviewService,
     private readonly studentGradesService: StudentGradesService,
+    private readonly studentAttendanceService: StudentAttendanceService,
   ) {}
 
   /** Student: own. Parent: a child (required with 2+ children). Admin: any student. */
@@ -65,6 +68,27 @@ export class OverviewResolver {
     studentId?: string,
   ): Promise<MyGrades> {
     return this.studentGradesService.getMyGrades(user, periodId, studentId);
+  }
+
+  /** The Attendance page: one period (default: the current one). Same student rule as studentOverview. */
+  @Roles(Role.STUDENT, Role.PARENT, Role.ADMIN)
+  @Query(() => PeriodAttendance)
+  public studentAttendance(
+    @CurrentUser() user: AuthUser,
+    @Args('periodId', { nullable: true }, new ParseUUIDPipe({ optional: true }))
+    periodId?: string,
+    @Args(
+      'studentId',
+      { nullable: true },
+      new ParseUUIDPipe({ optional: true }),
+    )
+    studentId?: string,
+  ): Promise<PeriodAttendance> {
+    return this.studentAttendanceService.getStudentAttendance(
+      user,
+      periodId,
+      studentId,
+    );
   }
 
   @Roles(Role.PARENT)

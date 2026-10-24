@@ -44,5 +44,29 @@
       "empty": "Hozircha e'lonlar yo'q.",
       "hotline": "Maktab ofisi"
     }
+  },
+  "attendance": {
+    "title": "Davomat",
+    "subtitle": "Chorakdagi barcha belgilangan darslar",
+    "periodRate": "{{period}} davomati",
+    "attended": "{{total}} ta darsdan {{attended}} tasiga qatnashgan",
+    "noMarks": "Hali dars belgilanmagan",
+    "course": "Kurs",
+    "allCourses": "Barcha kurslar",
+    "rate": "Foiz",
+    "status": {
+      "PRESENT": "Kelgan",
+      "LATE": "Kechikkan",
+      "EXCUSED": "Sababli",
+      "ABSENT": "Kelmagan"
+    },
+    "lessons": "Darslar",
+    "onlyMissed": "Faqat kechikkan yoki kelmagan",
+    "recent": "So'nggi darslar",
+    "seeAll": "Yana darslarni ko'rish",
+    "moreDays": "Yana kunlarni ko'rsatish ({{total}} tadan {{shown}})",
+    "none": "Bu chorakda hali dars belgilanmagan.",
+    "noMatch": "Bu filtrlarga mos dars yo'q.",
+    "noPeriod": "O'quv yili hali boshlanmagan."
   }
 }
