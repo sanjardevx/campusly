@@ -348,3 +348,27 @@ export const STUDENT_ANNOUNCEMENTS = graphql(`
     }
   }
 `);
+
+/** AI Study Tutor: the course's weeks, lessons and assignments, for the "Topic" picker */
+export const STUDENT_TUTOR_TOPICS = graphql(`
+  query StudentTutorTopics($courseId: String!) {
+    courseDetail(courseId: $courseId) {
+      id
+      modules {
+        id
+        title
+        order
+        lessons {
+          id
+          title
+        }
+      }
+    }
+    courseAssignments(courseId: $courseId) {
+      id
+      moduleId
+      title
+      type
+    }
+  }
+`);

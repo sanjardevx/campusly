@@ -355,5 +355,67 @@
     "none": "Hozircha e'lonlar yo'q.",
     "noMatch": "Qidiruvga mos e'lon topilmadi.",
     "allRead": "Hammasini o'qib chiqdingiz."
+  },
+  "tutor": {
+    "title": "AI o'quv yordamchisi",
+    "subtitle": "O'z kurs materiallaringiz asosida bosqichma-bosqich maslahatlar",
+    "conversations": "Suhbatlar",
+    "items_one": "{{count}} ta",
+    "items_other": "{{count}} ta",
+    "new": "Yangi suhbat",
+    "noConversations": "Hali suhbat yo'q. Dars yoki uy vazifasi haqida boshlang.",
+    "group": {
+      "today": "Bugun",
+      "earlier": "Avvalroq"
+    },
+    "policyNote": "Sokratik rejim: javob emas, maslahat. Testlar vaqtida o'chiq.",
+    "course": "Kurs",
+    "topic": "Mavzu",
+    "anyTopic": "Shu kursdagi istalgan mavzu",
+    "assignments": "Topshiriqlar",
+    "onlyCourse": "Yordamchi faqat kurs materiallaringizdan foydalanadi.",
+    "back": "Suhbatlarga qaytish",
+    "help": "Yordam",
+    "level": {
+      "1": "Turtki",
+      "2": "Tushuncha",
+      "3": "Qadam",
+      "4": "O'xshash misol"
+    },
+    "notConnectedBanner": "AI yordamchi sozlanmoqda. Sahifani sinab ko'rishingiz mumkin, lekin savollar hali hech qayerga yuborilmaydi.",
+    "anotherHint": "Yana maslahat",
+    "solved": "Yechdim",
+    "attach": "Rasm biriktirish (tez orada)",
+    "placeholder": "Dars yoki uy vazifasi haqida so'rang…",
+    "send": "Yuborish",
+    "hintsOnly": "Faqat maslahat — yordamchi tayyor javob bermaydi. Testlar vaqtida o'chiq.",
+    "you": "Siz",
+    "name": "AI o'quv yordamchisi",
+    "welcome": {
+      "title": "Biror joyda qiynaldingizmi?",
+      "body": "Kurs va dars yoki uy vazifasini tanlab, savol bering. Yordamchi savol va maslahatlar bilan javob beradi — javobni o'zingiz topasiz.",
+      "start": "Bu masalani qanday boshlayman?",
+      "stuck": "2-qadamda qotib qoldim",
+      "check": "Fikrimni tekshirib bera olasizmi?"
+    },
+    "system": {
+      "notConnected": "Yordamchi hali ulanmagan — bu savol faqat ekraningizda qoladi."
+    },
+    "sources": {
+      "title": "Kursingizdan",
+      "subtitle": "Bu suhbatda yordamchi tayangan materiallar",
+      "none": "Yordamchi foydalangan darslar va fayllar shu yerda chiqadi.",
+      "onlyCourse": "Faqat o'qituvchingizning {{course}} materiallaridan foydalanadi.",
+      "kind": {
+        "LESSON": "Dars",
+        "FILE": "Fayl"
+      }
+    },
+    "quota": {
+      "title": "Kunlik savollar",
+      "left_one": "Bugun {{count}} ta qoldi",
+      "left_other": "Bugun {{count}} ta qoldi",
+      "resets": "Har kuni 00:00 da yangilanadi"
+    }
   }
 }

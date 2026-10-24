@@ -54,7 +54,8 @@
       "announcements": "News",
       "overview": "Home",
       "attendance": "Attendance"
-    }
+    },
+    "tutor": "AI Study Tutor"
   },
   "shell": {
     "portal": {

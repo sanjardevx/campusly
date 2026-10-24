@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import NextLink from 'next/link';
-import { Box, ButtonBase, Menu } from '@mui/material';
+import { Box, ButtonBase, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useTranslation } from 'next-i18next/pages';
 import type { SessionUser } from '@/libs/auth/api';
@@ -14,8 +14,11 @@ import { AccountItems } from './UserMenu';
  * light edge, and one glass lens under the active tab that slides to the next tab.
  * CSS only (backdrop-filter): SVG refraction filters do not work in Safari, i.e. on iPhones.
  */
-export function GlassTabBar({ user, items }: { user: SessionUser; items: NavItem[] }) {
+export function GlassTabBar({ user, items: all }: { user: SessionUser; items: NavItem[] }) {
   const { t } = useTranslation('common');
+  // Five places in the bar; the rest (tab: false) open from "More"
+  const items = all.filter((i) => i.tab !== false);
+  const extra = all.filter((i) => i.tab === false);
   const navHref = useNavHref();
   const current = useActiveItem(user.role);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
@@ -119,6 +122,18 @@ export function GlassTabBar({ user, items }: { user: SessionUser; items: NavItem
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
+        {extra.map((item) => {
+          const Icon = item.icon;
+          return (
+            <MenuItem key={item.href} component={NextLink} href={navHref(item.href)} onClick={() => setAnchor(null)}>
+              <ListItemIcon>
+                <Icon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t(`nav.${item.key}`)}</ListItemText>
+            </MenuItem>
+          );
+        })}
+        {extra.length > 0 && <Divider />}
         <AccountItems user={user} onDone={() => setAnchor(null)} />
       </Menu>
     </Box>

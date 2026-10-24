@@ -54,7 +54,8 @@
       "announcements": "Новости",
       "overview": "Главная",
       "attendance": "Явка"
-    }
+    },
+    "tutor": "ИИ-помощник"
   },
   "shell": {
     "portal": {

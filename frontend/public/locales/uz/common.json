@@ -54,7 +54,8 @@
       "announcements": "E’lonlar",
       "overview": "Asosiy",
       "attendance": "Davomat"
-    }
+    },
+    "tutor": "AI o'quv yordamchisi"
   },
   "shell": {
     "portal": {

@@ -13,6 +13,7 @@ import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import LibraryBooksOutlinedIcon from '@mui/icons-material/LibraryBooksOutlined';
 import MarkEmailUnreadOutlinedIcon from '@mui/icons-material/MarkEmailUnreadOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
@@ -27,6 +28,8 @@ export interface NavItem {
   icon: SvgIconComponent;
   /** The plan day that builds the page (shown on the "coming soon" placeholder); none = later phase */
   day?: number;
+  /** false: not a phone tab (the bar keeps five places) — it opens from the "More" menu instead */
+  tab?: false;
 }
 
 export interface NavSection {
@@ -36,8 +39,8 @@ export interface NavSection {
 }
 
 /**
- * The menus of the Stitch dashboards, MVP pages only. Later-phase items (AI Study Tutor,
- * Calendar, Q&A, the website CMS) come back with their features (DECISIONS §14).
+ * The menus of the Stitch dashboards, MVP pages only. Later-phase items (Calendar, Q&A, the website
+ * CMS) come back with their features (DECISIONS §14). The AI Study Tutor page is built ahead (UI only).
  */
 export const NAV: Record<Role, NavSection[]> = {
   STUDENT: [
@@ -46,6 +49,8 @@ export const NAV: Record<Role, NavSection[]> = {
         { key: 'home', href: '/student', icon: HomeOutlinedIcon, day: 12 },
         { key: 'courses', href: '/student/courses', icon: MenuBookOutlinedIcon, day: 12 },
         { key: 'grades', href: '/student/grades', icon: AssessmentOutlinedIcon, day: 12 },
+        // The UI is ready; the answers come with the AI tutor phase (DECISIONS §14)
+        { key: 'tutor', href: '/student/tutor', icon: PsychologyOutlinedIcon, tab: false },
         { key: 'announcements', href: '/student/announcements', icon: CampaignOutlinedIcon, day: 12 },
       ],
     },
