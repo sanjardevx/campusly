@@ -1,0 +1,81 @@
+# Production stack on the EC2 box (DECISIONS §3): api + batch + Redis + Caddy.
+# Postgres is NOT here: it is RDS. Secrets come from SSM into .env.production (never in git).
+#
+#   docker compose -f docker-compose.prod.yml up -d --build      # build and (re)start
+#   docker compose -f docker-compose.prod.yml run --rm tools pnpm prisma migrate deploy
+#   docker compose -f docker-compose.prod.yml run --rm tools pnpm prisma db seed   # WIPES all tables (demo only)
+#   docker compose -f docker-compose.prod.yml logs -f api
+
+# Docker keeps container logs forever by default; cap them so the disk never fills up
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  api:
+    build: { context: ., target: runtime }
+    image: campusly-backend
+    restart: unless-stopped # like PM2: restarts after a crash or a reboot
+    env_file: .env.production
+    environment:
+      REDIS_URL: redis://redis:6379 # the redis service below, inside the Docker network
+    depends_on:
+      redis: { condition: service_healthy }
+    # No "ports": the API is reachable only through Caddy
+    logging: *logging
+
+  batch:
+    image: campusly-backend # same image as api, another program
+    command: ["node", "dist/apps/campusly-batch/main"]
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      api: { condition: service_started } # api builds the shared image first
+      redis: { condition: service_healthy }
+    logging: *logging
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"] # keep queue data across restarts
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    logging: *logging
+
+  # Reverse proxy, like Nginx in the lessons — but it gets and renews the HTTPS certificate itself
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    env_file: .env.production # Caddyfile reads API_DOMAIN from it
+    ports:
+      - "80:80" # HTTP: certificate check + redirect to HTTPS
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data # certificates: keep them, or Let's Encrypt rate limits hit
+      - caddy_config:/config
+    depends_on:
+      - api
+    logging: *logging
+
+  # One-off commands only (migrate deploy, seed): the build stage, with the Prisma CLI and tsx.
+  # The "tools" profile keeps it out of `up`.
+  tools:
+    build: { context: ., target: build }
+    image: campusly-backend-tools
+    profiles: [tools]
+    env_file: .env.production
+
+volumes:
+  redis_data:
+  caddy_data:
+  caddy_config:

@@ -34,7 +34,7 @@ When a decision changes, update it here **and** add a line to the [Decision log]
 | i18n | `next-i18next`; locales `en`, `uz`, `ru`, `ko`; **default `en`**. Korean code is `ko` (Nestar used `kr`, which is a country code) |
 | Files / video | AWS S3 (private) + CloudFront signed URLs; MP4 in phase 1, MediaConvert HLS later |
 | AI tutor (later) | Amazon Bedrock → Claude Haiku 4.5 behind an `LlmProvider` interface; embeddings via Bedrock + pgvector |
-| Hosting | Frontend on Vercel. Backend on EC2 t4g.small with Docker Compose (api + batch + Redis + Caddy), RDS Postgres, SSM Parameter Store for secrets |
+| Hosting | Frontend on Vercel. Backend on EC2 t4g.small with Docker Compose (api + batch + Redis + Caddy), RDS Postgres, SSM Parameter Store for secrets. The backend image is built on the EC2 box itself (`git pull && docker compose build`, 2 GB swap), no image registry |
 | Tooling | Node 24, pnpm 12.11.2 via corepack (`"packageManager": "pnpm@12.11.2"`) |
 
 **Local dev:** only Postgres and Redis run in Docker (Docker Desktop, 4 CPU / 3 GB RAM). Nest and Next run natively with `pnpm dev`.
@@ -255,3 +255,4 @@ Order after day 14: Telegram bot (password reset + notifications) → quiz engin
 | 2026-10-24 | Demo login: no password, token flag + `@NotForDemo()` instead of DB checks, demo accounts flagged by the seed only with `DEMO_MODE=true`; landing hero uses the public site's photo wash |
 | 2026-10-24 | Parent phone home follows Stitch "Parent Mobile: Home" in a simpler form; the "More" tab stays a menu until its features exist — developer's rule "mobile simpler than desktop" |
 | 2026-10-24 | AI Study Tutor UI built ahead behind a `useTutor` stub (developer's choice: connect the API later); Calendar page stays a later phase |
+| 2026-10-26 | Deploy: the backend image is built on EC2 (like the bootcamp lessons), not pushed from the Mac to ECR — developer's choice (option A) |

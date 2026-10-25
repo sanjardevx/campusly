@@ -156,3 +156,6 @@ vite.config.ts.timestamp-*
 
 # Daily learning journal: kept locally, not in the repo
 docs/journal/
+
+# Agent handoff notes: kept locally, not in the repo
+docs/HANDOFF.md

@@ -3,6 +3,7 @@
 Campusly is a K-12 learning platform (LMS) for one private school: roles ADMIN, TEACHER, STUDENT, PARENT.
 It is a learning platform, **not** a school-management system (no timetable, rooms or homeroom).
 
+- **Start here (new session / new account):** [docs/HANDOFF.md](docs/HANDOFF.md) — current status, next steps, skills to install, context from earlier chats. **Local only** (git-ignored): never stage or commit it.
 - **Decisions:** [docs/DECISIONS.md](docs/DECISIONS.md) — read before designing anything. Do not contradict it silently.
 - **Plan:** [docs/PLAN.md](docs/PLAN.md) — 14-day MVP. "Start day N" means: read PLAN.md + DECISIONS.md, then work through that day.
 - **Journal:** `docs/journal/day-N.md` — written at the end of each day. **Local only** (git-ignored): never stage or commit it.
@@ -24,8 +25,10 @@ Before writing code for a step, explain in 3 short parts:
 3. **Flow** — for logic or APIs, describe the request path, e.g.
    `request → JwtAuthGuard checks the token → RolesGuard checks the role → service loads the course → AccessPolicy checks ownership → response`.
 
-Then implement in **small steps**. After each step: run it, show the result (query, test, screenshot of DB), then move on.
-Never write a whole day of code in one go. If the step is trivial (installing a package), one line of "why" is enough.
+Then implement the **whole PLAN step** (one checkbox) in one go — no need to split it into tiny pieces.
+Use judgement: split a big step into 2–3 parts, or merge several small related steps, when that is simpler.
+After each step: run the checks, show the result briefly (what works, test/typecheck output), then move on.
+Keep the explanation short (3–5 sentences total); if the step is trivial, one line of "why" is enough.
 
 ## Commands
 
@@ -117,4 +120,5 @@ The repo is private while it is being built. When the developer makes it public 
 1. Everything from the day runs; tests pass; `pnpm typecheck` is clean.
 2. Tick the day's boxes in `docs/PLAN.md`.
 3. Write `docs/journal/day-N.md` (local only, git-ignored): done (3–5 lines), deferred, 3 interview questions with short answers.
-4. Propose the commit (commit skill), commit and push to `develop` only after the developer approves.
+4. Update §2 "Current status" and §3 "What to do next" in `docs/HANDOFF.md`.
+5. Propose the commit (commit skill), commit and push to `develop` only after the developer approves.

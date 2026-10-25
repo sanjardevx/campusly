@@ -1,0 +1,10 @@
+# Keep the build context small and secret-free: only source goes into the image
+node_modules
+dist
+generated
+coverage
+.env
+.env.*
+*.pem
+*.log
+apps/*/test
