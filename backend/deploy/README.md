@@ -127,7 +127,7 @@ RDS → Create database:
 | Connectivity | Don't connect an EC2 resource · default VPC · **Public access: No** · security group **`campusly-db-sg`** only (remove `default`) · AZ = the EC2 box's AZ |
 | Monitoring | Performance / Database Insights off, Enhanced monitoring off |
 | Additional → Initial database name | **`campusly`** |
-| Additional → Backups | 7 days · encryption on · **deletion protection on** |
+| Additional → Backups | 7 days (the AWS **Free plan** allows only **1 day**; raise it after moving to the Paid plan, before real data) · encryption on · **deletion protection on** |
 
 Wait for **Available**, then copy the **Endpoint** (`campusly-db.xxxx.eu-central-1.rds.amazonaws.com`).
 
@@ -153,10 +153,12 @@ cd ~/campusly/backend
 bash deploy/env-from-ssm.sh                                          # SSM → .env.production (chmod 600)
 docker compose -f docker-compose.prod.yml --profile tools build      # ~10 min on t4g.small
 docker compose -f docker-compose.prod.yml run --rm tools pnpm prisma migrate deploy
-docker compose -f docker-compose.prod.yml run --rm tools pnpm prisma db seed   # demo data (wipes all tables)
+docker compose -f docker-compose.prod.yml run --rm -e SEED_ALLOW_RESET=true tools pnpm prisma db seed   # demo data
 docker compose -f docker-compose.prod.yml up -d
 docker compose -f docker-compose.prod.yml ps                         # api, batch, caddy, redis: Up
 ```
+
+The seed **empties every table** first, so it refuses any non-local database unless `SEED_ALLOW_RESET=true` is passed. Pass it only for this demo database.
 
 Health, on the box and from the Mac:
 

@@ -264,3 +264,4 @@ If a day slips, cut in this order: Q&A → CMS reduced to News + Enquiries → q
 | 2026-10-26 | Re-plan (developer's choice: finish fast): the project ends on day 20; phase 2 in minimal versions on days 16–20 after deploy (days 14–15); HLS, Socket.IO, Mock tests / Open Courses / Honor Students and PPTX ingestion move to a backlog |
 | 2026-10-26 | Separate prod S3 bucket + CloudFront for the server; the dev bucket stays for the Mac — developer's choice |
 | 2026-10-26 | AI tutor model: Claude Haiku 5.5 instead of 4.5 — same price, stronger, and 4.5 may reach end of life in `eu-central-1` in 2027 (developer's choice); Anthropic use-case form submitted on the AWS account, first call waits for AWS account verification |
+| 2026-10-26 | RDS backups: 1 day while the account is on the AWS Free plan (it refuses 7); raise to 7 days after moving to the Paid plan, before any real school data |

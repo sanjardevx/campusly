@@ -32,4 +32,4 @@ for p in params:
 mv "$OUT.tmp" "$OUT" # replace the old file only when the new one is complete
 
 # Names only, never the values
-echo "Wrote $OUT with: $(grep -o '^[A-Z_]*' "$OUT" | tr '\n' ' ')"
+echo "Wrote $OUT with: $(grep -o '^[A-Z0-9_]*' "$OUT" | tr '\n' ' ')"
