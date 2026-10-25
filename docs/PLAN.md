@@ -225,7 +225,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [x] Backend Dockerfile (multi-stage) for api and batch; `docker-compose.prod.yml` (api, batch, redis, caddy) — following lessons 166–169, Caddy instead of Nginx; the image is built on EC2.
 - [x] EC2 t4g.small: UFW, Docker, 2 GB swap, IAM role (no access keys on the box).
 - [x] RDS Postgres 17 (with pgvector), SSM parameters → `.env.production`, `prisma migrate deploy`, seed demo.
-- [ ] Batch: nightly demo reset (cron).
+- [x] Batch: nightly demo reset (cron).
 - [x] The API answers `health` on EC2.
 
 **Developer:** request Bedrock Anthropic model access in the AWS console today (approval can take time; needed on day 18).

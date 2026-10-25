@@ -1,7 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { createSeedClient, seedDemo } from '../../../prisma/demo-seed';
 import { StorageService } from '../../campusly-api/src/components/media/storage.service';
 import { PrismaService } from '../../campusly-api/src/database/prisma.service';
-import { STALE_UPLOAD_HOURS } from '../../campusly-api/src/libs/config';
+import {
+  STALE_UPLOAD_HOURS,
+  type Env,
+} from '../../campusly-api/src/libs/config';
 import { errorReason } from '../../campusly-api/src/libs/utils/error-reason';
 
 /** The work behind each cron job (the schedule itself is in BatchCron) */
@@ -12,6 +17,7 @@ export class CampuslyBatchService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly storageService: StorageService,
+    private readonly config: ConfigService<Env, true>,
   ) {}
 
   /**
@@ -49,5 +55,24 @@ export class CampuslyBatchService {
       data: { status: 'FAILED' },
     });
     return count;
+  }
+
+  /**
+   * The public demo goes back to fresh seed data every night, so one visitor's changes do not
+   * stay for the next. The story is moved forward in whole weeks, so deadlines and "this week"
+   * stay current. Call it only when DEMO_MODE=true (BatchCron checks): it wipes every table.
+   */
+  public async resetDemo(now = new Date()) {
+    const password = this.config.get('SEED_PASSWORD', { infer: true });
+    if (!password) throw new Error('SEED_PASSWORD is not set');
+    // Its own short connection: the seed writes columns that PrismaService hides
+    const client = createSeedClient(
+      this.config.get('DATABASE_URL', { infer: true }),
+    );
+    try {
+      return await seedDemo(client, { password, demoMode: true, shiftTo: now });
+    } finally {
+      await client.$disconnect();
+    }
   }
 }

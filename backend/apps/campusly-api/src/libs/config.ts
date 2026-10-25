@@ -22,6 +22,8 @@ const envSchema = z
       .enum(['true', 'false'])
       .default('false')
       .transform((v) => v === 'true'),
+    // The batch's nightly demo reset gives every seeded account this password (DEMO_MODE only)
+    SEED_PASSWORD: optional(z.string().min(8)),
 
     // Media (S3 + CloudFront). All or nothing: without them uploads and videos are off (CI, tests).
     AWS_REGION: z.string().default('eu-central-1'),
@@ -172,6 +174,9 @@ export const MAX_PENDING_UPLOADS = 20;
 export const UPLOAD_URL_TTL_SEC = 15 * 60;
 /** The batch app marks uploads still UPLOADING after this long as FAILED (and deletes the file) */
 export const STALE_UPLOAD_HOURS = 24;
+/** DEMO_MODE only: the batch app puts the demo data back every night at 03:00 school time */
+export const DEMO_RESET_CRON = '0 3 * * *';
+export const DEMO_RESET_TIMEZONE = 'Asia/Tashkent';
 /** A CloudFront video link works this long (DECISIONS §11: ~3 h) */
 export const VIDEO_URL_TTL_SEC = 3 * 60 * 60;
 

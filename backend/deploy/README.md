@@ -168,4 +168,6 @@ curl -s http://<ELASTIC_IP>/graphql -H 'content-type: application/json' \
 # {"data":{"health":{"status":"ok","postgres":true,"redis":true,"migration":"2026..."}}}
 ```
 
+Nightly demo reset: with `DEMO_MODE=true` the batch puts the demo data back at **03:00 Tashkent** (moved to the current week). Check the next morning: `docker compose -f docker-compose.prod.yml logs batch | grep BATCH_DEMO_RESET`. The batch reads the new code only after a rebuild: `docker compose -f docker-compose.prod.yml up -d --build`.
+
 Until day 15 `API_DOMAIN` is `:80` (plain HTTP on the Elastic IP). Day 15: set it to `api.campusly.uz` in SSM, run `env-from-ssm.sh` and `up -d` — Caddy gets the HTTPS certificate.
