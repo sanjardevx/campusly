@@ -11,7 +11,7 @@
       "Condition": {
         "StringEquals": {
           "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
-          "token.actions.githubusercontent.com:sub": "repo:sanjardev23/campusly:ref:refs/heads/develop"
+          "token.actions.githubusercontent.com:sub": "repo:sanjardev23@107606078/campusly@1420902278:ref:refs/heads/develop"
         }
       }
     }
