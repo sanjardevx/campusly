@@ -236,7 +236,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 - [ ] DNS: `campusly.uz` → Vercel, `api.campusly.uz` → EC2, `media.campusly.uz` → CloudFront (ACM certificate in us-east-1).
 - [ ] Frontend on Vercel (root `frontend/`), env vars; production CORS on the API and S3; the refresh cookie works across `campusly.uz` ↔ `api.campusly.uz`.
-- [ ] Smoke test all 4 roles on `campusly.uz`; AWS budget alerts on.
+- [ ] Smoke test all 4 roles on `campusly.uz`; AWS budget alerts on (zero-spend + monthly $35, DECISIONS §12).
 - [ ] Admin **Activity log** page — read-only `auditLogs(filter, page)` (action, user, date), with the before → after of each change (the rows are already written by every admin action).
 - [ ] Simple deploy script on EC2 (`git pull` + `docker compose up -d --build`); every later day ends with a deploy.
 
@@ -270,6 +270,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 - [ ] Ingest lesson PDFs → chunks → Bedrock embeddings → pgvector (`DocumentChunk`).
 - [ ] `LlmProvider` + Bedrock Claude Haiku 5.5; SSE chat endpoint.
+  - Deploy: `BEDROCK_CHAT_MODEL_ID` / `BEDROCK_EMBED_MODEL_ID` (SSM String, `ssm-put-params.sh`, `.env.example`); `iam-ec2-policy.json` gets `bedrock:InvokeModel` + `InvokeModelWithResponseStream` on the inference-profile ARN **and** the foundation-model ARNs of every region the EU profile routes to, plus `InvokeModel` for the embedding model.
 - [ ] Help levels 1–4 and the assignment's `tutorMode`; off during quizzes.
 - [ ] Daily limit per student + global budget (Redis).
 - [ ] The `useTutor` stub calls the real API; a test proves parents cannot read tutor conversations; deploy.

@@ -39,7 +39,7 @@ CloudFront:
 2. Key groups → Create `campusly-prod` with that key.
 3. Distributions → Create: origin = the prod bucket, **Origin access control (OAC)** → create new; Viewer protocol policy **Redirect HTTP to HTTPS**; **Restrict viewer access: Yes → Trusted key groups → `campusly-prod`**; WAF off.
 4. Copy the bucket policy CloudFront offers → S3 bucket → Permissions → Bucket policy → paste.
-5. Note the distribution domain `dxxxx.cloudfront.net` (`CLOUDFRONT_DOMAIN`). The `media.campusly.uz` alias comes on day 15.
+5. Note the distribution domain `dxxxx.cloudfront.net`. Day 15: alternate domain `media.campusly.uz` + an ACM certificate from **us-east-1** (CloudFront only takes certificates from there); `CLOUDFRONT_DOMAIN` = `media.campusly.uz`.
 
 ## 3. IAM role for the EC2 box (no access keys on the server)
 
@@ -142,7 +142,7 @@ DB_HOST=<rds endpoint> bash ssm-put-params.sh
 rm cf-prod-private.pem
 ```
 
-It writes `/campusly/prod/*`: settings as String, secrets as SecureString (JWT secrets, seed password and `DATABASE_URL` are generated in CloudShell and never shown). Run it again any time: settings are refreshed, secrets are kept. Check: Systems Manager → Parameter Store.
+It writes `/campusly/prod/*`: settings as String, secrets as SecureString (JWT secrets, seed password and `DATABASE_URL` are generated in CloudShell and never shown). Run it again any time: it only adds missing parameters (later runs need no `DB_*` values) and never changes existing ones. To change a setting: `aws ssm put-parameter --name /campusly/prod/NAME --value VALUE --overwrite`, then on the box `bash deploy/env-from-ssm.sh && docker compose -f docker-compose.prod.yml up -d`. Check: Systems Manager → Parameter Store.
 
 ## 9. First deploy on the box
 
@@ -170,4 +170,34 @@ curl -s http://<ELASTIC_IP>/graphql -H 'content-type: application/json' \
 
 Nightly demo reset: with `DEMO_MODE=true` the batch puts the demo data back at **03:00 Tashkent** (moved to the current week). Check the next morning: `docker compose -f docker-compose.prod.yml logs batch | grep BATCH_DEMO_RESET`. The batch reads the new code only after a rebuild: `docker compose -f docker-compose.prod.yml up -d --build`.
 
-Until day 15 `API_DOMAIN` is `:80` (plain HTTP on the Elastic IP). Day 15: set it to `api.campusly.uz` in SSM, run `env-from-ssm.sh` and `up -d` — Caddy gets the HTTPS certificate.
+`API_DOMAIN` is the address Caddy serves: `:80` (plain HTTP on the Elastic IP) before the domain worked, `api.campusly.uz` since day 15 — Caddy then gets and renews the Let's Encrypt certificate by itself (HTTP → 308 HTTPS).
+
+## 10. DNS (aHOST DNS manager, name servers `rdns1-3.ahost.uz`)
+
+| Name | Type | Value |
+|---|---|---|
+| `api` | A | Elastic IP `3.126.181.136` (TTL 300) |
+| `media` | CNAME | `d13njm9qjhav5w.cloudfront.net` + the ACM validation CNAME (certificate in **us-east-1**) |
+| `@`, `www` | A / CNAME | the Vercel values (frontend) — until then aHOST defaults |
+
+aHOST quirk: write full names with a **trailing dot** (`_xxxx.media.campusly.uz.`), otherwise the panel adds the zone twice.
+
+## 11. Frontend on Vercel
+
+The frontend is not on EC2: Vercel builds `frontend/` from GitHub on every push to `develop` and serves it from its CDN with HTTPS.
+
+Vercel → Add New → Project → import `sanjardev23/campusly` (GitHub sign-in):
+
+| Setting | Value |
+|---|---|
+| Root Directory | **`frontend`** |
+| Framework | Next.js (detected) · build `next build` (default) |
+| Production branch | `develop` (Settings → Git) |
+| Node.js version | **24.x** (Settings → Build and Deployment) |
+| Environment variables (Production) | `NEXT_PUBLIC_API_URL=https://api.campusly.uz` · `NEXT_PUBLIC_DEMO_MODE=true` · `ENABLE_EXPERIMENTAL_COREPACK=1` (Vercel then uses pnpm 12.11.2 from `packageManager`) |
+
+`NEXT_PUBLIC_*` values are baked in at build time: after changing one, **Redeploy**.
+
+Domains (Project → Settings → Domains): add `campusly.uz` and `www.campusly.uz` → redirect `www` to `campusly.uz`. Vercel shows the DNS records; set them in aHOST (trailing dot rule, §10), replacing the aHOST defaults on `@` and `www`. The certificate comes by itself once DNS points to Vercel.
+
+Why it works across two hosts: `campusly.uz` and `api.campusly.uz` are the **same site** (same registrable domain), so the browser sends the `SameSite=Lax` refresh cookie (`Path=/auth`, host `api.campusly.uz` only) on `fetch(..., { credentials: 'include' })`; the API allows only `FRONTEND_URL=https://campusly.uz` in CORS. A `*.vercel.app` URL is not in the API's CORS list, so it cannot talk to the API: test on `https://campusly.uz`.

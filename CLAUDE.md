@@ -3,7 +3,7 @@
 Campusly is a K-12 learning platform (LMS) for one private school: roles ADMIN, TEACHER, STUDENT, PARENT.
 It is a learning platform, **not** a school-management system (no timetable, rooms or homeroom).
 
-- **Start here (new session / new account):** [docs/HANDOFF.md](docs/HANDOFF.md) — current status, next steps, skills to install, context from earlier chats. **Local only** (git-ignored): never stage or commit it.
+- **Start here (new session / new account):** [docs/HANDOFF.md](docs/HANDOFF.md) — a one-time start guide (status at hand-off, skills to install, context from earlier chats). **Read only, local only** (git-ignored): do not update or commit it; the current status lives in PLAN.md and the journal.
 - **Decisions:** [docs/DECISIONS.md](docs/DECISIONS.md) — read before designing anything. Do not contradict it silently.
 - **Plan:** [docs/PLAN.md](docs/PLAN.md) — 14-day MVP. "Start day N" means: read PLAN.md + DECISIONS.md, then work through that day.
 - **Journal:** `docs/journal/day-N.md` — written at the end of each day. **Local only** (git-ignored): never stage or commit it.
@@ -120,5 +120,4 @@ The repo is private while it is being built. When the developer makes it public 
 1. Everything from the day runs; tests pass; `pnpm typecheck` is clean.
 2. Tick the day's boxes in `docs/PLAN.md`.
 3. Write `docs/journal/day-N.md` (local only, git-ignored): done (3–5 lines), deferred, 3 interview questions with short answers.
-4. Update §2 "Current status" and §3 "What to do next" in `docs/HANDOFF.md`.
-5. Propose the commit (commit skill), commit and push to `develop` only after the developer approves.
+4. Propose the commit (commit skill), commit and push to `develop` only after the developer approves.
