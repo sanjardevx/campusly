@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "MediaObjects",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::PROD_BUCKET/*"
+    },
+    {
+      "Sid": "ReadSecrets",
+      "Effect": "Allow",
+      "Action": ["ssm:GetParametersByPath", "ssm:GetParameter"],
+      "Resource": [
+        "arn:aws:ssm:eu-central-1:ACCOUNT_ID:parameter/campusly/prod",
+        "arn:aws:ssm:eu-central-1:ACCOUNT_ID:parameter/campusly/prod/*"
+      ]
+    }
+  ]
+}

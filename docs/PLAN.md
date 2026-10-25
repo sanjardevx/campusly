@@ -1,6 +1,7 @@
-# Campusly — 14-Day MVP Plan
+# Campusly — Plan (MVP days 1–14, phase 2 days 15–20)
 
-Time box: 2 weeks, ~85 hours. **L** = long day (8 h), **S** = short day (3–4 h).
+Time box: days 1–13 built the MVP (~85 hours); days 14–20 are all **L** days: deploy first, then the phase 2 features in a **minimal working version**, each deployed the same day. **L** = long day (8 h), **S** = short day (3–4 h).
+The project must be finished by **day 20** (re-planned 2026-10-26; the old phase 2 estimate was ~18 days).
 Decisions live in [DECISIONS.md](DECISIONS.md). Working rules for the agent live in [../CLAUDE.md](../CLAUDE.md).
 
 When the user says **"start day N"**: read this file and DECISIONS.md, then follow the teaching format in CLAUDE.md.
@@ -11,7 +12,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 3. Write `docs/journal/day-N.md` (local only, git-ignored): what was done (3–5 lines), what was deferred, and 3 interview questions with short answers.
 4. Tick the checkboxes below.
 
-**No buffer.** If behind schedule, cut in this order: CSV import → announcement read receipts → mobile polish → PeriodGrade publish.
+**No buffer.** If days 15–20 fall behind, cut in this order: Q&A → CMS reduced to News + Enquiries → quiz Number questions → Telegram notifications (password reset stays). Cut items go to the [Backlog](#backlog-after-day-20).
 
 ---
 
@@ -32,9 +33,15 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 | 11 | L | Teacher UI |
 | 12 | S | Student UI |
 | 13 | S | Parent UI, mini landing + demo login, mobile pass |
-| 14 | S | Deploy (EC2 + RDS + S3/CloudFront + Vercel) → demo ready |
+| 14 | L | Backend deploy: Docker image, compose + Caddy, EC2, RDS, SSM, nightly demo reset |
+| 15 | L | MVP live: domain DNS, Vercel, CORS, smoke test, budget alerts, admin Activity log |
+| 16 | L | Telegram bot: account linking, password reset link, notifications (BullMQ) |
+| 17 | L | Quiz engine: MC / True-False / Number, timer, 1 attempt, auto-grade → gradebook |
+| 18 | L | AI Study Tutor backend: PDF → pgvector, Bedrock Haiku 5.5, SSE chat, limits; connect the UI |
+| 19 | L | Public website + minimal CMS: News & Events, Programs, Our team, Enquiries |
+| 20 | L | Q&A, student / parent calendar page, final fixes, README, public-repo prep → **done** |
 
-**External prerequisites:** AWS account ready by the end of day 4 (S3 on day 6). Domain DNS ready by day 13.
+**External prerequisites:** AWS account ready by the end of day 4 (S3 on day 6). Domain `campusly.uz` active with DNS access by day 15 (if not, days 15 and 16 swap). Bedrock Anthropic model access requested on day 14 (needed on day 18). Telegram bot token from BotFather by day 16.
 
 ---
 
@@ -209,28 +216,94 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [x] Parent dashboard with child switcher (child in URL), grades, attendance, missing assignments, announcements.
 - [x] Logged-out home: mini landing + login + per-role "Demo login" buttons (`DEMO_MODE`).
 - [x] Mobile pass for student and parent pages.
-- [ ] Domain DNS ready.
+- [ ] Domain DNS ready. → moved to day 15 (`campusly.uz` is registered at aHOST, waiting for activation).
 
 ---
 
-## Day 14 (S) — Deploy
+## Day 14 (L) — Backend deploy
 
-- [ ] Backend Dockerfile (multi-stage) for api and batch; `docker-compose.prod.yml` (api, batch, redis, caddy) on EC2 — following lessons 166–169, Caddy instead of Nginx.
-- [ ] RDS Postgres (with pgvector), SSM parameters, `prisma migrate deploy`, seed demo.
-- [ ] Frontend on Vercel (root `frontend/`), env vars, custom domain.
+- [x] Backend Dockerfile (multi-stage) for api and batch; `docker-compose.prod.yml` (api, batch, redis, caddy) — following lessons 166–169, Caddy instead of Nginx; the image is built on EC2.
+- [x] EC2 t4g.small: UFW, Docker, 2 GB swap, IAM role (no access keys on the box).
+- [ ] RDS Postgres 17 (with pgvector), SSM parameters → `.env.production`, `prisma migrate deploy`, seed demo.
+- [ ] Batch: nightly demo reset (cron).
+- [ ] The API answers `health` on EC2.
+
+**Developer:** request Bedrock Anthropic model access in the AWS console today (approval can take time; needed on day 18).
+
+---
+
+## Day 15 (L) — MVP live
+
+- [ ] DNS: `campusly.uz` → Vercel, `api.campusly.uz` → EC2, `media.campusly.uz` → CloudFront (ACM certificate in us-east-1).
+- [ ] Frontend on Vercel (root `frontend/`), env vars; production CORS on the API and S3; the refresh cookie works across `campusly.uz` ↔ `api.campusly.uz`.
 - [ ] Smoke test all 4 roles on `campusly.uz`; AWS budget alerts on.
-- [ ] If time is left: admin **Activity log** page — read-only `auditLogs(filter, page)` (action, user, date), with the before → after of each change (the rows are already written by every admin action).
+- [ ] Admin **Activity log** page — read-only `auditLogs(filter, page)` (action, user, date), with the before → after of each change (the rows are already written by every admin action).
+- [ ] Simple deploy script on EC2 (`git pull` + `docker compose up -d --build`); every later day ends with a deploy.
 
-**Done when:** the demo works end-to-end on the real domain.
+**Done when:** the demo works end-to-end on the real domain. If the domain is not active yet, swap days 15 and 16 (the refresh cookie needs the frontend and the API under one site).
 
 ---
 
-## After day 14 (in order)
+## Day 16 (L) — Telegram bot
 
-1. Telegram bot — password reset + notifications
-2. Quiz engine
-3. AI Study Tutor
-4. Website CMS + public site
-5. Q&A and calendar
-6. HLS (MediaConvert) + multipart upload
-7. Socket.IO notifications
+- [ ] Webhook endpoint (`@Public()` + secret token header).
+- [ ] Account linking: a parent shares their phone contact (matched to the parent login); a student links with a one-time code.
+- [ ] Password reset through a one-time link (`OneTimeToken`); the "Reset in Telegram" button from Settings starts it.
+- [ ] Notifications through BullMQ: grade published, new announcement, homework due tomorrow.
+- [ ] e2e + isolation tests; deploy.
+
+**Developer:** bot token from BotFather.
+
+---
+
+## Day 17 (L) — Quiz engine
+
+- [ ] `QuizQuestion`, `QuizAttempt`, `QuizAnswer` tables + migration.
+- [ ] Teacher editor: MC / True-False / Number questions, time limit (the "Quiz" item in the Add menu stops being "coming soon").
+- [ ] Student: timer, 1 attempt, time checked on the server, auto-grade → `Submission` score → gradebook.
+- [ ] Results go out through the existing "publish grades" flow.
+- [ ] Isolation tests; deploy.
+
+---
+
+## Day 18 (L) — AI Study Tutor backend
+
+- [ ] Ingest lesson PDFs → chunks → Bedrock embeddings → pgvector (`DocumentChunk`).
+- [ ] `LlmProvider` + Bedrock Claude Haiku 5.5; SSE chat endpoint.
+- [ ] Help levels 1–4 and the assignment's `tutorMode`; off during quizzes.
+- [ ] Daily limit per student + global budget (Redis).
+- [ ] The `useTutor` stub calls the real API; a test proves parents cannot read tutor conversations; deploy.
+
+---
+
+## Day 19 (L) — Public website + minimal CMS
+
+- [ ] CMS tables: News & Events, Programs, Our team, Enquiries + migration.
+- [ ] Admin CMS pages: list + drawer, publish / archive (no hard delete, audited).
+- [ ] Public pages from Stitch "Campusly Public": home, news, programs, team, contact form.
+- [ ] Enquiry form: rate limit, admin inbox.
+- [ ] Deploy.
+
+---
+
+## Day 20 (L) — Q&A, calendar, finish
+
+- [ ] Q&A: a student asks under a lesson, the teacher answers (`CourseQuestion`); the teacher dashboard card goes live.
+- [ ] Calendar page for students and parents (the `studentCalendar` API already exists).
+- [ ] Bug fixes; final smoke test of all 4 roles.
+- [ ] README: architecture diagram, demo accounts, screenshots.
+- [ ] Public-repo prep (see CLAUDE.md "Before the repo goes public"; purging the journal history only after the developer approves).
+
+**Done when:** every day 15–20 feature works on `campusly.uz`, and the repo is ready to go public.
+
+---
+
+## Backlog (after day 20)
+
+Only if needed after the school's feedback:
+
+- HLS (MediaConvert) + multipart upload — MP4 is enough for now.
+- Socket.IO notifications — Telegram covers notifications.
+- Public site: Mock tests, Open Courses, Honor Students.
+- Tutor: PPTX ingestion (PDF only for now).
+- Manual `finalScore` override UI; parent "More" page (notifications, Telegram, report a problem); longer refresh grace window for interrupted `/auth/refresh` calls.
