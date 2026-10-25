@@ -234,10 +234,10 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 15 (L) — MVP live
 
-- [ ] DNS: `campusly.uz` → Vercel, `api.campusly.uz` → EC2, `media.campusly.uz` → CloudFront (ACM certificate in us-east-1).
-- [ ] Frontend on Vercel (root `frontend/`), env vars; production CORS on the API and S3; the refresh cookie works across `campusly.uz` ↔ `api.campusly.uz`.
-- [ ] Smoke test all 4 roles on `campusly.uz`; AWS budget alerts on (zero-spend + monthly $35, DECISIONS §12).
-- [ ] Admin **Activity log** page — read-only `auditLogs(filter, page)` (action, user, date), with the before → after of each change (the rows are already written by every admin action).
+- [x] DNS: `campusly.uz` → Vercel, `api.campusly.uz` → EC2, `media.campusly.uz` → CloudFront (ACM certificate in us-east-1).
+- [x] Frontend on Vercel (root `frontend/`), env vars; production CORS on the API and S3; the refresh cookie works across `campusly.uz` ↔ `api.campusly.uz`.
+- [x] Smoke test all 4 roles on `campusly.uz`; AWS budget alerts on (zero-spend + monthly $35, DECISIONS §12).
+- [x] Admin **Activity log** page — read-only `auditLogs(filter, page)` (action, user, date), with the before → after of each change (the rows are already written by every admin action).
 - [ ] Simple deploy script on EC2 (`git pull` + `docker compose up -d --build`); every later day ends with a deploy.
 
 **Done when:** the demo works end-to-end on the real domain. If the domain is not active yet, swap days 15 and 16 (the refresh cookie needs the frontend and the API under one site).

@@ -206,6 +206,43 @@ type AttentionStudent {
   studentId: String!
 }
 
+type AuditActor {
+  firstName: String!
+  id: String!
+  lastName: String!
+  loginId: String!
+  role: Role!
+}
+
+type AuditChange {
+  after: String
+  before: String
+  field: String!
+}
+
+type AuditLogItem {
+  action: String!
+  actor: AuditActor
+  changes: [AuditChange!]!
+  createdAt: DateTime!
+  entityId: String
+  entityType: String!
+  id: String!
+  target: String
+}
+
+type AuditLogs {
+  list: [AuditLogItem!]!
+  metaCounter: TotalCounter!
+}
+
+input AuditLogsInquiry {
+  action: String
+  actorId: String
+  limit: Int!
+  page: Int!
+}
+
 type CalendarEvent {
   assignmentId: String
   courseId: String
@@ -1013,6 +1050,7 @@ type Query {
   assignmentSubmissions(assignmentId: String!): [GradebookRow!]!
   attendanceJournal(courseId: String!, from: String!, to: String!): AttendanceJournal!
   attendanceOverview(range: AttendanceRange!): AttendanceOverview!
+  auditLogs(input: AuditLogsInquiry!): AuditLogs!
   courseAnnualGrades(courseId: String!): [MyPeriodGrades!]!
   courseAssignments(courseId: String!): [Assignment!]!
   courseAttendance(courseId: String!, date: String!): CourseAttendance!

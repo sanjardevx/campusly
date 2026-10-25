@@ -292,3 +292,32 @@ export const DASHBOARD_CALENDAR = graphql(`
     }
   }
 `);
+
+export const AUDIT_LOGS = graphql(`
+  query AuditLogs($input: AuditLogsInquiry!) {
+    auditLogs(input: $input) {
+      list {
+        id
+        action
+        entityType
+        target
+        createdAt
+        actor {
+          id
+          loginId
+          firstName
+          lastName
+          role
+        }
+        changes {
+          field
+          before
+          after
+        }
+      }
+      metaCounter {
+        total
+      }
+    }
+  }
+`);

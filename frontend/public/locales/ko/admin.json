@@ -646,5 +646,118 @@
       "notePlaceholder": "장소, 대상…",
       "save": "저장"
     }
+  },
+  "activity": {
+    "title": "활동 기록",
+    "subtitle": "누가 언제 무엇을 바꿨는지 보여 줍니다. 읽기 전용 — 모든 관리자 작업과 채점이 기록됩니다.",
+    "filters": {
+      "action": "작업",
+      "allActions": "모든 작업",
+      "onlyActor": "{{name}}만"
+    },
+    "groups": {
+      "people": "사용자",
+      "school": "학교 설정",
+      "courses": "강좌",
+      "grades": "성적",
+      "records": "문서"
+    },
+    "col": {
+      "when": "시간",
+      "who": "사용자",
+      "action": "작업",
+      "target": "변경 대상"
+    },
+    "system": "시스템",
+    "details": "변경 내용 보기",
+    "noChanges": "이 작업에는 저장된 세부 정보가 없습니다.",
+    "empty": "(비어 있음)",
+    "emptyLog": "아직 변경된 내용이 없습니다.",
+    "emptyFiltered": "이 필터에 맞는 작업이 없습니다.",
+    "actions": {
+      "user": {
+        "create": "계정 생성",
+        "update": "계정 수정",
+        "resetPassword": "비밀번호 재설정",
+        "block": "계정 차단",
+        "unblock": "계정 차단 해제"
+      },
+      "users": {
+        "import": "CSV로 학생 가져오기"
+      },
+      "parent": {
+        "link": "보호자 연결",
+        "unlink": "보호자 연결 해제"
+      },
+      "student": {
+        "moveClass": "학생 반 이동"
+      },
+      "settings": {
+        "update": "학교 설정 변경"
+      },
+      "academicYear": {
+        "create": "학년도 생성",
+        "update": "학년도 수정"
+      },
+      "period": {
+        "create": "분기 생성",
+        "update": "분기 수정"
+      },
+      "subject": {
+        "create": "과목 생성",
+        "update": "과목 수정"
+      },
+      "group": {
+        "create": "반 생성",
+        "update": "반 수정"
+      },
+      "course": {
+        "create": "강좌 생성",
+        "update": "강좌 수정",
+        "setTeachers": "강좌 교사 변경",
+        "setStudents": "강좌 학생 변경",
+        "gradeCategories": "성적 비중 변경"
+      },
+      "announcement": {
+        "archive": "공지 보관"
+      },
+      "submission": {
+        "grade": "제출물 채점",
+        "return": "제출물 반환"
+      },
+      "assignment": {
+        "zeroMissing": "미제출 0점 처리",
+        "publishGrades": "과제 성적 공개"
+      },
+      "periodGrades": {
+        "publish": "분기 성적 공개"
+      },
+      "periodGrade": {
+        "override": "최종 성적 변경"
+      },
+      "records": {
+        "export": "문서 다운로드 또는 인쇄"
+      },
+      "schoolEvent": {
+        "create": "캘린더 일정 추가",
+        "update": "일정 수정",
+        "archive": "일정 삭제"
+      }
+    },
+    "entities": {
+      "User": "계정",
+      "Course": "강좌",
+      "Group": "반",
+      "Subject": "과목",
+      "AcademicYear": "학년도",
+      "Period": "분기",
+      "PeriodGrade": "분기 성적",
+      "Assignment": "과제",
+      "Submission": "제출물",
+      "Announcement": "공지",
+      "SchoolEvent": "일정",
+      "SchoolSetting": "학교 설정",
+      "ParentStudent": "보호자 연결"
+    }
   }
 }

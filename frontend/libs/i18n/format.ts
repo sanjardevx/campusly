@@ -12,6 +12,13 @@ export function formatDate(value: string | Date, locale = 'en'): string {
   return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(date);
 }
 
+/** Date and time for logs: "Oct 26, 2026, 21:05" (Uzbek: "26.10.2026 21:05") */
+export function formatDateTime(value: string | Date, locale = 'en'): string {
+  const date = typeof value === 'string' ? new Date(value) : value;
+  if (locale === 'uz') return `${formatDate(date, locale)} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+}
+
 /**
  * How long ago a user was active, like Stitch: "Today, 08:12" · "Yesterday" · "3 days ago" ·
  * "2 weeks ago" · then a date. Calendar days on the viewer's clock, so "yesterday" means the

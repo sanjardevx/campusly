@@ -657,5 +657,118 @@
       "notePlaceholder": "Place, who it is for…",
       "save": "Save"
     }
+  },
+  "activity": {
+    "title": "Activity log",
+    "subtitle": "Who changed what and when. Read only — every admin and grading action is recorded.",
+    "filters": {
+      "action": "Action",
+      "allActions": "All actions",
+      "onlyActor": "Only {{name}}"
+    },
+    "groups": {
+      "people": "People",
+      "school": "School setup",
+      "courses": "Courses",
+      "grades": "Grades",
+      "records": "Records"
+    },
+    "col": {
+      "when": "When",
+      "who": "Who",
+      "action": "Action",
+      "target": "Changed"
+    },
+    "system": "System",
+    "details": "Show changes",
+    "noChanges": "No details were saved for this action.",
+    "empty": "(empty)",
+    "emptyLog": "Nothing has been changed yet.",
+    "emptyFiltered": "No actions match these filters.",
+    "actions": {
+      "user": {
+        "create": "Created an account",
+        "update": "Edited an account",
+        "resetPassword": "Reset a password",
+        "block": "Blocked an account",
+        "unblock": "Unblocked an account"
+      },
+      "users": {
+        "import": "Imported students from CSV"
+      },
+      "parent": {
+        "link": "Linked a parent",
+        "unlink": "Unlinked a parent"
+      },
+      "student": {
+        "moveClass": "Moved a student to another class"
+      },
+      "settings": {
+        "update": "Changed school settings"
+      },
+      "academicYear": {
+        "create": "Created a school year",
+        "update": "Edited a school year"
+      },
+      "period": {
+        "create": "Created a quarter",
+        "update": "Edited a quarter"
+      },
+      "subject": {
+        "create": "Created a subject",
+        "update": "Edited a subject"
+      },
+      "group": {
+        "create": "Created a class",
+        "update": "Edited a class"
+      },
+      "course": {
+        "create": "Created a course",
+        "update": "Edited a course",
+        "setTeachers": "Changed course teachers",
+        "setStudents": "Changed course students",
+        "gradeCategories": "Changed grade weights"
+      },
+      "announcement": {
+        "archive": "Archived an announcement"
+      },
+      "submission": {
+        "grade": "Graded a submission",
+        "return": "Returned a submission"
+      },
+      "assignment": {
+        "zeroMissing": "Gave zero for missing work",
+        "publishGrades": "Published assignment grades"
+      },
+      "periodGrades": {
+        "publish": "Published quarter grades"
+      },
+      "periodGrade": {
+        "override": "Changed a final grade"
+      },
+      "records": {
+        "export": "Downloaded or printed a document"
+      },
+      "schoolEvent": {
+        "create": "Added a calendar event",
+        "update": "Edited a calendar event",
+        "archive": "Removed a calendar event"
+      }
+    },
+    "entities": {
+      "User": "Account",
+      "Course": "Course",
+      "Group": "Class",
+      "Subject": "Subject",
+      "AcademicYear": "School year",
+      "Period": "Quarter",
+      "PeriodGrade": "Quarter grade",
+      "Assignment": "Assignment",
+      "Submission": "Submission",
+      "Announcement": "Announcement",
+      "SchoolEvent": "Calendar event",
+      "SchoolSetting": "School settings",
+      "ParentStudent": "Parent link"
+    }
   }
 }

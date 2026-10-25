@@ -657,5 +657,118 @@
       "notePlaceholder": "Joyi, kimlar uchun…",
       "save": "Saqlash"
     }
+  },
+  "activity": {
+    "title": "Faollik jurnali",
+    "subtitle": "Kim nimani va qachon o‘zgartirgani. Faqat o‘qish uchun — har bir admin va baholash amali yoziladi.",
+    "filters": {
+      "action": "Amal",
+      "allActions": "Barcha amallar",
+      "onlyActor": "Faqat {{name}}"
+    },
+    "groups": {
+      "people": "Foydalanuvchilar",
+      "school": "Maktab sozlamalari",
+      "courses": "Kurslar",
+      "grades": "Baholar",
+      "records": "Hujjatlar"
+    },
+    "col": {
+      "when": "Qachon",
+      "who": "Kim",
+      "action": "Amal",
+      "target": "Nima o‘zgardi"
+    },
+    "system": "Tizim",
+    "details": "O‘zgarishlarni ko‘rsatish",
+    "noChanges": "Bu amal uchun tafsilot saqlanmagan.",
+    "empty": "(bo‘sh)",
+    "emptyLog": "Hali hech narsa o‘zgartirilmagan.",
+    "emptyFiltered": "Bu filtrlarga mos amal yo‘q.",
+    "actions": {
+      "user": {
+        "create": "Akkaunt yaratdi",
+        "update": "Akkauntni tahrirladi",
+        "resetPassword": "Parolni tikladi",
+        "block": "Akkauntni blokladi",
+        "unblock": "Akkauntni blokdan chiqardi"
+      },
+      "users": {
+        "import": "CSV’dan o‘quvchilarni yukladi"
+      },
+      "parent": {
+        "link": "Ota-onani bog‘ladi",
+        "unlink": "Ota-ona bog‘lanishini uzdi"
+      },
+      "student": {
+        "moveClass": "O‘quvchini boshqa sinfga o‘tkazdi"
+      },
+      "settings": {
+        "update": "Maktab sozlamalarini o‘zgartirdi"
+      },
+      "academicYear": {
+        "create": "O‘quv yili yaratdi",
+        "update": "O‘quv yilini tahrirladi"
+      },
+      "period": {
+        "create": "Chorak yaratdi",
+        "update": "Chorakni tahrirladi"
+      },
+      "subject": {
+        "create": "Fan yaratdi",
+        "update": "Fanni tahrirladi"
+      },
+      "group": {
+        "create": "Sinf yaratdi",
+        "update": "Sinfni tahrirladi"
+      },
+      "course": {
+        "create": "Kurs yaratdi",
+        "update": "Kursni tahrirladi",
+        "setTeachers": "Kurs o‘qituvchilarini o‘zgartirdi",
+        "setStudents": "Kurs o‘quvchilarini o‘zgartirdi",
+        "gradeCategories": "Baho vaznlarini o‘zgartirdi"
+      },
+      "announcement": {
+        "archive": "E’lonni arxivladi"
+      },
+      "submission": {
+        "grade": "Topshiriqni baholadi",
+        "return": "Topshiriqni qaytardi"
+      },
+      "assignment": {
+        "zeroMissing": "Topshirilmaganlarga nol qo‘ydi",
+        "publishGrades": "Topshiriq baholarini e’lon qildi"
+      },
+      "periodGrades": {
+        "publish": "Chorak baholarini e’lon qildi"
+      },
+      "periodGrade": {
+        "override": "Yakuniy bahoni o‘zgartirdi"
+      },
+      "records": {
+        "export": "Hujjatni yuklab oldi yoki chop etdi"
+      },
+      "schoolEvent": {
+        "create": "Kalendarga tadbir qo‘shdi",
+        "update": "Tadbirni tahrirladi",
+        "archive": "Tadbirni olib tashladi"
+      }
+    },
+    "entities": {
+      "User": "Akkaunt",
+      "Course": "Kurs",
+      "Group": "Sinf",
+      "Subject": "Fan",
+      "AcademicYear": "O‘quv yili",
+      "Period": "Chorak",
+      "PeriodGrade": "Chorak bahosi",
+      "Assignment": "Topshiriq",
+      "Submission": "Javob",
+      "Announcement": "E’lon",
+      "SchoolEvent": "Tadbir",
+      "SchoolSetting": "Maktab sozlamalari",
+      "ParentStudent": "Ota-ona bog‘lanishi"
+    }
   }
 }

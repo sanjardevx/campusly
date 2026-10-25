@@ -16,6 +16,7 @@ import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
 import { useRouter } from 'next/router';
@@ -102,7 +103,10 @@ export const NAV: Record<Role, NavSection[]> = {
     },
     {
       title: 'system',
-      items: [{ key: 'settings', href: '/_admin/settings', icon: SettingsOutlinedIcon, day: 10 }],
+      items: [
+        { key: 'settings', href: '/_admin/settings', icon: SettingsOutlinedIcon, day: 10 },
+        { key: 'activity', href: '/_admin/activity', icon: HistoryOutlinedIcon, day: 15 },
+      ],
     },
   ],
 };

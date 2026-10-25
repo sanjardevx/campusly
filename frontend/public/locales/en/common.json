@@ -55,7 +55,8 @@
       "overview": "Home",
       "attendance": "Attendance"
     },
-    "tutor": "AI Study Tutor"
+    "tutor": "AI Study Tutor",
+    "activity": "Activity log"
   },
   "shell": {
     "portal": {

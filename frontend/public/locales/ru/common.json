@@ -55,7 +55,8 @@
       "overview": "Главная",
       "attendance": "Явка"
     },
-    "tutor": "ИИ-помощник"
+    "tutor": "ИИ-помощник",
+    "activity": "Журнал действий"
   },
   "shell": {
     "portal": {
