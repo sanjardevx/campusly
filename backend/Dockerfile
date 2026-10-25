@@ -8,10 +8,16 @@
 
 # ── base: Node + pnpm (the version comes from "packageManager" in package.json) ──
 FROM node:24-bookworm-slim AS base
-# openssl: Prisma's migration engine needs it
+# openssl: Prisma's migration engine needs it; ca-certificates: the trust store for RDS SSL
 RUN apt-get update \
   && apt-get install -y --no-install-recommends openssl ca-certificates \
   && rm -rf /var/lib/apt/lists/*
+# RDS accepts only SSL connections, signed by Amazon's own certificate authority.
+# Trust it twice: the system store (Prisma's migration engine) and Node (api, batch, seed).
+ADD --chmod=644 https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem \
+  /usr/local/share/ca-certificates/rds-global-bundle.crt
+RUN update-ca-certificates
+ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/rds-global-bundle.crt
 RUN corepack enable
 WORKDIR /app
 
@@ -35,9 +41,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # ── runtime: what actually runs on the server ──
-FROM node:24-bookworm-slim AS runtime
+FROM base AS runtime
 ENV NODE_ENV=production
-WORKDIR /app
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json ./

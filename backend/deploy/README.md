@@ -104,4 +104,66 @@ printf 'Host github.com\n  IdentityFile ~/.ssh/github_deploy\n' >> ~/.ssh/config
 git clone -b develop git@github.com:sanjardev23/campusly.git ~/campusly
 ```
 
-Next: RDS + SSM → `.env.production`, `prisma migrate deploy`, seed (section 7, day 14).
+## 7. RDS Postgres (private, SSL only)
+
+First a password, in **CloudShell** (console top bar → CloudShell icon, region eu-central-1). Keep this tab open: step 8 uses the same variable.
+
+```bash
+export DB_PASSWORD=$(openssl rand -hex 24) && echo "$DB_PASSWORD"   # copy it into the RDS form below
+```
+
+EC2 → Security Groups → Create `campusly-db-sg` (default VPC): inbound **PostgreSQL 5432, source = `campusly-api-sg`** (the group, not an IP). Only the EC2 box can reach the database.
+
+RDS → Create database:
+
+| Setting | Value |
+|---|---|
+| Creation | Standard / full configuration · **PostgreSQL 17** (latest 17.x) |
+| Template | Free tier (single-AZ) |
+| Identifier | `campusly-db` |
+| Master username | `campusly_admin` · credentials **self managed** · password = `DB_PASSWORD` |
+| Instance | **db.t4g.micro** |
+| Storage | gp3 **20 GiB**, autoscaling off |
+| Connectivity | Don't connect an EC2 resource · default VPC · **Public access: No** · security group **`campusly-db-sg`** only (remove `default`) · AZ = the EC2 box's AZ |
+| Monitoring | Performance / Database Insights off, Enhanced monitoring off |
+| Additional → Initial database name | **`campusly`** |
+| Additional → Backups | 7 days · encryption on · **deletion protection on** |
+
+Wait for **Available**, then copy the **Endpoint** (`campusly-db.xxxx.eu-central-1.rds.amazonaws.com`).
+
+pgvector is built into RDS Postgres 17; the tutor migration (day 18) runs `CREATE EXTENSION vector` as the master user.
+
+## 8. SSM parameters (CloudShell)
+
+CloudShell → Actions → **Upload file**: [`ssm-put-params.sh`](ssm-put-params.sh) and `~/.campusly/cf-prod-private.pem`. Then, in the same tab as step 7:
+
+```bash
+DB_HOST=<rds endpoint> bash ssm-put-params.sh
+rm cf-prod-private.pem
+```
+
+It writes `/campusly/prod/*`: settings as String, secrets as SecureString (JWT secrets, seed password and `DATABASE_URL` are generated in CloudShell and never shown). Run it again any time: settings are refreshed, secrets are kept. Check: Systems Manager → Parameter Store.
+
+## 9. First deploy on the box
+
+After step 6 (code cloned):
+
+```bash
+cd ~/campusly/backend
+bash deploy/env-from-ssm.sh                                          # SSM → .env.production (chmod 600)
+docker compose -f docker-compose.prod.yml --profile tools build      # ~10 min on t4g.small
+docker compose -f docker-compose.prod.yml run --rm tools pnpm prisma migrate deploy
+docker compose -f docker-compose.prod.yml run --rm tools pnpm prisma db seed   # demo data (wipes all tables)
+docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml ps                         # api, batch, caddy, redis: Up
+```
+
+Health, on the box and from the Mac:
+
+```bash
+curl -s http://<ELASTIC_IP>/graphql -H 'content-type: application/json' \
+  -H 'apollo-require-preflight: true' -d '{"query":"{ health { status postgres redis migration } }"}'
+# {"data":{"health":{"status":"ok","postgres":true,"redis":true,"migration":"2026..."}}}
+```
+
+Until day 15 `API_DOMAIN` is `:80` (plain HTTP on the Elastic IP). Day 15: set it to `api.campusly.uz` in SSM, run `env-from-ssm.sh` and `up -d` — Caddy gets the HTTPS certificate.
