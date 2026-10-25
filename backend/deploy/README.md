@@ -180,7 +180,9 @@ Nightly demo reset: with `DEMO_MODE=true` the batch puts the demo data back at *
 | `media` | CNAME | `d13njm9qjhav5w.cloudfront.net` + the ACM validation CNAME (certificate in **us-east-1**) |
 | `@`, `www` | A / CNAME | the Vercel values (frontend) — until then aHOST defaults |
 
-aHOST quirk: write full names with a **trailing dot** (`_xxxx.media.campusly.uz.`), otherwise the panel adds the zone twice.
+aHOST quirk: write full names with a **trailing dot** (`_xxxx.media.campusly.uz.`), otherwise the panel adds the zone twice. Editing an existing row rejects TTL 300 (the field turns red and Save silently does nothing): keep its TTL or add a new row from the modal, which accepts 300.
+
+Vercel's records (`@` A `216.198.79.1`, `www` CNAME `…vercel-dns-017.com`) come from Project → Domains. Make **`campusly.uz` the primary domain and `www` redirect to it** (Vercel may propose the opposite): the API's CORS allows only `https://campusly.uz`.
 
 ## 11. Frontend on Vercel
 
@@ -204,3 +206,18 @@ Why `vercel.json` pins pnpm: Vercel's corepack looks for `packageManager` in the
 Domains (Project → Settings → Domains): add `campusly.uz` and `www.campusly.uz` → redirect `www` to `campusly.uz`. Vercel shows the DNS records; set them in aHOST (trailing dot rule, §10), replacing the aHOST defaults on `@` and `www`. The certificate comes by itself once DNS points to Vercel.
 
 Why it works across two hosts: `campusly.uz` and `api.campusly.uz` are the **same site** (same registrable domain), so the browser sends the `SameSite=Lax` refresh cookie (`Path=/auth`, host `api.campusly.uz` only) on `fetch(..., { credentials: 'include' })`; the API allows only `FRONTEND_URL=https://campusly.uz` in CORS. A `*.vercel.app` URL is not in the API's CORS list, so it cannot talk to the API: test on `https://campusly.uz`.
+
+## 12. Deploys and CD
+
+Every deploy is [`deploy.sh`](deploy.sh): `git pull` → `env-from-ssm.sh` → build (api + tools) → `prisma migrate deploy` → `up -d` → health check on `https://api.campusly.uz`. By hand: `ssh … 'bash ~/campusly/backend/deploy/deploy.sh'`.
+
+**CD** (`.github/workflows/ci.yml`, job `deploy`): after the `backend` and `frontend` jobs pass on a push to `develop`, GitHub Actions gets a short-lived AWS role through **OIDC** and runs `deploy.sh` on the box with **SSM Run Command** — no AWS keys in GitHub, port 22 stays closed to GitHub. The frontend is deployed by Vercel itself.
+
+One-time setup:
+
+1. **EC2 role** `campusly-ec2` → Add permissions → attach the AWS managed policy **`AmazonSSMManagedInstanceCore`** (the SSM agent, preinstalled on Ubuntu 24.04, then registers the box). Check: Systems Manager → Fleet Manager shows `campusly-api` as *Online* — if it stays offline, the agent tried before the policy existed ("not authorized to perform: ssm:UpdateInstanceInformation") and waits ~25 min to retry: `sudo snap restart amazon-ssm-agent` connects it at once. Test from CloudShell: `aws ssm send-command --instance-ids <id> --document-name AWS-RunShellScript --parameters 'commands=["whoami"]'` → `root`.
+2. **OIDC provider**: IAM → Identity providers → Add → OpenID Connect · URL `https://token.actions.githubusercontent.com` · audience `sts.amazonaws.com`.
+3. **Deploy role** `campusly-github-deploy`: IAM → Roles → Create → *Custom trust policy* = [`iam-github-trust.json`](iam-github-trust.json) (only this repo's `develop` branch may assume it) → inline policy [`iam-github-deploy-policy.json`](iam-github-deploy-policy.json) (send `AWS-RunShellScript` to this one instance, read the result). Replace `ACCOUNT_ID` and `INSTANCE_ID`.
+4. **GitHub** → repo → Settings → Secrets and variables → Actions → **Variables** (not secrets — they are not secret). Do not add an `environment:` to the job: it changes the OIDC subject and the trust condition would refuse it: `AWS_DEPLOY_ROLE_ARN` = the role ARN, `EC2_INSTANCE_ID` = `i-…`.
+
+Then a push to `develop` shows CI → `deploy` in the Actions tab; the job prints the script's output.

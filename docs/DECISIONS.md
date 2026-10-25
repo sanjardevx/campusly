@@ -34,7 +34,7 @@ When a decision changes, update it here **and** add a line to the [Decision log]
 | i18n | `next-i18next`; locales `en`, `uz`, `ru`, `ko`; **default `en`**. Korean code is `ko` (Nestar used `kr`, which is a country code) |
 | Files / video | AWS S3 (private) + CloudFront signed URLs; MP4 in phase 1, MediaConvert HLS later |
 | AI tutor (later) | Amazon Bedrock → Claude Haiku 5.5 (called from `eu-central-1`; in-region or EU inference profile — confirm on the first call; model ID from config) behind an `LlmProvider` interface; embeddings via Bedrock + pgvector |
-| Hosting | Frontend on Vercel. Backend on EC2 t4g.small with Docker Compose (api + batch + Redis + Caddy), RDS Postgres, SSM Parameter Store for secrets. The backend image is built on the EC2 box itself (`git pull && docker compose build`, 2 GB swap), no image registry |
+| Hosting | Frontend on Vercel. Backend on EC2 t4g.small with Docker Compose (api + batch + Redis + Caddy), RDS Postgres, SSM Parameter Store for secrets. The backend image is built on the EC2 box itself (`git pull && docker compose build`, 2 GB swap), no image registry. Deploy = `backend/deploy/deploy.sh`; CD: after CI passes on `develop`, GitHub Actions assumes an AWS role through OIDC (no stored keys) and runs the script on the box with SSM Run Command (port 22 stays closed to GitHub). Vercel deploys the frontend by itself |
 | Tooling | Node 24, pnpm 12.11.2 via corepack (`"packageManager": "pnpm@12.11.2"`) |
 
 **Local dev:** only Postgres and Redis run in Docker (Docker Desktop, 4 CPU / 3 GB RAM). Nest and Next run natively with `pnpm dev`.
@@ -267,3 +267,4 @@ If a day slips, cut in this order: Q&A → CMS reduced to News + Enquiries → q
 | 2026-10-26 | RDS backups: 1 day while the account is on the AWS Free plan (it refuses 7); raise to 7 days after moving to the Paid plan, before any real school data |
 | 2026-10-26 | Nightly demo reset in the batch app: same seed code as the CLI, story shifted by whole weeks to the current week (developer approved) |
 | 2026-10-26 | Budget alerts: zero-spend + monthly $35 (80 % / 100 % actual, 100 % forecast) instead of $10 / $25 / $50 tiers, which would fire every normal month once credits end — developer's choice |
+| 2026-10-26 | Backend CD: GitHub Actions → OIDC role → SSM Run Command → `deploy.sh` (option B), not SSH from GitHub — developer's choice |

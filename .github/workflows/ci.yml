@@ -78,3 +78,48 @@ jobs:
       - run: pnpm check:locales
       - run: pnpm lint
       - run: pnpm typecheck
+
+  # CD (DECISIONS §3): when both CI jobs pass on develop, the EC2 box deploys the backend.
+  # GitHub gets a short-lived AWS role through OIDC (no stored keys) and runs deploy.sh on the box
+  # with SSM Run Command, so SSH (port 22) stays closed to GitHub. Vercel deploys the frontend itself.
+  deploy:
+    needs: [backend, frontend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # lets the job ask GitHub for the OIDC token AWS trusts
+      contents: read
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false # never stop a deploy halfway
+    env:
+      INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: eu-central-1
+      - name: Run deploy.sh on the box
+        run: |
+          command_id=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name AWS-RunShellScript \
+            --comment "deploy ${GITHUB_SHA::7}" \
+            --timeout-seconds 1800 \
+            --parameters 'commands=["sudo -iu ubuntu bash /home/ubuntu/campusly/backend/deploy/deploy.sh"]' \
+            --query Command.CommandId --output text)
+          echo "SSM command $command_id"
+          # The build takes minutes; poll instead of "aws ssm wait" (it gives up after ~100 s)
+          for _ in $(seq 1 120); do
+            sleep 15
+            status=$(aws ssm get-command-invocation --command-id "$command_id" \
+              --instance-id "$INSTANCE_ID" --query Status --output text 2>/dev/null || echo Pending)
+            case "$status" in
+              Pending|InProgress|Delayed) continue ;;
+              *) break ;;
+            esac
+          done
+          aws ssm get-command-invocation --command-id "$command_id" --instance-id "$INSTANCE_ID" \
+            --query '[StandardOutputContent, StandardErrorContent]' --output text
+          echo "Status: $status"
+          [ "$status" = "Success" ]
