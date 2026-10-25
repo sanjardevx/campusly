@@ -194,7 +194,10 @@ Vercel → Add New → Project → import `sanjardev23/campusly` (GitHub sign-in
 | Framework | Next.js (detected) · build `next build` (default) |
 | Production branch | `develop` (Settings → Git) |
 | Node.js version | **24.x** (Settings → Build and Deployment) |
-| Environment variables (Production) | `NEXT_PUBLIC_API_URL=https://api.campusly.uz` · `NEXT_PUBLIC_DEMO_MODE=true` · `ENABLE_EXPERIMENTAL_COREPACK=1` (Vercel then uses pnpm 12.11.2 from `packageManager`) |
+| Install / build commands | from [`frontend/vercel.json`](../../frontend/vercel.json): `npx --yes pnpm@12.11.2 install --frozen-lockfile` / `... run build` — leave the dashboard fields empty |
+| Environment variables (Production) | `NEXT_PUBLIC_API_URL=https://api.campusly.uz` · `NEXT_PUBLIC_DEMO_MODE=true` |
+
+Why `vercel.json` pins pnpm: Vercel's corepack looks for `packageManager` in the **repo-root** `package.json` (the repo has none; `frontend/package.json` has it), falls back to an old pnpm that cannot read pnpm 12's lockfile and fails on Node 24. Running the exact pnpm through `npx` avoids that, and the commands live in git instead of dashboard settings.
 
 `NEXT_PUBLIC_*` values are baked in at build time: after changing one, **Redeploy**.
 
