@@ -211,7 +211,7 @@ Why it works across two hosts: `campusly.uz` and `api.campusly.uz` are the **sam
 
 Every deploy is [`deploy.sh`](deploy.sh): `git pull` → `env-from-ssm.sh` → build (api + tools) → `prisma migrate deploy` → `up -d` → health check on `https://api.campusly.uz`. By hand: `ssh … 'bash ~/campusly/backend/deploy/deploy.sh'`.
 
-**CD** (`.github/workflows/ci.yml`, job `deploy`): after the `backend` and `frontend` jobs pass on a push to `develop`, GitHub Actions gets a short-lived AWS role through **OIDC** and runs `deploy.sh` on the box with **SSM Run Command** — no AWS keys in GitHub, port 22 stays closed to GitHub. The frontend is deployed by Vercel itself.
+**CD** (`.github/workflows/ci.yml`, job `deploy`): after the `backend` and `frontend` jobs pass on a push to `develop`, GitHub Actions gets a short-lived AWS role through **OIDC** and, with **SSM Run Command**, pulls the code on the box and runs that commit's `deploy.sh` — no AWS keys in GitHub, port 22 stays closed to GitHub. The frontend is deployed by Vercel itself.
 
 One-time setup:
 
