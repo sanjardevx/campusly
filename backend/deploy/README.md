@@ -192,7 +192,7 @@ Vercel → Add New → Project → import `sanjardev23/campusly` (GitHub sign-in
 |---|---|
 | Root Directory | **`frontend`** |
 | Framework | Next.js (detected) · build `next build` (default) |
-| Production branch | `develop` (Settings → Git) |
+| Production branch | **`develop`** — Settings → Environments → Production → Branch Tracking (the default `master` makes every `develop` push a *Preview*, and `campusly.uz` keeps the old build); after changing it, promote the latest deployment once |
 | Node.js version | **24.x** (Settings → Build and Deployment) |
 | Install / build commands | from [`frontend/vercel.json`](../../frontend/vercel.json): `npx --yes pnpm@12.11.2 install --frozen-lockfile` / `... run build` — leave the dashboard fields empty |
 | Environment variables (Production) | `NEXT_PUBLIC_API_URL=https://api.campusly.uz` · `NEXT_PUBLIC_DEMO_MODE=true` |
