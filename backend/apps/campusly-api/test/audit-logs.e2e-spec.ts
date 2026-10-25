@@ -62,7 +62,9 @@ describe('Activity log (e2e)', () => {
     });
     const userIds = users.map((u) => u.id);
     await prisma.auditLog.deleteMany({ where: { actorId: { in: userIds } } });
-    await prisma.refreshToken.deleteMany({ where: { userId: { in: userIds } } });
+    await prisma.refreshToken.deleteMany({
+      where: { userId: { in: userIds } },
+    });
     await prisma.user.deleteMany({ where: { id: { in: userIds } } });
   }
 
