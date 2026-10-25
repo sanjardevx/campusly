@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
   // Bundle MUI's Next.js integration together with MUI on the server. Otherwise Turbopack loads it
   // as an external module with its own Emotion copy, and the SSR style cache is ignored (hydration mismatch).
   transpilePackages: ["@mui/material-nextjs"],
+  // Dynamic pages ([courseId], fallback 'blocking') read the translation JSON on Vercel's server at
+  // their first visit; files read with fs are not traced by themselves, so ship them explicitly.
+  outputFileTracingIncludes: {
+    "/**/*": ["./public/locales/**/*"],
+  },
 };
 
 export default nextConfig;

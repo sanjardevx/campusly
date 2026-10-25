@@ -1,5 +1,6 @@
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/pages/serverSideTranslations';
+import i18nConfig from '../../next-i18next.config.js';
 import { AREA_ROLE, NAV } from '@/libs/components/layout/nav';
 import type { Role } from '@/libs/gql/graphql';
 
@@ -10,8 +11,9 @@ const ROLE_AREA = Object.fromEntries(Object.entries(AREA_ROLE).map(([area, role]
  * nowhere else: Next.js removes getStaticProps and the imports only it uses from the browser
  * bundle, but not a module that client components import too.
  *
- * getStaticProps, not getServerSideProps: on Vercel the public/ folder is not on the server's
- * file system at runtime. Data comes later from the API in the browser (Apollo).
+ * getStaticProps, not getServerSideProps: data comes later from the API in the browser (Apollo).
+ * Dynamic pages (fallback 'blocking') still run this on Vercel's server on their first visit, so
+ * the config is passed in (bundled) and next.config.ts ships public/locales with the server code.
  */
 export const withTranslations =
   (namespaces: string[] = []): GetStaticProps =>
@@ -21,7 +23,7 @@ export const withTranslations =
         'common',
         'errors',
         ...namespaces,
-      ])),
+      ], i18nConfig)),
     },
   });
 
