@@ -16,6 +16,7 @@ import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { STUDENT_TUTOR_TOPICS } from '@/apollo/student/query';
+import { useErrorText } from '@/libs/i18n';
 import { STITCH, SoftPill, pressSx } from '@/libs/components/student/home/parts';
 import { HELP_LEVELS, useTutor, type Tutor, type TutorConversation, type TutorMessage, type TutorTopic } from './useTutor';
 
@@ -27,7 +28,8 @@ const time = (iso: string, locale = 'en') => new Date(iso).toLocaleTimeString(lo
  * Stitch "AI Study Tutor" (DECISIONS §14, built ahead of the tutor phase): conversations on the left,
  * the chat with course / topic, the four help levels and the "hints only" rule in the middle, the
  * cited course materials and the daily limit on the right. Phones: the list or the chat, one at a time.
- * Everything goes through useTutor, which is a stub until the API exists.
+ * Everything goes through useTutor (GraphQL for the lists, POST /tutor/chat for the streamed answer).
+ * `?course=` and `?topic=lesson:<id>` open it from a lesson or homework page.
  */
 export function TutorView({ courses }: { courses: Course[] }) {
   const theme = useTheme();
@@ -36,7 +38,7 @@ export function TutorView({ courses }: { courses: Course[] }) {
   const { query } = useRouter();
   const tutor = useTutor();
   const [courseId, setCourseId] = useState(typeof query.course === 'string' ? query.course : '');
-  const [topicKey, setTopicKey] = useState('');
+  const [topicKey, setTopicKey] = useState(typeof query.topic === 'string' ? query.topic : '');
   // Phones show one panel: the list until a conversation is open (or a new one started)
   const [chatOpen, setChatOpen] = useState(false);
 
@@ -51,6 +53,7 @@ export function TutorView({ courses }: { courses: Course[] }) {
   const open = (c: TutorConversation) => {
     tutor.select(c.id);
     setCourseId(c.courseId);
+    setTopicKey(c.lessonId ? `lesson:${c.lessonId}` : c.assignmentId ? `assignment:${c.assignmentId}` : '');
     setChatOpen(true);
   };
 
@@ -66,7 +69,11 @@ export function TutorView({ courses }: { courses: Course[] }) {
         tutor.select(null);
       }}
       topicKey={topicKey}
-      onTopic={setTopicKey}
+      onTopic={(key) => {
+        // A conversation keeps its topic: another topic is a new conversation
+        setTopicKey(key);
+        if (tutor.activeId) tutor.select(null);
+      }}
       onBack={phone ? () => setChatOpen(false) : undefined}
     />
   );
@@ -187,7 +194,8 @@ function ChatPanel({
 
   // Topics: the course's lessons by week, then its assignments
   const modules = [...(data?.courseDetail.modules ?? [])].sort((a, b) => a.order - b.order);
-  const assignments = data?.courseAssignments ?? [];
+  // Quizzes and assignments the teacher closed to the tutor are not offered (the server refuses them too)
+  const assignments = (data?.courseAssignments ?? []).filter((a) => a.type !== 'QUIZ' && a.tutorMode !== 'OFF');
   const topicTitle =
     topicKey.startsWith('lesson:')
       ? (modules.flatMap((m) => m.lessons).find((l) => `lesson:${l.id}` === topicKey)?.title ?? null)
@@ -196,14 +204,18 @@ function ChatPanel({
         : null;
 
   // Follow new messages; an empty chat stays at the top (the banner and the welcome)
+  const lastText = tutor.messages.at(-1)?.text.length ?? 0;
   useEffect(() => {
     if (tutor.messages.length) bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, [tutor.messages.length]);
+  }, [tutor.messages.length, lastText, tutor.error]);
 
+  const errorText = useErrorText();
   const left = tutor.quota.limit - tutor.quota.used;
+  const blocked = !tutor.connected || tutor.quizActive || tutor.streaming || left <= 0;
+  const lastRole = tutor.messages.at(-1)?.role;
   const send = () => {
     const question = text.trim();
-    if (!question || !course || left <= 0) return;
+    if (!question || !course || blocked) return;
     const topic: TutorTopic = { courseId: course.id, courseTitle: course.title, topicKey, topicTitle };
     tutor.send(question, topic);
     setText('');
@@ -257,6 +269,11 @@ function ChatPanel({
             {t('tutor.notConnectedBanner')}
           </Alert>
         )}
+        {tutor.connected && tutor.quizActive && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {t('tutor.quizActiveBanner')}
+          </Alert>
+        )}
         {tutor.messages.length === 0 ? (
           <Welcome onPick={setText} />
         ) : (
@@ -264,9 +281,10 @@ function ChatPanel({
             {tutor.messages.map((m) => (
               <Message key={m.id} message={m} />
             ))}
-            {tutor.connected && (
+            {tutor.streaming && lastRole !== 'TUTOR' && <Thinking />}
+            {tutor.connected && !tutor.streaming && lastRole === 'TUTOR' && (
               <Stack direction="row" spacing={1}>
-                <Button size="small" variant="outlined" color="inherit" startIcon={<LightbulbOutlinedIcon />} onClick={tutor.nextHint} disabled={tutor.level === 4} sx={{ ...pressSx, borderColor: STITCH.outline }}>
+                <Button size="small" variant="outlined" color="inherit" startIcon={<LightbulbOutlinedIcon />} onClick={tutor.nextHint} disabled={tutor.level === 4 || blocked} sx={{ ...pressSx, borderColor: STITCH.outline }}>
                   {t('tutor.anotherHint')}
                 </Button>
                 <Button size="small" variant="outlined" startIcon={<CheckCircleOutlineRoundedIcon />} onClick={tutor.solved} sx={pressSx}>
@@ -276,13 +294,18 @@ function ChatPanel({
             )}
           </Stack>
         )}
+        {tutor.error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {errorText(tutor.error)}
+          </Alert>
+        )}
         <div ref={bottom} />
       </Box>
 
       {/* Composer */}
       <Box sx={{ p: { xs: 0, md: 2 }, pt: 1.5, borderTop: { md: 1 }, borderColor: { md: STITCH.outline } }}>
         <Stack direction="row" sx={{ alignItems: 'flex-end', gap: 1, p: 1, border: 1, borderColor: '#D1D5CB', borderRadius: 3, bgcolor: '#fff' }}>
-          {/* Photos of written work come with the tutor phase */}
+          {/* Photos of written work: later (the tutor reads text only for now) */}
           <IconButton size="small" disabled aria-label={t('tutor.attach')}>
             <AttachFileRoundedIcon />
           </IconButton>
@@ -301,7 +324,7 @@ function ChatPanel({
             sx={{ flex: 1, py: 0.75, fontSize: '0.9375rem' }}
             inputProps={{ maxLength: 2000, 'aria-label': t('tutor.placeholder') }}
           />
-          <IconButton onClick={send} disabled={!text.trim() || !course || left <= 0} aria-label={t('tutor.send')} sx={{ bgcolor: 'primary.main', color: '#fff', borderRadius: 2, '&:hover': { bgcolor: 'primary.dark' }, '&.Mui-disabled': { bgcolor: STITCH.surfaceContainer } }}>
+          <IconButton onClick={send} disabled={!text.trim() || !course || blocked} aria-label={t('tutor.send')} sx={{ bgcolor: 'primary.main', color: '#fff', borderRadius: 2, '&:hover': { bgcolor: 'primary.dark' }, '&.Mui-disabled': { bgcolor: STITCH.surfaceContainer } }}>
             <ArrowUpwardRoundedIcon />
           </IconButton>
         </Stack>
@@ -356,6 +379,32 @@ function Welcome({ onPick }: { onPick: (text: string) => void }) {
   );
 }
 
+/** The tutor is reading the materials: three dots until the first words arrive */
+function Thinking() {
+  const { t } = useTranslation('student');
+  return (
+    <Stack sx={{ alignItems: 'flex-start' }}>
+      <Box role="status" aria-label={t('tutor.thinking')} sx={{ px: 2, py: 1.25, borderRadius: 3, borderBottomLeftRadius: 6, bgcolor: '#fff', border: 1, borderColor: STITCH.outline, display: 'flex', gap: 0.5 }}>
+        {[0, 1, 2].map((i) => (
+          <Box
+            key={i}
+            sx={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              bgcolor: 'text.secondary',
+              animation: 'tutorDot 1.2s ease-in-out infinite',
+              animationDelay: `${i * 0.15}s`,
+              '@keyframes tutorDot': { '0%, 80%, 100%': { opacity: 0.25 }, '40%': { opacity: 1 } },
+              '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0.6 },
+            }}
+          />
+        ))}
+      </Box>
+    </Stack>
+  );
+}
+
 function Message({ message }: { message: TutorMessage }) {
   const { t } = useTranslation('student');
   const { locale } = useRouter();
@@ -400,10 +449,10 @@ function SidePanel({ tutor, course }: { tutor: Tutor; course: Course | undefined
         </Card>
       ) : (
         tutor.sources.map((s) => (
-          <Card key={`${s.kind}-${s.title}`} variant="outlined" sx={{ borderRadius: 3, p: 1.5, borderColor: STITCH.outline }}>
+          <Card key={`${s.kind}-${s.title}-${s.page}`} variant="outlined" sx={{ borderRadius: 3, p: 1.5, borderColor: STITCH.outline, flexShrink: 0 }}>
             <SoftPill tone="mint">{t(`tutor.sources.kind.${s.kind}`)}</SoftPill>
             <Typography sx={{ mt: 1, fontWeight: 600, fontSize: '0.875rem' }}>{s.title}</Typography>
-            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>{s.detail}</Typography>
+            {s.page && <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>{t('tutor.sources.page', { page: s.page })}</Typography>}
           </Card>
         ))
       )}

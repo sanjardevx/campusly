@@ -36,5 +36,11 @@
   "RESET_LINK_INVALID": "This link is wrong, expired or already used.",
   "QUIZ_LOCKED": "A student has started this quiz: its questions cannot change.",
   "QUIZ_CLOSED": "This quiz cannot be started.",
-  "QUIZ_TIME_UP": "Time is up: the answer was not saved."
+  "QUIZ_TIME_UP": "Time is up: the answer was not saved.",
+  "TUTOR_DISABLED": "The AI tutor is not connected on this server.",
+  "TUTOR_LIMIT": "You've used today's tutor questions. They come back tomorrow.",
+  "TUTOR_BUDGET": "The tutor is resting for today. Please try again tomorrow.",
+  "TUTOR_QUIZ_ACTIVE": "The tutor is off while you have a quiz open.",
+  "TUTOR_OFF": "Your teacher turned the tutor off for this assignment.",
+  "TUTOR_FAILED": "The tutor couldn't answer. Please try again — this question was not counted."
 }

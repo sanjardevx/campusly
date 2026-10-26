@@ -268,11 +268,11 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 18 (L) — AI Study Tutor backend
 
-- [ ] Ingest lesson PDFs → chunks → Bedrock embeddings → pgvector (`DocumentChunk`).
-- [ ] `LlmProvider` + Bedrock Claude Haiku 5.5; SSE chat endpoint.
-  - Deploy: `BEDROCK_CHAT_MODEL_ID` / `BEDROCK_EMBED_MODEL_ID` (SSM String, `ssm-put-params.sh`, `.env.example`); `iam-ec2-policy.json` gets `bedrock:InvokeModel` + `InvokeModelWithResponseStream` on the inference-profile ARN **and** the foundation-model ARNs of every region the EU profile routes to, plus `InvokeModel` for the embedding model.
-- [ ] Help levels 1–4 and the assignment's `tutorMode`; off during quizzes.
-- [ ] Daily limit per student + global budget (Redis).
+- [x] Ingest lesson PDFs → chunks → Bedrock embeddings → pgvector (`DocumentChunk`).
+- [x] `LlmProvider` + Bedrock Claude Haiku 5.5; SSE chat endpoint.
+  - Deploy: `TUTOR_PROVIDER` (SSM, `off` until Bedrock allows Haiku 5.5), model IDs default in config (`.env.example`); `iam-ec2-policy.json` gets `bedrock-mantle:CreateInference` (Claude in Amazon Bedrock) and `bedrock:InvokeModel` on Titan Embeddings V2 — deploy README §14.
+- [x] Help levels 1–4 and the assignment's `tutorMode`; off during quizzes.
+- [x] Daily limit per student + global budget (Redis).
 - [ ] The `useTutor` stub calls the real API; a test proves parents cannot read tutor conversations; deploy.
 
 ---

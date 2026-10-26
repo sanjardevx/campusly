@@ -200,6 +200,7 @@ export function HomeworkView({ data, refetch }: { data: Data; refetch: () => Pro
         <SubmitPanel
           key={user ? `${user.id}.${a.id}` : a.id}
           assignmentId={a.id}
+          tutorHref={a.tutorMode === 'OFF' ? null : `/student/tutor?course=${a.courseId}&topic=assignment:${a.id}`}
           draftKey={user ? `campusly.homework.${user.id}.${a.id}` : null}
           accept={a.acceptedFileTypes.map((x) => MIME_BY_EXTENSION[x]).filter(Boolean)}
           hint={t('homework.upload.hint', { types, size: formatSize(limitBytes), max: MAX_FILES })}
@@ -310,7 +311,7 @@ export function FileChip({ assetId, url, name, mimeType, size }: { assetId?: str
   );
 }
 
-/** A disabled "coming soon" link (Study Tutor, Q&A wait for their phases) */
+/** A disabled "coming soon" link (Q&A waits for its phase) */
 export function Soon({ icon, label }: { icon: ReactNode; label: string }) {
   const { t } = useTranslation('student');
   return (
@@ -380,6 +381,7 @@ interface Pending {
 /** Upload area + optional text + Save draft / Submit (Stitch "Action area") */
 function SubmitPanel({
   assignmentId,
+  tutorHref,
   draftKey,
   accept,
   hint,
@@ -388,6 +390,8 @@ function SubmitPanel({
   onSubmitted,
 }: {
   assignmentId: string;
+  /** null: the teacher turned the tutor off for this assignment */
+  tutorHref: string | null;
   draftKey: string | null;
   accept: string[];
   hint: string;
@@ -580,7 +584,14 @@ function SubmitPanel({
         {error && <Alert severity="error">{error}</Alert>}
 
         <Stack direction={{ xs: 'column-reverse', sm: 'row' }} sx={{ pt: 2, borderTop: 1, borderColor: STITCH.outlineSoft, justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
-          <Soon icon={<SmartToyOutlinedIcon />} label={t('homework.tutor')} />
+          {tutorHref ? (
+            <Link component={NextLink} href={tutorHref} underline="hover" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, fontSize: '0.84375rem', fontWeight: 600, color: 'secondary.main', '& svg': { fontSize: 18 } }}>
+              <SmartToyOutlinedIcon />
+              {t('homework.tutor')}
+            </Link>
+          ) : (
+            <span />
+          )}
           <Stack direction="row" sx={{ gap: 1.5, justifyContent: 'flex-end' }}>
             {onCancel && (
               <Button onClick={onCancel} sx={{ ...pressSx, color: 'text.secondary' }}>

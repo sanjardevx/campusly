@@ -20,6 +20,7 @@ import { SchoolEventResolver } from '../src/components/school/school-event.resol
 import { SchoolResolver } from '../src/components/school/school.resolver';
 import { TeacherDashboardResolver } from '../src/components/dashboard/teacher-dashboard.resolver';
 import { TelegramResolver } from '../src/components/telegram/telegram.resolver';
+import { TutorResolver } from '../src/components/tutor/tutor.resolver';
 import { UserAdminResolver } from '../src/components/user/user-admin.resolver';
 import { UserResolver } from '../src/components/user/user.resolver';
 import {
@@ -54,6 +55,7 @@ const RESOLVERS = [
   SubmissionResolver,
   TeacherDashboardResolver,
   TelegramResolver,
+  TutorResolver,
   UserAdminResolver,
   UserResolver,
 ];
@@ -173,5 +175,16 @@ describe('Every GraphQL operation has a deliberate role rule', () => {
       );
     // addSubmissionComment lets parents in only to answer FORBIDDEN for their own child
     expect(parentMutations).toEqual(['addSubmissionComment']);
+  });
+
+  it('parents never see AI tutor conversations: every tutor operation is STUDENT only', () => {
+    const tutor = ops.filter((o) => o.resolver === 'TutorResolver');
+    expect(tutor.map((o) => o.name).sort()).toEqual([
+      'markTutorSolved',
+      'tutorConversation',
+      'tutorConversations',
+      'tutorStatus',
+    ]);
+    for (const op of tutor) expect(op.roles).toEqual([Role.STUDENT]);
   });
 });

@@ -42,6 +42,19 @@ const envSchema = z
     // Telegram sends it back in a header on every webhook call: 1–256 of A–Z a–z 0–9 _ -
     TELEGRAM_WEBHOOK_SECRET: optional(z.string().regex(/^[\w-]{32,256}$/)),
     TELEGRAM_BOT_USERNAME: optional(z.string().regex(/^\w{5,32}bot$/i)),
+
+    // AI Study Tutor (DECISIONS §14). off = the page says "not connected" (CI, local without Bedrock);
+    // fake = canned hints and word-hash embeddings for tests and offline work; bedrock = the real thing.
+    TUTOR_PROVIDER: z.enum(['off', 'fake', 'bedrock']).default('off'),
+    // Claude in Amazon Bedrock (Messages API, region = AWS_REGION) and the embedding model
+    BEDROCK_CHAT_MODEL_ID: z
+      .string()
+      .min(3)
+      .default('anthropic.claude-haiku-5-5'),
+    BEDROCK_EMBED_MODEL_ID: z
+      .string()
+      .min(3)
+      .default('amazon.titan-embed-text-v2:0'),
   })
   .refine((env) => env.JWT_ACCESS_SECRET !== env.JWT_REFRESH_SECRET, {
     path: ['JWT_REFRESH_SECRET'],
@@ -84,6 +97,14 @@ const envSchema = z
           message: 'required for the Telegram bot (set all three or none)',
         });
       }
+    }
+    // Canned answers must never reach real students
+    if (env.NODE_ENV === 'production' && env.TUTOR_PROVIDER === 'fake') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['TUTOR_PROVIDER'],
+        message: 'fake is for tests and local work only',
+      });
     }
     if (!!env.AWS_ACCESS_KEY_ID !== !!env.AWS_SECRET_ACCESS_KEY) {
       ctx.addIssue({
@@ -142,6 +163,37 @@ export const RESET_SUBMIT_LIMIT = { perIp: 20, windowSec: 15 * 60 };
  * the limits an admin may choose within: a temporary password that lives for months is a hole.
  */
 export const TEMP_PASSWORD_LIMITS = { maxUses: 10, maxDays: 60 };
+
+// ───────────────────────────── AI Study Tutor ─────────────────────────────
+// DECISIONS §14.
+
+/** "Today" for the tutor limits: they reset at midnight school time */
+export const TUTOR_TIMEZONE = 'Asia/Tashkent';
+/** Requests per student per day ("Show another hint" counts: every one is a model call) */
+export const TUTOR_DAILY_LIMIT = 30;
+/** The whole school's tutor spend per day, in USD; when it is used up the tutor waits for tomorrow */
+export const TUTOR_DAILY_BUDGET_USD = 2;
+/**
+ * USD per million tokens, for the budget. Claude Haiku 5.5 is $0.10 / $0.50 (prompts up to 100K);
+ * +10 % for Bedrock's regional endpoint. Titan Text Embeddings V2: $0.02.
+ */
+export const TUTOR_PRICES = { input: 0.11, output: 0.55, embed: 0.02 };
+/** A hint is short: the model may write at most this many tokens */
+export const TUTOR_MAX_TOKENS = 1024;
+/** Earlier messages sent with each request (the conversation's memory) */
+export const TUTOR_HISTORY_MESSAGES = 12;
+/** Pieces of course material given to the model per question */
+export const TUTOR_CONTEXT_CHUNKS = 5;
+/** Longest question a student may send, in characters */
+export const TUTOR_QUESTION_MAX = 2000;
+/** Material is cut into pieces of about this many characters (with a small overlap) */
+export const TUTOR_CHUNK = { size: 1200, overlap: 150 };
+/** Embedding size (Titan V2 allows 256 / 512 / 1024); the DB column is vector(1024) */
+export const TUTOR_EMBED_DIMENSIONS = 1024;
+/** Files the batch reads for the index: PDFs up to this size and page count */
+export const TUTOR_PDF_LIMITS = { maxMb: 20, maxPages: 80 };
+/** Sources (re)indexed per batch run; the rest wait for the next run */
+export const TUTOR_INDEX_BATCH = 40;
 
 // ───────────────────────────── lists ─────────────────────────────
 

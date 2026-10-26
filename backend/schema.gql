@@ -846,6 +846,7 @@ type Mutation {
   markAllAnnouncementsRead(studentId: String): Int!
   markAnnouncementRead(id: String!): Announcement!
   markAttendance(input: MarkAttendanceInput!): CourseAttendance!
+  markTutorSolved(conversationId: String!): TutorMessage!
   moveStudent(input: MoveStudentInput!): Group!
   previewStudentImport(csv: String!): ImportPreview!
   publishAssignment(input: PublishInput!): Assignment!
@@ -1107,6 +1108,9 @@ type Query {
   teacherDashboard: TeacherDashboard!
   teachingCourses: [Course!]!
   telegramStatus: TelegramStatus!
+  tutorConversation(conversationId: String!): TutorThread!
+  tutorConversations: [TutorConversation!]!
+  tutorStatus: TutorStatus!
   users(input: UsersInquiry!): Users!
 }
 
@@ -1462,10 +1466,55 @@ type TotalCounter {
   total: Int!
 }
 
+type TutorConversation {
+  assignmentId: String
+  courseId: String!
+  courseTitle: String!
+  id: String!
+  lessonId: String
+  level: Int!
+  preview: String!
+  title: String!
+  updatedAt: DateTime!
+}
+
+type TutorMessage {
+  createdAt: DateTime!
+  id: String!
+  level: Int
+  role: TutorRole!
+  sources: [TutorSource!]!
+  text: String!
+}
+
 enum TutorMode {
   CHECK_ONLY
   HINTS
   OFF
+}
+
+enum TutorRole {
+  STUDENT
+  SYSTEM
+  TUTOR
+}
+
+type TutorSource {
+  kind: String!
+  page: Int
+  title: String!
+}
+
+type TutorStatus {
+  enabled: Boolean!
+  limit: Int!
+  quizActive: Boolean!
+  used: Int!
+}
+
+type TutorThread {
+  conversation: TutorConversation!
+  messages: [TutorMessage!]!
 }
 
 type UpcomingItem {

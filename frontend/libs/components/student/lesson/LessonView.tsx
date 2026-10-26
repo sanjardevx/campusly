@@ -150,7 +150,7 @@ export function LessonView({ data, lessonId, desktop, refetch }: { data: Data; l
       {desktop ? (
         <Box sx={{ display: 'grid', gap: 4, alignItems: 'start', gridTemplateColumns: 'minmax(0, 8fr) minmax(0, 4fr)' }}>
           {main}
-          <TutorSoon />
+          <TutorCard courseId={course.id} lessonId={lesson.id} />
         </Box>
       ) : (
         main
@@ -300,21 +300,28 @@ function Hint({ icon, text }: { icon: ReactNode; text: string }) {
   );
 }
 
-/** The Study Tutor's place (Stitch's right panel) until the AI tutor phase */
-function TutorSoon() {
+/** Stitch's right panel: opens the AI Study Tutor with this lesson as the topic */
+function TutorCard({ courseId, lessonId }: { courseId: string; lessonId: string }) {
   const { t } = useTranslation('student');
   return (
     <Card variant="outlined" sx={{ ...cardSx, position: 'sticky', top: 96, ...enter(2) }}>
-      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1, mb: 1.5 }}>
-        <Stack direction="row" sx={{ alignItems: 'center', gap: 1.25 }}>
-          <Box sx={{ width: 32, height: 32, borderRadius: 2, bgcolor: 'primary.main', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <PsychologyOutlinedIcon fontSize="small" />
-          </Box>
-          <Typography sx={{ fontWeight: 600 }}>{t('lesson.tutor.title')}</Typography>
-        </Stack>
-        <SoftPill tone="neutral">{t('lesson.tutor.soon')}</SoftPill>
+      <Stack direction="row" sx={{ alignItems: 'center', gap: 1.25, mb: 1.5 }}>
+        <Box sx={{ width: 32, height: 32, borderRadius: 2, bgcolor: 'primary.main', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <PsychologyOutlinedIcon fontSize="small" />
+        </Box>
+        <Typography sx={{ fontWeight: 600 }}>{t('lesson.tutor.title')}</Typography>
       </Stack>
       <Typography sx={{ fontSize: '0.84375rem', color: 'text.secondary', lineHeight: 1.6 }}>{t('lesson.tutor.body')}</Typography>
+      <Button
+        component={NextLink}
+        href={`/student/tutor?course=${courseId}&topic=lesson:${lessonId}`}
+        variant="contained"
+        disableElevation
+        fullWidth
+        sx={{ ...pressSx, mt: 2 }}
+      >
+        {t('lesson.tutor.ask')}
+      </Button>
     </Card>
   );
 }

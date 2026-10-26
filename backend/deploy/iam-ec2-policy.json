@@ -15,6 +15,18 @@
         "arn:aws:ssm:eu-central-1:ACCOUNT_ID:parameter/campusly/prod",
         "arn:aws:ssm:eu-central-1:ACCOUNT_ID:parameter/campusly/prod/*"
       ]
+    },
+    {
+      "Sid": "TutorClaude",
+      "Effect": "Allow",
+      "Action": "bedrock-mantle:CreateInference",
+      "Resource": "*"
+    },
+    {
+      "Sid": "TutorEmbeddings",
+      "Effect": "Allow",
+      "Action": "bedrock:InvokeModel",
+      "Resource": "arn:aws:bedrock:eu-central-1::foundation-model/amazon.titan-embed-text-v2:0"
     }
   ]
 }

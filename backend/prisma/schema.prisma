@@ -85,6 +85,7 @@ model User {
   assignmentsCreated    Assignment[]        @relation("AssignmentsCreated")
   submissions           Submission[]        @relation("Submissions")
   quizAttempts          QuizAttempt[]
+  tutorConversations    TutorConversation[] @relation("TutorConversations")
   submissionsGraded     Submission[]        @relation("SubmissionsGraded")
   submissionComments    SubmissionComment[] @relation("SubmissionComments")
   periodGrades          PeriodGrade[]       @relation("PeriodGrades")
@@ -443,14 +444,16 @@ model Course {
   group        Group        @relation(fields: [groupId], references: [id])
   subject      Subject      @relation(fields: [subjectId], references: [id])
 
-  teachers        CourseTeacher[]
-  enrollments     Enrollment[]
-  modules         Module[]
-  gradeCategories GradeCategory[]
-  assignments     Assignment[]
-  periodGrades    PeriodGrade[]
-  sessions        ClassSession[]
-  announcements   Announcement[]
+  teachers           CourseTeacher[]
+  enrollments        Enrollment[]
+  modules            Module[]
+  gradeCategories    GradeCategory[]
+  assignments        Assignment[]
+  periodGrades       PeriodGrade[]
+  sessions           ClassSession[]
+  announcements      Announcement[]
+  documentChunks     DocumentChunk[]
+  tutorConversations TutorConversation[]
 
   @@index([groupId])
   @@index([subjectId])
@@ -525,12 +528,14 @@ model Lesson {
   createdAt      DateTime       @default(now()) @db.Timestamptz(3)
   updatedAt      DateTime       @updatedAt @db.Timestamptz(3)
 
-  module      Module           @relation(fields: [moduleId], references: [id])
-  videoAsset  MediaAsset?      @relation("LessonVideo", fields: [videoAssetId], references: [id])
-  resources   LessonResource[]
-  progress    LessonProgress[]
-  assignments Assignment[]
-  sessions    ClassSession[]
+  module             Module              @relation(fields: [moduleId], references: [id])
+  videoAsset         MediaAsset?         @relation("LessonVideo", fields: [videoAssetId], references: [id])
+  resources          LessonResource[]
+  progress           LessonProgress[]
+  assignments        Assignment[]
+  sessions           ClassSession[]
+  documentChunks     DocumentChunk[]
+  tutorConversations TutorConversation[]
 
   @@index([moduleId, order])
   @@map("lessons")
@@ -675,15 +680,17 @@ model Assignment {
   createdAt         DateTime       @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime       @updatedAt @db.Timestamptz(3)
 
-  course      Course           @relation(fields: [courseId], references: [id])
-  module      Module?          @relation(fields: [moduleId], references: [id])
-  lesson      Lesson?          @relation(fields: [lessonId], references: [id])
-  category    GradeCategory    @relation(fields: [categoryId], references: [id])
-  createdBy   User             @relation("AssignmentsCreated", fields: [createdById], references: [id])
-  submissions Submission[]
-  files       AssignmentFile[]
-  questions   QuizQuestion[]
-  attempts    QuizAttempt[]
+  course             Course              @relation(fields: [courseId], references: [id])
+  module             Module?             @relation(fields: [moduleId], references: [id])
+  lesson             Lesson?             @relation(fields: [lessonId], references: [id])
+  category           GradeCategory       @relation(fields: [categoryId], references: [id])
+  createdBy          User                @relation("AssignmentsCreated", fields: [createdById], references: [id])
+  submissions        Submission[]
+  files              AssignmentFile[]
+  questions          QuizQuestion[]
+  attempts           QuizAttempt[]
+  documentChunks     DocumentChunk[]
+  tutorConversations TutorConversation[]
 
   @@index([courseId, dueAt])
   @@index([moduleId])
@@ -1034,4 +1041,91 @@ model QuizAnswer {
 
   @@unique([attemptId, questionId])
   @@map("quiz_answers")
+}
+
+// ─────────────────────────────── AI Study Tutor ───────────────────────────────
+// DECISIONS §14: hints from the course's own materials (RAG). Students only; parents never see
+// conversations, teachers see nothing yet (aggregated topics are a later phase).
+
+/// The tutor's search index: course material cut into pieces, each with its embedding (pgvector).
+/// Derived data — the batch rebuilds it from lessons, assignments and their PDFs — so when a
+/// source changes its old pieces are deleted and written again (no user data lives here).
+model DocumentChunk {
+  id           String                      @id @default(uuid(7)) @db.Uuid
+  courseId     String                      @db.Uuid
+  /// Where the text came from. Visibility is checked again when a student asks (drafts never show)
+  lessonId     String?                     @db.Uuid
+  assignmentId String?                     @db.Uuid
+  /// "lesson:<id>", "assignment:<id>", "lesson-file:<resourceId>", "assignment-file:<fileId>"
+  sourceKey    String
+  /// sha256 of the text (files: the asset id — an upload never changes): same hash = not embedded again
+  sourceHash   String
+  /// Shown under "Course materials": the lesson / assignment / file name
+  title        String
+  /// "LESSON" or "FILE"; for files the page, e.g. "p. 3"
+  kind         String
+  locator      String                      @default("")
+  order        Int
+  text         String
+  /// Amazon Titan Text Embeddings V2, 1024 dimensions, normalized (cosine distance `<=>`)
+  embedding    Unsupported("vector(1024)")
+  createdAt    DateTime                    @default(now()) @db.Timestamptz(3)
+
+  course     Course      @relation(fields: [courseId], references: [id])
+  lesson     Lesson?     @relation(fields: [lessonId], references: [id])
+  assignment Assignment? @relation(fields: [assignmentId], references: [id])
+
+  @@index([courseId])
+  @@index([sourceKey])
+  @@map("document_chunks")
+}
+
+enum TutorRole {
+  STUDENT
+  TUTOR
+  /// Notes from the app (another hint asked, solved, blocked); `text` is a key the UI translates
+  SYSTEM
+}
+
+model TutorConversation {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  studentId    String   @db.Uuid
+  courseId     String   @db.Uuid
+  /// The topic picked above the chat (null = a general question about the course)
+  lessonId     String?  @db.Uuid
+  assignmentId String?  @db.Uuid
+  title        String
+  /// Help level of the current problem: 1 nudge, 2 concept hint, 3 step hint, 4 similar example
+  level        Int      @default(1)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  student    User           @relation("TutorConversations", fields: [studentId], references: [id])
+  course     Course         @relation(fields: [courseId], references: [id])
+  lesson     Lesson?        @relation(fields: [lessonId], references: [id])
+  assignment Assignment?    @relation(fields: [assignmentId], references: [id])
+  messages   TutorMessage[]
+
+  @@index([studentId, updatedAt])
+  @@map("tutor_conversations")
+}
+
+model TutorMessage {
+  id             String    @id @default(uuid(7)) @db.Uuid
+  conversationId String    @db.Uuid
+  role           TutorRole
+  text           String
+  /// TUTOR: the help level it answered at
+  level          Int?
+  /// TUTOR: the course materials it was given, [{ kind, title, detail }]
+  sources        Json?
+  /// TUTOR: tokens the model used (cost = budget)
+  inputTokens    Int       @default(0)
+  outputTokens   Int       @default(0)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(3)
+
+  conversation TutorConversation @relation(fields: [conversationId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@map("tutor_messages")
 }

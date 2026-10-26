@@ -36,5 +36,11 @@
   "RESET_LINK_INVALID": "Havola noto‘g‘ri, muddati o‘tgan yoki allaqachon ishlatilgan.",
   "QUIZ_LOCKED": "O‘quvchi quiz’ni boshlagan: savollarni o‘zgartirib bo‘lmaydi.",
   "QUIZ_CLOSED": "Bu quiz’ni boshlab bo‘lmaydi.",
-  "QUIZ_TIME_UP": "Vaqt tugadi: javob saqlanmadi."
+  "QUIZ_TIME_UP": "Vaqt tugadi: javob saqlanmadi.",
+  "TUTOR_DISABLED": "AI tutor bu serverda ulanmagan.",
+  "TUTOR_LIMIT": "Bugungi tutor savollaringiz tugadi. Ertaga yana paydo bo'ladi.",
+  "TUTOR_BUDGET": "Tutor bugun dam olyapti. Iltimos, ertaga urinib ko'ring.",
+  "TUTOR_QUIZ_ACTIVE": "Ochiq quiz bor ekan, tutor o'chiq.",
+  "TUTOR_OFF": "O'qituvchingiz bu vazifa uchun tutorni o'chirgan.",
+  "TUTOR_FAILED": "Tutor javob bera olmadi. Qaytadan urinib ko'ring — bu savol hisobga olinmadi."
 }

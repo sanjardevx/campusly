@@ -221,6 +221,7 @@ export const STUDENT_ASSIGNMENT = graphql(`
       maxAttempts
       acceptedFileTypes
       timeLimitMin
+      tutorMode
       gradesPublishedAt
       files {
         id
@@ -370,6 +371,59 @@ export const STUDENT_TUTOR_TOPICS = graphql(`
       moduleId
       title
       type
+      tutorMode
+    }
+  }
+`);
+
+/** AI Study Tutor: is it on, today's requests, is a quiz open */
+export const TUTOR_STATUS = graphql(`
+  query TutorStatus {
+    tutorStatus {
+      enabled
+      used
+      limit
+      quizActive
+    }
+  }
+`);
+
+export const TUTOR_CONVERSATIONS = graphql(`
+  query TutorConversations {
+    tutorConversations {
+      id
+      courseId
+      courseTitle
+      lessonId
+      assignmentId
+      title
+      preview
+      level
+      updatedAt
+    }
+  }
+`);
+
+/** One conversation's messages, oldest first */
+export const TUTOR_CONVERSATION = graphql(`
+  query TutorConversation($conversationId: String!) {
+    tutorConversation(conversationId: $conversationId) {
+      conversation {
+        id
+        level
+      }
+      messages {
+        id
+        role
+        text
+        level
+        sources {
+          kind
+          title
+          page
+        }
+        createdAt
+      }
     }
   }
 `);

@@ -46,6 +46,8 @@ setting AWS_REGION eu-central-1
 setting S3_BUCKET campusly-prod-media
 setting CLOUDFRONT_DOMAIN media.campusly.uz # alias of d13njm9qjhav5w.cloudfront.net (ACM cert in us-east-1)
 setting CLOUDFRONT_KEY_PAIR_ID K1EDVKZHKZ3I52
+# AI tutor: off until Bedrock allows Claude Haiku 5.5 on the account, then bedrock (README §14)
+setting TUTOR_PROVIDER off
 
 echo "Secrets:"
 # RDS forces SSL; the image trusts the RDS certificate authority (Dockerfile)

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import {
   DeleteObjectCommand,
+  GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -123,6 +124,16 @@ export class StorageService {
       }
       throw err;
     }
+  }
+
+  /** The file's bytes (the batch reads lesson PDFs for the AI tutor's index) */
+  public async download(key: string): Promise<Uint8Array> {
+    const { bucket } = this.config();
+    const object = await this.s3.send(
+      new GetObjectCommand({ Bucket: bucket, Key: key }),
+    );
+    if (!object.Body) throw new Error(`Empty S3 object ${key}`);
+    return object.Body.transformToByteArray();
   }
 
   public async delete(key: string): Promise<void> {

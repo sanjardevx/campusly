@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { weekShiftMs } from '../../../prisma/demo-seed';
 import { BatchCron } from '../../campusly-batch/src/batch.cron';
+import { TutorIndexService } from '../src/components/tutor/tutor-index.service';
 import { CampuslyBatchService } from '../../campusly-batch/src/campusly-batch.service';
 import type { Env } from '../src/libs/config';
 
@@ -28,6 +29,7 @@ describe('BatchCron.resetDemo', () => {
     const config = { get: () => demoMode };
     const cron = new BatchCron(
       batchService as unknown as CampuslyBatchService,
+      { isEnabled: false } as TutorIndexService,
       config as unknown as ConfigService<Env, true>,
     );
     return { cron, batchService };

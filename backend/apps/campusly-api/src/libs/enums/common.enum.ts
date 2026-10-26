@@ -26,6 +26,18 @@ export enum ErrorCode {
   QUIZ_CLOSED = 'QUIZ_CLOSED',
   /** The attempt's time is over: the answer was not saved */
   QUIZ_TIME_UP = 'QUIZ_TIME_UP',
+  /** The AI tutor is not connected on this server (TUTOR_PROVIDER=off) */
+  TUTOR_DISABLED = 'TUTOR_DISABLED',
+  /** The student used today's tutor requests */
+  TUTOR_LIMIT = 'TUTOR_LIMIT',
+  /** The school's tutor budget for today is used up */
+  TUTOR_BUDGET = 'TUTOR_BUDGET',
+  /** The student has a quiz open: the tutor is off until it is submitted */
+  TUTOR_QUIZ_ACTIVE = 'TUTOR_QUIZ_ACTIVE',
+  /** The teacher turned the tutor off for this assignment (or it is a quiz) */
+  TUTOR_OFF = 'TUTOR_OFF',
+  /** The model call failed; the request was not counted */
+  TUTOR_FAILED = 'TUTOR_FAILED',
   /** S3 / CloudFront are not configured on this server (local run without AWS, CI) */
   MEDIA_DISABLED = 'MEDIA_DISABLED',
   // CSV import: the whole file is refused (row problems are ImportIssueCode instead)

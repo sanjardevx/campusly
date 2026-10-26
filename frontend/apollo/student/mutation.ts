@@ -119,3 +119,16 @@ export const SUBMIT_QUIZ = graphql(`
     }
   }
 `);
+
+/** AI Study Tutor: "I solved it" — the next question starts at help level 1 */
+export const MARK_TUTOR_SOLVED = graphql(`
+  mutation MarkTutorSolved($conversationId: String!) {
+    markTutorSolved(conversationId: $conversationId) {
+      id
+      role
+      text
+      level
+      createdAt
+    }
+  }
+`);

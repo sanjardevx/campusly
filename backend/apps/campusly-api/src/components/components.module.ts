@@ -13,6 +13,7 @@ import { OverviewModule } from './overview/overview.module';
 import { ProgressModule } from './progress/progress.module';
 import { SchoolModule } from './school/school.module';
 import { TelegramModule } from './telegram/telegram.module';
+import { TutorModule } from './tutor/tutor.module';
 import { UserModule } from './user/user.module';
 
 // Every feature module is registered here (same as Nestar's ComponentsModule)
@@ -32,6 +33,7 @@ import { UserModule } from './user/user.module';
     ProgressModule,
     SchoolModule,
     TelegramModule,
+    TutorModule,
     UserModule,
   ],
 })

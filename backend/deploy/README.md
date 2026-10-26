@@ -248,3 +248,22 @@ curl -s "https://api.telegram.org/bot$TOKEN/setWebhook" \
 3. Deploy (the next push, or `deploy.sh`): `env-from-ssm.sh` adds the three values to `.env.production`. Check: `curl -s "https://api.telegram.org/bot$TOKEN/getWebhookInfo"` shows the URL and no `last_error_message`; send `/start` to the bot.
 
 All three variables or none: with only some of them the API refuses to start (zod), so a half-configured bot never runs. Locally the bot cannot receive messages (Telegram calls the production webhook); the e2e test fakes Telegram.
+
+## 14. AI Study Tutor (Bedrock)
+
+The tutor (DECISIONS §14) calls **Claude Haiku 5.5** through *Claude in Amazon Bedrock* (Messages API at `bedrock-mantle.eu-central-1.api.aws`, model `anthropic.claude-haiku-5-5`) and embeds course material with **Titan Text Embeddings V2** (`amazon.titan-embed-text-v2:0`, bedrock-runtime). Both are signed with the EC2 role: no API key. The batch indexes lessons, assignments and their PDFs into `document_chunks` (pgvector) every 10 minutes; the API answers on `POST /tutor/chat` (Server-Sent Events — Caddy passes them through as they come).
+
+1. **Model access** (§0): Claude Haiku 5.5 must be allowed on the account and its quota above 0. Try it once in the Bedrock playground (eu-central-1).
+2. **EC2 role**: the inline policy from [`iam-ec2-policy.json`](iam-ec2-policy.json) now has `TutorClaude` (`bedrock-mantle:CreateInference`) and `TutorEmbeddings` (`bedrock:InvokeModel` on the Titan model). Update the role's inline policy with the new file. `TutorClaude` is `*` for now: narrow it to the model ARN the console shows once access is granted.
+3. **Switch it on** and deploy:
+
+```bash
+export AWS_REGION=eu-central-1
+aws ssm put-parameter --name /campusly/prod/TUTOR_PROVIDER --type String --value bedrock --overwrite
+# optional, only to change the defaults:
+# aws ssm put-parameter --name /campusly/prod/BEDROCK_CHAT_MODEL_ID --type String --value anthropic.claude-haiku-5-5
+```
+
+The migration `ai_tutor` runs `CREATE EXTENSION vector` (RDS PostgreSQL 17 ships pgvector; the master user may create it). Check after the deploy: `docker compose -f docker-compose.prod.yml logs batch | grep TUTOR_INDEX` shows "N sources indexed"; then ask a question as a demo student. Spend is capped in the app at **$2 a day** for the whole school and 30 requests per student (Redis); the AWS budgets (DECISIONS §12) stay the outer limit.
+
+`TUTOR_PROVIDER=off` (the SSM default) keeps the page in its "not connected" state; `fake` is refused in production.

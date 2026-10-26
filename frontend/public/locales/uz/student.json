@@ -174,8 +174,8 @@
     "notFound": "Bu dars mavjud emas.",
     "tutor": {
       "title": "Study Tutor",
-      "soon": "Tez orada",
-      "body": "Dars bo‘yicha savol bering va bosqichma-bosqich maslahat oling. AI yordamchi tez orada qo‘shiladi."
+      "body": "Shu dars bo'yicha so'rang va kurs materiallaringizdan bosqichma-bosqich maslahat oling.",
+      "ask": "Shu dars bo'yicha so'rash"
     },
     "player": {
       "play": "Ijro etish",
@@ -382,7 +382,9 @@
       "3": "Qadam",
       "4": "O'xshash misol"
     },
-    "notConnectedBanner": "AI yordamchi sozlanmoqda. Sahifani sinab ko'rishingiz mumkin, lekin savollar hali hech qayerga yuborilmaydi.",
+    "notConnectedBanner": "AI tutor bu serverda hali ulanmagan. Savollar hech qayerga yuborilmaydi.",
+    "quizActiveBanner": "Sizda ochiq quiz bor. Uni topshirmaguningizcha tutor o'chiq.",
+    "thinking": "Tutor o'ylayapti…",
     "anotherHint": "Yana maslahat",
     "solved": "Yechdim",
     "attach": "Rasm biriktirish (tez orada)",
@@ -399,7 +401,9 @@
       "check": "Fikrimni tekshirib bera olasizmi?"
     },
     "system": {
-      "notConnected": "Yordamchi hali ulanmagan — bu savol faqat ekraningizda qoladi."
+      "anotherHint": "Yana bir maslahat so'radingiz",
+      "solved": "Yechildi — keyingi savol kichik yo'naltirishdan boshlanadi",
+      "refused": "Tutor bunga yordam bera olmaydi. Kursingiz bo'yicha savol bering."
     },
     "sources": {
       "title": "Kursingizdan",
@@ -408,8 +412,10 @@
       "onlyCourse": "Faqat o'qituvchingizning {{course}} materiallaridan foydalanadi.",
       "kind": {
         "LESSON": "Dars",
-        "FILE": "Fayl"
-      }
+        "FILE": "Fayl",
+        "ASSIGNMENT": "Vazifa"
+      },
+      "page": "{{page}}-sahifa"
     },
     "quota": {
       "title": "Kunlik savollar",

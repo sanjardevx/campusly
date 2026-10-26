@@ -174,8 +174,8 @@
     "notFound": "This lesson is not available.",
     "tutor": {
       "title": "Study Tutor",
-      "soon": "Coming soon",
-      "body": "Ask questions about this lesson and get step-by-step hints. The AI study tutor is on its way."
+      "body": "Ask about this lesson and get step-by-step hints from your course materials.",
+      "ask": "Ask about this lesson"
     },
     "player": {
       "play": "Play",
@@ -382,7 +382,9 @@
       "3": "Step hint",
       "4": "Similar example"
     },
-    "notConnectedBanner": "The AI tutor is being set up. You can try the page, but questions are not sent anywhere yet.",
+    "notConnectedBanner": "The AI tutor is not connected on this server yet. Questions are not sent anywhere.",
+    "quizActiveBanner": "You have a quiz open. The tutor is off until you submit it.",
+    "thinking": "The tutor is thinking…",
     "anotherHint": "Show another hint",
     "solved": "I solved it",
     "attach": "Attach a photo (coming soon)",
@@ -399,7 +401,9 @@
       "check": "Can you check my idea?"
     },
     "system": {
-      "notConnected": "The tutor is not connected yet — this question stays on your screen only."
+      "anotherHint": "You asked for another hint",
+      "solved": "Solved — the next question starts with a nudge",
+      "refused": "The tutor can't help with this one. Try a question about your course."
     },
     "sources": {
       "title": "From your course",
@@ -408,8 +412,10 @@
       "onlyCourse": "Uses only {{course}} materials from your teacher.",
       "kind": {
         "LESSON": "Lesson",
-        "FILE": "File"
-      }
+        "FILE": "File",
+        "ASSIGNMENT": "Assignment"
+      },
+      "page": "Page {{page}}"
     },
     "quota": {
       "title": "Daily questions",
