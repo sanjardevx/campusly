@@ -231,6 +231,12 @@ export const UPDATE_SCHOOL_SETTINGS = graphql(`
       officeHours
       telegramUrl
       telegramBotUrl
+      siteAddress
+      siteMetro
+      siteEmail
+      instagramUrl
+      youtubeUrl
+      foundedYear
       tempPasswordUses
       tempPasswordDays
     }
@@ -309,6 +315,122 @@ export const ARCHIVE_SCHOOL_EVENT = graphql(`
   mutation ArchiveSchoolEvent($id: String!) {
     archiveSchoolEvent(id: $id) {
       id
+    }
+  }
+`);
+
+// ───────────── Public website CMS (day 19) ─────────────
+
+export const SAVE_SITE_POST = graphql(`
+  mutation SaveSitePost($input: SaveSitePostInput!) {
+    saveSitePost(input: $input) {
+      id
+    }
+  }
+`);
+
+export const ARCHIVE_SITE_POST = graphql(`
+  mutation ArchiveSitePost($id: String!) {
+    archiveSitePost(id: $id) {
+      id
+    }
+  }
+`);
+
+export const SAVE_SITE_PROGRAM = graphql(`
+  mutation SaveSiteProgram($input: SaveSiteProgramInput!) {
+    saveSiteProgram(input: $input) {
+      id
+    }
+  }
+`);
+
+export const SET_SITE_PROGRAM_VISIBLE = graphql(`
+  mutation SetSiteProgramVisible($id: String!, $showOnSite: Boolean!) {
+    setSiteProgramVisible(id: $id, showOnSite: $showOnSite) {
+      id
+      showOnSite
+    }
+  }
+`);
+
+export const REORDER_SITE_PROGRAMS = graphql(`
+  mutation ReorderSitePrograms($ids: [String!]!) {
+    reorderSitePrograms(ids: $ids) {
+      id
+      order
+    }
+  }
+`);
+
+export const ARCHIVE_SITE_PROGRAM = graphql(`
+  mutation ArchiveSiteProgram($id: String!) {
+    archiveSiteProgram(id: $id) {
+      id
+    }
+  }
+`);
+
+export const SAVE_SITE_PERSON = graphql(`
+  mutation SaveSitePerson($input: SaveSitePersonInput!) {
+    saveSitePerson(input: $input) {
+      id
+    }
+  }
+`);
+
+export const SET_SITE_PERSON_VISIBLE = graphql(`
+  mutation SetSitePersonVisible($id: String!, $showOnSite: Boolean!) {
+    setSitePersonVisible(id: $id, showOnSite: $showOnSite) {
+      id
+      showOnSite
+    }
+  }
+`);
+
+export const REORDER_SITE_PEOPLE = graphql(`
+  mutation ReorderSitePeople($ids: [String!]!) {
+    reorderSitePeople(ids: $ids) {
+      id
+      order
+    }
+  }
+`);
+
+export const ARCHIVE_SITE_PERSON = graphql(`
+  mutation ArchiveSitePerson($id: String!) {
+    archiveSitePerson(id: $id) {
+      id
+    }
+  }
+`);
+
+export const SET_ENQUIRY_STATUS = graphql(`
+  mutation SetEnquiryStatus($id: String!, $status: EnquiryStatus!) {
+    setEnquiryStatus(id: $id, status: $status) {
+      id
+      status
+      handledBy
+      handledAt
+    }
+  }
+`);
+
+export const TRANSLATE_SITE_TEXT = graphql(`
+  mutation TranslateSiteText($input: TranslateSiteTextInput!) {
+    translateSiteText(input: $input) {
+      uz
+      ru
+      ko
+    }
+  }
+`);
+
+export const CREATE_SITE_UPLOAD = graphql(`
+  mutation CreateSiteUpload($input: UploadFileInput!) {
+    createSiteUpload(input: $input) {
+      assetId
+      uploadUrl
     }
   }
 `);

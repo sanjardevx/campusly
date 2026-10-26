@@ -62,6 +62,12 @@ export const SCHOOL_SETTINGS = graphql(`
       officeHours
       telegramUrl
       telegramBotUrl
+      siteAddress
+      siteMetro
+      siteEmail
+      instagramUrl
+      youtubeUrl
+      foundedYear
       tempPasswordUses
       tempPasswordDays
     }

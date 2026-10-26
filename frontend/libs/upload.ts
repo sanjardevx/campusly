@@ -1,4 +1,5 @@
 import type { ApolloClient } from '@apollo/client';
+import { CREATE_SITE_UPLOAD } from '@/apollo/admin/mutation';
 import { CREATE_SUBMISSION_UPLOAD } from '@/apollo/student/mutation';
 import { CONFIRM_UPLOAD, CREATE_UPLOAD } from '@/apollo/teacher/mutation';
 import type { MediaKind } from '@/libs/gql/graphql';
@@ -128,6 +129,27 @@ export async function uploadSubmissionFile(
   const ticket = data!.createSubmissionUpload;
   onPhase('UPLOADING', 0);
   await put(ticket.uploadUrl, file, (p) => onPhase('UPLOADING', p), signal);
+  onPhase('CHECKING');
+  await client.mutate({ mutation: CONFIRM_UPLOAD, variables: { assetId: ticket.assetId } });
+  onPhase('READY');
+  return ticket.assetId;
+}
+
+/** A picture for the public website (CMS, admins only): the ticket comes from createSiteUpload */
+export async function uploadSiteImage(
+  client: ApolloClient,
+  file: File,
+  onPhase: (phase: UploadPhase, percent?: number) => void,
+): Promise<string> {
+  if (kindOf(file) !== 'IMAGE') throw new Error('FILE_TYPE');
+  onPhase('PREPARING');
+  const { data } = await client.mutate({
+    mutation: CREATE_SITE_UPLOAD,
+    variables: { input: { kind: 'IMAGE', fileName: file.name, mimeType: file.type, size: file.size } },
+  });
+  const ticket = data!.createSiteUpload;
+  onPhase('UPLOADING', 0);
+  await put(ticket.uploadUrl, file, (p) => onPhase('UPLOADING', p));
   onPhase('CHECKING');
   await client.mutate({ mutation: CONFIRM_UPLOAD, variables: { assetId: ticket.assetId } });
   onPhase('READY');

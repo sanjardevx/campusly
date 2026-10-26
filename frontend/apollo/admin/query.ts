@@ -321,3 +321,101 @@ export const AUDIT_LOGS = graphql(`
     }
   }
 `);
+
+// ───────────── Public website CMS (day 19) ─────────────
+
+export const ADMIN_SITE_POSTS = graphql(`
+  query AdminSitePosts {
+    adminSitePosts {
+      id
+      type
+      title { en uz ru ko }
+      summary { en uz ru ko }
+      body { en uz ru ko }
+      coverUrl
+      eventDate
+      startTime
+      endTime
+      place { en uz ru ko }
+      carouselPosition
+      status
+      publishedAt
+      editedBy
+      updatedAt
+    }
+  }
+`);
+
+export const ADMIN_SITE_PROGRAMS = graphql(`
+  query AdminSitePrograms {
+    adminSitePrograms {
+      id
+      category
+      name { en uz ru ko }
+      gradeFrom
+      gradeTo
+      levelNote { en uz ru ko }
+      days
+      startTime
+      endTime
+      room
+      teachers {
+        id
+        name
+        role { en uz ru ko }
+      }
+      description { en uz ru ko }
+      photoUrl
+      videoUrl
+      showOnSite
+      order
+      editedBy
+      updatedAt
+    }
+  }
+`);
+
+export const ADMIN_SITE_PEOPLE = graphql(`
+  query AdminSitePeople {
+    adminSitePeople {
+      id
+      firstName
+      lastName
+      role { en uz ru ko }
+      note { en uz ru ko }
+      isDirector
+      photoUrl
+      showOnSite
+      order
+    }
+  }
+`);
+
+export const ADMIN_ENQUIRIES = graphql(`
+  query AdminEnquiries($input: EnquiriesInput!) {
+    adminEnquiries(input: $input) {
+      new
+      inProgress
+      resolved
+      items {
+        id
+        parentName
+        phone
+        childGrade
+        interest
+        locale
+        userAgent
+        status
+        handledBy
+        handledAt
+        createdAt
+      }
+    }
+  }
+`);
+
+export const SITE_TRANSLATE_AVAILABLE = graphql(`
+  query SiteTranslateAvailable {
+    siteTranslateAvailable
+  }
+`);

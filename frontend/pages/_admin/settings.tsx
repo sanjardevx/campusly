@@ -6,6 +6,7 @@ import { PageHeader } from '@/libs/components/admin/PageHeader';
 import { AccountsCard } from '@/libs/components/admin/settings/AccountsCard';
 import { GradingCard } from '@/libs/components/admin/settings/GradingCard';
 import { SchoolCard } from '@/libs/components/admin/settings/SchoolCard';
+import { WebsiteCard } from '@/libs/components/admin/settings/WebsiteCard';
 import { YearsCard } from '@/libs/components/admin/settings/YearsCard';
 import { layoutFor } from '@/libs/components/layout';
 import { withTranslations } from '@/libs/i18n/server';
@@ -29,6 +30,7 @@ const SettingsPage: NextPageWithLayout = () => {
         {settings && (
           <>
             <SchoolCard settings={settings} />
+            <WebsiteCard settings={settings} />
             <GradingCard settings={settings} />
             <AccountsCard settings={settings} />
           </>

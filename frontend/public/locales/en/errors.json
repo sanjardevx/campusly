@@ -43,5 +43,7 @@
   "TUTOR_QUIZ_ACTIVE": "The tutor is off while you have a quiz open.",
   "TUTOR_OFF": "Your teacher turned the tutor off for this assignment.",
   "TUTOR_FAILED": "The tutor couldn't answer. Please try again — this question was not counted.",
+  "SITE_CAROUSEL_FULL": "The home page slider already has 5 posts. Take one out first.",
+  "SITE_IMAGE_INVALID": "The picture did not upload correctly. Please upload it again.",
   "INVALID_PHONE": "Please write an Uzbek mobile number, e.g. 90 123 45 67."
 }

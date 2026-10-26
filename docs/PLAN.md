@@ -262,7 +262,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [x] Teacher editor: MC / True-False / Number questions, time limit (the "Quiz" item in the Add menu stops being "coming soon").
 - [x] Student: timer, 1 attempt, time checked on the server, auto-grade → `Submission` score → gradebook.
 - [x] Results go out through the existing "publish grades" flow.
-- [ ] Isolation tests; deploy.
+- [x] Isolation tests; deploy.
 
 ---
 
@@ -273,16 +273,16 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
   - Deploy: Claude through the Anthropic API (Bedrock Claude blocked on the account): `ANTHROPIC_API_KEY` (SSM SecureString) + `TUTOR_PROVIDER=anthropic`; `iam-ec2-policy.json` gets InvokeModel on Titan Embeddings V2 (and the Bedrock Claude statement for later) — deploy README §14.
 - [x] Help levels 1–4 and the assignment's `tutorMode`; off during quizzes.
 - [x] Daily limit per student + global budget (Redis).
-- [ ] The `useTutor` stub calls the real API; a test proves parents cannot read tutor conversations; deploy.
+- [x] The `useTutor` stub calls the real API; a test proves parents cannot read tutor conversations; deploy.
 
 ---
 
 ## Day 19 (L) — Public website + minimal CMS
 
-- [ ] CMS tables: News & Events, Programs, Our team, Enquiries + migration.
-- [ ] Admin CMS pages: list + drawer, publish / archive (no hard delete, audited).
-- [ ] Public pages from Stitch "Campusly Public": home, news, programs, team, contact form.
-- [ ] Enquiry form: rate limit, admin inbox.
+- [x] CMS tables: News & Events, Programs, Our team, Enquiries + migration.
+- [x] Admin CMS pages: list + drawer, publish / archive (no hard delete, audited).
+- [x] Public pages from Stitch "Campusly Public": home, news, programs, team, contact form.
+- [x] Enquiry form: rate limit, admin inbox.
 - [ ] Deploy.
 
 ---
