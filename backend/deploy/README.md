@@ -233,7 +233,8 @@ export AWS_REGION=eu-central-1   # CloudShell otherwise follows the console's re
 # 1. Settings — the token comes from BotFather; never paste it into a chat
 aws ssm put-parameter --name /campusly/prod/TELEGRAM_BOT_USERNAME --type String --value campuslyreset_bot
 aws ssm put-parameter --name /campusly/prod/TELEGRAM_WEBHOOK_SECRET --type SecureString --value "$(openssl rand -hex 32)"
-read -rs TOKEN && aws ssm put-parameter --name /campusly/prod/TELEGRAM_BOT_TOKEN --type SecureString --value "$TOKEN"
+read -rs TOKEN && curl -s "https://api.telegram.org/bot$TOKEN/getMe" | grep -o '"username":"[^"]*"'   # must print "campuslyreset_bot"
+aws ssm put-parameter --name /campusly/prod/TELEGRAM_BOT_TOKEN --type SecureString --value "$TOKEN" --overwrite
 
 # 2. Point Telegram at the API (reads both secrets from SSM, prints only Telegram's answer)
 TOKEN=$(aws ssm get-parameter --name /campusly/prod/TELEGRAM_BOT_TOKEN --with-decryption --query Parameter.Value --output text)

@@ -250,7 +250,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [x] Account linking: a parent shares their phone contact (matched to the parent login); a student links with a one-time code.
 - [x] Password reset through a one-time link (`OneTimeToken`); the "Reset in Telegram" button from Settings starts it.
 - [ ] ~~Notifications through BullMQ~~ — cut (developer's choice, 2026-10-27): the bot only links accounts and resets passwords.
-- [ ] e2e + isolation tests; deploy.
+- [x] e2e + isolation tests; deploy.
 
 **Developer:** bot token from BotFather.
 
