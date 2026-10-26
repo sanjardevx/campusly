@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   HttpException,
   HttpStatus,
@@ -21,7 +22,11 @@ import {
   LOGIN_LIMIT,
   REFRESH_GRACE_SEC,
   REFRESH_TTL_DAYS,
+  RESET_SUBMIT_LIMIT,
 } from '../../libs/config';
+import { AuditAction } from '../../libs/enums/audit.enum';
+import { AuditService } from '../audit/audit.service';
+import { consumeOneTimeToken } from './one-time-token';
 import { LoginInput } from '../../libs/dto/auth/login.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import { Role } from '../../libs/enums/user.enum';
@@ -70,6 +75,7 @@ export class AuthService {
     private readonly redisService: RedisService,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService<Env, true>,
+    private readonly auditService: AuditService,
   ) {}
 
   // ─────────────────────────── login ───────────────────────────
@@ -276,6 +282,68 @@ export class AuthService {
       where: { userId, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+  }
+
+  /**
+   * The Telegram bot's one-time link (DECISIONS §6): sets a new password, signs out every
+   * session and unlocks the login ID. Any problem with the link (wrong, expired, used, or the
+   * account is blocked / a demo) gives the same RESET_LINK_INVALID, so the link reveals nothing.
+   */
+  public async resetPassword(
+    token: string,
+    newPassword: string,
+    client: ClientInfo,
+  ): Promise<void> {
+    const ipKey = `reset:ip:${client.ip}`;
+    const [attempts] = (await this.redisService
+      .multi()
+      .incr(ipKey)
+      .expire(ipKey, RESET_SUBMIT_LIMIT.windowSec, 'NX')
+      .exec()) as [[Error | null, number]];
+    if (attempts[1] > RESET_SUBMIT_LIMIT.perIp) {
+      throw new HttpException(
+        {
+          code: ErrorCode.RATE_LIMITED,
+          message: 'Too many attempts. Try again in 15 minutes.',
+        },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    const loginId = await this.prismaService.$transaction(async (tx) => {
+      const userId = await consumeOneTimeToken(tx, 'PASSWORD_RESET', token);
+      const user = userId
+        ? await tx.user.findUnique({
+            where: { id: userId },
+            select: { id: true, loginId: true, status: true, isDemo: true },
+          })
+        : null;
+      if (!user || user.status !== 'ACTIVE' || user.isDemo) {
+        throw new BadRequestException({
+          code: ErrorCode.RESET_LINK_INVALID,
+          message: 'This link is wrong, expired or already used',
+        });
+      }
+      await tx.user.update({
+        where: { id: user.id },
+        data: {
+          passwordHash,
+          tempPasswordUsesLeft: null,
+          tempPasswordExpiresAt: null,
+          mustChangePassword: false,
+        },
+      });
+      await this.revokeAllSessions(user.id, tx);
+      await this.auditService.log(tx, {
+        actor: { id: user.id, ip: client.ip },
+        action: AuditAction.USER_TELEGRAM_RESET,
+        entityType: 'User',
+        entityId: user.id,
+      });
+      return user.loginId;
+    });
+    await this.clearLoginFailures(loginId);
   }
 
   /** After a reset the login ID may be rate-limited from earlier failures: unlock it */

@@ -31,5 +31,7 @@
   "NETWORK_ERROR": "Cannot reach the server. Check your internet connection.",
   "UNKNOWN": "Something went wrong. Please try again.",
   "CATEGORY_NAME_TAKEN": "Two categories have the same name.",
-  "DEMO_READ_ONLY": "This is not available in the demo."
+  "DEMO_READ_ONLY": "This is not available in the demo.",
+  "TELEGRAM_DISABLED": "Telegram is not available on this server yet.",
+  "RESET_LINK_INVALID": "This link is wrong, expired or already used."
 }

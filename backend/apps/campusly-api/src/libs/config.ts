@@ -36,6 +36,12 @@ const envSchema = z
     // The key that signs video links: a file outside the repo (local) or the PEM text (production)
     CLOUDFRONT_PRIVATE_KEY_PATH: optional(z.string()),
     CLOUDFRONT_PRIVATE_KEY: optional(z.string()),
+
+    // Telegram bot (account linking + password reset). All or nothing: without them it is off (CI, tests).
+    TELEGRAM_BOT_TOKEN: optional(z.string().regex(/^\d+:[\w-]{30,}$/)),
+    // Telegram sends it back in a header on every webhook call: 1–256 of A–Z a–z 0–9 _ -
+    TELEGRAM_WEBHOOK_SECRET: optional(z.string().regex(/^[\w-]{32,256}$/)),
+    TELEGRAM_BOT_USERNAME: optional(z.string().regex(/^\w{5,32}bot$/i)),
   })
   .refine((env) => env.JWT_ACCESS_SECRET !== env.JWT_REFRESH_SECRET, {
     path: ['JWT_REFRESH_SECRET'],
@@ -61,6 +67,21 @@ const envSchema = z
             key === 'CLOUDFRONT_PRIVATE_KEY_PATH'
               ? 'set CLOUDFRONT_PRIVATE_KEY_PATH or CLOUDFRONT_PRIVATE_KEY'
               : 'required for media (S3 + CloudFront)',
+        });
+      }
+    }
+    const telegram = {
+      TELEGRAM_BOT_TOKEN: env.TELEGRAM_BOT_TOKEN,
+      TELEGRAM_WEBHOOK_SECRET: env.TELEGRAM_WEBHOOK_SECRET,
+      TELEGRAM_BOT_USERNAME: env.TELEGRAM_BOT_USERNAME,
+    };
+    const telegramMissing = Object.entries(telegram).filter(([, v]) => !v);
+    if (telegramMissing.length && telegramMissing.length < 3) {
+      for (const [key] of telegramMissing) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [key],
+          message: 'required for the Telegram bot (set all three or none)',
         });
       }
     }
@@ -105,6 +126,17 @@ export const LOGIN_LIMIT = { perLoginId: 5, perIp: 30, windowSec: 15 * 60 };
 export const DEMO_LIMIT = { perIp: 20, windowSec: 15 * 60 };
 /** A just-rotated refresh token still works this long (two tabs refreshing at the same time) */
 export const REFRESH_GRACE_SEC = 10;
+
+// ───────────────────────────── Telegram ─────────────────────────────
+
+/** A portal link that connects a student's Telegram works this long, once */
+export const TELEGRAM_LINK_TTL_MIN = 15;
+/** A password-reset link sent by the bot works this long, once */
+export const PASSWORD_RESET_TTL_MIN = 15;
+/** /reset requests per Telegram chat per hour (each sends a new link) */
+export const RESET_LIMIT = { perChat: 3, windowSec: 60 * 60 };
+/** POST /auth/reset-password attempts per IP in 15 minutes (guessing tokens is pointless, but cheap to stop) */
+export const RESET_SUBMIT_LIMIT = { perIp: 20, windowSec: 15 * 60 };
 /**
  * Temporary passwords: the rule itself is a school setting (default 3 sign-ins / 14 days). These are
  * the limits an admin may choose within: a temporary password that lives for months is a hole.

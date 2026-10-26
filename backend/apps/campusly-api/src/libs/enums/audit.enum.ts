@@ -3,6 +3,10 @@ export enum AuditAction {
   USER_CREATE = 'user.create',
   USER_UPDATE = 'user.update',
   USER_RESET_PASSWORD = 'user.resetPassword',
+  /** The user set a new password through the Telegram bot's one-time link */
+  USER_TELEGRAM_RESET = 'user.telegramReset',
+  USER_TELEGRAM_LINK = 'user.telegramLink',
+  USER_TELEGRAM_UNLINK = 'user.telegramUnlink',
   USER_BLOCK = 'user.block',
   USER_UNBLOCK = 'user.unblock',
   PARENT_LINK = 'parent.link',

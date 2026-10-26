@@ -16,6 +16,10 @@ export enum ErrorCode {
   RATE_LIMITED = 'RATE_LIMITED',
   /** A demo account tried something demos may not do (change password, manage users, upload) */
   DEMO_READ_ONLY = 'DEMO_READ_ONLY',
+  /** The Telegram bot is not configured on this server */
+  TELEGRAM_DISABLED = 'TELEGRAM_DISABLED',
+  /** A password-reset link is wrong, expired or already used */
+  RESET_LINK_INVALID = 'RESET_LINK_INVALID',
   /** S3 / CloudFront are not configured on this server (local run without AWS, CI) */
   MEDIA_DISABLED = 'MEDIA_DISABLED',
   // CSV import: the whole file is refused (row problems are ImportIssueCode instead)

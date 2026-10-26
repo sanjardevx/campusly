@@ -834,6 +834,7 @@ type Mutation {
   createSubject(input: CreateSubjectInput!): Subject!
   createSubmissionUpload(input: CreateSubmissionUploadInput!): UploadTicket!
   createTeacher(input: CreateTeacherInput!): LoginSlip!
+  createTelegramLink: TelegramLink!
   createUpload(input: CreateUploadInput!): UploadTicket!
   giveZeroToMissing(assignmentId: String!): Int!
   gradeSubmission(input: GradeSubmissionInput!): Submission!
@@ -1081,6 +1082,7 @@ type Query {
   subjects(includeArchived: Boolean): [Subject!]!
   teacherDashboard: TeacherDashboard!
   teachingCourses: [Course!]!
+  telegramStatus: TelegramStatus!
   users(input: UsersInquiry!): Users!
 }
 
@@ -1330,6 +1332,17 @@ type TeacherDeadline {
   id: String!
   kind: DeadlineKind!
   title: String!
+}
+
+type TelegramLink {
+  expiresAt: DateTime!
+  url: String!
+}
+
+type TelegramStatus {
+  botUsername: String
+  enabled: Boolean!
+  linked: Boolean!
 }
 
 type TodayCourse {

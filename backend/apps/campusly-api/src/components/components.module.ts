@@ -12,6 +12,7 @@ import { MediaModule } from './media/media.module';
 import { OverviewModule } from './overview/overview.module';
 import { ProgressModule } from './progress/progress.module';
 import { SchoolModule } from './school/school.module';
+import { TelegramModule } from './telegram/telegram.module';
 import { UserModule } from './user/user.module';
 
 // Every feature module is registered here (same as Nestar's ComponentsModule)
@@ -30,6 +31,7 @@ import { UserModule } from './user/user.module';
     OverviewModule,
     ProgressModule,
     SchoolModule,
+    TelegramModule,
     UserModule,
   ],
 })

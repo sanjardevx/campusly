@@ -18,6 +18,7 @@ import { ProgressResolver } from '../src/components/progress/progress.resolver';
 import { SchoolEventResolver } from '../src/components/school/school-event.resolver';
 import { SchoolResolver } from '../src/components/school/school.resolver';
 import { TeacherDashboardResolver } from '../src/components/dashboard/teacher-dashboard.resolver';
+import { TelegramResolver } from '../src/components/telegram/telegram.resolver';
 import { UserAdminResolver } from '../src/components/user/user-admin.resolver';
 import { UserResolver } from '../src/components/user/user.resolver';
 import {
@@ -50,6 +51,7 @@ const RESOLVERS = [
   SchoolResolver,
   SubmissionResolver,
   TeacherDashboardResolver,
+  TelegramResolver,
   UserAdminResolver,
   UserResolver,
 ];
@@ -163,6 +165,7 @@ describe('Every GraphQL operation has a deliberate role rule', () => {
             'studentCalendar',
             'studentAttendance',
             'courseProgress',
+            'telegramStatus', // own account only: is Telegram connected
           ].includes(n),
       );
     // addSubmissionComment lets parents in only to answer FORBIDDEN for their own child

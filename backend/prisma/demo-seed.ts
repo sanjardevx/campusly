@@ -86,7 +86,11 @@ async function reset() {
 
 async function seedSchool() {
   await prisma.schoolSetting.create({
-    data: { schoolName: 'Campusly School' },
+    data: {
+      schoolName: 'Campusly School',
+      // "Reset in Telegram" under "Forgot password?" (DECISIONS §6)
+      telegramBotUrl: 'https://t.me/campuslyreset_bot',
+    },
   });
 
   const year = await prisma.academicYear.create({

@@ -121,8 +121,10 @@ type Documents = {
     "\n  query TeacherAttendance($courseId: String!, $date: String!) {\n    courseAttendance(courseId: $courseId, date: $date) {\n      courseId\n      date\n      isMarked\n      rows {\n        studentId\n        loginId\n        firstName\n        lastName\n        status\n        note\n      }\n    }\n  }\n": typeof types.TeacherAttendanceDocument,
     "\n  query TeacherAnnouncements($input: AnnouncementsInquiry) {\n    announcements(input: $input) {\n      total\n      list {\n        id\n        title\n        body\n        courseId\n        courseTitle\n        isPinned\n        publishedAt\n        authorName\n        authorRole\n        audience\n        studentReads\n        files {\n          id\n          kind\n          status\n          name\n          mimeType\n          size\n          durationSec\n        }\n      }\n    }\n  }\n": typeof types.TeacherAnnouncementsDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input) {\n      accessToken\n    }\n  }\n": typeof types.ChangePasswordDocument,
+    "\n  mutation CreateTelegramLink {\n    createTelegramLink {\n      url\n      expiresAt\n    }\n  }\n": typeof types.CreateTelegramLinkDocument,
     "\n  query Me {\n    me {\n      id\n      loginId\n      role\n      firstName\n      lastName\n      locale\n      mustChangePassword\n    }\n  }\n": typeof types.MeDocument,
     "\n  query MyChildren {\n    myChildren {\n      id\n      loginId\n      firstName\n      lastName\n      className\n    }\n  }\n": typeof types.MyChildrenDocument,
+    "\n  query TelegramStatus {\n    telegramStatus {\n      enabled\n      linked\n      botUsername\n    }\n  }\n": typeof types.TelegramStatusDocument,
 };
 const documents: Documents = {
     "\n  mutation ResetPassword($userId: String!) {\n    resetPassword(userId: $userId) {\n      userId\n      loginId\n      fullName\n      role\n      tempPassword\n      isNew\n    }\n  }\n": types.ResetPasswordDocument,
@@ -232,8 +234,10 @@ const documents: Documents = {
     "\n  query TeacherAttendance($courseId: String!, $date: String!) {\n    courseAttendance(courseId: $courseId, date: $date) {\n      courseId\n      date\n      isMarked\n      rows {\n        studentId\n        loginId\n        firstName\n        lastName\n        status\n        note\n      }\n    }\n  }\n": types.TeacherAttendanceDocument,
     "\n  query TeacherAnnouncements($input: AnnouncementsInquiry) {\n    announcements(input: $input) {\n      total\n      list {\n        id\n        title\n        body\n        courseId\n        courseTitle\n        isPinned\n        publishedAt\n        authorName\n        authorRole\n        audience\n        studentReads\n        files {\n          id\n          kind\n          status\n          name\n          mimeType\n          size\n          durationSec\n        }\n      }\n    }\n  }\n": types.TeacherAnnouncementsDocument,
     "\n  mutation ChangePassword($input: ChangePasswordInput!) {\n    changePassword(input: $input) {\n      accessToken\n    }\n  }\n": types.ChangePasswordDocument,
+    "\n  mutation CreateTelegramLink {\n    createTelegramLink {\n      url\n      expiresAt\n    }\n  }\n": types.CreateTelegramLinkDocument,
     "\n  query Me {\n    me {\n      id\n      loginId\n      role\n      firstName\n      lastName\n      locale\n      mustChangePassword\n    }\n  }\n": types.MeDocument,
     "\n  query MyChildren {\n    myChildren {\n      id\n      loginId\n      firstName\n      lastName\n      className\n    }\n  }\n": types.MyChildrenDocument,
+    "\n  query TelegramStatus {\n    telegramStatus {\n      enabled\n      linked\n      botUsername\n    }\n  }\n": types.TelegramStatusDocument,
 };
 
 /**
@@ -681,11 +685,19 @@ export function graphql(source: "\n  mutation ChangePassword($input: ChangePassw
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation CreateTelegramLink {\n    createTelegramLink {\n      url\n      expiresAt\n    }\n  }\n"): (typeof documents)["\n  mutation CreateTelegramLink {\n    createTelegramLink {\n      url\n      expiresAt\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query Me {\n    me {\n      id\n      loginId\n      role\n      firstName\n      lastName\n      locale\n      mustChangePassword\n    }\n  }\n"): (typeof documents)["\n  query Me {\n    me {\n      id\n      loginId\n      role\n      firstName\n      lastName\n      locale\n      mustChangePassword\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query MyChildren {\n    myChildren {\n      id\n      loginId\n      firstName\n      lastName\n      className\n    }\n  }\n"): (typeof documents)["\n  query MyChildren {\n    myChildren {\n      id\n      loginId\n      firstName\n      lastName\n      className\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query TelegramStatus {\n    telegramStatus {\n      enabled\n      linked\n      botUsername\n    }\n  }\n"): (typeof documents)["\n  query TelegramStatus {\n    telegramStatus {\n      enabled\n      linked\n      botUsername\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

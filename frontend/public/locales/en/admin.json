@@ -691,7 +691,10 @@
         "update": "Edited an account",
         "resetPassword": "Reset a password",
         "block": "Blocked an account",
-        "unblock": "Unblocked an account"
+        "unblock": "Unblocked an account",
+        "telegramReset": "Reset own password in Telegram",
+        "telegramLink": "Connected Telegram",
+        "telegramUnlink": "Disconnected Telegram"
       },
       "users": {
         "import": "Imported students from CSV"

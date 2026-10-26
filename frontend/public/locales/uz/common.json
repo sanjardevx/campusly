@@ -87,6 +87,7 @@
     "period": "{{year}} · {{period}}",
     "periods": "{{year}} davrlari",
     "manageYears": "Sozlamalarda boshqarish",
-    "noPeriod": "Bugun davr yo‘q"
+    "noPeriod": "Bugun davr yo‘q",
+    "telegram": "Telegram’ni ulash"
   }
 }

@@ -31,5 +31,7 @@
   "NETWORK_ERROR": "서버에 연결할 수 없습니다. 인터넷 연결을 확인해 주세요.",
   "UNKNOWN": "문제가 발생했습니다. 다시 시도해 주세요.",
   "CATEGORY_NAME_TAKEN": "같은 이름의 카테고리가 두 개 있습니다.",
-  "DEMO_READ_ONLY": "데모에서는 사용할 수 없습니다."
+  "DEMO_READ_ONLY": "데모에서는 사용할 수 없습니다.",
+  "TELEGRAM_DISABLED": "이 서버에서는 아직 Telegram을 사용할 수 없습니다.",
+  "RESET_LINK_INVALID": "링크가 잘못되었거나 만료되었거나 이미 사용되었습니다."
 }

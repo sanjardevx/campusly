@@ -7,3 +7,13 @@ export const CHANGE_PASSWORD = graphql(`
     }
   }
 `);
+
+/** Students: a one-time t.me link that connects this account to the bot */
+export const CREATE_TELEGRAM_LINK = graphql(`
+  mutation CreateTelegramLink {
+    createTelegramLink {
+      url
+      expiresAt
+    }
+  }
+`);

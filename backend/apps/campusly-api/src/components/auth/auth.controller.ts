@@ -12,6 +12,7 @@ import type { CookieOptions, Request, Response } from 'express';
 import { Env, REFRESH_COOKIE } from '../../libs/config';
 import { DemoLoginInput } from '../../libs/dto/auth/demo-login.input';
 import { LoginInput } from '../../libs/dto/auth/login.input';
+import { ResetPasswordInput } from '../../libs/dto/auth/reset-password.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import type { AuthResult } from '../../libs/types/auth';
 import { AuthService, ClientInfo, SignInResult } from './auth.service';
@@ -80,6 +81,21 @@ export class AuthController {
     this.assertTrustedOrigin(req);
     await this.authService.logout(this.readCookie(req));
     res.clearCookie(REFRESH_COOKIE, this.cookieOptions());
+  }
+
+  /** The new-password page opened from the Telegram bot's one-time link */
+  @Post('reset-password')
+  @HttpCode(204)
+  public async resetPassword(
+    @Body() input: ResetPasswordInput,
+    @Req() req: Request,
+  ): Promise<void> {
+    this.assertTrustedOrigin(req);
+    await this.authService.resetPassword(
+      input.token,
+      input.newPassword,
+      this.client(req),
+    );
   }
 
   // ───────────────────────── helpers ─────────────────────────

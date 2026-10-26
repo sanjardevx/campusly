@@ -87,6 +87,7 @@
     "period": "{{year}} · {{period}}",
     "periods": "{{year}} 기간",
     "manageYears": "설정에서 관리",
-    "noPeriod": "오늘은 기간이 없습니다"
+    "noPeriod": "오늘은 기간이 없습니다",
+    "telegram": "Telegram 연결"
   }
 }

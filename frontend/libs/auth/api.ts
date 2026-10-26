@@ -64,3 +64,7 @@ export const demoRequest = (role: Role) => post<AuthResult>('demo', { role });
 export const refreshRequest = () => post<AuthResult>('refresh');
 
 export const logoutRequest = () => post<void>('logout');
+
+/** The new-password page opened from the Telegram bot's one-time link (204 on success) */
+export const resetPasswordRequest = (token: string, newPassword: string) =>
+  post<void>('reset-password', { token, newPassword });

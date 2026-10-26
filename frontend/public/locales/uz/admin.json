@@ -691,7 +691,10 @@
         "update": "Akkauntni tahrirladi",
         "resetPassword": "Parolni tikladi",
         "block": "Akkauntni blokladi",
-        "unblock": "Akkauntni blokdan chiqardi"
+        "unblock": "Akkauntni blokdan chiqardi",
+        "telegramReset": "Telegram orqali parolini tikladi",
+        "telegramLink": "Telegram’ni uladi",
+        "telegramUnlink": "Telegram’ni uzdi"
       },
       "users": {
         "import": "CSV’dan o‘quvchilarni yukladi"

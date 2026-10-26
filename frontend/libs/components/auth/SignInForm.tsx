@@ -111,7 +111,7 @@ export function SignInForm({ mode }: { mode: SignInMode }) {
           </Link>
         }
       />
-      {/* Password reset by the Telegram bot comes in a later phase (DECISIONS §14) */}
+      {/* Students and parents with Telegram connected reset it with the bot (/reset); others ask the office */}
       <Collapse in={showForgot}>
         <Alert severity="info" icon={false}>
           {t('signIn.forgotHint')}

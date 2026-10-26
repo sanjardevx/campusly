@@ -713,7 +713,10 @@
         "update": "Изменил аккаунт",
         "resetPassword": "Сбросил пароль",
         "block": "Заблокировал аккаунт",
-        "unblock": "Разблокировал аккаунт"
+        "unblock": "Разблокировал аккаунт",
+        "telegramReset": "Сбросил свой пароль через Telegram",
+        "telegramLink": "Подключил Telegram",
+        "telegramUnlink": "Отключил Telegram"
       },
       "users": {
         "import": "Импортировал учеников из CSV"

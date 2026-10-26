@@ -268,3 +268,4 @@ If a day slips, cut in this order: Q&A → CMS reduced to News + Enquiries → q
 | 2026-10-26 | Nightly demo reset in the batch app: same seed code as the CLI, story shifted by whole weeks to the current week (developer approved) |
 | 2026-10-26 | Budget alerts: zero-spend + monthly $35 (80 % / 100 % actual, 100 % forecast) instead of $10 / $25 / $50 tiers, which would fire every normal month once credits end — developer's choice |
 | 2026-10-26 | Backend CD: GitHub Actions → OIDC role → SSM Run Command → `deploy.sh` (option B), not SSH from GitHub — developer's choice |
+| 2026-10-27 | Telegram (day 16): bot @campuslyreset_bot for account linking and password reset only — parents link by sharing their own contact, students by a one-time portal link; teachers / admins reset through the admin; no Telegram notifications (developer's choice) |

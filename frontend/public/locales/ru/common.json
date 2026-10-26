@@ -87,6 +87,7 @@
     "period": "{{year}} · {{period}}",
     "periods": "Периоды {{year}}",
     "manageYears": "Управлять в настройках",
-    "noPeriod": "Сегодня нет периода"
+    "noPeriod": "Сегодня нет периода",
+    "telegram": "Подключить Telegram"
   }
 }

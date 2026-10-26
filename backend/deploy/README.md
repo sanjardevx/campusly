@@ -221,3 +221,29 @@ One-time setup:
 4. **GitHub** → repo → Settings → Secrets and variables → Actions → **Variables** (not secrets — they are not secret). Do not add an `environment:` to the job: it changes the OIDC subject and the trust condition would refuse it: `AWS_DEPLOY_ROLE_ARN` = the role ARN, `EC2_INSTANCE_ID` = `i-…`.
 
 Then a push to `develop` shows CI → `deploy` in the Actions tab; the job prints the script's output.
+
+## 13. Telegram bot (@campuslyreset_bot)
+
+Account linking and password reset (DECISIONS §6): parents share their own phone contact with the bot, students open a one-time link from the portal (account menu → "Connect Telegram"); `/reset` sends a one-time link to `https://campusly.uz/reset-password`. The API answers Telegram at `POST https://api.campusly.uz/telegram/webhook` and checks the secret header on every call.
+
+One-time setup (CloudShell, then one deploy):
+
+```bash
+export AWS_REGION=eu-central-1   # CloudShell otherwise follows the console's region
+# 1. Settings — the token comes from BotFather; never paste it into a chat
+aws ssm put-parameter --name /campusly/prod/TELEGRAM_BOT_USERNAME --type String --value campuslyreset_bot
+aws ssm put-parameter --name /campusly/prod/TELEGRAM_WEBHOOK_SECRET --type SecureString --value "$(openssl rand -hex 32)"
+read -rs TOKEN && aws ssm put-parameter --name /campusly/prod/TELEGRAM_BOT_TOKEN --type SecureString --value "$TOKEN"
+
+# 2. Point Telegram at the API (reads both secrets from SSM, prints only Telegram's answer)
+TOKEN=$(aws ssm get-parameter --name /campusly/prod/TELEGRAM_BOT_TOKEN --with-decryption --query Parameter.Value --output text)
+SECRET=$(aws ssm get-parameter --name /campusly/prod/TELEGRAM_WEBHOOK_SECRET --with-decryption --query Parameter.Value --output text)
+curl -s "https://api.telegram.org/bot$TOKEN/setWebhook" \
+  -d url=https://api.campusly.uz/telegram/webhook -d secret_token="$SECRET" \
+  -d 'allowed_updates=["message"]' -d drop_pending_updates=true
+# → {"ok":true,"result":true,"description":"Webhook was set"}
+```
+
+3. Deploy (the next push, or `deploy.sh`): `env-from-ssm.sh` adds the three values to `.env.production`. Check: `curl -s "https://api.telegram.org/bot$TOKEN/getWebhookInfo"` shows the URL and no `last_error_message`; send `/start` to the bot.
+
+All three variables or none: with only some of them the API refuses to start (zod), so a half-configured bot never runs. Locally the bot cannot receive messages (Telegram calls the production webhook); the e2e test fakes Telegram.

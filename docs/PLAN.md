@@ -246,10 +246,10 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 16 (L) — Telegram bot
 
-- [ ] Webhook endpoint (`@Public()` + secret token header).
-- [ ] Account linking: a parent shares their phone contact (matched to the parent login); a student links with a one-time code.
-- [ ] Password reset through a one-time link (`OneTimeToken`); the "Reset in Telegram" button from Settings starts it.
-- [ ] Notifications through BullMQ: grade published, new announcement, homework due tomorrow.
+- [x] Webhook endpoint (`@Public()` + secret token header).
+- [x] Account linking: a parent shares their phone contact (matched to the parent login); a student links with a one-time code.
+- [x] Password reset through a one-time link (`OneTimeToken`); the "Reset in Telegram" button from Settings starts it.
+- [ ] ~~Notifications through BullMQ~~ — cut (developer's choice, 2026-10-27): the bot only links accounts and resets passwords.
 - [ ] e2e + isolation tests; deploy.
 
 **Developer:** bot token from BotFather.

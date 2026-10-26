@@ -87,6 +87,7 @@
     "period": "{{year}} · {{period}}",
     "periods": "Periods of {{year}}",
     "manageYears": "Manage in Settings",
-    "noPeriod": "No period today"
+    "noPeriod": "No period today",
+    "telegram": "Connect Telegram"
   }
 }

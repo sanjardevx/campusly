@@ -31,5 +31,7 @@
   "NETWORK_ERROR": "Serverga ulanib bo‘lmadi. Internetni tekshiring.",
   "UNKNOWN": "Xatolik yuz berdi. Qayta urinib ko‘ring.",
   "CATEGORY_NAME_TAKEN": "Ikkita kategoriyaning nomi bir xil.",
-  "DEMO_READ_ONLY": "Bu demo rejimida mavjud emas."
+  "DEMO_READ_ONLY": "Bu demo rejimida mavjud emas.",
+  "TELEGRAM_DISABLED": "Bu serverda Telegram hali ishlamaydi.",
+  "RESET_LINK_INVALID": "Havola noto‘g‘ri, muddati o‘tgan yoki allaqachon ishlatilgan."
 }

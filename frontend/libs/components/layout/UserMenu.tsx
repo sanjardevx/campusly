@@ -5,6 +5,7 @@ import { useApolloClient } from '@apollo/client/react';
 import { Avatar, Box, ButtonBase, Divider, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import TelegramIcon from '@mui/icons-material/Telegram';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'next-i18next/pages';
 import { logOut } from '@/libs/auth';
@@ -75,6 +76,15 @@ export function AccountItems({ user, onDone }: { user: SessionUser; onDone: () =
       <ListItemIcon><KeyOutlinedIcon fontSize="small" /></ListItemIcon>
       {t('shell.changePassword')}
     </MenuItem>,
+    // Students and parents can reset a forgotten password through the Telegram bot
+    ...(user.role === 'STUDENT' || user.role === 'PARENT'
+      ? [
+          <MenuItem key="telegram" component={NextLink} href="/telegram" onClick={onDone}>
+            <ListItemIcon><TelegramIcon fontSize="small" /></ListItemIcon>
+            {t('shell.telegram')}
+          </MenuItem>,
+        ]
+      : []),
     <Divider key="divider" />,
     <MenuItem key="signout" onClick={() => void signOut()}>
       <ListItemIcon><LogoutOutlinedIcon fontSize="small" /></ListItemIcon>
