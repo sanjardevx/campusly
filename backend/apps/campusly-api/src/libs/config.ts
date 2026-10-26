@@ -202,6 +202,17 @@ export const MIME_EXTENSIONS: Record<string, string> = {
 };
 /** Unfinished uploads one user may have at a time (stops filling the bucket with junk) */
 export const MAX_PENDING_UPLOADS = 20;
+// ───────────────────────────── quizzes ─────────────────────────────
+
+/** Time limit choices: 1 minute to 3 hours; a new quiz starts with 20 */
+export const QUIZ_MAX_MINUTES = 180;
+export const QUIZ_DEFAULT_MINUTES = 20;
+export const QUIZ_MAX_QUESTIONS = 50;
+/** Multiple choice: 2 to 6 answers */
+export const QUIZ_MAX_OPTIONS = 6;
+/** An answer that left the browser just before the deadline still counts (network delay) */
+export const QUIZ_GRACE_SEC = 5;
+
 /** A presigned upload URL works this long */
 export const UPLOAD_URL_TTL_SEC = 15 * 60;
 /** The batch app marks uploads still UPLOADING after this long as FAILED (and deletes the file) */

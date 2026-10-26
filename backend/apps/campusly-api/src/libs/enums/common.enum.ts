@@ -20,6 +20,12 @@ export enum ErrorCode {
   TELEGRAM_DISABLED = 'TELEGRAM_DISABLED',
   /** A password-reset link is wrong, expired or already used */
   RESET_LINK_INVALID = 'RESET_LINK_INVALID',
+  /** Quiz questions cannot change once a student has started */
+  QUIZ_LOCKED = 'QUIZ_LOCKED',
+  /** The quiz cannot be started: no questions, past the due date, or grades already published */
+  QUIZ_CLOSED = 'QUIZ_CLOSED',
+  /** The attempt's time is over: the answer was not saved */
+  QUIZ_TIME_UP = 'QUIZ_TIME_UP',
   /** S3 / CloudFront are not configured on this server (local run without AWS, CI) */
   MEDIA_DISABLED = 'MEDIA_DISABLED',
   // CSV import: the whole file is refused (row problems are ImportIssueCode instead)

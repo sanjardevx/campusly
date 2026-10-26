@@ -417,5 +417,51 @@
       "left_other": "{{count}} left today",
       "resets": "Resets every day at 00:00"
     }
+  },
+  "quiz": {
+    "label": "Quiz",
+    "due": "Due {{date}}",
+    "submittedTitle": "Your answers are submitted",
+    "submittedBody": "You will see your score and the right answers when your teacher publishes the grades.",
+    "readyTitle": "Ready?",
+    "start": "Start quiz",
+    "notReady": "The teacher has not added questions yet.",
+    "closed": "This quiz is closed.",
+    "confirm": {
+      "start": {
+        "title": "Start the quiz?",
+        "action": "Start",
+        "body_one": "The {{count}}-minute timer starts now and cannot be paused. One attempt only.",
+        "body_other": "The {{count}}-minute timer starts now and cannot be paused. One attempt only."
+      },
+      "submit": {
+        "title": "Submit your answers?",
+        "body": "You cannot change them after this.",
+        "action": "Submit"
+      }
+    },
+    "cancel": "Cancel",
+    "questionN": "Question {{n}} of {{total}}",
+    "saved": "Saved",
+    "yourAnswer": "Your answer",
+    "true": "True",
+    "false": "False",
+    "timeUp": "Time is up: your saved answers were submitted.",
+    "saveFailed": "This answer was not saved. Check your connection and try again.",
+    "submitHint": "Every answer is saved as you go.",
+    "submit": "Submit answers",
+    "score": "Your score",
+    "noAnswer": "no answer",
+    "yourAnswerIs": "Your answer: {{answer}}",
+    "rightAnswerIs": "Right answer: {{answer}}",
+    "answered": "{{done}} / {{total}} answered",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "questions_one": "{{count}} question · {{points}} points",
+    "questions_other": "{{count}} questions · {{points}} points",
+    "readyBody_one": "You have {{count}} minute and one attempt. The timer starts when you press Start.",
+    "readyBody_other": "You have {{count}} minutes and one attempt. The timer starts when you press Start.",
+    "points_one": "{{count}} point",
+    "points_other": "{{count}} points"
   }
 }

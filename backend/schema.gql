@@ -96,6 +96,7 @@ type Assignment {
   maxScore: Float!
   moduleId: String
   publishedAt: DateTime
+  timeLimitMin: Int
   title: String!
   tutorMode: TutorMode!
   type: AssignmentType!
@@ -426,6 +427,7 @@ input CreateAssignmentInput {
   maxAttempts: Int
   maxScore: Float!
   moduleId: String
+  timeLimitMin: Int
   title: String!
   tutorMode: TutorMode
   type: AssignmentType!
@@ -855,6 +857,7 @@ type Mutation {
   reorderModules(input: ReorderInput!): [Module!]!
   resetPassword(userId: String!): LoginSlip!
   returnSubmission(input: ReturnSubmissionInput!): Submission!
+  saveQuizAnswer(input: SaveQuizAnswerInput!): Boolean!
   setCourseStudents(input: SetCourseStudentsInput!): Course!
   setCourseTeachers(input: SetCourseTeachersInput!): Course!
   setCurrentAcademicYear(id: String!): AcademicYear!
@@ -862,7 +865,10 @@ type Mutation {
   setLessonFile(input: SetLessonFileInput!): Lesson!
   setLessonVideo(input: SetLessonVideoInput!): Lesson!
   setPeriodFinalScore(input: SetPeriodFinalScoreInput!): PeriodGradeRow!
+  setQuizQuestions(input: SetQuizQuestionsInput!): QuizEditor!
+  startQuiz(assignmentId: String!): MyQuiz!
   submitAssignment(input: SubmitAssignmentInput!): Submission!
+  submitQuiz(assignmentId: String!): MyQuiz!
   unblockUser(userId: String!): Boolean!
   unlinkParent(parentId: String!, studentId: String!): Boolean!
   updateAcademicYear(input: UpdateAcademicYearInput!): AcademicYear!
@@ -915,6 +921,21 @@ type MyGrades {
 type MyPeriodGrades {
   annual: PeriodGradeRow!
   periods: [PeriodGradeRow!]!
+}
+
+type MyQuiz {
+  assignmentId: String!
+  canStart: Boolean!
+  deadlineAt: DateTime
+  dueAt: DateTime
+  questionCount: Int!
+  questions: [StudentQuizQuestion!]!
+  serverNow: DateTime!
+  startedAt: DateTime
+  state: QuizState!
+  submittedAt: DateTime
+  timeLimitMin: Int
+  totalPoints: Float!
 }
 
 type NeedsAttention {
@@ -1073,8 +1094,11 @@ type Query {
   myCourses(studentId: String): [Course!]!
   myGrades(periodId: String, studentId: String): MyGrades!
   myPeriodGrades(courseId: String!, studentId: String): MyPeriodGrades!
+  myQuiz(assignmentId: String!): MyQuiz!
   mySubmission(assignmentId: String!, studentId: String): Submission
   periods(academicYearId: String!): [Period!]!
+  quizEditor(assignmentId: String!): QuizEditor!
+  quizResult(assignmentId: String!, studentId: String): QuizResult!
   schoolSettings: SchoolSettings!
   studentAttendance(periodId: String, studentId: String): PeriodAttendance!
   studentCalendar(month: String!, studentId: String): [CalendarEvent!]!
@@ -1084,6 +1108,66 @@ type Query {
   teachingCourses: [Course!]!
   telegramStatus: TelegramStatus!
   users(input: UsersInquiry!): Users!
+}
+
+type QuizEditor {
+  attempts: Int!
+  locked: Boolean!
+  questions: [QuizQuestion!]!
+}
+
+type QuizQuestion {
+  correctNumber: Float
+  correctOption: Int
+  id: String!
+  options: [String!]!
+  points: Float!
+  text: String!
+  tolerance: Float
+  type: QuizQuestionType!
+}
+
+input QuizQuestionInput {
+  correctNumber: Float
+  correctOption: Int
+  options: [String!]
+  points: Float!
+  text: String!
+  tolerance: Float
+  type: QuizQuestionType!
+}
+
+enum QuizQuestionType {
+  MULTIPLE_CHOICE
+  NUMBER
+  TRUE_FALSE
+}
+
+type QuizResult {
+  items: [QuizResultItem!]!
+  maxScore: Float!
+  score: Float!
+  submittedAt: DateTime
+}
+
+type QuizResultItem {
+  correctNumber: Float
+  correctOption: Int
+  earned: Float!
+  isCorrect: Boolean!
+  myChoice: Int
+  myNumber: Float
+  options: [String!]!
+  points: Float!
+  text: String!
+  tolerance: Float
+  type: QuizQuestionType!
+}
+
+enum QuizState {
+  IN_PROGRESS
+  NOT_STARTED
+  SUBMITTED
 }
 
 type RecentGrade {
@@ -1137,6 +1221,13 @@ enum Role {
   PARENT
   STUDENT
   TEACHER
+}
+
+input SaveQuizAnswerInput {
+  assignmentId: String!
+  choice: Int
+  number: Float
+  questionId: String!
 }
 
 type SchoolEvent {
@@ -1206,6 +1297,11 @@ input SetPeriodFinalScoreInput {
   studentId: String!
 }
 
+input SetQuizQuestionsInput {
+  assignmentId: String!
+  questions: [QuizQuestionInput!]!
+}
+
 type StudentAttendance {
   courseId: String!
   entries: [AttendanceEntry!]!
@@ -1234,6 +1330,16 @@ type StudentOverview {
   recentGrades: [RecentGrade!]!
   student: OverviewStudent!
   upcoming: [UpcomingItem!]!
+}
+
+type StudentQuizQuestion {
+  id: String!
+  myChoice: Int
+  myNumber: Float
+  options: [String!]!
+  points: Float!
+  text: String!
+  type: QuizQuestionType!
 }
 
 type Subject {
@@ -1401,6 +1507,7 @@ input UpdateAssignmentInput {
   maxAttempts: Int
   maxScore: Float
   moduleId: String
+  timeLimitMin: Int
   title: String
   tutorMode: TutorMode
 }

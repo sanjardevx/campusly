@@ -755,6 +755,84 @@ async function seedCourses(
 
 // ─────────────────────── 4. assignments and grades ───────────────────────
 
+type SeedQuestion = {
+  type: 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'NUMBER';
+  text: string;
+  options: string[];
+  correctOption: number | null;
+  correctNumber: number | null;
+  tolerance: number | null;
+};
+const mc = (
+  text: string,
+  options: string[],
+  correctOption: number,
+): SeedQuestion => ({
+  type: 'MULTIPLE_CHOICE',
+  text,
+  options,
+  correctOption,
+  correctNumber: null,
+  tolerance: null,
+});
+const tf = (text: string, correct: boolean): SeedQuestion => ({
+  type: 'TRUE_FALSE',
+  text,
+  options: [],
+  correctOption: correct ? 1 : 0,
+  correctNumber: null,
+  tolerance: null,
+});
+const numeric = (
+  text: string,
+  correctNumber: number,
+  tolerance = 0,
+): SeedQuestion => ({
+  type: 'NUMBER',
+  text,
+  options: [],
+  correctOption: null,
+  correctNumber,
+  tolerance,
+});
+
+/** Sample questions per subject (the same four for each quiz of a course: demo data) */
+const QUIZ_QUESTIONS: Record<string, SeedQuestion[]> = {
+  Algebra: [
+    mc('What is the discriminant of x² − 5x + 6?', ['1', '25', '−1', '49'], 0),
+    tf('A quadratic with a negative discriminant has two real roots.', false),
+    numeric('Solve 3x + 7 = 22. What is x?', 5),
+    mc('Which number is a root of x² − 9 = 0?', ['3', '9', '0', '81'], 0),
+  ],
+  English: [
+    mc('She ___ to school every day.', ['go', 'goes', 'going', 'gone'], 1),
+    tf('"Their" and "there" mean the same thing.', false),
+    mc(
+      'Which word is an adjective?',
+      ['quickly', 'happiness', 'bright', 'run'],
+      2,
+    ),
+    numeric('How many syllables are in the word "education"?', 4),
+  ],
+  Physics: [
+    mc(
+      'The SI unit of force is the …',
+      ['joule', 'newton', 'watt', 'pascal'],
+      1,
+    ),
+    tf(
+      'Without air, a heavy ball and a light ball dropped together land at the same time.',
+      true,
+    ),
+    numeric('A car travels 120 m in 10 s. What is its speed in m/s?', 12),
+    mc(
+      'Which quantity is a vector?',
+      ['mass', 'time', 'velocity', 'temperature'],
+      2,
+    ),
+  ],
+};
+
 const ALGEBRA_QUIZZES = [
   'Linear Equations',
   'Quadratic Equations',
@@ -838,12 +916,16 @@ async function seedAssignments(
           instructions:
             item.type === 'EXAM'
               ? 'Written exam in class. Grade only, no upload.'
-              : 'Upload your solution as a PDF or photo.',
+              : item.type === 'QUIZ'
+                ? 'Answer every question in 15 minutes. One attempt.'
+                : 'Upload your solution as a PDF or photo.',
           maxScore: item.maxScore,
           dueAt,
           allowLate: item.type === 'HOMEWORK',
           maxAttempts: item.type === 'HOMEWORK' ? 2 : 1,
-          acceptedFileTypes: item.type === 'EXAM' ? [] : ['pdf', 'jpg', 'png'],
+          acceptedFileTypes:
+            item.type === 'HOMEWORK' ? ['pdf', 'jpg', 'png'] : [],
+          timeLimitMin: item.type === 'QUIZ' ? 15 : null,
           tutorMode: item.type === 'HOMEWORK' ? 'HINTS' : 'OFF',
           publishedAt: tashkent(addDays(item.due, -6), '18:00'),
           gradesPublishedAt: isPublished
@@ -852,6 +934,18 @@ async function seedAssignments(
           createdById: course.teacherId,
         },
       });
+
+      // Every quiz gets four questions worth 5 points each (= maxScore 20)
+      if (item.type === 'QUIZ') {
+        await prisma.quizQuestion.createMany({
+          data: QUIZ_QUESTIONS[course.subject].map((q, order) => ({
+            ...q,
+            assignmentId: assignment.id,
+            order,
+            points: 5,
+          })),
+        });
+      }
 
       // Exams are offline; future and today's work has no grades yet
       if (item.type === 'EXAM' || item.due > TODAY) continue;

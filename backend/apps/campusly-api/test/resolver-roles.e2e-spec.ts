@@ -15,6 +15,7 @@ import { GroupResolver } from '../src/components/group/group.resolver';
 import { MediaResolver } from '../src/components/media/media.resolver';
 import { OverviewResolver } from '../src/components/overview/overview.resolver';
 import { ProgressResolver } from '../src/components/progress/progress.resolver';
+import { QuizResolver } from '../src/components/assignment/quiz.resolver';
 import { SchoolEventResolver } from '../src/components/school/school-event.resolver';
 import { SchoolResolver } from '../src/components/school/school.resolver';
 import { TeacherDashboardResolver } from '../src/components/dashboard/teacher-dashboard.resolver';
@@ -47,6 +48,7 @@ const RESOLVERS = [
   OverviewResolver,
   PeriodGradeResolver,
   ProgressResolver,
+  QuizResolver,
   SchoolEventResolver,
   SchoolResolver,
   SubmissionResolver,
@@ -64,6 +66,7 @@ const ANY_SIGNED_IN = new Set([
   'assignment', // assertCanViewAssignment
   'courseAssignments', // assertCanViewCourse
   'courseDetail', // assertCanViewCourse
+  'quizResult', // students / parents after publish, teachers per enrolled student (QuizService)
   'academicYears', // not secret: the school calendar
   'currentAcademicYear',
   'periods',

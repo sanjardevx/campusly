@@ -12,6 +12,7 @@ import { layoutFor } from '@/libs/components/layout';
 import { AssignmentsTab } from '@/libs/components/teacher/course/AssignmentsTab';
 import { CourseHeader, type CourseTab } from '@/libs/components/teacher/course/CourseHeader';
 import { HomeworkDrawer } from '@/libs/components/teacher/course/HomeworkDrawer';
+import { QuizDrawer } from '@/libs/components/teacher/course/QuizDrawer';
 import { LessonDrawer } from '@/libs/components/teacher/course/LessonDrawer';
 import { todayLocal, visibility, weekItems, weekState, type Assignment, type Lesson, type Week, type WeekItem } from '@/libs/components/teacher/course/model';
 import { useDragList } from '@/libs/components/teacher/course/useDragList';
@@ -32,6 +33,7 @@ type Drawer =
   | { kind: 'week'; week: Week | null }
   | { kind: 'lesson'; week: Week; type: Lesson['type']; lesson: Lesson | null }
   | { kind: 'homework'; week: Week | null; assignment: Assignment | null }
+  | { kind: 'quiz'; week: Week | null; assignment: Assignment | null }
   | null;
 
 /**
@@ -137,12 +139,22 @@ const CoursePage: NextPageWithLayout = () => {
     onWeekHidden: (week, hidden) => void updateModule({ variables: { input: { id: week.id, isHidden: hidden } } }).catch(fail),
     onWeekPublish: (week, publish) => void publishModule({ variables: { input: { id: week.id, publish } } }).catch(fail),
     onAdd: (week: Week, kind: AddKind) =>
-      setDrawer(kind === 'HOMEWORK' ? { kind: 'homework', week, assignment: null } : { kind: 'lesson', week, type: kind, lesson: null }),
+      setDrawer(
+        kind === 'HOMEWORK'
+          ? { kind: 'homework', week, assignment: null }
+          : kind === 'QUIZ'
+            ? { kind: 'quiz', week, assignment: null }
+            : { kind: 'lesson', week, type: kind, lesson: null },
+      ),
     onEditItem: (item) =>
       setDrawer(
         item.kind === 'lesson'
           ? { kind: 'lesson', week: weeks.find((w) => w.id === item.lesson.moduleId)!, type: item.lesson.type, lesson: item.lesson }
-          : { kind: 'homework', week: weeks.find((w) => w.id === item.assignment.moduleId) ?? null, assignment: item.assignment },
+          : {
+              kind: item.assignment.type === 'QUIZ' ? 'quiz' : 'homework',
+              week: weeks.find((w) => w.id === item.assignment.moduleId) ?? null,
+              assignment: item.assignment,
+            },
       ),
     onItemPublish: (item, publish) =>
       void (
@@ -241,6 +253,7 @@ const CoursePage: NextPageWithLayout = () => {
       {drawer?.kind === 'week' && <WeekDialog courseId={course.id} week={drawer.week} weeks={course.modules} onClose={() => setDrawer(null)} />}
       {drawer?.kind === 'lesson' && <LessonDrawer courseId={course.id} week={drawer.week} type={drawer.type} lesson={drawer.lesson} onClose={() => setDrawer(null)} />}
       {drawer?.kind === 'homework' && <HomeworkDrawer courseId={course.id} week={drawer.week} assignment={drawer.assignment} onClose={() => setDrawer(null)} />}
+      {drawer?.kind === 'quiz' && <QuizDrawer courseId={course.id} week={drawer.week} assignment={drawer.assignment} onClose={() => setDrawer(null)} />}
 
       <Snackbar open={!!toast} autoHideDuration={6000} onClose={() => setToast(null)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         <Alert severity="error" onClose={() => setToast(null)} variant="filled">

@@ -5,7 +5,10 @@ import {
 } from '@nestjs/common';
 import type { Prisma } from '../../../../../generated/prisma/client';
 import { PrismaService } from '../../database/prisma.service';
-import { DEFAULT_CATEGORY_BY_TYPE } from '../../libs/config';
+import {
+  DEFAULT_CATEGORY_BY_TYPE,
+  QUIZ_DEFAULT_MINUTES,
+} from '../../libs/config';
 import { Assignment } from '../../libs/dto/assignment/assignment';
 import {
   CreateAssignmentInput,
@@ -51,6 +54,8 @@ export class AssignmentService {
     await this.assertCourseFiles(fileIds, input.courseId);
     // An exam is offline: it is graded, never submitted
     const isExam = input.type === AssignmentType.EXAM;
+    // A quiz is answered on its own page (one timed attempt); its points come from its questions
+    const isQuiz = input.type === AssignmentType.QUIZ;
 
     const row = await this.prismaService.assignment.create({
       data: {
@@ -64,12 +69,16 @@ export class AssignmentService {
         maxScore: input.maxScore,
         dueAt: input.dueAt,
         allowLate: input.allowLate ?? true,
-        maxAttempts: isExam ? 0 : (input.maxAttempts ?? 1),
-        acceptedFileTypes: isExam
-          ? []
-          : (input.acceptedFileTypes ?? ['pdf', 'docx', 'jpg', 'png']),
+        maxAttempts: isExam ? 0 : isQuiz ? 1 : (input.maxAttempts ?? 1),
+        acceptedFileTypes:
+          isExam || isQuiz
+            ? []
+            : (input.acceptedFileTypes ?? ['pdf', 'docx', 'jpg', 'png']),
         tutorMode: input.tutorMode,
         finalAnswer: input.finalAnswer,
+        timeLimitMin: isQuiz
+          ? (input.timeLimitMin ?? QUIZ_DEFAULT_MINUTES)
+          : null,
         createdById: user.id,
         files: {
           create: fileIds.map((assetId, order) => ({ assetId, order })),
@@ -90,7 +99,9 @@ export class AssignmentService {
     if (!before) throw notFound('Assignment not found');
     await this.accessPolicy.assertCanEditCourse(user, before.courseId);
 
+    const isQuiz = before.type === AssignmentType.QUIZ;
     if (
+      !isQuiz &&
       input.maxScore !== undefined &&
       input.maxScore !== Number(before.maxScore)
     ) {
@@ -131,14 +142,17 @@ export class AssignmentService {
           moduleId: input.moduleId,
           lessonId: input.lessonId,
           instructions: input.instructions,
-          maxScore: input.maxScore,
+          // A quiz's points are the sum of its questions (setQuizQuestions)
+          maxScore: isQuiz ? undefined : input.maxScore,
           dueAt: input.dueAt,
           allowLate: input.allowLate,
-          // An exam stays offline whatever is sent
-          maxAttempts: isExam ? undefined : input.maxAttempts,
-          acceptedFileTypes: isExam ? undefined : input.acceptedFileTypes,
+          // An exam stays offline and a quiz keeps its one attempt, whatever is sent
+          maxAttempts: isExam || isQuiz ? undefined : input.maxAttempts,
+          acceptedFileTypes:
+            isExam || isQuiz ? undefined : input.acceptedFileTypes,
           tutorMode: input.tutorMode,
           finalAnswer: input.finalAnswer,
+          timeLimitMin: isQuiz ? input.timeLimitMin : undefined,
         },
         include: ASSIGNMENT_INCLUDE,
       });
@@ -332,6 +346,7 @@ export function toAssignment(row: AssignmentRow, viewer: AuthUser): Assignment {
     finalAnswer: isLearner(viewer) ? null : row.finalAnswer,
     publishedAt: row.publishedAt,
     gradesPublishedAt: row.gradesPublishedAt,
+    timeLimitMin: row.timeLimitMin,
     files: row.files.map((f) => toCourseFile(f.asset)),
   };
 }

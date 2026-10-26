@@ -142,6 +142,26 @@ export const PUBLISH_ASSIGNMENT = graphql(`
   }
 `);
 
+/** The whole question list (allowed until a student starts); the quiz's points become their sum */
+export const SET_QUIZ_QUESTIONS = graphql(`
+  mutation SetQuizQuestions($input: SetQuizQuestionsInput!) {
+    setQuizQuestions(input: $input) {
+      locked
+      attempts
+      questions {
+        id
+        type
+        text
+        points
+        options
+        correctOption
+        correctNumber
+        tolerance
+      }
+    }
+  }
+`);
+
 // ───────────────────────── grading ─────────────────────────
 
 /** Saved at once, but students see it only after publishGrades (one mapper hides it) */

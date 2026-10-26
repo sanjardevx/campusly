@@ -33,5 +33,8 @@
   "CATEGORY_NAME_TAKEN": "Ikkita kategoriyaning nomi bir xil.",
   "DEMO_READ_ONLY": "Bu demo rejimida mavjud emas.",
   "TELEGRAM_DISABLED": "Bu serverda Telegram hali ishlamaydi.",
-  "RESET_LINK_INVALID": "Havola noto‘g‘ri, muddati o‘tgan yoki allaqachon ishlatilgan."
+  "RESET_LINK_INVALID": "Havola noto‘g‘ri, muddati o‘tgan yoki allaqachon ishlatilgan.",
+  "QUIZ_LOCKED": "O‘quvchi quiz’ni boshlagan: savollarni o‘zgartirib bo‘lmaydi.",
+  "QUIZ_CLOSED": "Bu quiz’ni boshlab bo‘lmaydi.",
+  "QUIZ_TIME_UP": "Vaqt tugadi: javob saqlanmadi."
 }

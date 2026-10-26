@@ -20,6 +20,8 @@ import {
   Select,
   Snackbar,
   Stack,
+  Tab,
+  Tabs,
   Table,
   TableBody,
   TableCell,
@@ -40,6 +42,7 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
+import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import UnpublishedOutlinedIcon from '@mui/icons-material/UnpublishedOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { SCHOOL_SETTINGS } from '@/apollo/app/query';
@@ -47,6 +50,7 @@ import { GIVE_ZERO_TO_MISSING, PUBLISH_GRADES } from '@/apollo/teacher/mutation'
 import { ASSIGNMENT_SUBMISSIONS, GRADING_ASSIGNMENT, TEACHING_COURSES } from '@/apollo/teacher/query';
 import { layoutFor } from '@/libs/components/layout';
 import { downloadAllZip, formatInZone, formatLocal, matches, needsGrading, viewOf, type Filter } from '@/libs/components/teacher/grading/model';
+import { QuizEditor } from '@/libs/components/teacher/grading/QuizEditor';
 import { StatusChip } from '@/libs/components/teacher/grading/StatusChip';
 import { errorCode } from '@/libs/errors';
 import { useCrumb } from '@/libs/hooks/useCrumb';
@@ -104,6 +108,7 @@ const GradingPage: NextPageWithLayout = () => {
   }
 
   const exam = assignment.type === 'EXAM';
+  const tab = assignment.type === 'QUIZ' && router.query.tab === 'questions' ? 'questions' : 'results';
   const total = views.length;
   const count = (f: Filter) => views.filter((v) => matches(v, f)).length;
   const graded = count('GRADED');
@@ -190,7 +195,8 @@ const GradingPage: NextPageWithLayout = () => {
               assignment.dueAt ? t('grading.due', { date: formatInZone(assignment.dueAt, zone, locale), zone: zone.split('/').pop()?.replace('_', ' ') }) : t('course.item.noDue'),
             )}
             {chip(<GradeOutlinedIcon />, t('grading.maxScore', { score: assignment.maxScore }))}
-            {!exam &&
+            {assignment.type === 'QUIZ' && assignment.timeLimitMin && chip(<TimerOutlinedIcon />, t('quiz.minutes', { count: assignment.timeLimitMin }))}
+            {!exam && assignment.type !== 'QUIZ' &&
               (assignment.allowLate
                 ? chip(<CheckCircleOutlineOutlinedIcon />, t('grading.lateOn'), 'good')
                 : chip(<HighlightOffOutlinedIcon />, t('grading.lateOff')))}
@@ -198,7 +204,7 @@ const GradingPage: NextPageWithLayout = () => {
           </Stack>
         </Stack>
         <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', flexShrink: 0 }}>
-          {!exam && (
+          {!exam && assignment.type !== 'QUIZ' && (
             <Button
               variant="outlined"
               color="inherit"
@@ -232,6 +238,21 @@ const GradingPage: NextPageWithLayout = () => {
         </Alert>
       )}
 
+      {/* A quiz: its students' results, or its questions */}
+      {assignment.type === 'QUIZ' && (
+        <Tabs
+          value={tab}
+          onChange={(_e, next: 'results' | 'questions') => void router.replace({ query: { ...router.query, tab: next } }, undefined, { shallow: true })}
+          sx={{ borderBottom: 1, borderColor: 'divider' }}
+        >
+          <Tab value="results" label={t('quiz.tabResults')} />
+          <Tab value="questions" label={t('quiz.tabQuestions')} />
+        </Tabs>
+      )}
+      {tab === 'questions' ? (
+        <QuizEditor assignmentId={assignment.id} publishedAt={assignment.publishedAt ?? null} />
+      ) : (
+      <>
       {/* Summary */}
       <Card variant="outlined" sx={{ borderRadius: '12px', p: 1.75 }}>
         <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', gap: 1, flexWrap: 'wrap', mb: 1.25 }}>
@@ -373,6 +394,8 @@ const GradingPage: NextPageWithLayout = () => {
           </Box>
         )}
       </Card>
+      </>
+      )}
 
       <Dialog open={!!confirm} onClose={() => setConfirm(null)} maxWidth="xs" fullWidth>
         <DialogTitle>{confirm && t(`grading.confirm.${confirm}.title`)}</DialogTitle>

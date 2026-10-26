@@ -220,6 +220,7 @@ export const STUDENT_ASSIGNMENT = graphql(`
       allowLate
       maxAttempts
       acceptedFileTypes
+      timeLimitMin
       gradesPublishedAt
       files {
         id
@@ -369,6 +370,58 @@ export const STUDENT_TUTOR_TOPICS = graphql(`
       moduleId
       title
       type
+    }
+  }
+`);
+
+/** The student's quiz: state, timer and (during the attempt) the shuffled questions */
+export const MY_QUIZ = graphql(`
+  query MyQuiz($assignmentId: String!) {
+    myQuiz(assignmentId: $assignmentId) {
+      assignmentId
+      state
+      canStart
+      timeLimitMin
+      questionCount
+      totalPoints
+      dueAt
+      startedAt
+      deadlineAt
+      submittedAt
+      serverNow
+      questions {
+        id
+        type
+        text
+        points
+        options
+        myChoice
+        myNumber
+      }
+    }
+  }
+`);
+
+/** After grades are published: right / wrong per question and the right answers */
+export const QUIZ_RESULT = graphql(`
+  query QuizResult($assignmentId: String!) {
+    quizResult(assignmentId: $assignmentId) {
+      score
+      maxScore
+      submittedAt
+      items {
+        type
+        text
+        points
+        options
+        myChoice
+        myNumber
+        correctOption
+        correctNumber
+        tolerance
+        isCorrect
+        earned
+      }
     }
   }
 `);

@@ -1,9 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createSeedClient, seedDemo } from '../../../prisma/demo-seed';
+import { finishQuizAttempt } from '../../campusly-api/src/components/assignment/quiz-grading';
 import { StorageService } from '../../campusly-api/src/components/media/storage.service';
 import { PrismaService } from '../../campusly-api/src/database/prisma.service';
 import {
+  QUIZ_GRACE_SEC,
   STALE_UPLOAD_HOURS,
   type Env,
 } from '../../campusly-api/src/libs/config';
@@ -74,5 +76,23 @@ export class CampuslyBatchService {
     } finally {
       await client.$disconnect();
     }
+  }
+
+  /**
+   * Quiz attempts whose time ran out while nobody looked (the student closed the tab): graded
+   * now from the saved answers, so the teacher sees the score without waiting for a page view.
+   */
+  public async closeExpiredQuizAttempts(now = new Date()): Promise<number> {
+    const before = new Date(now.getTime() - QUIZ_GRACE_SEC * 1000);
+    const expired = await this.prismaService.quizAttempt.findMany({
+      where: { submittedAt: null, deadlineAt: { lt: before } },
+      select: { id: true },
+      take: 200,
+    });
+    let closed = 0;
+    for (const { id } of expired) {
+      if (await finishQuizAttempt(this.prismaService, id, now)) closed++;
+    }
+    return closed;
   }
 }

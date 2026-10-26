@@ -136,6 +136,7 @@ export const COURSE_ASSIGNMENTS = graphql(`
       allowLate
       maxAttempts
       acceptedFileTypes
+      timeLimitMin
       publishedAt
       gradesPublishedAt
       files {
@@ -195,8 +196,53 @@ export const GRADING_ASSIGNMENT = graphql(`
       dueAt
       allowLate
       maxAttempts
+      timeLimitMin
       publishedAt
       gradesPublishedAt
+    }
+  }
+`);
+
+/** Quiz questions with the right answers (teachers only) and whether a student has started */
+export const QUIZ_EDITOR = graphql(`
+  query QuizEditor($assignmentId: String!) {
+    quizEditor(assignmentId: $assignmentId) {
+      locked
+      attempts
+      questions {
+        id
+        type
+        text
+        points
+        options
+        correctOption
+        correctNumber
+        tolerance
+      }
+    }
+  }
+`);
+
+/** One student's finished quiz, question by question (teachers: any enrolled student) */
+export const TEACHER_QUIZ_RESULT = graphql(`
+  query TeacherQuizResult($assignmentId: String!, $studentId: String) {
+    quizResult(assignmentId: $assignmentId, studentId: $studentId) {
+      score
+      maxScore
+      submittedAt
+      items {
+        type
+        text
+        points
+        options
+        myChoice
+        myNumber
+        correctOption
+        correctNumber
+        tolerance
+        isCorrect
+        earned
+      }
     }
   }
 `);

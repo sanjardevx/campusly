@@ -417,5 +417,51 @@
       "left_other": "Bugun {{count}} ta qoldi",
       "resets": "Har kuni 00:00 da yangilanadi"
     }
+  },
+  "quiz": {
+    "label": "Quiz",
+    "due": "Muddat: {{date}}",
+    "submittedTitle": "Javoblaringiz topshirildi",
+    "submittedBody": "O‘qituvchi baholarni e’lon qilgach, ballingiz va to‘g‘ri javoblarni ko‘rasiz.",
+    "readyTitle": "Tayyormisiz?",
+    "start": "Quiz’ni boshlash",
+    "notReady": "O‘qituvchi hali savollar qo‘shmagan.",
+    "closed": "Bu quiz yopilgan.",
+    "confirm": {
+      "start": {
+        "title": "Quiz’ni boshlaysizmi?",
+        "action": "Boshlash",
+        "body_one": "{{count}} daqiqalik taymer hozir boshlanadi va to‘xtatib bo‘lmaydi. Faqat bitta urinish.",
+        "body_other": "{{count}} daqiqalik taymer hozir boshlanadi va to‘xtatib bo‘lmaydi. Faqat bitta urinish."
+      },
+      "submit": {
+        "title": "Javoblarni topshirasizmi?",
+        "body": "Shundan keyin ularni o‘zgartirib bo‘lmaydi.",
+        "action": "Topshirish"
+      }
+    },
+    "cancel": "Bekor qilish",
+    "questionN": "{{total}} tadan {{n}}-savol",
+    "saved": "Saqlandi",
+    "yourAnswer": "Javobingiz",
+    "true": "To‘g‘ri",
+    "false": "Noto‘g‘ri",
+    "timeUp": "Vaqt tugadi: saqlangan javoblaringiz topshirildi.",
+    "saveFailed": "Bu javob saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.",
+    "submitHint": "Har bir javob darhol saqlanadi.",
+    "submit": "Javoblarni topshirish",
+    "score": "Ballingiz",
+    "noAnswer": "javob yo‘q",
+    "yourAnswerIs": "Javobingiz: {{answer}}",
+    "rightAnswerIs": "To‘g‘ri javob: {{answer}}",
+    "answered": "{{done}} / {{total}} javob berildi",
+    "minutes_one": "{{count}} daqiqa",
+    "minutes_other": "{{count}} daqiqa",
+    "questions_one": "{{count}} ta savol · {{points}} ball",
+    "questions_other": "{{count}} ta savol · {{points}} ball",
+    "readyBody_one": "Sizda {{count}} daqiqa va bitta urinish bor. Taymer «Boshlash»ni bosganingizda boshlanadi.",
+    "readyBody_other": "Sizda {{count}} daqiqa va bitta urinish bor. Taymer «Boshlash»ni bosganingizda boshlanadi.",
+    "points_one": "{{count}} ball",
+    "points_other": "{{count}} ball"
   }
 }

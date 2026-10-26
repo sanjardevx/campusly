@@ -399,5 +399,46 @@
       "left_other": "오늘 {{count}}개 남음",
       "resets": "매일 00:00에 초기화"
     }
+  },
+  "quiz": {
+    "label": "퀴즈",
+    "due": "마감 {{date}}",
+    "submittedTitle": "답안을 제출했습니다",
+    "submittedBody": "선생님이 성적을 공개하면 점수와 정답을 볼 수 있습니다.",
+    "readyTitle": "준비되었나요?",
+    "start": "퀴즈 시작",
+    "notReady": "선생님이 아직 문제를 추가하지 않았습니다.",
+    "closed": "이 퀴즈는 마감되었습니다.",
+    "confirm": {
+      "start": {
+        "title": "퀴즈를 시작할까요?",
+        "action": "시작",
+        "body_other": "{{count}}분 타이머가 지금 시작되며 멈출 수 없습니다. 1회만 응시할 수 있습니다."
+      },
+      "submit": {
+        "title": "답안을 제출할까요?",
+        "body": "제출 후에는 바꿀 수 없습니다.",
+        "action": "제출"
+      }
+    },
+    "cancel": "취소",
+    "questionN": "문제 {{n}} / {{total}}",
+    "saved": "저장됨",
+    "yourAnswer": "내 답",
+    "true": "참",
+    "false": "거짓",
+    "timeUp": "시간이 끝나 저장된 답안이 제출되었습니다.",
+    "saveFailed": "답이 저장되지 않았습니다. 연결을 확인하고 다시 시도하세요.",
+    "submitHint": "답은 입력할 때마다 저장됩니다.",
+    "submit": "답안 제출",
+    "score": "내 점수",
+    "noAnswer": "답 없음",
+    "yourAnswerIs": "내 답: {{answer}}",
+    "rightAnswerIs": "정답: {{answer}}",
+    "answered": "{{total}}문제 중 {{done}}개 답함",
+    "minutes_other": "{{count}}분",
+    "questions_other": "문제 {{count}}개 · {{points}}점",
+    "readyBody_other": "제한 시간은 {{count}}분이고 응시는 1회입니다. 시작을 누르면 타이머가 시작됩니다.",
+    "points_other": "{{count}}점"
   }
 }

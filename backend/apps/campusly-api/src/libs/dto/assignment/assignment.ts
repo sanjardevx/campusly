@@ -68,6 +68,10 @@ export class Assignment {
   @Field(() => Date, { nullable: true })
   gradesPublishedAt: Date | null;
 
+  /** QUIZ: minutes from "Start"; null for other types */
+  @Field(() => Int, { nullable: true })
+  timeLimitMin: number | null;
+
   /** The teacher's attachments, in order; the link comes from `courseFileUrl` */
   @Field(() => [CourseFile])
   files: CourseFile[];

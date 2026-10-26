@@ -6,6 +6,7 @@ import { useTranslation } from 'next-i18next/pages';
 import { STUDENT_ASSIGNMENT } from '@/apollo/student/query';
 import { layoutFor } from '@/libs/components/layout';
 import { HomeworkView } from '@/libs/components/student/homework/HomeworkView';
+import { QuizView } from '@/libs/components/student/quiz/QuizView';
 import { useCrumb } from '@/libs/hooks/useCrumb';
 import { withTranslations } from '@/libs/i18n/server';
 import type { NextPageWithLayout } from '@/libs/types/page';
@@ -37,6 +38,8 @@ const AssignmentPage: NextPageWithLayout = () => {
       </Box>
     );
   }
+  // A quiz has its own page: one timed attempt instead of an upload
+  if (data.assignment.type === 'QUIZ') return <QuizView data={data} />;
   return <HomeworkView data={data} refetch={refetch} />;
 };
 

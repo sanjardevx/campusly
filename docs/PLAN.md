@@ -258,10 +258,10 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 17 (L) — Quiz engine
 
-- [ ] `QuizQuestion`, `QuizAttempt`, `QuizAnswer` tables + migration.
-- [ ] Teacher editor: MC / True-False / Number questions, time limit (the "Quiz" item in the Add menu stops being "coming soon").
-- [ ] Student: timer, 1 attempt, time checked on the server, auto-grade → `Submission` score → gradebook.
-- [ ] Results go out through the existing "publish grades" flow.
+- [x] `QuizQuestion`, `QuizAttempt`, `QuizAnswer` tables + migration.
+- [x] Teacher editor: MC / True-False / Number questions, time limit (the "Quiz" item in the Add menu stops being "coming soon").
+- [x] Student: timer, 1 attempt, time checked on the server, auto-grade → `Submission` score → gradebook.
+- [x] Results go out through the existing "publish grades" flow.
 - [ ] Isolation tests; deploy.
 
 ---

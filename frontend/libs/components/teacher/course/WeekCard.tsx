@@ -32,7 +32,7 @@ import { formatDate } from '@/libs/i18n/format';
 import { dragRowSx, useDragList } from './useDragList';
 import { dayRange, fileType, formatSize, visibility, weekState, type Week, type WeekItem } from './model';
 
-export type AddKind = 'VIDEO' | 'FILE' | 'HOMEWORK';
+export type AddKind = 'VIDEO' | 'FILE' | 'HOMEWORK' | 'QUIZ';
 
 /** Icon tile colours by item type (Stitch: video sky, file rose, homework green, quiz amber) */
 const TILES: Record<string, { icon: SvgIconComponent; fg: string; bg: string }> = {
@@ -296,8 +296,7 @@ export function WeekCard({
         <AddOption icon={<VideoCameraBackOutlinedIcon fontSize="small" />} title={t('course.add.video')} hint={t('course.add.videoHint')} onClick={() => add('VIDEO')} />
         <AddOption icon={<DescriptionOutlinedIcon fontSize="small" />} title={t('course.add.file')} hint={t('course.add.fileHint')} onClick={() => add('FILE')} />
         <AddOption icon={<AssignmentOutlinedIcon fontSize="small" />} title={t('course.add.homework')} hint={t('course.add.homeworkHint')} onClick={() => add('HOMEWORK')} />
-        {/* The quiz engine is a later phase (DECISIONS §14) */}
-        <AddOption icon={<TaskAltOutlinedIcon fontSize="small" />} title={t('course.add.quiz')} hint={t('course.add.quizHint')} soon={t('course.add.soon')} />
+        <AddOption icon={<TaskAltOutlinedIcon fontSize="small" />} title={t('course.add.quiz')} hint={t('course.add.quizHint')} onClick={() => add('QUIZ')} />
       </Menu>
     </Card>
   );

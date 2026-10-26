@@ -84,6 +84,7 @@ model User {
   lessonProgress        LessonProgress[]    @relation("LessonProgress")
   assignmentsCreated    Assignment[]        @relation("AssignmentsCreated")
   submissions           Submission[]        @relation("Submissions")
+  quizAttempts          QuizAttempt[]
   submissionsGraded     Submission[]        @relation("SubmissionsGraded")
   submissionComments    SubmissionComment[] @relation("SubmissionComments")
   periodGrades          PeriodGrade[]       @relation("PeriodGrades")
@@ -665,6 +666,8 @@ model Assignment {
   tutorMode         TutorMode      @default(HINTS)
   /// Only for the AI tutor's CHECK_ONLY mode; never sent to students
   finalAnswer       String?
+  /// QUIZ only: minutes from "Start" (the due date still ends the attempt if it comes first)
+  timeLimitMin      Int?
   publishedAt       DateTime?      @db.Timestamptz(3)
   /// null = students and parents do not see scores or feedback yet
   gradesPublishedAt DateTime?      @db.Timestamptz(3)
@@ -679,6 +682,8 @@ model Assignment {
   createdBy   User             @relation("AssignmentsCreated", fields: [createdById], references: [id])
   submissions Submission[]
   files       AssignmentFile[]
+  questions   QuizQuestion[]
+  attempts    QuizAttempt[]
 
   @@index([courseId, dueAt])
   @@index([moduleId])
@@ -948,4 +953,85 @@ model AuditLog {
   @@index([entityType, entityId])
   @@index([actorId, createdAt])
   @@map("audit_logs")
+}
+
+// ─────────────────────────────── Quizzes ───────────────────────────────
+// A quiz is an Assignment of type QUIZ (DECISIONS log 2026-10-27): its grade goes through the
+// normal Submission → gradebook → "publish grades". These tables hold the questions and the timed
+// attempt; the correct answers never leave the server before grades are published.
+
+enum QuizQuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  NUMBER
+}
+
+model QuizQuestion {
+  id            String           @id @default(uuid(7)) @db.Uuid
+  assignmentId  String           @db.Uuid
+  /// The teacher's order (students see a shuffled order)
+  order         Int
+  type          QuizQuestionType
+  text          String
+  points        Decimal          @db.Decimal(6, 2)
+  /// MULTIPLE_CHOICE: the answers in the teacher's order (2–6); other types: empty
+  options       String[]
+  /// MULTIPLE_CHOICE: index of the right answer in `options`; TRUE_FALSE: 1 = true, 0 = false
+  correctOption Int?
+  /// NUMBER: the right value and the allowed difference (0 = exact)
+  correctNumber Decimal?         @db.Decimal(14, 4)
+  tolerance     Decimal?         @db.Decimal(14, 4)
+  /// No hard delete: an edited question list replaces the old one (only before anyone starts)
+  removedAt     DateTime?        @db.Timestamptz(3)
+  createdAt     DateTime         @default(now()) @db.Timestamptz(3)
+
+  assignment Assignment   @relation(fields: [assignmentId], references: [id])
+  answers    QuizAnswer[]
+
+  @@index([assignmentId])
+  @@map("quiz_questions")
+}
+
+/// The one timed attempt of a student
+model QuizAttempt {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  assignmentId String    @db.Uuid
+  studentId    String    @db.Uuid
+  startedAt    DateTime  @db.Timestamptz(3)
+  /// min(start + time limit, due date): answers after it are refused
+  deadlineAt   DateTime  @db.Timestamptz(3)
+  /// Set by "Submit" or, when time ran out, by the next read or the batch job (= the deadline)
+  submittedAt  DateTime? @db.Timestamptz(3)
+  /// This student's shuffled order: { "questions": [id…], "options": { "<questionId>": [teacherIndex…] } }
+  order        Json
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+
+  assignment Assignment   @relation(fields: [assignmentId], references: [id])
+  student    User         @relation(fields: [studentId], references: [id])
+  answers    QuizAnswer[]
+
+  /// One attempt per student (DECISIONS): a second "Start" fails on this constraint
+  @@unique([assignmentId, studentId])
+  @@index([submittedAt, deadlineAt])
+  @@map("quiz_attempts")
+}
+
+model QuizAnswer {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  attemptId  String   @db.Uuid
+  questionId String   @db.Uuid
+  /// MULTIPLE_CHOICE: the teacher's index of the chosen answer; TRUE_FALSE: 1 / 0
+  choice     Int?
+  /// NUMBER
+  number     Decimal? @db.Decimal(14, 4)
+  /// Filled when the attempt is graded
+  isCorrect  Boolean?
+  points     Decimal? @db.Decimal(6, 2)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+
+  attempt  QuizAttempt  @relation(fields: [attemptId], references: [id])
+  question QuizQuestion @relation(fields: [questionId], references: [id])
+
+  @@unique([attemptId, questionId])
+  @@map("quiz_answers")
 }

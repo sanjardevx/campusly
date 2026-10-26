@@ -17,7 +17,11 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { MAX_ASSIGNMENT_FILES, SUBMISSION_FILE_TYPES } from '../../config';
+import {
+  MAX_ASSIGNMENT_FILES,
+  QUIZ_MAX_MINUTES,
+  SUBMISSION_FILE_TYPES,
+} from '../../config';
 import { AssignmentType, TutorMode } from '../../enums/assignment.enum';
 
 /** Fields a teacher may change after creation (the type and course are fixed) */
@@ -93,6 +97,14 @@ class AssignmentFields {
   @IsString()
   @MaxLength(2_000)
   finalAnswer?: string;
+
+  /** QUIZ only: minutes from "Start" (ignored for other types) */
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(QUIZ_MAX_MINUTES)
+  timeLimitMin?: number;
 }
 
 @InputType()

@@ -33,5 +33,8 @@
   "CATEGORY_NAME_TAKEN": "Two categories have the same name.",
   "DEMO_READ_ONLY": "This is not available in the demo.",
   "TELEGRAM_DISABLED": "Telegram is not available on this server yet.",
-  "RESET_LINK_INVALID": "This link is wrong, expired or already used."
+  "RESET_LINK_INVALID": "This link is wrong, expired or already used.",
+  "QUIZ_LOCKED": "A student has started this quiz: its questions cannot change.",
+  "QUIZ_CLOSED": "This quiz cannot be started.",
+  "QUIZ_TIME_UP": "Time is up: the answer was not saved."
 }

@@ -5,6 +5,8 @@ import { AssignmentResolver } from './assignment.resolver';
 import { AssignmentService } from './assignment.service';
 import { GradingResolver } from './grading.resolver';
 import { GradingService } from './grading.service';
+import { QuizResolver } from './quiz.resolver';
+import { QuizService } from './quiz.service';
 import { SubmissionResolver } from './submission.resolver';
 import { SubmissionService } from './submission.service';
 
@@ -17,6 +19,8 @@ import { SubmissionService } from './submission.service';
     SubmissionService,
     GradingResolver,
     GradingService,
+    QuizResolver,
+    QuizService,
   ],
   exports: [AssignmentService, SubmissionService],
 })

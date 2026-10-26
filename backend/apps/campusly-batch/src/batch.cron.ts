@@ -11,6 +11,7 @@ import { CampuslyBatchService } from './campusly-batch.service';
 
 export const BATCH_STALE_UPLOADS = 'BATCH_STALE_UPLOADS';
 export const BATCH_DEMO_RESET = 'BATCH_DEMO_RESET';
+export const BATCH_QUIZ_DEADLINES = 'BATCH_QUIZ_DEADLINES';
 
 // Same idea as Nestar's BatchController: the schedule here, the work in the service,
 // and a failing job is logged instead of crashing the worker
@@ -58,6 +59,16 @@ export class BatchCron implements OnApplicationBootstrap {
       );
     } catch (err) {
       this.logger.error(`${BATCH_DEMO_RESET} failed: ${errorReason(err)}`);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE, { name: BATCH_QUIZ_DEADLINES })
+  public async closeExpiredQuizAttempts() {
+    try {
+      const count = await this.batchService.closeExpiredQuizAttempts();
+      if (count) this.logger.log(`${BATCH_QUIZ_DEADLINES}: ${count} graded`);
+    } catch (err) {
+      this.logger.error(`${BATCH_QUIZ_DEADLINES} failed: ${errorReason(err)}`);
     }
   }
 }

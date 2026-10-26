@@ -74,3 +74,48 @@ export const MARK_ALL_ANNOUNCEMENTS_READ = graphql(`
     markAllAnnouncementsRead(studentId: $studentId)
   }
 `);
+
+/** One attempt: the server writes the start time and the deadline */
+export const START_QUIZ = graphql(`
+  mutation StartQuiz($assignmentId: String!) {
+    startQuiz(assignmentId: $assignmentId) {
+      assignmentId
+      state
+      canStart
+      timeLimitMin
+      questionCount
+      totalPoints
+      dueAt
+      startedAt
+      deadlineAt
+      submittedAt
+      serverNow
+      questions {
+        id
+        type
+        text
+        points
+        options
+        myChoice
+        myNumber
+      }
+    }
+  }
+`);
+
+/** Saved at once; QUIZ_TIME_UP after the deadline */
+export const SAVE_QUIZ_ANSWER = graphql(`
+  mutation SaveQuizAnswer($input: SaveQuizAnswerInput!) {
+    saveQuizAnswer(input: $input)
+  }
+`);
+
+export const SUBMIT_QUIZ = graphql(`
+  mutation SubmitQuiz($assignmentId: String!) {
+    submitQuiz(assignmentId: $assignmentId) {
+      assignmentId
+      state
+      submittedAt
+    }
+  }
+`);
