@@ -1,7 +1,7 @@
 /**
  * What the tutor needs from a language model, and nothing more (DECISIONS §3: "behind an
- * LlmProvider interface"). The service never imports a vendor SDK: Bedrock today, another
- * provider later means one new class. Tests and offline work use the fake one.
+ * LlmProvider interface"). The service never imports a vendor SDK: the Anthropic API in production,
+ * Bedrock kept for later, the fake one for tests and offline work — one class each.
  */
 export interface ChatTurn {
   role: 'user' | 'assistant';
@@ -30,7 +30,7 @@ export interface Embedding {
 }
 
 export interface LlmProvider {
-  readonly name: 'fake' | 'bedrock';
+  readonly name: 'fake' | 'bedrock' | 'anthropic';
   /** Streams the answer: `onText` gets each new piece as it is written */
   streamChat(
     request: ChatRequest,

@@ -270,7 +270,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 - [x] Ingest lesson PDFs → chunks → Bedrock embeddings → pgvector (`DocumentChunk`).
 - [x] `LlmProvider` + Bedrock Claude Haiku 5.5; SSE chat endpoint.
-  - Deploy: `TUTOR_PROVIDER` (SSM, `off` until Bedrock allows Haiku 5.5), model IDs default in config (`.env.example`); `iam-ec2-policy.json` gets `bedrock-mantle:CreateInference` (Claude in Amazon Bedrock) and `bedrock:InvokeModel` on Titan Embeddings V2 — deploy README §14.
+  - Deploy: Claude through the Anthropic API (Bedrock Claude blocked on the account): `ANTHROPIC_API_KEY` (SSM SecureString) + `TUTOR_PROVIDER=anthropic`; `iam-ec2-policy.json` gets InvokeModel on Titan Embeddings V2 (and the Bedrock Claude statement for later) — deploy README §14.
 - [x] Help levels 1–4 and the assignment's `tutorMode`; off during quizzes.
 - [x] Daily limit per student + global budget (Redis).
 - [ ] The `useTutor` stub calls the real API; a test proves parents cannot read tutor conversations; deploy.
@@ -291,6 +291,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 - [ ] Q&A: a student asks under a lesson, the teacher answers (`CourseQuestion`); the teacher dashboard card goes live.
 - [ ] Calendar page for students and parents (the `studentCalendar` API already exists).
+- [ ] AI tutor live: buy the Anthropic API key ($5 prepaid, auto-reload off) → test call → SSM `ANTHROPIC_API_KEY` + `TUTOR_PROVIDER=anthropic` together → deploy → smoke-test the tutor on campusly.uz (deploy README §14).
 - [ ] Bug fixes; final smoke test of all 4 roles.
 - [ ] README: architecture diagram, demo accounts, screenshots.
 - [ ] Public-repo prep (see CLAUDE.md "Before the repo goes public"; purging the journal history only after the developer approves).

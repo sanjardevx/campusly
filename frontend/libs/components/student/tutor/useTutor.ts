@@ -157,7 +157,7 @@ export function useTutor(): Tutor {
     activeId,
     messages,
     sources: lastAnswer?.sources ?? [],
-    quota: { used: live?.used ?? status?.tutorStatus.used ?? 0, limit: status?.tutorStatus.limit ?? 30 },
+    quota: { used: live?.used ?? status?.tutorStatus.used ?? 0, limit: status?.tutorStatus.limit ?? 20 },
     level,
     streaming: live !== null,
     error,

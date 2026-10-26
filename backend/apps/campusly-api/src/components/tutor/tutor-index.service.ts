@@ -110,7 +110,7 @@ export class TutorIndexService {
           ${toVectorLiteral(embedding.vector)}::vector)`,
       );
     }
-    await this.limits.addCost({ embedTokens: tokens });
+    await this.limits.addCost(llm.name, { embedTokens: tokens });
     // Old pieces out, new pieces in, in one transaction: a question never sees half of each
     await this.prismaService.$transaction(async (tx) => {
       await tx.documentChunk.deleteMany({ where: { sourceKey: source.key } });

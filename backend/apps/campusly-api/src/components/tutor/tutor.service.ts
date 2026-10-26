@@ -12,7 +12,6 @@ import { PrismaService } from '../../database/prisma.service';
 import {
   QUIZ_GRACE_SEC,
   TUTOR_CONTEXT_CHUNKS,
-  TUTOR_DAILY_LIMIT,
   TUTOR_HISTORY_MESSAGES,
   TUTOR_MAX_TOKENS,
 } from '../../libs/config';
@@ -122,7 +121,7 @@ export class TutorService {
     return {
       enabled: this.llm !== null,
       used: await this.limits.used(user.id),
-      limit: TUTOR_DAILY_LIMIT,
+      limit: this.limits.limit,
       quizActive: await this.hasOpenQuiz(user.id),
     };
   }
@@ -329,7 +328,7 @@ export class TutorService {
         },
       );
       answered = true;
-      await this.limits.addCost(result);
+      await this.limits.addCost(llm.name, result);
       const reply = await this.prismaService.tutorMessage.create({
         data: result.refused
           ? { conversationId, role: 'SYSTEM', text: 'refused' }
@@ -377,7 +376,7 @@ export class TutorService {
     query: string,
   ): Promise<PromptMaterial[]> {
     const embedding = await llm.embed(query);
-    await this.limits.addCost({ embedTokens: embedding.tokens });
+    await this.limits.addCost(llm.name, { embedTokens: embedding.tokens });
     return this.prismaService.$queryRaw<PromptMaterial[]>`
       SELECT c."title", c."kind", c."locator", c."text"
       FROM document_chunks c

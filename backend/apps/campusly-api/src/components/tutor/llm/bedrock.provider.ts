@@ -1,99 +1,57 @@
-import { AnthropicBedrockMantle } from '@anthropic-ai/bedrock-sdk';
-import {
-  BedrockRuntimeClient,
-  InvokeModelCommand,
-} from '@aws-sdk/client-bedrock-runtime';
-import { TUTOR_EMBED_DIMENSIONS } from '../../../libs/config';
+import AnthropicBedrock from '@anthropic-ai/bedrock-sdk';
+import { streamClaude } from './claude-stream';
 import type {
   ChatRequest,
   ChatResult,
   Embedding,
   LlmProvider,
 } from './llm.provider';
-
-export interface BedrockOptions {
-  region: string;
-  chatModelId: string;
-  embedModelId: string;
-  /** Local only; on EC2 both clients use the instance role */
-  accessKeyId?: string;
-  secretAccessKey?: string;
-}
+import { type AwsAccess, TitanEmbedder } from './titan.embedder';
 
 /**
- * Claude Haiku 5.5 through Claude in Amazon Bedrock (the Messages API at
- * bedrock-mantle.{region}.api.aws, signed with SigV4), and Titan Text Embeddings V2 through
- * bedrock-runtime InvokeModel. Both stay inside the AWS account: no API key to store.
+ * Claude on Amazon Bedrock through bedrock-runtime with the EU inference profile
+ * (`eu.anthropic.…`), signed with SigV4 (the EC2 role). Kept for later: the account cannot use
+ * Claude on Bedrock yet (Free plan, no Haiku 5.5 quota), so production uses AnthropicLlmProvider.
+ * Claude in Amazon Bedrock's newer endpoint (bedrock-mantle) has no Haiku in eu-central-1.
  */
 export class BedrockLlmProvider implements LlmProvider {
   public readonly name = 'bedrock';
-  private readonly claude: AnthropicBedrockMantle;
-  private readonly runtime: BedrockRuntimeClient;
+  private readonly claude: AnthropicBedrock;
+  private readonly titan: TitanEmbedder;
 
-  constructor(private readonly options: BedrockOptions) {
-    const { region, accessKeyId, secretAccessKey } = options;
-    const keys =
-      accessKeyId && secretAccessKey
-        ? { accessKeyId, secretAccessKey }
-        : undefined;
-    this.claude = new AnthropicBedrockMantle({
-      awsRegion: region,
+  constructor(
+    aws: AwsAccess,
+    private readonly chatModelId: string,
+    embedModelId: string,
+  ) {
+    const client = {
+      awsRegion: aws.region,
       // null: never pick up a bearer token from the environment, only SigV4
       apiKey: null,
-      awsAccessKey: keys?.accessKeyId,
-      awsSecretAccessKey: keys?.secretAccessKey,
       // A student is waiting: one quick retry, then the error goes to the chat
       maxRetries: 1,
       timeout: 60_000,
-    });
-    this.runtime = new BedrockRuntimeClient({ region, credentials: keys });
+    };
+    // Local keys, or none: then the SDK's default chain finds the EC2 role
+    this.claude =
+      aws.accessKeyId && aws.secretAccessKey
+        ? new AnthropicBedrock({
+            ...client,
+            awsAccessKey: aws.accessKeyId,
+            awsSecretKey: aws.secretAccessKey,
+          })
+        : new AnthropicBedrock(client);
+    this.titan = new TitanEmbedder(aws, embedModelId);
   }
 
-  public async streamChat(
+  public streamChat(
     request: ChatRequest,
     onText: (delta: string) => void,
   ): Promise<ChatResult> {
-    const stream = this.claude.messages.stream(
-      {
-        model: this.options.chatModelId,
-        max_tokens: request.maxTokens,
-        system: request.system,
-        messages: request.messages,
-        // Short hints, not deep reasoning: low effort keeps the answer fast and cheap
-        output_config: { effort: 'low' },
-      },
-      { signal: request.signal },
-    );
-    stream.on('text', (delta) => onText(delta));
-    const message = await stream.finalMessage();
-    const text = message.content
-      .map((block) => (block.type === 'text' ? block.text : ''))
-      .join('');
-    return {
-      text,
-      inputTokens: message.usage.input_tokens,
-      outputTokens: message.usage.output_tokens,
-      refused: message.stop_reason === 'refusal',
-    };
+    return streamClaude(this.claude, this.chatModelId, request, onText);
   }
 
-  public async embed(text: string): Promise<Embedding> {
-    const response = await this.runtime.send(
-      new InvokeModelCommand({
-        modelId: this.options.embedModelId,
-        contentType: 'application/json',
-        accept: 'application/json',
-        body: JSON.stringify({
-          inputText: text,
-          dimensions: TUTOR_EMBED_DIMENSIONS,
-          normalize: true,
-        }),
-      }),
-    );
-    const body = JSON.parse(new TextDecoder().decode(response.body)) as {
-      embedding: number[];
-      inputTextTokenCount: number;
-    };
-    return { vector: body.embedding, tokens: body.inputTextTokenCount };
+  public embed(text: string): Promise<Embedding> {
+    return this.titan.embed(text);
   }
 }

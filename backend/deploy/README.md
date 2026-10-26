@@ -249,21 +249,24 @@ curl -s "https://api.telegram.org/bot$TOKEN/setWebhook" \
 
 All three variables or none: with only some of them the API refuses to start (zod), so a half-configured bot never runs. Locally the bot cannot receive messages (Telegram calls the production webhook); the e2e test fakes Telegram.
 
-## 14. AI Study Tutor (Bedrock)
+## 14. AI Study Tutor (Anthropic API + Bedrock Titan)
 
-The tutor (DECISIONS §14) calls **Claude Haiku 5.5** through *Claude in Amazon Bedrock* (Messages API at `bedrock-mantle.eu-central-1.api.aws`, model `anthropic.claude-haiku-5-5`) and embeds course material with **Titan Text Embeddings V2** (`amazon.titan-embed-text-v2:0`, bedrock-runtime). Both are signed with the EC2 role: no API key. The batch indexes lessons, assignments and their PDFs into `document_chunks` (pgvector) every 10 minutes; the API answers on `POST /tutor/chat` (Server-Sent Events — Caddy passes them through as they come).
+The tutor (DECISIONS §14) asks **Claude Haiku 5.5 on the Anthropic API** (`api.anthropic.com`, model `claude-haiku-5-5`, key in SSM) and embeds course material with **Bedrock Titan Text Embeddings V2** (`amazon.titan-embed-text-v2:0`, the EC2 role). The batch indexes lessons, assignments and their PDFs into `document_chunks` (pgvector) every 10 minutes; the API answers on `POST /tutor/chat` (Server-Sent Events — Caddy passes them through as they come).
 
-1. **Model access** (§0): Claude Haiku 5.5 must be allowed on the account and its quota above 0. Try it once in the Bedrock playground (eu-central-1).
-2. **EC2 role**: the inline policy from [`iam-ec2-policy.json`](iam-ec2-policy.json) now has `TutorClaude` (`bedrock-mantle:CreateInference`) and `TutorEmbeddings` (`bedrock:InvokeModel` on the Titan model). Update the role's inline policy with the new file. `TutorClaude` is `*` for now: narrow it to the model ARN the console shows once access is granted.
-3. **Switch it on** and deploy:
+Why not Claude on Bedrock: the account is on the AWS Free plan, which cannot use AWS Marketplace (Claude fails with `INVALID_PAYMENT_INSTRUMENT`), the Haiku 5.5 quota request was denied twice, and bedrock-mantle has no Haiku in eu-central-1. The Bedrock provider stays in the code (`TUTOR_PROVIDER=bedrock`, EU profile `eu.anthropic.claude-haiku-5-5`) for later.
+
+1. **Anthropic Console** (console.anthropic.com): buy a small prepaid credit (e.g. $5) with **auto-reload off**, set a monthly spend limit, create an API key named `campusly-prod`. Prepaid credit is the hard cap: when it runs out, the API refuses and the chat shows "the tutor couldn't answer" (the request is not counted).
+2. **EC2 role**: [`iam-ec2-policy.json`](iam-ec2-policy.json) — `TutorEmbeddings` (InvokeModel on Titan) is what this setup uses; `TutorClaude` (Bedrock Claude) is harmless and stays for later. Replace `ACCOUNT_ID`.
+3. **SSM** (CloudShell), then deploy — `env-from-ssm.sh` picks up every `/campusly/prod/*` parameter, no script change:
 
 ```bash
 export AWS_REGION=eu-central-1
-aws ssm put-parameter --name /campusly/prod/TUTOR_PROVIDER --type String --value bedrock --overwrite
-# optional, only to change the defaults:
-# aws ssm put-parameter --name /campusly/prod/BEDROCK_CHAT_MODEL_ID --type String --value anthropic.claude-haiku-5-5
+read -rs KEY && aws ssm put-parameter --name /campusly/prod/ANTHROPIC_API_KEY --type SecureString --value "$KEY" --overwrite
+aws ssm put-parameter --name /campusly/prod/TUTOR_PROVIDER --type String --value anthropic --overwrite
+# optional, default 20 requests per student per day:
+# aws ssm put-parameter --name /campusly/prod/TUTOR_DAILY_LIMIT --type String --value 10
 ```
 
-The migration `ai_tutor` runs `CREATE EXTENSION vector` (RDS PostgreSQL 17 ships pgvector; the master user may create it). Check after the deploy: `docker compose -f docker-compose.prod.yml logs batch | grep TUTOR_INDEX` shows "N sources indexed"; then ask a question as a demo student. Spend is capped in the app at **$2 a day** for the whole school and 30 requests per student (Redis); the AWS budgets (DECISIONS §12) stay the outer limit.
+`TUTOR_PROVIDER=anthropic` without `ANTHROPIC_API_KEY` stops the API at start (zod), so a half-configured tutor never runs. The migration `ai_tutor` runs `CREATE EXTENSION vector` (RDS PostgreSQL 17 ships pgvector; the master user may create it). Check after the deploy: `docker compose -f docker-compose.prod.yml logs batch | grep TUTOR_INDEX` shows "N sources indexed"; then ask a question as a demo student.
 
-`TUTOR_PROVIDER=off` (the SSM default) keeps the page in its "not connected" state; `fake` is refused in production.
+Cost guard in the app: 20 requests per student per day, short answers (max 1 024 tokens, effort low), only the last 12 messages and 5 pieces of material per request, and $2 a day for the whole school (Redis). The Anthropic prepaid credit and spend limit are the outer cap. `TUTOR_PROVIDER=off` (the SSM default) keeps the page in its "not connected" state; `fake` is refused in production.

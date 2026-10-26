@@ -304,7 +304,7 @@ describe('AI Study Tutor: index, SSE chat, levels, rules, limits, isolation (e2e
     expect(await index.sync(course.A)).toEqual({ indexed: 0, removed: 0 });
   });
 
-  it('the student sees the tutor is on, with today’s limit', async () => {
+  it('the student sees the tutor is on, with today’s limit (TUTOR_DAILY_LIMIT)', async () => {
     const res = await gql<{ tutorStatus: object }>(
       '{ tutorStatus { enabled used limit quizActive } }',
       {},
@@ -313,7 +313,7 @@ describe('AI Study Tutor: index, SSE chat, levels, rules, limits, isolation (e2e
     expect(res.data!.tutorStatus).toEqual({
       enabled: true,
       used: 0,
-      limit: 30,
+      limit: app.get(TutorLimitsService).limit,
       quizActive: false,
     });
   });
@@ -498,7 +498,7 @@ describe('AI Study Tutor: index, SSE chat, levels, rules, limits, isolation (e2e
   });
 
   it('stops at the daily limit and when the school budget is used up', async () => {
-    await redis.set(questionsKey(id.sA), 30);
+    await redis.set(questionsKey(id.sA), app.get(TutorLimitsService).limit);
     const limited = await chat(
       { action: 'ASK', courseId: course.A, text: 'one more' },
       'sA',

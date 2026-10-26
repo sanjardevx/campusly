@@ -4,15 +4,18 @@ import {
   Injectable,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { RedisService } from '../../database/redis.service';
 import {
+  type Env,
   TUTOR_DAILY_BUDGET_USD,
-  TUTOR_DAILY_LIMIT,
+  TUTOR_EMBED_PRICE,
   TUTOR_PRICES,
   TUTOR_TIMEZONE,
 } from '../../libs/config';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import { todayInZone } from '../../libs/utils/date';
+import type { LlmProvider } from './llm/llm.provider';
 
 /** Counters live two days: long enough for "today" in any timezone, then Redis forgets them */
 const TTL_SEC = 2 * 24 * 60 * 60;
@@ -21,7 +24,7 @@ const MICRO = 1_000_000;
 
 /**
  * The tutor's two limits (DECISIONS §14), in Redis because every request checks them:
- * - per student: TUTOR_DAILY_LIMIT requests a day (INCR is atomic, so two tabs cannot both
+ * - per student: TUTOR_DAILY_LIMIT requests a day (env, default 20) (INCR is atomic, so two tabs cannot both
  *   take the last one);
  * - per school: TUTOR_DAILY_BUDGET_USD of model spend a day, so a bug or a busy day cannot
  *   run up the AWS bill. A request already running may finish over it; the next one waits.
@@ -29,7 +32,15 @@ const MICRO = 1_000_000;
  */
 @Injectable()
 export class TutorLimitsService {
-  constructor(private readonly redis: RedisService) {}
+  /** Requests per student per day */
+  public readonly limit: number;
+
+  constructor(
+    private readonly redis: RedisService,
+    config: ConfigService<Env, true>,
+  ) {
+    this.limit = config.get('TUTOR_DAILY_LIMIT', { infer: true });
+  }
 
   private day(now = new Date()) {
     return todayInZone(TUTOR_TIMEZONE, now);
@@ -50,7 +61,7 @@ export class TutorLimitsService {
     const key = this.questionKey(studentId);
     const used = await this.redis.incr(key);
     if (used === 1) await this.redis.expire(key, TTL_SEC);
-    if (used > TUTOR_DAILY_LIMIT) {
+    if (used > this.limit) {
       await this.redis.decr(key);
       throw new HttpException(
         {
@@ -79,15 +90,19 @@ export class TutorLimitsService {
   }
 
   /** Adds the cost of one model call (chat or embeddings) to today's spend */
-  public async addCost(usage: {
-    inputTokens?: number;
-    outputTokens?: number;
-    embedTokens?: number;
-  }): Promise<void> {
+  public async addCost(
+    provider: LlmProvider['name'],
+    usage: {
+      inputTokens?: number;
+      outputTokens?: number;
+      embedTokens?: number;
+    },
+  ): Promise<void> {
+    const price = TUTOR_PRICES[provider];
     const usd =
-      ((usage.inputTokens ?? 0) * TUTOR_PRICES.input +
-        (usage.outputTokens ?? 0) * TUTOR_PRICES.output +
-        (usage.embedTokens ?? 0) * TUTOR_PRICES.embed) /
+      ((usage.inputTokens ?? 0) * price.input +
+        (usage.outputTokens ?? 0) * price.output +
+        (usage.embedTokens ?? 0) * TUTOR_EMBED_PRICE) /
       1_000_000;
     const micro = Math.ceil(usd * MICRO);
     if (micro === 0) return;

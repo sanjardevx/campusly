@@ -43,14 +43,22 @@ const envSchema = z
     TELEGRAM_WEBHOOK_SECRET: optional(z.string().regex(/^[\w-]{32,256}$/)),
     TELEGRAM_BOT_USERNAME: optional(z.string().regex(/^\w{5,32}bot$/i)),
 
-    // AI Study Tutor (DECISIONS §14). off = the page says "not connected" (CI, local without Bedrock);
-    // fake = canned hints and word-hash embeddings for tests and offline work; bedrock = the real thing.
-    TUTOR_PROVIDER: z.enum(['off', 'fake', 'bedrock']).default('off'),
-    // Claude in Amazon Bedrock (Messages API, region = AWS_REGION) and the embedding model
+    // AI Study Tutor (DECISIONS §14). off = the page says "not connected" (CI, local without keys);
+    // fake = canned hints and word-hash embeddings for tests and offline work; anthropic = Claude on
+    // the Anthropic API (production); bedrock = Claude on Bedrock (kept for later). Embeddings: Titan.
+    TUTOR_PROVIDER: z
+      .enum(['off', 'fake', 'anthropic', 'bedrock'])
+      .default('off'),
+    // Requests per student per day ("Show another hint" counts too)
+    TUTOR_DAILY_LIMIT: z.coerce.number().int().min(1).max(200).default(20),
+    // Anthropic API (TUTOR_PROVIDER=anthropic): the key lives in SSM as a SecureString
+    ANTHROPIC_API_KEY: optional(z.string().regex(/^sk-ant-[\w-]{20,}$/)),
+    ANTHROPIC_CHAT_MODEL_ID: z.string().min(3).default('claude-haiku-5-5'),
+    // bedrock-runtime in AWS_REGION: Claude through the EU inference profile, and the embedding model
     BEDROCK_CHAT_MODEL_ID: z
       .string()
       .min(3)
-      .default('anthropic.claude-haiku-5-5'),
+      .default('eu.anthropic.claude-haiku-5-5'),
     BEDROCK_EMBED_MODEL_ID: z
       .string()
       .min(3)
@@ -97,6 +105,13 @@ const envSchema = z
           message: 'required for the Telegram bot (set all three or none)',
         });
       }
+    }
+    if (env.TUTOR_PROVIDER === 'anthropic' && !env.ANTHROPIC_API_KEY) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['ANTHROPIC_API_KEY'],
+        message: 'required when TUTOR_PROVIDER=anthropic',
+      });
     }
     // Canned answers must never reach real students
     if (env.NODE_ENV === 'production' && env.TUTOR_PROVIDER === 'fake') {
@@ -169,15 +184,20 @@ export const TEMP_PASSWORD_LIMITS = { maxUses: 10, maxDays: 60 };
 
 /** "Today" for the tutor limits: they reset at midnight school time */
 export const TUTOR_TIMEZONE = 'Asia/Tashkent';
-/** Requests per student per day ("Show another hint" counts: every one is a model call) */
-export const TUTOR_DAILY_LIMIT = 30;
 /** The whole school's tutor spend per day, in USD; when it is used up the tutor waits for tomorrow */
 export const TUTOR_DAILY_BUDGET_USD = 2;
 /**
- * USD per million tokens, for the budget. Claude Haiku 5.5 is $0.10 / $0.50 (prompts up to 100K);
- * +10 % for Bedrock's regional endpoint. Titan Text Embeddings V2: $0.02.
+ * USD per million tokens of the chat model, for the budget, per provider. Anthropic API: Claude
+ * Haiku 5.5 is $0.10 / $0.50 (prompts up to 100K). Bedrock prices Claude on its own, so it is counted
+ * high (Haiku 4.5's $1 / $5 + 10 % for the EU profile): over-counting only stops the tutor earlier.
  */
-export const TUTOR_PRICES = { input: 0.11, output: 0.55, embed: 0.02 };
+export const TUTOR_PRICES = {
+  anthropic: { input: 0.1, output: 0.5 },
+  bedrock: { input: 1.1, output: 5.5 },
+  fake: { input: 0, output: 0 },
+} as const;
+/** Titan Text Embeddings V2, USD per million tokens (every provider embeds with it) */
+export const TUTOR_EMBED_PRICE = 0.02;
 /** A hint is short: the model may write at most this many tokens */
 export const TUTOR_MAX_TOKENS = 1024;
 /** Earlier messages sent with each request (the conversation's memory) */
