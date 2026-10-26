@@ -42,5 +42,6 @@
   "TUTOR_BUDGET": "Tutor bugun dam olyapti. Iltimos, ertaga urinib ko'ring.",
   "TUTOR_QUIZ_ACTIVE": "Ochiq quiz bor ekan, tutor o'chiq.",
   "TUTOR_OFF": "O'qituvchingiz bu vazifa uchun tutorni o'chirgan.",
-  "TUTOR_FAILED": "Tutor javob bera olmadi. Qaytadan urinib ko'ring — bu savol hisobga olinmadi."
+  "TUTOR_FAILED": "Tutor javob bera olmadi. Qaytadan urinib ko'ring — bu savol hisobga olinmadi.",
+  "INVALID_PHONE": "O‘zbekiston mobil raqamini yozing, masalan 90 123 45 67."
 }

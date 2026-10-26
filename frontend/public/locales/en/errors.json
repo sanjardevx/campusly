@@ -42,5 +42,6 @@
   "TUTOR_BUDGET": "The tutor is resting for today. Please try again tomorrow.",
   "TUTOR_QUIZ_ACTIVE": "The tutor is off while you have a quiz open.",
   "TUTOR_OFF": "Your teacher turned the tutor off for this assignment.",
-  "TUTOR_FAILED": "The tutor couldn't answer. Please try again — this question was not counted."
+  "TUTOR_FAILED": "The tutor couldn't answer. Please try again — this question was not counted.",
+  "INVALID_PHONE": "Please write an Uzbek mobile number, e.g. 90 123 45 67."
 }

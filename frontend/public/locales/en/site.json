@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "title": "Campusly School — Tashkent",
+    "description": "A calm, focused school in Tashkent for grades 1–11: international standards, personal attention, strong English and Korean."
+  },
+  "nav": {
+    "portal": "Campusly Portal",
+    "signIn": "Sign in",
+    "enquire": "Enquire now",
+    "enquireShort": "Enquire"
+  },
+  "hero": {
+    "pill": "Tashkent · Grades 1–11",
+    "title": "A calm, focused school where every student is known.",
+    "subtitle": "International standards, personal attention, and strong English and Korean.",
+    "pause": "Pause slideshow",
+    "play": "Play slideshow",
+    "slide": "Show photo {{n}}"
+  },
+  "stats": {
+    "students": "students",
+    "teachers": "teachers",
+    "programs": "programs",
+    "founded": "founded"
+  },
+  "news": {
+    "eyebrow": "Campus updates",
+    "title": "News & Events",
+    "prev": "Previous slide",
+    "next": "Next slide",
+    "goTo": "Show post {{n}}",
+    "type": {
+      "EVENT": "Event",
+      "NEWS": "News"
+    },
+    "readMore": "Read more",
+    "close": "Close",
+    "empty": "News and events will appear here soon."
+  },
+  "why": {
+    "title": "Why choose Campusly School?",
+    "subtitle": "Everything your child needs, in one calm and well-run school.",
+    "tech": {
+      "title": "Technology school",
+      "item1": "Campusly portal: grades, attendance & homework online",
+      "item2": "AI Study Tutor that gives hints, not answers",
+      "item3": "Weekly progress summary for parents"
+    },
+    "tracks": {
+      "title": "Specialised tracks",
+      "body": "From grade 9, students go deeper into STEM or humanities, based on their strengths."
+    },
+    "languages": {
+      "title": "English & Korean",
+      "body": "Native-speaking teachers and built-in IELTS and TOPIK preparation."
+    },
+    "mentors": {
+      "title": "Small classes, real mentors",
+      "body": "Up to 20 students per class and a mentor teacher who knows every child."
+    }
+  },
+  "programs": {
+    "eyebrow": "Included in tuition",
+    "title": "Programs & clubs",
+    "subtitle": "Every enrolled student can join these programs at no extra cost.",
+    "included": "Included in tuition",
+    "ask": "Ask about schedule",
+    "grades": "Grades {{from}}–{{to}}",
+    "video": "Watch the video",
+    "days": {
+      "MON": "Mon",
+      "TUE": "Tue",
+      "WED": "Wed",
+      "THU": "Thu",
+      "FRI": "Fri",
+      "SAT": "Sat"
+    },
+    "and": "&"
+  },
+  "team": {
+    "eyebrow": "Leadership & teachers",
+    "title": "Our team"
+  },
+  "stages": {
+    "title": "School stages",
+    "subtitle": "One school from the first lesson to university.",
+    "primary": {
+      "ages": "Ages 7–10",
+      "title": "Primary · Grades 1–4",
+      "item1": "Reading & numeracy foundations",
+      "item2": "English from grade 1",
+      "item3": "Art, music & sport every week"
+    },
+    "middle": {
+      "ages": "Ages 11–14",
+      "title": "Middle · Grades 5–8",
+      "item1": "Lab sciences",
+      "item2": "Korean as a second foreign language",
+      "item3": "Olympiad clubs"
+    },
+    "high": {
+      "ages": "Ages 15–17",
+      "title": "High · Grades 9–11",
+      "item1": "STEM or humanities track",
+      "item2": "IELTS & SAT preparation",
+      "item3": "University guidance"
+    }
+  },
+  "admission": {
+    "title": "Admission process",
+    "subtitle": "Six simple steps from the first visit to the first lesson.",
+    "step1": {
+      "title": "Visit the school",
+      "body": "Our admissions team welcomes you on campus and answers every question."
+    },
+    "step2": {
+      "title": "Get to know us",
+      "body": "A personal tour of classrooms, labs, the library and the sports hall."
+    },
+    "step3": {
+      "title": "Parent interview",
+      "body": "A short conversation to make sure our goals and yours match."
+    },
+    "step4": {
+      "title": "Placement test",
+      "body": "A light test in maths and English to place your child in the right class."
+    },
+    "step5": {
+      "title": "Meeting with the school psychologist",
+      "body": "A friendly chat about readiness, behaviour and how your child learns best."
+    },
+    "step6": {
+      "title": "Enrolment & contract",
+      "body": "Sign the contract, get the uniform and portal login — and start lessons."
+    }
+  },
+  "enquiry": {
+    "eyebrow": "Admissions office",
+    "title": "Questions about admission or a program?",
+    "body": "Schedule a visit, meet our teachers, or find out which grade has open seats.",
+    "name": "Parent full name",
+    "namePlaceholder": "e.g. Dilshod Karimov",
+    "phone": "Phone number",
+    "phonePlaceholder": "90 123 45 67",
+    "grade": "Child's grade",
+    "gradePlaceholder": "Select a grade",
+    "gradeOption": "Grade {{n}}",
+    "interest": "Program of interest",
+    "interests": {
+      "STANDARD": "Standard K-11 Track",
+      "STEM": "STEM Track",
+      "KOREAN": "Korean Language Program",
+      "IELTS": "Cambridge & IELTS Prep"
+    },
+    "submit": "Send enquiry",
+    "note": "We will call you back within 1 working day.",
+    "sent": "Thank you! The admissions office will call you back within 1 working day.",
+    "sendAnother": "Send another enquiry",
+    "honeypot": "Leave this field empty"
+  },
+  "faq": {
+    "eyebrow": "Questions",
+    "title": "Frequently asked questions",
+    "q1": "Can tuition be paid in instalments?",
+    "a1": "Yes. You can pay yearly, per semester, or in 10 equal monthly instalments.",
+    "q2": "Are meals included?",
+    "a2": "Yes, tuition includes four balanced, fresh meals a day, planned by a children's nutritionist and cooked in our campus kitchen.",
+    "q3": "Is a school uniform required?",
+    "a3": "Yes. Students wear our classic navy school uniform, designed for comfort and everyday campus activities.",
+    "q4": "Is there school transport?",
+    "a4": "Yes. Safe, supervised minibus routes cover all major districts of Tashkent.",
+    "q5": "Are there sibling discounts?",
+    "a5": "We give a 10% discount for the second child and 15% for the third and every next child enrolled at the same time.",
+    "q6": "How can I follow my child's grades and attendance?",
+    "a6": "Parents sign in to the Campusly portal to see published grades, attendance and homework for each child, on the phone or the computer."
+  },
+  "footer": {
+    "followUs": "Follow us",
+    "portals": "Portals",
+    "studentSignIn": "Student & parent sign in",
+    "teacherSignIn": "Teacher sign in",
+    "rights": "© {{year}} {{school}}. All rights reserved.",
+    "city": "Tashkent, Uzbekistan",
+    "telegram": "Telegram",
+    "instagram": "Instagram",
+    "youtube": "YouTube"
+  }
+}

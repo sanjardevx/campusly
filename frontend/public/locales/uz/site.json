@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "title": "Campusly maktabi — Toshkent",
+    "description": "Toshkentdagi 1–11-sinflar uchun sokin va maqsadli maktab: xalqaro standartlar, har bir o‘quvchiga e’tibor, kuchli ingliz va koreys tillari."
+  },
+  "nav": {
+    "portal": "Campusly portali",
+    "signIn": "Kirish",
+    "enquire": "Ariza qoldirish",
+    "enquireShort": "Ariza"
+  },
+  "hero": {
+    "pill": "Toshkent · 1–11-sinflar",
+    "title": "Har bir o‘quvchi tanilgan sokin va maqsadli maktab.",
+    "subtitle": "Xalqaro standartlar, shaxsiy e’tibor hamda kuchli ingliz va koreys tillari.",
+    "pause": "Slayd-shouni to‘xtatish",
+    "play": "Slayd-shouni davom ettirish",
+    "slide": "{{n}}-suratni ko‘rsatish"
+  },
+  "stats": {
+    "students": "o‘quvchi",
+    "teachers": "o‘qituvchi",
+    "programs": "dastur",
+    "founded": "tashkil topgan"
+  },
+  "news": {
+    "eyebrow": "Maktab yangiliklari",
+    "title": "Yangiliklar va tadbirlar",
+    "prev": "Oldingi slayd",
+    "next": "Keyingi slayd",
+    "goTo": "{{n}}-xabarni ko‘rsatish",
+    "type": {
+      "EVENT": "Tadbir",
+      "NEWS": "Yangilik"
+    },
+    "readMore": "Batafsil",
+    "close": "Yopish",
+    "empty": "Yangiliklar va tadbirlar tez orada shu yerda paydo bo‘ladi."
+  },
+  "why": {
+    "title": "Nega aynan Campusly maktabi?",
+    "subtitle": "Farzandingizga kerak bo‘lgan hamma narsa — bitta sokin va yaxshi tashkil etilgan maktabda.",
+    "tech": {
+      "title": "Texnologik maktab",
+      "item1": "Campusly portali: baholar, davomat va uy vazifalari onlayn",
+      "item2": "Javob emas, yo‘l-yo‘riq beradigan AI Study Tutor",
+      "item3": "Ota-onalar uchun haftalik o‘zlashtirish xulosasi"
+    },
+    "tracks": {
+      "title": "Ixtisoslashgan yo‘nalishlar",
+      "body": "9-sinfdan boshlab o‘quvchilar o‘z kuchiga qarab STEM yoki gumanitar fanlarni chuqur o‘rganadi."
+    },
+    "languages": {
+      "title": "Ingliz va koreys tillari",
+      "body": "Ona tilida so‘zlashuvchi ustozlar hamda IELTS va TOPIKga ichki tayyorgarlik."
+    },
+    "mentors": {
+      "title": "Kichik sinflar, haqiqiy murabbiylar",
+      "body": "Sinfda 20 tagacha o‘quvchi va har bir bolani yaxshi biladigan murabbiy-ustoz."
+    }
+  },
+  "programs": {
+    "eyebrow": "O‘qish narxiga kiritilgan",
+    "title": "Dasturlar va to‘garaklar",
+    "subtitle": "Har bir o‘quvchi bu dasturlarga qo‘shimcha to‘lovsiz qatnasha oladi.",
+    "included": "O‘qish narxiga kiritilgan",
+    "ask": "Jadval haqida so‘rash",
+    "grades": "{{from}}–{{to}}-sinflar",
+    "video": "Videoni ko‘rish",
+    "days": {
+      "MON": "Du",
+      "TUE": "Se",
+      "WED": "Chor",
+      "THU": "Pay",
+      "FRI": "Ju",
+      "SAT": "Shan"
+    },
+    "and": "va"
+  },
+  "team": {
+    "eyebrow": "Rahbariyat va ustozlar",
+    "title": "Jamoamiz"
+  },
+  "stages": {
+    "title": "Ta’lim bosqichlari",
+    "subtitle": "Birinchi darsdan universitetgacha — bitta maktab.",
+    "primary": {
+      "ages": "7–10 yosh",
+      "title": "Boshlang‘ich · 1–4-sinflar",
+      "item1": "O‘qish va hisob asoslari",
+      "item2": "1-sinfdan ingliz tili",
+      "item3": "Har hafta san’at, musiqa va sport"
+    },
+    "middle": {
+      "ages": "11–14 yosh",
+      "title": "O‘rta · 5–8-sinflar",
+      "item1": "Laboratoriya fanlari",
+      "item2": "Ikkinchi chet tili sifatida koreys tili",
+      "item3": "Olimpiada to‘garaklari"
+    },
+    "high": {
+      "ages": "15–17 yosh",
+      "title": "Yuqori · 9–11-sinflar",
+      "item1": "STEM yoki gumanitar yo‘nalish",
+      "item2": "IELTS va SATga tayyorgarlik",
+      "item3": "Universitet tanlashda yordam"
+    }
+  },
+  "admission": {
+    "title": "Qabul jarayoni",
+    "subtitle": "Birinchi tashrifdan birinchi darsgacha — oltita oddiy qadam.",
+    "step1": {
+      "title": "Maktabga tashrif",
+      "body": "Qabul bo‘limimiz sizni maktabda kutib oladi va barcha savollarga javob beradi."
+    },
+    "step2": {
+      "title": "Biz bilan tanishuv",
+      "body": "Sinf xonalari, laboratoriyalar, kutubxona va sport zali bo‘ylab shaxsiy ekskursiya."
+    },
+    "step3": {
+      "title": "Ota-onalar bilan suhbat",
+      "body": "Maqsadlarimiz mos kelishiga ishonch hosil qilish uchun qisqa suhbat."
+    },
+    "step4": {
+      "title": "Darajani aniqlash testi",
+      "body": "Farzandingizni to‘g‘ri sinfga joylash uchun matematika va ingliz tilidan yengil test."
+    },
+    "step5": {
+      "title": "Maktab psixologi bilan uchrashuv",
+      "body": "Tayyorgarlik, xulq va farzandingiz qanday yaxshi o‘rganishi haqida samimiy suhbat."
+    },
+    "step6": {
+      "title": "Qabul va shartnoma",
+      "body": "Shartnomani imzolang, forma va portal loginini oling — va darslarni boshlang."
+    }
+  },
+  "enquiry": {
+    "eyebrow": "Qabul bo‘limi",
+    "title": "Qabul yoki dastur bo‘yicha savollaringiz bormi?",
+    "body": "Tashrifni rejalashtiring, ustozlarimiz bilan tanishing yoki qaysi sinfda bo‘sh o‘rin borligini bilib oling.",
+    "name": "Ota-onaning to‘liq ismi",
+    "namePlaceholder": "masalan, Dilshod Karimov",
+    "phone": "Telefon raqami",
+    "phonePlaceholder": "90 123 45 67",
+    "grade": "Farzandingiz sinfi",
+    "gradePlaceholder": "Sinfni tanlang",
+    "gradeOption": "{{n}}-sinf",
+    "interest": "Qiziqqan dastur",
+    "interests": {
+      "STANDARD": "Standart 1–11 yo‘nalishi",
+      "STEM": "STEM yo‘nalishi",
+      "KOREAN": "Koreys tili dasturi",
+      "IELTS": "Cambridge va IELTSga tayyorlov"
+    },
+    "submit": "Ariza yuborish",
+    "note": "1 ish kuni ichida sizga qayta qo‘ng‘iroq qilamiz.",
+    "sent": "Rahmat! Qabul bo‘limi 1 ish kuni ichida sizga qo‘ng‘iroq qiladi.",
+    "sendAnother": "Yana ariza yuborish",
+    "honeypot": "Bu maydonni bo‘sh qoldiring"
+  },
+  "faq": {
+    "eyebrow": "Savollar",
+    "title": "Ko‘p beriladigan savollar",
+    "q1": "O‘qish to‘lovini bo‘lib to‘lash mumkinmi?",
+    "a1": "Ha. Yillik, yarim yillik yoki 10 ta teng oylik to‘lov bilan to‘lash mumkin.",
+    "q2": "Ovqatlanish narxga kiradimi?",
+    "a2": "Ha, narxga bolalar dietologi tuzgan va maktab oshxonasida tayyorlanadigan kuniga to‘rt mahal muvozanatli, yangi ovqat kiradi.",
+    "q3": "Maktab formasi majburiymi?",
+    "a3": "Ha. O‘quvchilar qulaylik va kundalik mashg‘ulotlar uchun tikilgan klassik to‘q ko‘k maktab formasini kiyadi.",
+    "q4": "Maktab transporti bormi?",
+    "a4": "Ha. Xavfsiz, nazoratli mikroavtobus yo‘nalishlari Toshkentning barcha asosiy tumanlarini qamrab oladi.",
+    "q5": "Aka-ukalar uchun chegirma bormi?",
+    "a5": "Bir vaqtda o‘qiyotgan ikkinchi farzand uchun 10%, uchinchi va undan keyingi farzandlar uchun 15% chegirma beriladi.",
+    "q6": "Farzandimning baholari va davomatini qanday kuzataman?",
+    "a6": "Ota-onalar Campusly portaliga kirib, har bir farzandining e’lon qilingan baholari, davomati va uy vazifalarini telefon yoki kompyuterda ko‘radi."
+  },
+  "footer": {
+    "followUs": "Bizni kuzating",
+    "portals": "Portallar",
+    "studentSignIn": "O‘quvchi va ota-ona uchun kirish",
+    "teacherSignIn": "O‘qituvchi uchun kirish",
+    "rights": "© {{year}} {{school}}. Barcha huquqlar himoyalangan.",
+    "city": "Toshkent, O‘zbekiston",
+    "telegram": "Telegram",
+    "instagram": "Instagram",
+    "youtube": "YouTube"
+  }
+}
