@@ -348,7 +348,7 @@ function ItemRow({
   const tile = TILES[type] ?? TILES.LINK;
   const Icon = tile.icon;
 
-  /** "Video · 22 min" · "PDF · 1.8 MB" · "Due Oct 16, 23:59 · 10 pts · Late: off · Resubmit: up to 3" */
+  /** "Video · 22 min" · "PDF · 1.8 MB" · "Due Oct 16, 23:59 · 10 pts · Late: off · Resubmit: up to 3" (a quiz: "· 10 minutes") */
   const detail = () => {
     if (isLesson) {
       const { lesson } = item;
@@ -380,7 +380,9 @@ function ItemRow({
     return [
       due,
       t('course.item.points', { count: a.maxScore }),
-      a.type !== 'EXAM' && (a.allowLate ? t('course.item.lateOn') : t('course.item.lateOff')),
+      // A quiz cannot be started after its due date: its time limit says more than "Late"
+      a.type === 'QUIZ' && a.timeLimitMin && t('quiz.minutes', { count: a.timeLimitMin }),
+      a.type === 'HOMEWORK' && (a.allowLate ? t('course.item.lateOn') : t('course.item.lateOff')),
       a.type !== 'EXAM' && a.maxAttempts > 1 && t('course.item.resubmit', { count: a.maxAttempts }),
       a.files.length > 0 && t('course.item.attachments', { count: a.files.length }),
     ]
