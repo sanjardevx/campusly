@@ -18,6 +18,8 @@ import { ProgressResolver } from '../src/components/progress/progress.resolver';
 import { QuizResolver } from '../src/components/assignment/quiz.resolver';
 import { SchoolEventResolver } from '../src/components/school/school-event.resolver';
 import { SchoolResolver } from '../src/components/school/school.resolver';
+import { SiteAdminResolver } from '../src/components/site/site-admin.resolver';
+import { SitePublicResolver } from '../src/components/site/site-public.resolver';
 import { TeacherDashboardResolver } from '../src/components/dashboard/teacher-dashboard.resolver';
 import { TelegramResolver } from '../src/components/telegram/telegram.resolver';
 import { TutorResolver } from '../src/components/tutor/tutor.resolver';
@@ -52,6 +54,8 @@ const RESOLVERS = [
   QuizResolver,
   SchoolEventResolver,
   SchoolResolver,
+  SiteAdminResolver,
+  SitePublicResolver,
   SubmissionResolver,
   TeacherDashboardResolver,
   TelegramResolver,
@@ -77,7 +81,8 @@ const ANY_SIGNED_IN = new Set([
   'changePassword',
 ]);
 
-const PUBLIC = new Set(['schoolSettings']);
+// The public website: published content only, and a rate-limited enquiry form
+const PUBLIC = new Set(['schoolSettings', 'siteHome', 'submitEnquiry']);
 
 type Op = {
   resolver: string;
@@ -142,6 +147,7 @@ describe('Every GraphQL operation has a deliberate role rule', () => {
         'AuditResolver',
         'DashboardResolver',
         'SchoolEventResolver',
+        'SiteAdminResolver',
       ].includes(o.resolver),
     );
     for (const op of adminOnly) expect(op.roles).toEqual([Role.ADMIN]);

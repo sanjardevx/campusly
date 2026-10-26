@@ -58,6 +58,21 @@ export class MediaService {
   }
 
   /**
+   * A picture for the public website (news covers, program photos, team portraits): admins only,
+   * images only. The key starts with `site/`, so the CMS accepts no course or homework file.
+   */
+  public async createSiteUpload(
+    user: AuthUser,
+    input: UploadFileInput,
+  ): Promise<UploadTicket> {
+    await this.assertCanUpload(user);
+    if (input.kind !== 'IMAGE') {
+      throw badRequest('The website takes images only (JPG, PNG or WebP)');
+    }
+    return this.startUpload(user, input, SITE_KEY_PREFIX);
+  }
+
+  /**
    * A student's file for one assignment. The key holds the assignment id, so the file can only
    * be attached to this assignment (submitAssignment checks the prefix).
    */
@@ -382,3 +397,6 @@ function forbidden(message: string) {
 function notFound(message: string) {
   return new NotFoundException({ code: ErrorCode.NOT_FOUND, message });
 }
+
+/** Every website picture lives under this S3 prefix (the CMS checks it) */
+export const SITE_KEY_PREFIX = 'site';

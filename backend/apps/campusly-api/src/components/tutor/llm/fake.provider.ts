@@ -23,6 +23,24 @@ export class FakeLlmProvider implements LlmProvider {
     request: ChatRequest,
     onText: (delta: string) => void,
   ): Promise<ChatResult> {
+    // The CMS "Translate from English": tag every text with its language
+    if (request.system.startsWith('You translate')) {
+      const texts = JSON.parse(request.messages[0].content) as string[];
+      const text = JSON.stringify(
+        texts.map((t) => ({
+          uz: `[uz] ${t}`,
+          ru: `[ru] ${t}`,
+          ko: `[ko] ${t}`,
+        })),
+      );
+      onText(text);
+      return {
+        text,
+        inputTokens: tokens(texts.join(' ')),
+        outputTokens: tokens(text),
+        refused: false,
+      };
+    }
     const level = /Help level: (\d)/.exec(request.system)?.[1] ?? '1';
     const text = `Practice tutor (offline), help level ${level}: what is the first step you would try?`;
     // Three pieces, like a real stream

@@ -38,6 +38,12 @@ export enum ErrorCode {
   TUTOR_OFF = 'TUTOR_OFF',
   /** The model call failed; the request was not counted */
   TUTOR_FAILED = 'TUTOR_FAILED',
+  /** The home page slider already has 5 posts */
+  SITE_CAROUSEL_FULL = 'SITE_CAROUSEL_FULL',
+  /** The picture is not a finished website upload (createSiteUpload → confirmUpload) */
+  SITE_IMAGE_INVALID = 'SITE_IMAGE_INVALID',
+  /** The phone number is not an Uzbek mobile number */
+  INVALID_PHONE = 'INVALID_PHONE',
   /** S3 / CloudFront are not configured on this server (local run without AWS, CI) */
   MEDIA_DISABLED = 'MEDIA_DISABLED',
   // CSV import: the whole file is refused (row problems are ImportIssueCode instead)

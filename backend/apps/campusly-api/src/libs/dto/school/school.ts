@@ -51,6 +51,25 @@ export class SchoolSettings {
   @Field(() => String, { nullable: true })
   telegramBotUrl: string | null;
 
+  /** Public website footer: address, metro note, email, social links; the numbers strip: founded */
+  @Field(() => String, { nullable: true })
+  siteAddress: string | null;
+
+  @Field(() => String, { nullable: true })
+  siteMetro: string | null;
+
+  @Field(() => String, { nullable: true })
+  siteEmail: string | null;
+
+  @Field(() => String, { nullable: true })
+  instagramUrl: string | null;
+
+  @Field(() => String, { nullable: true })
+  youtubeUrl: string | null;
+
+  @Field(() => Int, { nullable: true })
+  foundedYear: number | null;
+
   /** New temporary passwords work for this many sign-ins … */
   @Field(() => Int)
   tempPasswordUses: number;

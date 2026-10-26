@@ -116,6 +116,53 @@ export class UpdateSchoolSettingsInput {
   })
   telegramBotUrl?: string;
 
+  // Public website footer and numbers ("" clears a text field)
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  siteAddress?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  siteMetro?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  @Matches(/^([^\s@]+@[^\s@]+\.[^\s@]+)?$/, {
+    message: 'siteEmail must be an email address',
+  })
+  siteEmail?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  @Matches(/^(https:\/\/(www\.)?instagram\.com\/[\w.]+\/?)?$/, {
+    message: 'instagramUrl must look like https://instagram.com/name',
+  })
+  instagramUrl?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  @Matches(/^(https:\/\/(www\.)?youtube\.com\/[\w@./-]+)?$/, {
+    message: 'youtubeUrl must look like https://youtube.com/@name',
+  })
+  youtubeUrl?: string;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1900)
+  @Max(2100)
+  foundedYear?: number;
+
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()

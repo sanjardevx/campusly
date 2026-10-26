@@ -542,16 +542,22 @@ export type UpdateSchoolSettingsInput = {
   defaultHomeworkWeight?: number | null | undefined;
   defaultLocale?: string | null | undefined;
   defaultQuizWeight?: number | null | undefined;
+  foundedYear?: number | null | undefined;
+  instagramUrl?: string | null | undefined;
   mark3MinPercent?: number | null | undefined;
   mark4MinPercent?: number | null | undefined;
   mark5MinPercent?: number | null | undefined;
   officeHours?: string | null | undefined;
   schoolName?: string | null | undefined;
+  siteAddress?: string | null | undefined;
+  siteEmail?: string | null | undefined;
+  siteMetro?: string | null | undefined;
   telegramBotUrl?: string | null | undefined;
   telegramUrl?: string | null | undefined;
   tempPasswordDays?: number | null | undefined;
   tempPasswordUses?: number | null | undefined;
   timezone?: string | null | undefined;
+  youtubeUrl?: string | null | undefined;
 };
 
 export type UpdateSubjectInput = {

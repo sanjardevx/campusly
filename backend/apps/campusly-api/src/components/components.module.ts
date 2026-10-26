@@ -12,6 +12,7 @@ import { MediaModule } from './media/media.module';
 import { OverviewModule } from './overview/overview.module';
 import { ProgressModule } from './progress/progress.module';
 import { SchoolModule } from './school/school.module';
+import { SiteModule } from './site/site.module';
 import { TelegramModule } from './telegram/telegram.module';
 import { TutorModule } from './tutor/tutor.module';
 import { UserModule } from './user/user.module';
@@ -32,6 +33,7 @@ import { UserModule } from './user/user.module';
     OverviewModule,
     ProgressModule,
     SchoolModule,
+    SiteModule,
     TelegramModule,
     TutorModule,
     UserModule,

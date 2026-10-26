@@ -86,6 +86,10 @@ model User {
   submissions           Submission[]        @relation("Submissions")
   quizAttempts          QuizAttempt[]
   tutorConversations    TutorConversation[] @relation("TutorConversations")
+  sitePostsCreated      SitePost[]          @relation("SitePostsCreated")
+  sitePostsUpdated      SitePost[]          @relation("SitePostsUpdated")
+  siteProgramsUpdated   SiteProgram[]       @relation("SiteProgramsUpdated")
+  enquiriesHandled      Enquiry[]           @relation("EnquiriesHandled")
   submissionsGraded     Submission[]        @relation("SubmissionsGraded")
   submissionComments    SubmissionComment[] @relation("SubmissionComments")
   periodGrades          PeriodGrade[]       @relation("PeriodGrades")
@@ -268,6 +272,16 @@ model SchoolSetting {
   /// Temporary passwords: N sign-ins or D days, whichever comes first (applies to NEW passwords)
   tempPasswordUses Int @default(3)
   tempPasswordDays Int @default(14)
+
+  /// Public website (footer and the numbers strip); the phone and hours above are reused
+  siteAddress  String?
+  /// e.g. "Nearest metro: Chilanzar, 5 min walk"
+  siteMetro    String?
+  siteEmail    String?
+  /// Only https:// links
+  instagramUrl String?
+  youtubeUrl   String?
+  foundedYear  Int?
 
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
 
@@ -581,6 +595,9 @@ model MediaAsset {
   submissionFiles   SubmissionFile[]
   assignmentFiles   AssignmentFile[]
   announcementFiles AnnouncementFile[]
+  sitePostCovers    SitePost[]         @relation("SitePostCover")
+  siteProgramPhotos SiteProgram[]      @relation("SiteProgramPhoto")
+  sitePersonPhotos  SitePerson[]       @relation("SitePersonPhoto")
 
   @@index([ownerId])
   @@index([status, createdAt])
@@ -1128,4 +1145,156 @@ model TutorMessage {
 
   @@index([conversationId, createdAt])
   @@map("tutor_messages")
+}
+
+// ─────────────────────────────── Public website CMS ───────────────────────────────
+// DECISIONS §14 (day 19). Text the visitor reads is stored in 4 languages as JSON
+// { "en": "…", "uz"?: "…", "ru"?: "…", "ko"?: "…" }: English is required, a missing language
+// falls back to English. Names, rooms and times are not translated. No hard deletes: archivedAt.
+// Images: an uploaded MediaAsset (site/{id}.jpg) or, for the seeded demo content, a picture that
+// ships with the frontend (`/site/…`); the upload wins.
+
+enum SitePostType {
+  NEWS
+  EVENT
+}
+
+enum SitePostStatus {
+  DRAFT
+  /// Visible from publishedAt (a future publishedAt = "Scheduled")
+  PUBLISHED
+  ARCHIVED
+}
+
+model SitePost {
+  id            String         @id @default(uuid(7)) @db.Uuid
+  type          SitePostType
+  title         Json
+  /// Short description (≤ 160): the home page slider
+  summary       Json
+  /// Full text, Markdown (optional)
+  body          Json?
+  coverAssetId  String?        @db.Uuid
+  coverPath     String?
+  /// EVENT: the day, the start / end time (school time, "10:00") and the place
+  eventDate     DateTime?      @db.Date
+  startTime     String?
+  endTime       String?
+  place         Json?
+  /// Home page slider: at most 5, in this order (1 first)
+  carouselOrder Int?
+  status        SitePostStatus @default(DRAFT)
+  publishedAt   DateTime?      @db.Timestamptz(3)
+  archivedAt    DateTime?      @db.Timestamptz(3)
+  createdById   String         @db.Uuid
+  updatedById   String?        @db.Uuid
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime       @updatedAt @db.Timestamptz(3)
+
+  cover     MediaAsset? @relation("SitePostCover", fields: [coverAssetId], references: [id])
+  createdBy User        @relation("SitePostsCreated", fields: [createdById], references: [id])
+  updatedBy User?       @relation("SitePostsUpdated", fields: [updatedById], references: [id])
+
+  @@index([status, publishedAt])
+  @@map("site_posts")
+}
+
+enum SiteProgramCategory {
+  LANGUAGE
+  SPORTS
+  IT
+  ARTS
+  READING
+  OTHER
+}
+
+model SiteProgram {
+  id           String              @id @default(uuid(7)) @db.Uuid
+  category     SiteProgramCategory
+  name         Json
+  gradeFrom    Int
+  gradeTo      Int
+  /// e.g. "Beginner → TOPIK II"
+  levelNote    Json?
+  /// MON … SAT
+  days         String[]
+  startTime    String?
+  endTime      String?
+  room         String?
+  /// Up to two people from "Our team"
+  teacherIds   String[]            @db.Uuid
+  /// ≤ 100 characters
+  description  Json
+  photoAssetId String?             @db.Uuid
+  photoPath    String?
+  /// Instead of a photo: a YouTube link
+  videoUrl     String?
+  showOnSite   Boolean             @default(true)
+  /// The home page shows the first 6 that are on the site
+  order        Int
+  archivedAt   DateTime?           @db.Timestamptz(3)
+  updatedById  String?             @db.Uuid
+  createdAt    DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime            @updatedAt @db.Timestamptz(3)
+
+  photo     MediaAsset? @relation("SiteProgramPhoto", fields: [photoAssetId], references: [id])
+  updatedBy User?       @relation("SiteProgramsUpdated", fields: [updatedById], references: [id])
+
+  @@index([showOnSite, order])
+  @@map("site_programs")
+}
+
+model SitePerson {
+  id           String    @id @default(uuid(7)) @db.Uuid
+  firstName    String
+  lastName     String
+  /// "Mathematics teacher", "CEO"
+  role         Json
+  /// ≤ 120; for the director it is shown as a quote
+  note         Json?
+  /// One person at most: shown first, in the large card
+  isDirector   Boolean   @default(false)
+  photoAssetId String?   @db.Uuid
+  photoPath    String?
+  showOnSite   Boolean   @default(true)
+  order        Int
+  archivedAt   DateTime? @db.Timestamptz(3)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(3)
+
+  photo MediaAsset? @relation("SitePersonPhoto", fields: [photoAssetId], references: [id])
+
+  @@index([showOnSite, order])
+  @@map("site_people")
+}
+
+enum EnquiryStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+}
+
+/// "Questions about admission or a program?" on the public site. Nobody signs in: the form is
+/// rate limited per IP and has a hidden honeypot field.
+model Enquiry {
+  id          String        @id @default(uuid(7)) @db.Uuid
+  parentName  String
+  /// +998XXXXXXXXX
+  phone       String
+  childGrade  Int?
+  /// STANDARD | STEM | KOREAN | IELTS (the form's "Program of interest")
+  interest    String?
+  /// The language the visitor used, so the office calls back in it
+  locale      String
+  /// Browser and device, e.g. "Chrome on Android" (no IP is stored)
+  userAgent   String?
+  status      EnquiryStatus @default(NEW)
+  handledById String?       @db.Uuid
+  handledAt   DateTime?     @db.Timestamptz(3)
+  createdAt   DateTime      @default(now()) @db.Timestamptz(3)
+
+  handledBy User? @relation("EnquiriesHandled", fields: [handledById], references: [id])
+
+  @@index([status, createdAt])
+  @@map("enquiries")
 }

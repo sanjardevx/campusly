@@ -558,6 +558,38 @@ enum Direction {
   DESC
 }
 
+input EnquiriesInput {
+  search: String
+  status: EnquiryStatus
+}
+
+type EnquiryList {
+  inProgress: Int!
+  items: [EnquiryRow!]!
+  new: Int!
+  resolved: Int!
+}
+
+type EnquiryRow {
+  childGrade: Int
+  createdAt: DateTime!
+  handledAt: DateTime
+  handledBy: String
+  id: String!
+  interest: String
+  locale: String!
+  parentName: String!
+  phone: String!
+  status: EnquiryStatus!
+  userAgent: String
+}
+
+enum EnquiryStatus {
+  IN_PROGRESS
+  NEW
+  RESOLVED
+}
+
 type FileLink {
   expiresAt: DateTime!
   url: String!
@@ -756,6 +788,20 @@ type LinkedUser {
   relation: ParentRelation!
 }
 
+type LocalizedText {
+  en: String!
+  ko: String
+  ru: String
+  uz: String
+}
+
+input LocalizedTextInput {
+  en: String!
+  ko: String
+  ru: String
+  uz: String
+}
+
 type LoginSlip {
   fullName: String!
   isNew: Boolean!
@@ -818,6 +864,9 @@ type Mutation {
   addSubmissionComment(input: AddSubmissionCommentInput!): Submission!
   archiveAnnouncement(id: String!): Announcement!
   archiveSchoolEvent(id: String!): SchoolEvent!
+  archiveSitePerson(id: String!): SitePersonAdmin!
+  archiveSitePost(id: String!): SitePostAdmin!
+  archiveSiteProgram(id: String!): SiteProgramAdmin!
   blockUser(userId: String!): Boolean!
   changePassword(input: ChangePasswordInput!): AccessToken!
   completeLesson(lessonId: String!): LessonProgress!
@@ -832,6 +881,7 @@ type Mutation {
   createModule(input: CreateModuleInput!): Module!
   createPeriod(input: CreatePeriodInput!): Period!
   createSchoolEvent(input: CreateSchoolEventInput!): SchoolEvent!
+  createSiteUpload(input: UploadFileInput!): UploadTicket!
   createStudent(input: CreateStudentInput!): CreateStudentResult!
   createSubject(input: CreateSubjectInput!): Subject!
   createSubmissionUpload(input: CreateSubmissionUploadInput!): UploadTicket!
@@ -856,20 +906,30 @@ type Mutation {
   publishPeriodGrades(input: PublishPeriodGradesInput!): [PeriodGradeRow!]!
   reorderLessons(input: ReorderInput!): Module!
   reorderModules(input: ReorderInput!): [Module!]!
+  reorderSitePeople(ids: [String!]!): [SitePersonAdmin!]!
+  reorderSitePrograms(ids: [String!]!): [SiteProgramAdmin!]!
   resetPassword(userId: String!): LoginSlip!
   returnSubmission(input: ReturnSubmissionInput!): Submission!
   saveQuizAnswer(input: SaveQuizAnswerInput!): Boolean!
+  saveSitePerson(input: SaveSitePersonInput!): SitePersonAdmin!
+  saveSitePost(input: SaveSitePostInput!): SitePostAdmin!
+  saveSiteProgram(input: SaveSiteProgramInput!): SiteProgramAdmin!
   setCourseStudents(input: SetCourseStudentsInput!): Course!
   setCourseTeachers(input: SetCourseTeachersInput!): Course!
   setCurrentAcademicYear(id: String!): AcademicYear!
+  setEnquiryStatus(id: String!, status: EnquiryStatus!): EnquiryRow!
   setGradeCategories(input: SetGradeCategoriesInput!): [GradeCategory!]!
   setLessonFile(input: SetLessonFileInput!): Lesson!
   setLessonVideo(input: SetLessonVideoInput!): Lesson!
   setPeriodFinalScore(input: SetPeriodFinalScoreInput!): PeriodGradeRow!
   setQuizQuestions(input: SetQuizQuestionsInput!): QuizEditor!
+  setSitePersonVisible(id: String!, showOnSite: Boolean!): SitePersonAdmin!
+  setSiteProgramVisible(id: String!, showOnSite: Boolean!): SiteProgramAdmin!
   startQuiz(assignmentId: String!): MyQuiz!
   submitAssignment(input: SubmitAssignmentInput!): Submission!
+  submitEnquiry(input: SubmitEnquiryInput!): Boolean!
   submitQuiz(assignmentId: String!): MyQuiz!
+  translateSiteText(input: TranslateSiteTextInput!): [SiteTranslation!]!
   unblockUser(userId: String!): Boolean!
   unlinkParent(parentId: String!, studentId: String!): Boolean!
   updateAcademicYear(input: UpdateAcademicYearInput!): AcademicYear!
@@ -1068,6 +1128,10 @@ input PublishPeriodGradesInput {
 type Query {
   academicYears: [AcademicYear!]!
   adminDashboard: AdminDashboard!
+  adminEnquiries(input: EnquiriesInput!): EnquiryList!
+  adminSitePeople: [SitePersonAdmin!]!
+  adminSitePosts: [SitePostAdmin!]!
+  adminSitePrograms: [SiteProgramAdmin!]!
   announcements(input: AnnouncementsInquiry): Announcements!
   assignment(id: String!): Assignment!
   assignmentSubmissions(assignmentId: String!): [GradebookRow!]!
@@ -1101,6 +1165,8 @@ type Query {
   quizEditor(assignmentId: String!): QuizEditor!
   quizResult(assignmentId: String!, studentId: String): QuizResult!
   schoolSettings: SchoolSettings!
+  siteHome(locale: SiteLocale!): SiteHome!
+  siteTranslateAvailable: Boolean!
   studentAttendance(periodId: String, studentId: String): PeriodAttendance!
   studentCalendar(month: String!, studentId: String): [CalendarEvent!]!
   studentOverview(studentId: String): StudentOverview!
@@ -1234,6 +1300,54 @@ input SaveQuizAnswerInput {
   questionId: String!
 }
 
+input SaveSitePersonInput {
+  firstName: String!
+  id: String
+  isDirector: Boolean!
+  lastName: String!
+  note: LocalizedTextInput
+  photoAssetId: String
+  removePhoto: Boolean
+  role: LocalizedTextInput!
+  showOnSite: Boolean!
+}
+
+input SaveSitePostInput {
+  body: LocalizedTextInput
+  carouselPosition: Int
+  coverAssetId: String
+  endTime: String
+  eventDate: String
+  id: String
+  place: LocalizedTextInput
+  publish: SitePublishMode!
+  removeCover: Boolean
+  scheduledAt: DateTime
+  startTime: String
+  summary: LocalizedTextInput!
+  title: LocalizedTextInput!
+  type: SitePostType!
+}
+
+input SaveSiteProgramInput {
+  category: SiteProgramCategory!
+  days: [String!]!
+  description: LocalizedTextInput!
+  endTime: String
+  gradeFrom: Int!
+  gradeTo: Int!
+  id: String
+  levelNote: LocalizedTextInput
+  name: LocalizedTextInput!
+  photoAssetId: String
+  removePhoto: Boolean
+  room: String
+  showOnSite: Boolean!
+  startTime: String
+  teacherIds: [String!]!
+  videoUrl: String
+}
+
 type SchoolEvent {
   endsOn: String!
   id: String!
@@ -1257,16 +1371,22 @@ type SchoolSettings {
   defaultHomeworkWeight: Int!
   defaultLocale: String!
   defaultQuizWeight: Int!
+  foundedYear: Int
+  instagramUrl: String
   mark3MinPercent: Int!
   mark4MinPercent: Int!
   mark5MinPercent: Int!
   officeHours: String
   schoolName: String!
+  siteAddress: String
+  siteEmail: String
+  siteMetro: String
   telegramBotUrl: String
   telegramUrl: String
   tempPasswordDays: Int!
   tempPasswordUses: Int!
   timezone: String!
+  youtubeUrl: String
 }
 
 input SetCourseStudentsInput {
@@ -1304,6 +1424,166 @@ input SetPeriodFinalScoreInput {
 input SetQuizQuestionsInput {
   assignmentId: String!
   questions: [QuizQuestionInput!]!
+}
+
+type SiteContact {
+  address: String
+  email: String
+  instagramUrl: String
+  metro: String
+  officeHours: String
+  phone: String
+  schoolName: String!
+  telegramUrl: String
+  youtubeUrl: String
+}
+
+type SiteHome {
+  contact: SiteContact!
+  director: SitePersonPublic
+  posts: [SitePostPublic!]!
+  programs: [SiteProgramPublic!]!
+  stats: SiteStats!
+  team: [SitePersonPublic!]!
+}
+
+enum SiteLocale {
+  en
+  ko
+  ru
+  uz
+}
+
+type SitePersonAdmin {
+  firstName: String!
+  id: String!
+  isDirector: Boolean!
+  lastName: String!
+  note: LocalizedText
+  order: Int!
+  photoUrl: String
+  role: LocalizedText!
+  showOnSite: Boolean!
+}
+
+type SitePersonPublic {
+  id: String!
+  name: String!
+  note: String
+  photoUrl: String
+  role: String!
+}
+
+type SitePostAdmin {
+  body: LocalizedText
+  carouselPosition: Int
+  coverUrl: String
+  editedBy: String!
+  endTime: String
+  eventDate: String
+  id: String!
+  place: LocalizedText
+  publishedAt: DateTime
+  startTime: String
+  status: SitePostStatus!
+  summary: LocalizedText!
+  title: LocalizedText!
+  type: SitePostType!
+  updatedAt: DateTime!
+}
+
+type SitePostPublic {
+  body: String
+  coverUrl: String
+  date: String!
+  endTime: String
+  id: String!
+  place: String
+  startTime: String
+  summary: String!
+  title: String!
+  type: SitePostType!
+}
+
+enum SitePostStatus {
+  ARCHIVED
+  DRAFT
+  PUBLISHED
+}
+
+enum SitePostType {
+  EVENT
+  NEWS
+}
+
+type SiteProgramAdmin {
+  category: SiteProgramCategory!
+  days: [String!]!
+  description: LocalizedText!
+  editedBy: String
+  endTime: String
+  gradeFrom: Int!
+  gradeTo: Int!
+  id: String!
+  levelNote: LocalizedText
+  name: LocalizedText!
+  order: Int!
+  photoUrl: String
+  room: String
+  showOnSite: Boolean!
+  startTime: String
+  teachers: [SiteTeacherRef!]!
+  updatedAt: DateTime!
+  videoUrl: String
+}
+
+enum SiteProgramCategory {
+  ARTS
+  IT
+  LANGUAGE
+  OTHER
+  READING
+  SPORTS
+}
+
+type SiteProgramPublic {
+  category: SiteProgramCategory!
+  days: [String!]!
+  description: String!
+  endTime: String
+  gradeFrom: Int!
+  gradeTo: Int!
+  id: String!
+  levelNote: String
+  name: String!
+  photoUrl: String
+  startTime: String
+  videoUrl: String
+}
+
+enum SitePublishMode {
+  DRAFT
+  NOW
+  SCHEDULE
+}
+
+type SiteStats {
+  founded: Int
+  programs: Int!
+  students: Int!
+  teachers: Int!
+}
+
+type SiteTeacherRef {
+  id: String!
+  name: String!
+  role: LocalizedText!
+}
+
+type SiteTranslation {
+  ko: String!
+  ru: String!
+  uz: String!
 }
 
 type StudentAttendance {
@@ -1406,6 +1686,15 @@ input SubmitAssignmentInput {
   text: String
 }
 
+input SubmitEnquiryInput {
+  childGrade: Int
+  interest: String
+  locale: SiteLocale!
+  parentName: String!
+  phone: String!
+  website: String
+}
+
 type TeacherAnnouncement {
   audience: Int
   courseTitle: String
@@ -1464,6 +1753,10 @@ type TodayCourse {
 
 type TotalCounter {
   total: Int!
+}
+
+input TranslateSiteTextInput {
+  texts: [String!]!
 }
 
 type TutorConversation {
@@ -1614,22 +1907,35 @@ input UpdateSchoolSettingsInput {
   defaultHomeworkWeight: Int
   defaultLocale: String
   defaultQuizWeight: Int
+  foundedYear: Int
+  instagramUrl: String
   mark3MinPercent: Int
   mark4MinPercent: Int
   mark5MinPercent: Int
   officeHours: String
   schoolName: String
+  siteAddress: String
+  siteEmail: String
+  siteMetro: String
   telegramBotUrl: String
   telegramUrl: String
   tempPasswordDays: Int
   tempPasswordUses: Int
   timezone: String
+  youtubeUrl: String
 }
 
 input UpdateSubjectInput {
   id: String!
   name: String
   status: RecordStatus
+}
+
+input UploadFileInput {
+  fileName: String!
+  kind: MediaKind!
+  mimeType: String!
+  size: Float!
 }
 
 type UploadTicket {

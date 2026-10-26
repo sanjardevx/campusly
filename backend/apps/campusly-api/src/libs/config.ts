@@ -292,6 +292,12 @@ export const STALE_UPLOAD_HOURS = 24;
 /** DEMO_MODE only: the batch app puts the demo data back every night at 03:00 school time */
 export const DEMO_RESET_CRON = '0 3 * * *';
 export const DEMO_RESET_TIMEZONE = 'Asia/Tashkent';
+/** Website pictures: the public page is rebuilt every few minutes, so a day-long link is plenty */
+export const SITE_IMAGE_URL_TTL_SEC = 24 * 60 * 60;
+/** Public enquiry form: sends per IP per hour (a family sends one; a bot sends hundreds) */
+export const ENQUIRY_LIMIT = { perIp: 5, windowSec: 60 * 60 };
+/** The home page slider holds at most this many posts */
+export const SITE_CAROUSEL_MAX = 5;
 /** A CloudFront video link works this long (DECISIONS §11: ~3 h) */
 export const VIDEO_URL_TTL_SEC = 3 * 60 * 60;
 

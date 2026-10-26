@@ -162,6 +162,10 @@ export function auditTarget(snapshot: unknown): string | null {
   }
   if (typeof title === 'string') return title;
   if (typeof name === 'string') return name;
+  // Website content: text in four languages, the English one names it
+  for (const value of [title, name]) {
+    if (isRecord(value) && typeof value.en === 'string') return value.en;
+  }
   return null;
 }
 

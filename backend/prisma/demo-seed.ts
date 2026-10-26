@@ -6,6 +6,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '../generated/prisma/client';
 import type { ParentRelation, UserStatus } from '../generated/prisma/enums';
+import { SITE_SETTINGS, seedSite } from './demo-site';
 
 /** A plain client for the seed (the API's PrismaService hides columns the seed writes) */
 export const createSeedClient = (databaseUrl: string) =>
@@ -90,6 +91,8 @@ async function seedSchool() {
       schoolName: 'Campusly School',
       // "Reset in Telegram" under "Forgot password?" (DECISIONS §6)
       telegramBotUrl: 'https://t.me/campuslyreset_bot',
+      // Public website footer and numbers strip (day 19)
+      ...SITE_SETTINGS,
     },
   });
 
@@ -1257,5 +1260,6 @@ export async function seedDemo(client: SeedClient, options: SeedDemoOptions) {
   await seedAssignments(courses, users);
   await seedAttendance(courses, users);
   await seedAnnouncements(courses, users);
+  await seedSite(prisma, { adminId: users.adminId, day, tashkent });
   return { shiftedWeeks: shiftMs / (7 * DAY_MS) };
 }

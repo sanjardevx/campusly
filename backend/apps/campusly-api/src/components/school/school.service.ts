@@ -41,6 +41,12 @@ const DEFAULT_SETTINGS: SchoolSettings = {
   officeHours: null,
   telegramUrl: null,
   telegramBotUrl: null,
+  siteAddress: null,
+  siteMetro: null,
+  siteEmail: null,
+  instagramUrl: null,
+  youtubeUrl: null,
+  foundedYear: null,
   tempPasswordUses: 3,
   tempPasswordDays: 14,
 };
@@ -75,6 +81,11 @@ export class SchoolService {
       'officeHours',
       'telegramUrl',
       'telegramBotUrl',
+      'siteAddress',
+      'siteMetro',
+      'siteEmail',
+      'instagramUrl',
+      'youtubeUrl',
     ] as const) {
       after[key] = after[key]?.trim() || null;
     }

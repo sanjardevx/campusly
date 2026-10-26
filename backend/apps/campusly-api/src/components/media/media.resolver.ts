@@ -9,6 +9,7 @@ import {
 import {
   CreateSubmissionUploadInput,
   CreateUploadInput,
+  UploadFileInput,
 } from '../../libs/dto/media/media.input';
 import { Role } from '../../libs/enums/user.enum';
 import type { AuthUser } from '../../libs/types/auth';
@@ -28,6 +29,16 @@ export class MediaResolver {
     @Args('input') input: CreateUploadInput,
   ): Promise<UploadTicket> {
     return this.mediaService.createUpload(user, input);
+  }
+
+  /** A picture for the public website (CMS) */
+  @Roles(Role.ADMIN)
+  @Mutation(() => UploadTicket)
+  public createSiteUpload(
+    @CurrentUser() user: AuthUser,
+    @Args('input') input: UploadFileInput,
+  ): Promise<UploadTicket> {
+    return this.mediaService.createSiteUpload(user, input);
   }
 
   @Roles(Role.STUDENT)
