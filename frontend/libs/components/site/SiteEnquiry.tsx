@@ -11,6 +11,7 @@ import { SUBMIT_ENQUIRY } from '@/apollo/site/mutation';
 import { errorCode } from '@/libs/errors';
 import type { SiteLocale } from '@/libs/gql/graphql';
 import { useErrorText } from '@/libs/i18n';
+import { Reveal } from './motion';
 import { SITE, type SiteData, containerSx, eyebrowSx } from './tokens';
 
 const INTERESTS = ['STANDARD', 'STEM', 'KOREAN', 'IELTS'] as const;
@@ -80,7 +81,7 @@ export function SiteEnquiry({ contact }: { contact: SiteData['contact'] }) {
 
   return (
     <Box component="section" id="enquire" sx={{ ...containerSx, scrollMarginTop: 32 }}>
-      <Box sx={{ bgcolor: '#fff', borderRadius: '16px', p: { xs: 3, lg: 5 }, border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, mt: { xs: 6, md: 8 }, mb: { xs: 6, md: 8 }, display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '5fr 7fr' }, gap: { xs: 4, lg: 6 } }}>
+      <Reveal sx={{ bgcolor: '#fff', borderRadius: '16px', p: { xs: 3, lg: 5 }, border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, mt: { xs: 6, md: 8 }, mb: { xs: 6, md: 8 }, display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '5fr 7fr' }, gap: { xs: 4, lg: 6 } }}>
         <Stack sx={{ justifyContent: 'space-between' }}>
           <Box>
             <Typography sx={eyebrowSx}>{t('enquiry.eyebrow')}</Typography>
@@ -185,7 +186,7 @@ export function SiteEnquiry({ contact }: { contact: SiteData['contact'] }) {
             </Box>
           </Stack>
         )}
-      </Box>
+      </Reveal>
     </Box>
   );
 }

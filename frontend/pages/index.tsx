@@ -9,6 +9,7 @@ import { SiteFooter } from '@/libs/components/site/SiteFooter';
 import { SiteHero } from '@/libs/components/site/SiteHero';
 import { SiteNews } from '@/libs/components/site/SiteNews';
 import { SiteHonorStudents, SiteMockTests, SiteOpenCourses } from '@/libs/components/site/SiteOpenSections';
+import { SmoothScroll } from '@/libs/components/site/motion';
 import { SiteAdmission, SiteFaq, SiteFeatures, SitePrograms, SiteStages, SiteTeam, SiteWhy } from '@/libs/components/site/SiteSections';
 import { SITE, type SiteData } from '@/libs/components/site/tokens';
 import { API_GRAPHQL_URL } from '@/libs/config';
@@ -72,6 +73,7 @@ export default function SiteHome({ site }: { site: SiteData }) {
         <meta property="og:description" content={t('meta.description')} />
         <meta property="og:image" content="/site/hero-campus.jpg" />
       </Head>
+      <SmoothScroll />
       <Box sx={{ bgcolor: SITE.canvas, color: SITE.text, minHeight: '100vh' }}>
         <SiteHero stats={site.stats} />
         <Box component="main">

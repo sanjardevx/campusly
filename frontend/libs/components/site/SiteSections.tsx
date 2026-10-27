@@ -26,6 +26,7 @@ import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { useReducedMotion } from '@/libs/components/dashboard/motion';
+import { EASE, HOVER, Reveal, hoverLift, hoverZoom, useScrollDraw } from './motion';
 import { SITE, type SiteData, containerSx, eyebrowSx, scrollToId, sectionTitleSx } from './tokens';
 
 /** A lighter green than the brand spruce for the icon tiles and the photo panel (the developer's reference) */
@@ -46,13 +47,13 @@ const iconTile = (size: number, radius: string) => ({
 
 function CenteredHeader({ title, subtitle, eyebrow }: { title: string; subtitle?: string; eyebrow?: string }) {
   return (
-    <Box sx={{ textAlign: 'center', maxWidth: 576, mx: 'auto', mb: { xs: 5, md: 7 } }}>
+    <Reveal sx={{ textAlign: 'center', maxWidth: 576, mx: 'auto', mb: { xs: 5, md: 7 } }}>
       {eyebrow && <Typography sx={{ ...eyebrowSx, mb: 0.5 }}>{eyebrow}</Typography>}
       <Typography component="h2" sx={{ ...sectionTitleSx, fontSize: { xs: '1.875rem', lg: '2.25rem' } }}>
         {title}
       </Typography>
       {subtitle && <Typography sx={{ color: SITE.stone600, fontSize: '1.125rem', mt: 1.5 }}>{subtitle}</Typography>}
-    </Box>
+    </Reveal>
   );
 }
 
@@ -71,8 +72,8 @@ export function SiteWhy() {
     <Box component="section" sx={{ ...containerSx, py: { xs: 8, md: 10 } }}>
       <CenteredHeader title={t('why.title')} subtitle={t('why.subtitle')} />
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-        {panels.map(({ key, icon: Icon, list }) => (
-          <Box key={key} sx={{ bgcolor: SITE.soft, borderRadius: '10px', p: 4 }}>
+        {panels.map(({ key, icon: Icon, list }, i) => (
+          <Reveal key={key} delay={i * 80} sx={{ bgcolor: SITE.soft, borderRadius: '10px', p: 4 }}>
             <Box sx={{ ...iconTile(56, '12px'), mb: 3 }}>
               <Icon />
             </Box>
@@ -91,7 +92,7 @@ export function SiteWhy() {
             ) : (
               <Typography sx={{ color: SITE.neutral600, fontSize: '1rem', lineHeight: 1.625 }}>{t(`why.${key}.body`)}</Typography>
             )}
-          </Box>
+          </Reveal>
         ))}
       </Box>
     </Box>
@@ -129,25 +130,46 @@ const TRIANGLES = `url("data:image/svg+xml,${encodeURIComponent(
  */
 export function SiteFeatures() {
   const { t } = useTranslation('site');
-  const card = ({ key, icon: Icon }: { key: string; icon: SvgIconComponent }) => (
-    <Stack key={key} direction="row" sx={{ alignItems: 'center', gap: 2.5, p: { xs: 2, md: 2.5 }, borderRadius: '20px', bgcolor: '#F6F7F6', border: '1px solid #EEF0EE', minHeight: { md: 104 } }}>
-      <Box sx={iconTile(56, '16px')}>
-        <Icon />
-      </Box>
-      <Typography sx={{ fontSize: { xs: '1rem', md: '1.0625rem' }, fontWeight: 500, color: SITE.heading, lineHeight: 1.45 }}>{t(`features.${key}`)}</Typography>
-    </Stack>
-  );
+  // Cards slide in from their side and lean towards the photo under the mouse
+  const card =
+    (side: 'left' | 'right') =>
+    function FeatureCard({ key, icon: Icon }: { key: string; icon: SvgIconComponent }, i: number) {
+      return (
+      <Reveal key={key} from={side} delay={i * 70}>
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: 'center',
+            gap: 2.5,
+            p: { xs: 2, md: 2.5 },
+            borderRadius: '20px',
+            bgcolor: '#F6F7F6',
+            border: '1px solid #EEF0EE',
+            minHeight: { md: 104 },
+            transition: `transform 300ms ${EASE}, background-color 200ms ease`,
+            '& .tile': { transition: `transform 300ms ${EASE}` },
+            [HOVER]: { '&:hover': { transform: `translateX(${side === 'left' ? 6 : -6}px)`, bgcolor: '#F1F4F2' }, '&:hover .tile': { transform: 'scale(1.08)' } },
+          }}
+        >
+          <Box className="tile" sx={iconTile(56, '16px')}>
+            <Icon />
+          </Box>
+          <Typography sx={{ fontSize: { xs: '1rem', md: '1.0625rem' }, fontWeight: 500, color: SITE.heading, lineHeight: 1.45 }}>{t(`features.${key}`)}</Typography>
+        </Stack>
+      </Reveal>
+      );
+    };
   return (
     <Box component="section" id="facilities" aria-labelledby="facilities-title" sx={{ ...containerSx, py: { xs: 8, md: 10 } }}>
-      <Box sx={{ textAlign: 'center', maxWidth: 640, mx: 'auto', mb: { xs: 9, md: 8 } }}>
+      <Reveal sx={{ textAlign: 'center', maxWidth: 640, mx: 'auto', mb: { xs: 9, md: 8 } }}>
         <Typography component="h2" id="facilities-title" sx={{ ...sectionTitleSx, fontWeight: 800, fontSize: { xs: '1.875rem', md: '2.75rem' }, color: SITE.ink }}>
           {t('features.title')}
         </Typography>
         <Typography sx={{ color: SITE.stone500, fontSize: '1.125rem', mt: 1.5 }}>{t('features.subtitle')}</Typography>
-      </Box>
+      </Reveal>
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 280px 1fr', lg: '1fr 330px 1fr' }, gap: { xs: 2, md: 3 }, alignItems: 'stretch' }}>
-        <Box sx={{ order: { xs: 1, md: 0 }, display: 'grid', gap: 2, alignContent: 'space-between' }}>{FEATURES_LEFT.map(card)}</Box>
-        <Box sx={{ order: { xs: 0, md: 0 }, position: 'relative', mt: { xs: 6, md: 10 }, minHeight: { xs: 400, md: 0 }, width: { xs: '100%', sm: 360, md: 'auto' }, mx: { xs: 'auto', md: 0 } }}>
+        <Box sx={{ order: { xs: 1, md: 0 }, display: 'grid', gap: 2, alignContent: 'space-between' }}>{FEATURES_LEFT.map(card('left'))}</Box>
+        <Reveal delay={120} sx={{ order: { xs: 0, md: 0 }, position: 'relative', mt: { xs: 6, md: 10 }, minHeight: { xs: 400, md: 0 }, width: { xs: '100%', sm: 360, md: 'auto' }, mx: { xs: 'auto', md: 0 } }}>
           <Box aria-hidden sx={{ position: 'absolute', inset: 0, borderRadius: '32px', backgroundColor: FRESH.to, backgroundImage: `${TRIANGLES}, linear-gradient(160deg, #66BC98, ${FRESH.from} 40%, ${FRESH.to})`, backgroundSize: '120px 120px, cover' }} />
           {/* Clips the sides and the rounded bottom, but not the top: the head rises above the panel */}
           <Box sx={{ position: 'absolute', inset: 0, clipPath: 'inset(-140px 0 0 0 round 0 0 32px 32px)' }}>
@@ -155,8 +177,8 @@ export function SiteFeatures() {
               <Image src="/site/features-student.png" alt={t('features.photoAlt')} fill sizes="(max-width: 900px) 300px, 340px" style={{ objectFit: 'contain', objectPosition: 'bottom' }} />
             </Box>
           </Box>
-        </Box>
-        <Box sx={{ order: { xs: 2, md: 0 }, display: 'grid', gap: 2, alignContent: 'space-between' }}>{FEATURES_RIGHT.map(card)}</Box>
+        </Reveal>
+        <Box sx={{ order: { xs: 2, md: 0 }, display: 'grid', gap: 2, alignContent: 'space-between' }}>{FEATURES_RIGHT.map(card('right'))}</Box>
       </Box>
     </Box>
   );
@@ -185,27 +207,29 @@ export function SitePrograms({ programs }: { programs: SiteData['programs'] }) {
   if (programs.length === 0) return null;
   return (
     <Box component="section" id="programs" sx={{ ...containerSx, py: { xs: 6, md: 8 } }}>
-      <Typography sx={{ ...eyebrowSx, fontWeight: 700, letterSpacing: '0.05em', mb: 1 }}>{t('programs.eyebrow')}</Typography>
-      <Typography component="h2" sx={{ ...sectionTitleSx, fontWeight: 800, color: SITE.ink, mb: 1 }}>
-        {t('programs.title')}
-      </Typography>
-      <Typography sx={{ color: SITE.neutral500, fontSize: '1rem', mb: 4 }}>{t('programs.subtitle')}</Typography>
+      <Reveal>
+        <Typography sx={{ ...eyebrowSx, fontWeight: 700, letterSpacing: '0.05em', mb: 1 }}>{t('programs.eyebrow')}</Typography>
+        <Typography component="h2" sx={{ ...sectionTitleSx, fontWeight: 800, color: SITE.ink, mb: 1 }}>
+          {t('programs.title')}
+        </Typography>
+        <Typography sx={{ color: SITE.neutral500, fontSize: '1rem', mb: 4 }}>{t('programs.subtitle')}</Typography>
+      </Reveal>
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-        {programs.map((p) => {
+        {programs.map((p, i) => {
           const thumb = p.photoUrl ?? (p.videoUrl ? youtubeThumb(p.videoUrl) : null);
           const time = p.startTime && p.endTime ? ` · ${p.startTime} – ${p.endTime}` : '';
           return (
+            <Reveal key={p.id} delay={(i % 2) * 90}>
             <Stack
-              key={p.id}
               direction="row"
-              sx={{ bgcolor: '#fff', borderRadius: '10px', border: `1px solid ${SITE.cardBorder}`, overflow: 'hidden', height: { xs: 'auto', sm: 208 }, minHeight: { xs: 176 }, boxShadow: SITE.cardShadow, transition: 'box-shadow 200ms ease', '&:hover': { boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)' } }}
+              sx={{ bgcolor: '#fff', borderRadius: '10px', border: `1px solid ${SITE.cardBorder}`, overflow: 'hidden', height: { xs: 'auto', sm: 208 }, minHeight: { xs: 176 }, boxShadow: SITE.cardShadow, ...hoverLift, ...hoverZoom('.thumb') }}
             >
               <Box
                 component={p.videoUrl ? 'a' : 'div'}
                 {...(p.videoUrl ? { href: p.videoUrl, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${t('programs.video')}: ${p.name}` } : {})}
                 sx={{ width: '38%', flexShrink: 0, bgcolor: SITE.stone100, position: 'relative', overflow: 'hidden', display: 'block' }}
               >
-                {thumb && <Box component="img" src={thumb} alt="" sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
+                {thumb && <Box component="img" className="thumb" src={thumb} alt="" sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
                 {p.videoUrl && <PlayCircleFilledRoundedIcon sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: 44, color: 'rgba(255,255,255,0.92)', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }} />}
               </Box>
               <Stack sx={{ flex: 1, p: 2.5, justifyContent: 'space-between', minWidth: 0 }}>
@@ -227,6 +251,7 @@ export function SitePrograms({ programs }: { programs: SiteData['programs'] }) {
                 </Stack>
               </Stack>
             </Stack>
+            </Reveal>
           );
         })}
       </Box>
@@ -254,12 +279,15 @@ export function SiteTeam({ director, team }: { director: SiteData['director']; t
     );
   return (
     <Box component="section" id="team" sx={{ ...containerSx, py: { xs: 6, md: 8 } }}>
-      <Typography sx={{ ...eyebrowSx, mb: 1 }}>{t('team.eyebrow')}</Typography>
-      <Typography component="h2" sx={{ ...sectionTitleSx, color: '#111827', mb: 4 }}>
-        {t('team.title')}
-      </Typography>
+      <Reveal>
+        <Typography sx={{ ...eyebrowSx, mb: 1 }}>{t('team.eyebrow')}</Typography>
+        <Typography component="h2" sx={{ ...sectionTitleSx, color: '#111827', mb: 4 }}>
+          {t('team.title')}
+        </Typography>
+      </Reveal>
       {director && (
-        <Stack direction={{ xs: 'column', md: 'row' }} sx={{ bgcolor: '#fff', borderRadius: '16px', p: 4, border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, mb: 3, alignItems: 'center', gap: 4 }}>
+        <Reveal sx={{ mb: 3 }}>
+        <Stack direction={{ xs: 'column', md: 'row' }} sx={{ bgcolor: '#fff', borderRadius: '16px', p: 4, border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, alignItems: 'center', gap: 4 }}>
           <Box sx={{ '& img, & > div': { width: 144, height: 144, boxShadow: SITE.cardShadow, borderWidth: 2 } }}>{portrait(director.photoUrl, 144)}</Box>
           <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
             <Typography component="h3" sx={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827' }}>
@@ -273,12 +301,14 @@ export function SiteTeam({ director, team }: { director: SiteData['director']; t
             )}
           </Box>
         </Stack>
+        </Reveal>
       )}
       {/* Rows of four; a shorter last row is centred (7 people: 4 + 3) */}
       <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: GAP }}>
-        {team.map((p) => (
-          <Box key={p.id} component="article" sx={{ width: { xs: '100%', sm: `calc((100% - ${GAP * 8}px) / 2)`, lg: `calc((100% - ${GAP * 3 * 8}px) / 4)` }, bgcolor: '#fff', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow }}>
-            <Box sx={{ aspectRatio: '1 / 1', bgcolor: SITE.tint }}>{p.photoUrl && <Box component="img" src={p.photoUrl} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}</Box>
+        {team.map((p, i) => (
+          <Reveal key={p.id} delay={(i % 4) * 70} sx={{ width: { xs: '100%', sm: `calc((100% - ${GAP * 8}px) / 2)`, lg: `calc((100% - ${GAP * 3 * 8}px) / 4)` } }}>
+          <Box component="article" sx={{ height: '100%', bgcolor: '#fff', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, ...hoverLift, ...hoverZoom() }}>
+            <Box sx={{ aspectRatio: '1 / 1', bgcolor: SITE.tint, overflow: 'hidden' }}>{p.photoUrl && <Box component="img" src={p.photoUrl} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}</Box>
             <Box sx={{ p: 2.5, textAlign: 'center' }}>
               <Typography component="h4" sx={{ fontWeight: 700, fontSize: '1.0625rem', color: '#111827' }}>
                 {p.name}
@@ -286,6 +316,7 @@ export function SiteTeam({ director, team }: { director: SiteData['director']; t
               <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: SITE.spruce, mt: 0.25 }}>{p.role}</Typography>
             </Box>
           </Box>
+          </Reveal>
         ))}
       </Box>
     </Box>
@@ -307,9 +338,12 @@ export function SiteStages() {
     <Box component="section" id="stages" sx={{ ...containerSx, py: { xs: 6, md: 8 } }}>
       <CenteredHeader title={t('stages.title')} subtitle={t('stages.subtitle')} />
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3 }}>
-        {STAGES.map(({ key, image }) => (
-          <Box key={key} sx={{ bgcolor: '#fff', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow }}>
-            <Box component="img" src={image} alt="" sx={{ width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', display: 'block' }} />
+        {STAGES.map(({ key, image }, i) => (
+          <Reveal key={key} delay={i * 90}>
+          <Box sx={{ height: '100%', bgcolor: '#fff', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, ...hoverLift, ...hoverZoom() }}>
+            <Box sx={{ overflow: 'hidden' }}>
+              <Box component="img" src={image} alt="" sx={{ width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', display: 'block' }} />
+            </Box>
             <Box sx={{ p: 3 }}>
               <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: SITE.stone500 }}>{t(`stages.${key}.ages`)}</Typography>
               <Typography component="h3" sx={{ fontSize: '1.25rem', fontWeight: 700, color: '#111827', mt: 0.5, mb: 2 }}>
@@ -325,6 +359,7 @@ export function SiteStages() {
               </Stack>
             </Box>
           </Box>
+          </Reveal>
         ))}
       </Box>
     </Box>
@@ -351,11 +386,14 @@ const OVERLAP = 56;
  */
 export function SiteAdmission() {
   const { t } = useTranslation('site');
+  const drawn = useScrollDraw<HTMLDivElement>();
   return (
     <Box component="section" id="admissions" sx={{ ...containerSx, py: { xs: 6, md: 10 } }}>
       <CenteredHeader title={t('admission.title')} subtitle={t('admission.subtitle')} />
       <Box component="ol" sx={{ position: 'relative', listStyle: 'none', m: 0, p: 0, mx: 'auto', maxWidth: { md: CARD_W * 2 + LANE }, display: 'flex', flexDirection: 'column' }}>
         <Box aria-hidden sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 15, md: '50%' }, borderLeft: dashed }} />
+        {/* The same line in green, growing as the visitor scrolls through the steps */}
+        <Box ref={drawn} aria-hidden sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 15, md: '50%' }, width: 2, bgcolor: '#4FA383', borderRadius: 1, transformOrigin: 'top' }} />
         {STEP_ICONS.map((Icon, i) => {
           const left = i % 2 === 0;
           const n = i + 1;
@@ -372,9 +410,11 @@ export function SiteAdmission() {
               }}
             >
               {/* The dot on the centre line and the dashed arm to the card */}
-              <Box aria-hidden sx={{ position: 'absolute', zIndex: 1, top: { xs: 30, md: '48%' }, width: 18, height: 18, borderRadius: '50%', bgcolor: '#D5DBE3', border: '3px solid #fff', boxShadow: '0 0 0 1px #D5DBE3', left: { xs: 15, md: left ? `calc(100% + ${LANE / 2}px)` : `-${LANE / 2}px` }, transform: 'translate(-50%, -50%)' }} />
+              {/* Centred with margins, not a transform: the reveal scales it in */}
+              <Reveal from="scale" delay={250} aria-hidden sx={{ position: 'absolute', zIndex: 1, top: { xs: 30, md: '48%' }, width: 18, height: 18, mt: '-9px', ml: '-9px', borderRadius: '50%', bgcolor: '#D5DBE3', border: '3px solid #fff', boxShadow: '0 0 0 1px #D5DBE3', left: { xs: 16, md: left ? `calc(100% + ${LANE / 2 + 1}px)` : `-${LANE / 2 - 1}px` } }} />
               <Box aria-hidden sx={{ display: { xs: 'none', md: 'block' }, position: 'absolute', top: '48%', width: LANE / 2 - 10, borderTop: dashed, ...(left ? { right: -(LANE / 2 - 10) } : { left: -(LANE / 2 - 10) }) }} />
-              <Box sx={{ minHeight: { md: 232 }, bgcolor: '#F8F9FA', border: '1px solid #EEF0EE', borderRadius: '24px', p: { xs: 2.5, md: 2.75 }, transition: 'box-shadow 200ms ease, transform 200ms ease', '@media (hover: hover) and (pointer: fine)': { '&:hover': { boxShadow: '0 12px 28px -16px rgba(31,78,67,0.3)', transform: 'translateY(-2px)' } } }}>
+              <Reveal from={left ? 'left' : 'right'}>
+              <Box sx={{ minHeight: { md: 232 }, bgcolor: '#F8F9FA', border: '1px solid #EEF0EE', borderRadius: '24px', p: { xs: 2.5, md: 2.75 }, ...hoverLift }}>
                 <Box sx={{ ...iconTile(52, '14px'), mb: 1.5 }}>
                   <Icon sx={{ fontSize: 26 }} />
                 </Box>
@@ -383,6 +423,7 @@ export function SiteAdmission() {
                 </Typography>
                 <Typography sx={{ fontSize: '1rem', color: SITE.stone500, mt: 0.75, lineHeight: 1.5 }}>{t(`admission.step${n}.body`)}</Typography>
               </Box>
+              </Reveal>
             </Box>
           );
         })}
@@ -405,7 +446,7 @@ export function SiteFaq() {
         {[1, 2, 3, 4, 5, 6].map((n) => {
           const isOpen = open === n;
           return (
-            <Box key={n} sx={{ bgcolor: '#fff', borderRadius: '12px', border: `1px solid ${SITE.stone200}`, p: 2.5, boxShadow: SITE.cardShadow }}>
+            <Reveal key={n} delay={(n - 1) * 60} sx={{ bgcolor: '#fff', borderRadius: '12px', border: `1px solid ${SITE.stone200}`, p: 2.5, boxShadow: SITE.cardShadow }}>
               <ButtonBase onClick={() => setOpen(isOpen ? null : n)} aria-expanded={isOpen} sx={{ width: '100%', justifyContent: 'space-between', gap: 2, textAlign: 'left', fontWeight: 700, color: '#111827', fontSize: '1rem', borderRadius: 1 }}>
                 <span>{t(`faq.q${n}`)}</span>
                 <KeyboardArrowDownRoundedIcon sx={{ color: SITE.stone500, transform: isOpen ? 'rotate(180deg)' : 'none', transition: reduced ? 'none' : 'transform 200ms ease' }} />
@@ -413,7 +454,7 @@ export function SiteFaq() {
               <Collapse in={isOpen} timeout={reduced ? 0 : 'auto'}>
                 <Typography sx={{ mt: 1.5, pt: 1.5, borderTop: `1px solid ${SITE.stone100}`, color: SITE.stone600, fontSize: '0.875rem', lineHeight: 1.625 }}>{t(`faq.a${n}`)}</Typography>
               </Collapse>
-            </Box>
+            </Reveal>
           );
         })}
       </Stack>

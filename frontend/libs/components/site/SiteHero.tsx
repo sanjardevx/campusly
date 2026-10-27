@@ -8,6 +8,7 @@ import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
 import { useReducedMotion } from '@/libs/components/dashboard/motion';
+import { CountUp, Typewriter } from './motion';
 import { SITE, type SiteData, containerSx, scrollToId } from './tokens';
 
 /** Hero photos (Stitch placeholders until the school's own; frontend/public/site) */
@@ -55,7 +56,8 @@ export function SiteHero({ stats }: { stats: SiteData['stats'] }) {
     { value: stats.students, label: t('stats.students') },
     { value: stats.teachers, label: t('stats.teachers') },
     { value: stats.programs, label: t('stats.programs') },
-    ...(stats.founded ? [{ value: stats.founded, label: t('stats.founded') }] : []),
+    // A year is not a count: it is shown as it is
+    ...(stats.founded ? [{ value: stats.founded, label: t('stats.founded'), year: true }] : []),
   ];
 
   return (
@@ -101,7 +103,7 @@ export function SiteHero({ stats }: { stats: SiteData['stats'] }) {
             {t('hero.pill')}
           </Box>
           <Typography component="h1" sx={{ color: '#fff', fontSize: { xs: '2.25rem', sm: '3rem', lg: '54px' }, fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15, mb: 2.5 }}>
-            {t('hero.title')}
+            <Typewriter text={t('hero.title')} />
           </Typography>
           <Typography sx={{ color: 'rgba(255,255,255,0.85)', fontSize: { xs: '1.125rem', lg: '1.25rem' }, lineHeight: 1.625, mb: 4, maxWidth: 576 }}>{t('hero.subtitle')}</Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
@@ -130,7 +132,9 @@ export function SiteHero({ stats }: { stats: SiteData['stats'] }) {
         <Box sx={{ bgcolor: '#fff', borderRadius: '16px', p: { xs: 2, md: 4 }, border: `1px solid ${SITE.stone100}`, boxShadow: SITE.statShadow, display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: `repeat(${numbers.length}, 1fr)` } }}>
           {numbers.map((n, i) => (
             <Stack key={n.label} direction="row" sx={{ alignItems: 'baseline', gap: 1, p: { xs: 2, md: 0 }, px: { md: 3 }, py: { md: 1 }, borderLeft: { md: i ? `1px solid ${SITE.stone200}` : 0 }, borderTop: { xs: i >= 2 ? `1px solid ${SITE.stone200}` : 0, md: 0 } }}>
-              <Typography sx={{ fontSize: { xs: '2rem', lg: '40px' }, fontWeight: 700, color: SITE.spruce, letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums' }}>{n.value}</Typography>
+              <Typography sx={{ fontSize: { xs: '2rem', lg: '40px' }, fontWeight: 700, color: SITE.spruce, letterSpacing: '-0.025em', fontVariantNumeric: 'tabular-nums' }}>
+                {'year' in n ? n.value : <CountUp value={n.value} />}
+              </Typography>
               <Typography sx={{ color: SITE.neutral500, fontWeight: 500, fontSize: '1rem' }}>· {n.label}</Typography>
             </Stack>
           ))}

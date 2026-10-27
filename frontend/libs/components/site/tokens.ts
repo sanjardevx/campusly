@@ -1,4 +1,5 @@
 import type { SiteHomeQuery } from '@/libs/gql/graphql';
+import { scrollToElement } from './motion';
 
 /**
  * Colours and sizes of the Stitch "Campusly Public" screens (Landing Page A/B/C), copied from their
@@ -61,10 +62,8 @@ export const sectionTitleSx = {
 /** Centred page column with Tailwind's px-6 */
 export const containerSx = { maxWidth: SITE.container, mx: 'auto', px: { xs: 2, sm: 3 } } as const;
 
-/** Scroll smoothly to a section; reduced motion jumps */
+/** Scroll smoothly to a section (through Lenis when it runs); reduced motion jumps */
 export function scrollToId(id: string) {
   const el = document.getElementById(id);
-  if (!el) return;
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  if (el) scrollToElement(el);
 }

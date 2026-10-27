@@ -10,6 +10,7 @@ import PlayCircleFilledRoundedIcon from '@mui/icons-material/PlayCircleFilledRou
 import { useTranslation } from 'next-i18next/pages';
 import type { SiteCourseCategory } from '@/libs/gql/graphql';
 import { clock, totalText, youtubeThumb, youtubeWatch } from '@/libs/youtube';
+import { EASE, Reveal, hoverLift, hoverZoom } from './motion';
 import { SITE, type SiteData, containerSx, eyebrowSx, sectionTitleSx } from './tokens';
 
 type MockTest = SiteData['mockTests'][number];
@@ -20,7 +21,8 @@ const cardSx = { bgcolor: '#fff', borderRadius: '12px', border: `1px solid ${SIT
 
 function SectionHeader({ id, eyebrow, title, subtitle, aside }: { id: string; eyebrow: string; title: string; subtitle?: string; aside?: ReactNode }) {
   return (
-    <Stack direction={{ xs: 'column', md: 'row' }} sx={{ justifyContent: 'space-between', alignItems: { md: 'flex-end' }, gap: 2, mb: 4 }}>
+    <Reveal>
+      <Stack direction={{ xs: 'column', md: 'row' }} sx={{ justifyContent: 'space-between', alignItems: { md: 'flex-end' }, gap: 2, mb: 4 }}>
       <Box>
         <Typography sx={{ ...eyebrowSx, fontWeight: 700, letterSpacing: '0.05em', mb: 1 }}>{eyebrow}</Typography>
         <Typography component="h2" id={`${id}-title`} sx={{ ...sectionTitleSx, fontWeight: 800, color: SITE.ink, mb: subtitle ? 1 : 0 }}>
@@ -29,7 +31,8 @@ function SectionHeader({ id, eyebrow, title, subtitle, aside }: { id: string; ey
         {subtitle && <Typography sx={{ color: SITE.neutral500, fontSize: '1rem' }}>{subtitle}</Typography>}
       </Box>
       {aside}
-    </Stack>
+      </Stack>
+    </Reveal>
   );
 }
 
@@ -56,10 +59,11 @@ export function SiteMockTests({ tests }: { tests: MockTest[] }) {
     <Box component="section" id="mock-tests" aria-labelledby="mock-tests-title" sx={{ ...containerSx, py: { xs: 6, md: 8 } }}>
       <SectionHeader id="mock-tests" eyebrow={t('mock.eyebrow')} title={t('mock.title')} subtitle={t('mock.subtitle')} />
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-        {tests.map((m) => {
+        {tests.map((m, i) => {
           const full = m.seatsLeft === 0;
           return (
-            <Box key={m.id} sx={{ ...cardSx, p: { xs: 2.5, sm: 3.5 } }}>
+            <Reveal key={m.id} delay={(i % 2) * 90}>
+            <Box sx={{ ...cardSx, height: '100%', p: { xs: 2.5, sm: 3.5 }, ...hoverLift }}>
               <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', gap: 2, mb: 2 }}>
                 <Box component="span" sx={{ px: 1.25, py: 0.5, borderRadius: 999, fontSize: '0.8125rem', fontWeight: 600, bgcolor: full ? '#FDECEC' : '#FEF3C7', color: full ? '#B42318' : '#92400E' }}>
                   {full ? t('mock.full') : t('mock.seatsLeft', { count: m.seatsLeft })}
@@ -97,6 +101,7 @@ export function SiteMockTests({ tests }: { tests: MockTest[] }) {
                 </Box>
               )}
             </Box>
+            </Reveal>
           );
         })}
       </Box>
@@ -118,6 +123,8 @@ export function SiteOpenCourses({ courses }: { courses: OpenCourse[] }) {
   const categories = CATEGORY_ORDER.filter((c) => courses.some((x) => x.category === c));
   const [category, setCategory] = useState<SiteCourseCategory | null>(null);
   const [open, setOpen] = useState<OpenCourse | null>(null);
+  // After a tab change the new cards rise in (not on the first render: Reveal handles that)
+  const [switched, setSwitched] = useState(false);
   if (courses.length === 0) return null;
   const current = category && categories.includes(category) ? category : categories[0];
   const shown = courses.filter((c) => c.category === current);
@@ -132,7 +139,10 @@ export function SiteOpenCourses({ courses }: { courses: OpenCourse[] }) {
           categories.length > 1 && (
             <Stack direction="row" role="tablist" aria-label={t('courses.title')} sx={{ p: 0.5, borderRadius: 2, border: `1px solid ${SITE.cardBorder}`, bgcolor: '#fff', gap: 0.5, alignSelf: { xs: 'flex-start', md: 'auto' }, overflowX: 'auto', maxWidth: '100%' }}>
               {categories.map((c) => (
-                <ButtonBase key={c} role="tab" aria-selected={c === current} onClick={() => setCategory(c)} sx={{ px: 2, py: 0.75, borderRadius: 1.5, fontSize: '0.875rem', fontWeight: 600, whiteSpace: 'nowrap', bgcolor: c === current ? SITE.spruce : 'transparent', color: c === current ? '#fff' : SITE.stone600, transition: 'background-color 150ms ease, color 150ms ease' }}>
+                <ButtonBase key={c} role="tab" aria-selected={c === current} onClick={() => {
+                    setCategory(c);
+                    setSwitched(true);
+                  }} sx={{ px: 2, py: 0.75, borderRadius: 1.5, fontSize: '0.875rem', fontWeight: 600, whiteSpace: 'nowrap', bgcolor: c === current ? SITE.spruce : 'transparent', color: c === current ? '#fff' : SITE.stone600, transition: 'background-color 150ms ease, color 150ms ease' }}>
                   {t(`courses.cat.${c}`)}
                 </ButtonBase>
               ))}
@@ -140,12 +150,27 @@ export function SiteOpenCourses({ courses }: { courses: OpenCourse[] }) {
           )
         }
       />
-      <Box role="tabpanel" sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(4, 1fr)' }, gap: 2.5 }}>
-        {shown.map((c) => (
-          <Stack key={c.id} sx={{ ...cardSx, overflow: 'hidden' }}>
+      <Box
+        key={current}
+        role="tabpanel"
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(4, 1fr)' },
+          gap: 2.5,
+          ...(switched && {
+            '@keyframes courseIn': { from: { opacity: 0, transform: 'translateY(14px)' } },
+            '& > *': { animation: `courseIn 500ms ${EASE} both` },
+            ...Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8].map((n) => [`& > *:nth-of-type(${n + 1})`, { animationDelay: `${n * 60}ms` }])),
+            '@media (prefers-reduced-motion: reduce)': { '& > *': { animation: 'none' } },
+          }),
+        }}
+      >
+        {shown.map((c, i) => (
+          <Reveal key={c.id} delay={i * 70}>
+          <Stack sx={{ ...cardSx, height: '100%', overflow: 'hidden', ...hoverLift, ...hoverZoom('.thumb') }}>
             {/* 16:9 crops the black bars of YouTube's 4:3 hqdefault picture */}
             <Box sx={{ position: 'relative', aspectRatio: '16 / 9', overflow: 'hidden', bgcolor: '#1C1917' }}>
-              {c.lessons[0] && <Box component="img" src={youtubeThumb(c.lessons[0].youtubeId, 'hq')} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
+              {c.lessons[0] && <Box component="img" className="thumb" src={youtubeThumb(c.lessons[0].youtubeId, 'hq')} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}
               <Box sx={{ position: 'absolute', top: 10, right: 10, px: 1, py: 0.25, borderRadius: 1, bgcolor: 'rgba(17,24,39,0.8)', color: '#fff', fontSize: '0.75rem', fontWeight: 600 }}>{t('courses.lessons', { count: c.lessons.length })}</Box>
             </Box>
             <Stack sx={{ p: 2.5, flex: 1, gap: 0.5 }}>
@@ -159,6 +184,7 @@ export function SiteOpenCourses({ courses }: { courses: OpenCourse[] }) {
               </Button>
             </Stack>
           </Stack>
+          </Reveal>
         ))}
       </Box>
       <CourseDialog course={open} onClose={() => setOpen(null)} />
@@ -231,20 +257,25 @@ export function SiteHonorStudents({ honors }: { honors: Honor[] }) {
     <Box component="section" id="honor-students" aria-labelledby="honor-students-title" sx={{ ...containerSx, py: { xs: 6, md: 8 } }}>
       <SectionHeader id="honor-students" eyebrow={t('honor.eyebrow')} title={t('honor.title')} />
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', lg: 'repeat(4, 1fr)' }, gap: { xs: 1.5, sm: 2.5 } }}>
-        {shown.map((h) => {
+        {shown.map((h, i) => {
           const medal = h.resultType === 'MEDAL' && h.place ? MEDAL_DOT[h.place] : null;
           return (
-            <Box key={h.id} component="article" sx={{ ...cardSx, overflow: 'hidden' }}>
-              <Box sx={{ position: 'relative', aspectRatio: '3 / 4', bgcolor: SITE.soft }}>
+            <Reveal key={h.id} delay={(i % 4) * 80}>
+            <Box component="article" sx={{ ...cardSx, height: '100%', overflow: 'hidden', ...hoverLift, ...hoverZoom('.photo') }}>
+              <Box sx={{ position: 'relative', aspectRatio: '3 / 4', bgcolor: SITE.soft, overflow: 'hidden' }}>
                 {h.photoUrl ? (
-                  <Box component="img" src={h.photoUrl} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <Box component="img" className="photo" src={h.photoUrl} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
                   <MilitaryTechRoundedIcon sx={{ position: 'absolute', inset: 0, m: 'auto', fontSize: 64, color: SITE.stone400 }} />
                 )}
                 {medal ? (
-                  <Box role="img" aria-label={t(`honor.medal${h.place}`)} sx={{ position: 'absolute', top: 12, right: 12, width: 28, height: 28, borderRadius: '50%', bgcolor: medal, boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }} />
+                  <Reveal from="scale" delay={350 + (i % 4) * 80} role="img" aria-label={t(`honor.medal${h.place}`)} sx={{ position: 'absolute', top: 12, right: 12, width: 28, height: 28, borderRadius: '50%', bgcolor: medal, boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }} />
                 ) : (
-                  h.score && <Box sx={{ position: 'absolute', top: 12, right: 12, px: 1, py: 0.25, borderRadius: 999, bgcolor: SITE.spruce, color: '#fff', fontSize: '0.75rem', fontWeight: 700 }}>{h.score}</Box>
+                  h.score && (
+                    <Reveal from="scale" delay={350 + (i % 4) * 80} sx={{ position: 'absolute', top: 12, right: 12, px: 1, py: 0.25, borderRadius: 999, bgcolor: SITE.spruce, color: '#fff', fontSize: '0.75rem', fontWeight: 700 }}>
+                      {h.score}
+                    </Reveal>
+                  )
                 )}
               </Box>
               <Box sx={{ p: { xs: 1.5, sm: 2.5 } }}>
@@ -255,6 +286,7 @@ export function SiteHonorStudents({ honors }: { honors: Honor[] }) {
                 <Typography sx={{ fontSize: '0.875rem', color: SITE.stone500, mt: 0.75, lineHeight: 1.4 }}>{medal ? t('honor.placeLine', { place: t(`honor.place${h.place}`), competition: h.competition }) : h.competition}</Typography>
               </Box>
             </Box>
+            </Reveal>
           );
         })}
       </Box>
