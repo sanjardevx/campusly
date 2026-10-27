@@ -1,6 +1,9 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import {
   EnquiryStatus,
+  SiteCourseCategory,
+  SiteHonorResult,
+  SiteMockExam,
   SitePostStatus,
   SitePostType,
   SiteProgramCategory,
@@ -171,6 +174,164 @@ export class SitePersonAdmin {
 
   @Field(() => Int)
   order: number;
+}
+
+@ObjectType()
+export class SiteMockTestAdmin {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => SiteMockExam)
+  exam: SiteMockExam;
+
+  @Field(() => LocalizedText)
+  title: LocalizedText;
+
+  @Field(() => LocalizedText)
+  included: LocalizedText;
+
+  @Field(() => String)
+  examDate: string;
+
+  @Field(() => String)
+  startTime: string;
+
+  @Field(() => Int)
+  durationMin: number;
+
+  @Field(() => LocalizedText)
+  location: LocalizedText;
+
+  @Field(() => Int)
+  price: number;
+
+  @Field(() => Int)
+  totalSeats: number;
+
+  @Field(() => Int)
+  takenSeats: number;
+
+  @Field(() => SiteTeacherRef, { nullable: true })
+  contactPerson: SiteTeacherRef | null;
+
+  /** The phone typed in the drawer (null = the school phone is used) */
+  @Field(() => String, { nullable: true })
+  contactPhone: string | null;
+
+  @Field(() => Boolean)
+  showOnSite: boolean;
+
+  /** The exam day is over in the school timezone (the site no longer shows it) */
+  @Field(() => Boolean)
+  isPast: boolean;
+
+  @Field(() => Date)
+  updatedAt: Date;
+}
+
+@ObjectType()
+export class SiteOpenLesson {
+  @Field(() => String)
+  title: string;
+
+  @Field(() => String)
+  youtubeId: string;
+
+  @Field(() => Int, { nullable: true })
+  durationSec: number | null;
+}
+
+@ObjectType()
+export class SiteOpenCourseAdmin {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => SiteCourseCategory)
+  category: SiteCourseCategory;
+
+  @Field(() => LocalizedText)
+  title: LocalizedText;
+
+  @Field(() => String, { nullable: true })
+  source: string | null;
+
+  @Field(() => LocalizedText, { nullable: true })
+  description: LocalizedText | null;
+
+  /** DRAFT or PUBLISHED */
+  @Field(() => SitePostStatus)
+  status: SitePostStatus;
+
+  @Field(() => [SiteOpenLesson])
+  lessons: SiteOpenLesson[];
+
+  /** Sum of the lessons with a known length */
+  @Field(() => Int)
+  totalDurationSec: number;
+
+  @Field(() => Date)
+  updatedAt: Date;
+}
+
+/** The student picked in the honor drawer (name and class come from the profile) */
+@ObjectType()
+export class SiteHonorStudentRef {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => String)
+  firstName: string;
+
+  @Field(() => String)
+  lastName: string;
+
+  @Field(() => String)
+  loginId: string;
+}
+
+@ObjectType()
+export class SiteHonorStudentAdmin {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => SiteHonorStudentRef)
+  student: SiteHonorStudentRef;
+
+  @Field(() => String, { nullable: true })
+  className: string | null;
+
+  @Field(() => SiteHonorResult)
+  resultType: SiteHonorResult;
+
+  @Field(() => Int, { nullable: true })
+  place: number | null;
+
+  @Field(() => String, { nullable: true })
+  score: string | null;
+
+  @Field(() => LocalizedText)
+  subject: LocalizedText;
+
+  @Field(() => LocalizedText)
+  competition: LocalizedText;
+
+  @Field(() => String)
+  achievedOn: string;
+
+  @Field(() => String, { nullable: true })
+  photoUrl: string | null;
+
+  @Field(() => Boolean)
+  parentConsent: boolean;
+
+  @Field(() => Boolean)
+  showOnSite: boolean;
+
+  @Field(() => Int)
+  order: number;
+
+  @Field(() => Date)
+  createdAt: Date;
 }
 
 @ObjectType()
@@ -347,6 +508,108 @@ export class SitePersonPublic {
 }
 
 @ObjectType()
+export class SiteMockTestPublic {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => SiteMockExam)
+  exam: SiteMockExam;
+
+  @Field(() => String)
+  title: string;
+
+  @Field(() => String)
+  included: string;
+
+  /** "YYYY-MM-DD" */
+  @Field(() => String)
+  date: string;
+
+  @Field(() => String)
+  startTime: string;
+
+  @Field(() => Int)
+  durationMin: number;
+
+  @Field(() => String)
+  location: string;
+
+  @Field(() => Int)
+  price: number;
+
+  /** 0 = "Full" */
+  @Field(() => Int)
+  seatsLeft: number;
+
+  @Field(() => String, { nullable: true })
+  contactName: string | null;
+
+  @Field(() => String, { nullable: true })
+  contactRole: string | null;
+
+  @Field(() => String, { nullable: true })
+  contactPhone: string | null;
+}
+
+@ObjectType()
+export class SiteOpenCoursePublic {
+  @Field(() => String)
+  id: string;
+
+  @Field(() => SiteCourseCategory)
+  category: SiteCourseCategory;
+
+  @Field(() => String)
+  title: string;
+
+  @Field(() => String, { nullable: true })
+  source: string | null;
+
+  @Field(() => String, { nullable: true })
+  description: string | null;
+
+  @Field(() => [SiteOpenLesson])
+  lessons: SiteOpenLesson[];
+
+  @Field(() => Int)
+  totalDurationSec: number;
+}
+
+@ObjectType()
+export class SiteHonorPublic {
+  @Field(() => String)
+  id: string;
+
+  /** "Madina A." — first name and the last name's initial */
+  @Field(() => String)
+  name: string;
+
+  @Field(() => String, { nullable: true })
+  className: string | null;
+
+  @Field(() => SiteHonorResult)
+  resultType: SiteHonorResult;
+
+  @Field(() => Int, { nullable: true })
+  place: number | null;
+
+  @Field(() => String, { nullable: true })
+  score: string | null;
+
+  @Field(() => String)
+  subject: string;
+
+  @Field(() => String)
+  competition: string;
+
+  @Field(() => String)
+  achievedOn: string;
+
+  @Field(() => String, { nullable: true })
+  photoUrl: string | null;
+}
+
+@ObjectType()
 export class SiteContact {
   @Field(() => String)
   schoolName: string;
@@ -393,6 +656,17 @@ export class SiteHome {
 
   @Field(() => [SitePersonPublic])
   team: SitePersonPublic[];
+
+  /** Upcoming mock tests that are on the site, soonest first */
+  @Field(() => [SiteMockTestPublic])
+  mockTests: SiteMockTestPublic[];
+
+  @Field(() => [SiteOpenCoursePublic])
+  openCourses: SiteOpenCoursePublic[];
+
+  /** Only with the parents' consent */
+  @Field(() => [SiteHonorPublic])
+  honorStudents: SiteHonorPublic[];
 
   @Field(() => SiteContact)
   contact: SiteContact;

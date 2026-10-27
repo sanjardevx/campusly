@@ -20,7 +20,10 @@ import {
 } from 'class-validator';
 import {
   EnquiryStatus,
+  SiteCourseCategory,
+  SiteHonorResult,
   SiteLocale,
+  SiteMockExam,
   SitePostType,
   SiteProgramCategory,
   SitePublishMode,
@@ -276,6 +279,212 @@ export class SaveSitePersonInput {
   @IsOptional()
   @IsBoolean()
   removePhoto?: boolean;
+
+  @Field(() => Boolean)
+  @IsBoolean()
+  showOnSite: boolean;
+}
+
+/** Create (no id) or edit a mock test (Stitch "Edit mock test" drawer) */
+@InputType()
+export class SaveSiteMockTestInput {
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  id?: string;
+
+  @Field(() => SiteMockExam)
+  @IsEnum(SiteMockExam)
+  exam: SiteMockExam;
+
+  @Field(() => LocalizedTextInput)
+  @ValidateNested()
+  @Type(() => LocalizedTextInput)
+  title: LocalizedTextInput;
+
+  /** "What's included" (≤ 100) */
+  @Field(() => LocalizedTextInput)
+  @ValidateNested()
+  @Type(() => LocalizedTextInput)
+  included: LocalizedTextInput;
+
+  /** "YYYY-MM-DD" */
+  @Field(() => String)
+  @IsDateString({ strict: true })
+  examDate: string;
+
+  @Field(() => String)
+  @Matches(TIME)
+  startTime: string;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(15)
+  @Max(600)
+  durationMin: number;
+
+  @Field(() => LocalizedTextInput)
+  @ValidateNested()
+  @Type(() => LocalizedTextInput)
+  location: LocalizedTextInput;
+
+  /** UZS */
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  @Max(100_000_000)
+  price: number;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(1)
+  @Max(1000)
+  totalSeats: number;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  @Max(1000)
+  takenSeats: number;
+
+  /** A person from "Our team"; null = nobody named */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  contactPersonId?: string;
+
+  /** "Use a different phone"; empty = the school phone */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  contactPhone?: string;
+
+  @Field(() => Boolean)
+  @IsBoolean()
+  showOnSite: boolean;
+}
+
+/** One video of an open course: a YouTube link, its title and (optional) length "8:42" */
+@InputType()
+export class SiteOpenLessonInput {
+  @Field(() => String)
+  @IsString()
+  @Length(1, 150)
+  title: string;
+
+  @Field(() => String)
+  @IsString()
+  @MaxLength(200)
+  youtubeUrl: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @Matches(/^(\d{1,2}:)?\d{1,2}:\d{2}$/)
+  duration?: string;
+}
+
+/** Create (no id) or edit an open course with its full lesson list, in order */
+@InputType()
+export class SaveSiteOpenCourseInput {
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  id?: string;
+
+  @Field(() => SiteCourseCategory)
+  @IsEnum(SiteCourseCategory)
+  category: SiteCourseCategory;
+
+  @Field(() => LocalizedTextInput)
+  @ValidateNested()
+  @Type(() => LocalizedTextInput)
+  title: LocalizedTextInput;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(60)
+  source?: string;
+
+  @Field(() => LocalizedTextInput, { nullable: true })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocalizedTextInput)
+  description?: LocalizedTextInput;
+
+  @Field(() => [SiteOpenLessonInput])
+  @IsArray()
+  @ArrayMaxSize(50)
+  @ValidateNested({ each: true })
+  @Type(() => SiteOpenLessonInput)
+  lessons: SiteOpenLessonInput[];
+
+  /** "Publish course" = true, "Save draft" = false */
+  @Field(() => Boolean)
+  @IsBoolean()
+  publish: boolean;
+}
+
+/** Create (no id) or edit an honor student (Stitch "Add honor student" drawer) */
+@InputType()
+export class SaveSiteHonorStudentInput {
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  id?: string;
+
+  @Field(() => String)
+  @IsUUID()
+  studentId: string;
+
+  @Field(() => SiteHonorResult)
+  @IsEnum(SiteHonorResult)
+  resultType: SiteHonorResult;
+
+  /** MEDAL: 1, 2 or 3 */
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(3)
+  place?: number;
+
+  /** EXAM_SCORE: "IELTS 8.0" */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(30)
+  score?: string;
+
+  @Field(() => LocalizedTextInput)
+  @ValidateNested()
+  @Type(() => LocalizedTextInput)
+  subject: LocalizedTextInput;
+
+  @Field(() => LocalizedTextInput)
+  @ValidateNested()
+  @Type(() => LocalizedTextInput)
+  competition: LocalizedTextInput;
+
+  /** "YYYY-MM-DD" */
+  @Field(() => String)
+  @IsDateString({ strict: true })
+  achievedOn: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsUUID()
+  photoAssetId?: string;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  removePhoto?: boolean;
+
+  @Field(() => Boolean)
+  @IsBoolean()
+  parentConsent: boolean;
 
   @Field(() => Boolean)
   @IsBoolean()

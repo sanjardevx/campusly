@@ -42,6 +42,8 @@ export enum ErrorCode {
   SITE_CAROUSEL_FULL = 'SITE_CAROUSEL_FULL',
   /** The picture is not a finished website upload (createSiteUpload → confirmUpload) */
   SITE_IMAGE_INVALID = 'SITE_IMAGE_INVALID',
+  /** An honor student goes on the public site only with the parents' consent */
+  SITE_CONSENT_REQUIRED = 'SITE_CONSENT_REQUIRED',
   /** The phone number is not an Uzbek mobile number */
   INVALID_PHONE = 'INVALID_PHONE',
   /** S3 / CloudFront are not configured on this server (local run without AWS, CI) */

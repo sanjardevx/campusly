@@ -1,6 +1,9 @@
 import { registerEnumType } from '@nestjs/graphql';
 import {
   EnquiryStatus,
+  SiteCourseCategory,
+  SiteHonorResult,
+  SiteMockExam,
   SitePostStatus,
   SitePostType,
   SiteProgramCategory,
@@ -11,6 +14,9 @@ registerEnumType(SitePostType, { name: 'SitePostType' });
 registerEnumType(SitePostStatus, { name: 'SitePostStatus' });
 registerEnumType(SiteProgramCategory, { name: 'SiteProgramCategory' });
 registerEnumType(EnquiryStatus, { name: 'EnquiryStatus' });
+registerEnumType(SiteMockExam, { name: 'SiteMockExam' });
+registerEnumType(SiteCourseCategory, { name: 'SiteCourseCategory' });
+registerEnumType(SiteHonorResult, { name: 'SiteHonorResult' });
 
 /** "Publish now" / "Schedule" / "Save as draft" in the post drawer */
 export enum SitePublishMode {
@@ -29,4 +35,12 @@ export enum SiteLocale {
 }
 registerEnumType(SiteLocale, { name: 'SiteLocale' });
 
-export { EnquiryStatus, SitePostStatus, SitePostType, SiteProgramCategory };
+export {
+  EnquiryStatus,
+  SiteCourseCategory,
+  SiteHonorResult,
+  SiteMockExam,
+  SitePostStatus,
+  SitePostType,
+  SiteProgramCategory,
+};

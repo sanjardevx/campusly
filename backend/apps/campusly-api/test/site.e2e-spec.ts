@@ -100,6 +100,15 @@ describe('Public website CMS: admin content, public home, enquiries (e2e)', () =
     await prisma.siteProgram.deleteMany({
       where: { name: { path: ['en'], string_starts_with: TAG } },
     });
+    await prisma.siteMockTest.deleteMany({
+      where: { title: { path: ['en'], string_starts_with: TAG } },
+    });
+    await prisma.siteOpenCourse.deleteMany({
+      where: { title: { path: ['en'], string_starts_with: TAG } },
+    });
+    await prisma.siteHonorStudent.deleteMany({
+      where: { studentId: { in: ids } },
+    });
     await prisma.sitePerson.deleteMany({ where: { lastName: TAG } });
     await prisma.enquiry.deleteMany({
       where: { parentName: { startsWith: TAG } },
@@ -400,5 +409,248 @@ describe('Public website CMS: admin content, public home, enquiries (e2e)', () =
       { uz: '[uz] Open day', ko: '[ko] Open day' },
       { uz: '', ko: '' },
     ]);
+  });
+
+  // ─────────────── Mock tests, Open Courses, Honor Students (day 20) ───────────────
+
+  it('mock tests, open courses and honor students are admin-only too (foreign users)', async () => {
+    for (const who of ['teacher', 'student', 'parent'] as const) {
+      for (const query of [
+        '{ adminSiteMockTests { id } }',
+        '{ adminSiteOpenCourses { id } }',
+        '{ adminSiteHonorStudents { id } }',
+      ]) {
+        expect(code(await gql(query, {}, who))).toBe('FORBIDDEN');
+      }
+    }
+    expect(code(await gql('{ adminSiteHonorStudents { id } }'))).toBe(
+      'UNAUTHENTICATED',
+    );
+  });
+
+  it('mock tests: seats are checked, full at 0 left, past and hidden tests leave the site', async () => {
+    const save = (input: object) =>
+      gql<{
+        saveSiteMockTest: { id: string; isPast: boolean; takenSeats: number };
+      }>(
+        `mutation($i: SaveSiteMockTestInput!) { saveSiteMockTest(input: $i) { id isPast takenSeats } }`,
+        {
+          i: {
+            exam: 'IELTS',
+            title: en('mock'),
+            included: { en: 'Listening, Reading' },
+            examDate: '2030-01-12',
+            startTime: '09:00',
+            durationMin: 180,
+            location: { en: 'Room 204' },
+            price: 120000,
+            totalSeats: 30,
+            takenSeats: 12,
+            showOnSite: true,
+            ...input,
+          },
+        },
+        'admin',
+      );
+    const mocks = async () =>
+      (
+        await gql<{
+          siteHome: {
+            mockTests: { id: string; seatsLeft: number; title: string }[];
+          };
+        }>('{ siteHome(locale: uz) { mockTests { id seatsLeft title } } }')
+      ).data!.siteHome.mockTests;
+
+    expect(code(await save({ takenSeats: 31 }))).toBe('BAD_REQUEST');
+    expect(
+      code(
+        await save({ contactPersonId: '01900000-0000-7000-8000-000000000000' }),
+      ),
+    ).toBe('BAD_REQUEST');
+    expect(code(await save({ contactPhone: 'call me' }))).toBe('BAD_REQUEST');
+
+    const upcoming = (await save({})).data!.saveSiteMockTest;
+    expect(upcoming.isPast).toBe(false);
+    let onSite = (await mocks()).find((m) => m.id === upcoming.id);
+    // No Uzbek title: the visitor gets the English one
+    expect(onSite).toMatchObject({ seatsLeft: 18, title: `${TAG} mock` });
+
+    const setSeats = (takenSeats: number) =>
+      gql<{ setSiteMockTestSeats: { takenSeats: number } }>(
+        `mutation($id: String!, $n: Int!) { setSiteMockTestSeats(id: $id, takenSeats: $n) { takenSeats } }`,
+        { id: upcoming.id, n: takenSeats },
+        'admin',
+      );
+    expect(code(await setSeats(31))).toBe('BAD_REQUEST');
+    await setSeats(30);
+    onSite = (await mocks()).find((m) => m.id === upcoming.id);
+    expect(onSite?.seatsLeft).toBe(0);
+
+    const past = (await save({ examDate: '2020-01-11' })).data!
+      .saveSiteMockTest;
+    expect(past.isPast).toBe(true);
+    const hidden = (await save({ showOnSite: false })).data!.saveSiteMockTest;
+    const ids = (await mocks()).map((m) => m.id);
+    expect(ids).not.toContain(past.id);
+    expect(ids).not.toContain(hidden.id);
+
+    await gql(
+      `mutation($id: String!) { archiveSiteMockTest(id: $id) { id } }`,
+      { id: upcoming.id },
+      'admin',
+    );
+    expect((await mocks()).map((m) => m.id)).not.toContain(upcoming.id);
+    const row = await prisma.siteMockTest.findUnique({
+      where: { id: upcoming.id },
+    });
+    expect(row?.archivedAt).not.toBeNull(); // archived, not deleted
+  });
+
+  it('open courses: YouTube links only, a lesson before publishing, drafts stay off the site', async () => {
+    const save = (input: object) =>
+      gql<{
+        saveSiteOpenCourse: {
+          id: string;
+          status: string;
+          totalDurationSec: number;
+          lessons: { youtubeId: string; durationSec: number | null }[];
+        };
+      }>(
+        `mutation($i: SaveSiteOpenCourseInput!) { saveSiteOpenCourse(input: $i) {
+          id status totalDurationSec lessons { youtubeId durationSec } } }`,
+        {
+          i: {
+            category: 'IT',
+            title: en('course'),
+            lessons: [],
+            publish: true,
+            ...input,
+          },
+        },
+        'admin',
+      );
+    const courseIds = async () =>
+      (
+        await gql<{ siteHome: { openCourses: { id: string }[] } }>(
+          '{ siteHome(locale: en) { openCourses { id } } }',
+        )
+      ).data!.siteHome.openCourses.map((c) => c.id);
+
+    expect(code(await save({}))).toBe('BAD_REQUEST'); // no lessons
+    expect(
+      code(
+        await save({
+          lessons: [{ title: 'Intro', youtubeUrl: 'https://vimeo.com/123' }],
+        }),
+      ),
+    ).toBe('BAD_REQUEST');
+
+    const draft = (
+      await save({
+        publish: false,
+        lessons: [
+          {
+            title: 'Intro',
+            youtubeUrl: 'https://youtu.be/kqtD5dpn9C8',
+            duration: '8:42',
+          },
+          {
+            title: 'Next',
+            youtubeUrl: 'https://www.youtube.com/watch?v=rfscVS0vtbw&t=30s',
+            duration: '1:02:03',
+          },
+        ],
+      })
+    ).data!.saveSiteOpenCourse;
+    expect(draft.status).toBe('DRAFT');
+    expect(draft.lessons.map((l) => l.youtubeId)).toEqual([
+      'kqtD5dpn9C8',
+      'rfscVS0vtbw',
+    ]);
+    expect(draft.totalDurationSec).toBe(522 + 3723);
+    expect(await courseIds()).not.toContain(draft.id);
+
+    const publish = (published: boolean) =>
+      gql(
+        `mutation($id: String!, $p: Boolean!) { setSiteOpenCoursePublished(id: $id, published: $p) { id } }`,
+        { id: draft.id, p: published },
+        'admin',
+      );
+    await publish(true);
+    expect(await courseIds()).toContain(draft.id);
+    await publish(false); // "Hide from site"
+    expect(await courseIds()).not.toContain(draft.id);
+  });
+
+  it('honor students: real students only, never on the site without the parents’ consent, short names', async () => {
+    const student = await prisma.user.findUniqueOrThrow({
+      where: { loginId: 'e2e-site-student' },
+    });
+    const teacher = await prisma.user.findUniqueOrThrow({
+      where: { loginId: 'e2e-site-teacher' },
+    });
+    const save = (input: object) =>
+      gql<{ saveSiteHonorStudent: { id: string; showOnSite: boolean } }>(
+        `mutation($i: SaveSiteHonorStudentInput!) { saveSiteHonorStudent(input: $i) { id showOnSite } }`,
+        {
+          i: {
+            studentId: student.id,
+            resultType: 'MEDAL',
+            place: 1,
+            subject: { en: 'Mathematics' },
+            competition: { en: 'City Olympiad' },
+            achievedOn: '2026-09-04',
+            parentConsent: true,
+            showOnSite: true,
+            ...input,
+          },
+        },
+        'admin',
+      );
+    const honors = async () =>
+      (
+        await gql<{
+          siteHome: { honorStudents: { id: string; name: string }[] };
+        }>('{ siteHome(locale: en) { honorStudents { id name } } }')
+      ).data!.siteHome.honorStudents;
+
+    // The client sends only an id: a teacher's id is not a student
+    expect(code(await save({ studentId: teacher.id }))).toBe('BAD_REQUEST');
+    expect(code(await save({ place: null }))).toBe('BAD_REQUEST');
+    expect(code(await save({ resultType: 'EXAM_SCORE', place: null }))).toBe(
+      'BAD_REQUEST',
+    );
+    expect(code(await save({ parentConsent: false }))).toBe(
+      'SITE_CONSENT_REQUIRED',
+    );
+
+    const hidden = (await save({ parentConsent: false, showOnSite: false }))
+      .data!.saveSiteHonorStudent;
+    expect(
+      code(
+        await gql(
+          `mutation($id: String!) { setSiteHonorStudentVisible(id: $id, showOnSite: true) { id } }`,
+          { id: hidden.id },
+          'admin',
+        ),
+      ),
+    ).toBe('SITE_CONSENT_REQUIRED');
+    expect((await honors()).map((h) => h.id)).not.toContain(hidden.id);
+
+    const shown = (await save({})).data!.saveSiteHonorStudent;
+    const onSite = (await honors()).find((h) => h.id === shown.id);
+    // First name and the last name's initial only ("student E2E Site" → "student E.")
+    expect(onSite?.name).toBe('student E.');
+
+    // Reorder needs every honor student once
+    expect(
+      code(
+        await gql(
+          `mutation($ids: [String!]!) { reorderSiteHonorStudents(ids: $ids) { id } }`,
+          { ids: [shown.id] },
+          'admin',
+        ),
+      ),
+    ).toBe('BAD_REQUEST');
   });
 });

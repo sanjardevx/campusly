@@ -1,8 +1,11 @@
 import { ParseUUIDPipe } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
   EnquiryList,
   EnquiryRow,
+  SiteHonorStudentAdmin,
+  SiteMockTestAdmin,
+  SiteOpenCourseAdmin,
   SitePersonAdmin,
   SitePostAdmin,
   SiteProgramAdmin,
@@ -10,6 +13,9 @@ import {
 } from '../../libs/dto/site/site';
 import {
   EnquiriesInput,
+  SaveSiteHonorStudentInput,
+  SaveSiteMockTestInput,
+  SaveSiteOpenCourseInput,
   SaveSitePersonInput,
   SaveSitePostInput,
   SaveSiteProgramInput,
@@ -20,6 +26,9 @@ import { Role } from '../../libs/enums/user.enum';
 import type { AuthUser } from '../../libs/types/auth';
 import { CurrentUser, Roles } from '../auth/decorators/auth.decorators';
 import { EnquiryService } from './enquiry.service';
+import { SiteHonorService } from './site-honor.service';
+import { SiteMockTestService } from './site-mock-test.service';
+import { SiteOpenCourseService } from './site-open-course.service';
 import { SitePersonService } from './site-person.service';
 import { SitePostService } from './site-post.service';
 import { SiteProgramService } from './site-program.service';
@@ -35,6 +44,9 @@ export class SiteAdminResolver {
     private readonly posts: SitePostService,
     private readonly programs: SiteProgramService,
     private readonly people: SitePersonService,
+    private readonly mockTests: SiteMockTestService,
+    private readonly openCourses: SiteOpenCourseService,
+    private readonly honors: SiteHonorService,
     private readonly enquiries: EnquiryService,
     private readonly translator: SiteTranslateService,
   ) {}
@@ -140,6 +152,119 @@ export class SiteAdminResolver {
     @Id() id: string,
   ): Promise<SitePersonAdmin> {
     return this.people.archive(admin, id);
+  }
+
+  // ─────────────── Mock tests ───────────────
+
+  @Query(() => [SiteMockTestAdmin])
+  public adminSiteMockTests(): Promise<SiteMockTestAdmin[]> {
+    return this.mockTests.list();
+  }
+
+  @Mutation(() => SiteMockTestAdmin)
+  public saveSiteMockTest(
+    @CurrentUser() admin: AuthUser,
+    @Args('input') input: SaveSiteMockTestInput,
+  ): Promise<SiteMockTestAdmin> {
+    return this.mockTests.save(admin, input);
+  }
+
+  @Mutation(() => SiteMockTestAdmin)
+  public setSiteMockTestSeats(
+    @CurrentUser() admin: AuthUser,
+    @Id() id: string,
+    @Args('takenSeats', { type: () => Int }) takenSeats: number,
+  ): Promise<SiteMockTestAdmin> {
+    return this.mockTests.setTakenSeats(admin, id, takenSeats);
+  }
+
+  @Mutation(() => SiteMockTestAdmin)
+  public setSiteMockTestVisible(
+    @CurrentUser() admin: AuthUser,
+    @Id() id: string,
+    @Args('showOnSite', { type: () => Boolean }) showOnSite: boolean,
+  ): Promise<SiteMockTestAdmin> {
+    return this.mockTests.setVisible(admin, id, showOnSite);
+  }
+
+  @Mutation(() => SiteMockTestAdmin)
+  public archiveSiteMockTest(
+    @CurrentUser() admin: AuthUser,
+    @Id() id: string,
+  ): Promise<SiteMockTestAdmin> {
+    return this.mockTests.archive(admin, id);
+  }
+
+  // ─────────────── Open Courses ───────────────
+
+  @Query(() => [SiteOpenCourseAdmin])
+  public adminSiteOpenCourses(): Promise<SiteOpenCourseAdmin[]> {
+    return this.openCourses.list();
+  }
+
+  @Mutation(() => SiteOpenCourseAdmin)
+  public saveSiteOpenCourse(
+    @CurrentUser() admin: AuthUser,
+    @Args('input') input: SaveSiteOpenCourseInput,
+  ): Promise<SiteOpenCourseAdmin> {
+    return this.openCourses.save(admin, input);
+  }
+
+  @Mutation(() => SiteOpenCourseAdmin)
+  public setSiteOpenCoursePublished(
+    @CurrentUser() admin: AuthUser,
+    @Id() id: string,
+    @Args('published', { type: () => Boolean }) published: boolean,
+  ): Promise<SiteOpenCourseAdmin> {
+    return this.openCourses.setPublished(admin, id, published);
+  }
+
+  @Mutation(() => SiteOpenCourseAdmin)
+  public archiveSiteOpenCourse(
+    @CurrentUser() admin: AuthUser,
+    @Id() id: string,
+  ): Promise<SiteOpenCourseAdmin> {
+    return this.openCourses.archive(admin, id);
+  }
+
+  // ─────────────── Honor Students ───────────────
+
+  @Query(() => [SiteHonorStudentAdmin])
+  public adminSiteHonorStudents(): Promise<SiteHonorStudentAdmin[]> {
+    return this.honors.list();
+  }
+
+  @Mutation(() => SiteHonorStudentAdmin)
+  public saveSiteHonorStudent(
+    @CurrentUser() admin: AuthUser,
+    @Args('input') input: SaveSiteHonorStudentInput,
+  ): Promise<SiteHonorStudentAdmin> {
+    return this.honors.save(admin, input);
+  }
+
+  @Mutation(() => SiteHonorStudentAdmin)
+  public setSiteHonorStudentVisible(
+    @CurrentUser() admin: AuthUser,
+    @Id() id: string,
+    @Args('showOnSite', { type: () => Boolean }) showOnSite: boolean,
+  ): Promise<SiteHonorStudentAdmin> {
+    return this.honors.setVisible(admin, id, showOnSite);
+  }
+
+  @Mutation(() => [SiteHonorStudentAdmin])
+  public reorderSiteHonorStudents(
+    @CurrentUser() admin: AuthUser,
+    @Args('ids', { type: () => [String] }) ids: string[],
+  ): Promise<SiteHonorStudentAdmin[]> {
+    return this.honors.reorder(admin, ids);
+  }
+
+  @Mutation(() => SiteHonorStudentAdmin)
+  public archiveSiteHonorStudent(
+    @CurrentUser() admin: AuthUser,
+    @Id() id: string,
+  ): Promise<SiteHonorStudentAdmin> {
+    return this.honors.archive(admin, id);
   }
 
   // ─────────────── Enquiries ───────────────

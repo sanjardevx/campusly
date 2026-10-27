@@ -864,6 +864,9 @@ type Mutation {
   addSubmissionComment(input: AddSubmissionCommentInput!): Submission!
   archiveAnnouncement(id: String!): Announcement!
   archiveSchoolEvent(id: String!): SchoolEvent!
+  archiveSiteHonorStudent(id: String!): SiteHonorStudentAdmin!
+  archiveSiteMockTest(id: String!): SiteMockTestAdmin!
+  archiveSiteOpenCourse(id: String!): SiteOpenCourseAdmin!
   archiveSitePerson(id: String!): SitePersonAdmin!
   archiveSitePost(id: String!): SitePostAdmin!
   archiveSiteProgram(id: String!): SiteProgramAdmin!
@@ -906,11 +909,15 @@ type Mutation {
   publishPeriodGrades(input: PublishPeriodGradesInput!): [PeriodGradeRow!]!
   reorderLessons(input: ReorderInput!): Module!
   reorderModules(input: ReorderInput!): [Module!]!
+  reorderSiteHonorStudents(ids: [String!]!): [SiteHonorStudentAdmin!]!
   reorderSitePeople(ids: [String!]!): [SitePersonAdmin!]!
   reorderSitePrograms(ids: [String!]!): [SiteProgramAdmin!]!
   resetPassword(userId: String!): LoginSlip!
   returnSubmission(input: ReturnSubmissionInput!): Submission!
   saveQuizAnswer(input: SaveQuizAnswerInput!): Boolean!
+  saveSiteHonorStudent(input: SaveSiteHonorStudentInput!): SiteHonorStudentAdmin!
+  saveSiteMockTest(input: SaveSiteMockTestInput!): SiteMockTestAdmin!
+  saveSiteOpenCourse(input: SaveSiteOpenCourseInput!): SiteOpenCourseAdmin!
   saveSitePerson(input: SaveSitePersonInput!): SitePersonAdmin!
   saveSitePost(input: SaveSitePostInput!): SitePostAdmin!
   saveSiteProgram(input: SaveSiteProgramInput!): SiteProgramAdmin!
@@ -923,6 +930,10 @@ type Mutation {
   setLessonVideo(input: SetLessonVideoInput!): Lesson!
   setPeriodFinalScore(input: SetPeriodFinalScoreInput!): PeriodGradeRow!
   setQuizQuestions(input: SetQuizQuestionsInput!): QuizEditor!
+  setSiteHonorStudentVisible(id: String!, showOnSite: Boolean!): SiteHonorStudentAdmin!
+  setSiteMockTestSeats(id: String!, takenSeats: Int!): SiteMockTestAdmin!
+  setSiteMockTestVisible(id: String!, showOnSite: Boolean!): SiteMockTestAdmin!
+  setSiteOpenCoursePublished(id: String!, published: Boolean!): SiteOpenCourseAdmin!
   setSitePersonVisible(id: String!, showOnSite: Boolean!): SitePersonAdmin!
   setSiteProgramVisible(id: String!, showOnSite: Boolean!): SiteProgramAdmin!
   startQuiz(assignmentId: String!): MyQuiz!
@@ -1129,6 +1140,9 @@ type Query {
   academicYears: [AcademicYear!]!
   adminDashboard: AdminDashboard!
   adminEnquiries(input: EnquiriesInput!): EnquiryList!
+  adminSiteHonorStudents: [SiteHonorStudentAdmin!]!
+  adminSiteMockTests: [SiteMockTestAdmin!]!
+  adminSiteOpenCourses: [SiteOpenCourseAdmin!]!
   adminSitePeople: [SitePersonAdmin!]!
   adminSitePosts: [SitePostAdmin!]!
   adminSitePrograms: [SiteProgramAdmin!]!
@@ -1300,6 +1314,48 @@ input SaveQuizAnswerInput {
   questionId: String!
 }
 
+input SaveSiteHonorStudentInput {
+  achievedOn: String!
+  competition: LocalizedTextInput!
+  id: String
+  parentConsent: Boolean!
+  photoAssetId: String
+  place: Int
+  removePhoto: Boolean
+  resultType: SiteHonorResult!
+  score: String
+  showOnSite: Boolean!
+  studentId: String!
+  subject: LocalizedTextInput!
+}
+
+input SaveSiteMockTestInput {
+  contactPersonId: String
+  contactPhone: String
+  durationMin: Int!
+  exam: SiteMockExam!
+  examDate: String!
+  id: String
+  included: LocalizedTextInput!
+  location: LocalizedTextInput!
+  price: Int!
+  showOnSite: Boolean!
+  startTime: String!
+  takenSeats: Int!
+  title: LocalizedTextInput!
+  totalSeats: Int!
+}
+
+input SaveSiteOpenCourseInput {
+  category: SiteCourseCategory!
+  description: LocalizedTextInput
+  id: String
+  lessons: [SiteOpenLessonInput!]!
+  publish: Boolean!
+  source: String
+  title: LocalizedTextInput!
+}
+
 input SaveSitePersonInput {
   firstName: String!
   id: String
@@ -1438,13 +1494,65 @@ type SiteContact {
   youtubeUrl: String
 }
 
+enum SiteCourseCategory {
+  AI
+  IT
+  MATH
+  STUDY_ABROAD
+}
+
 type SiteHome {
   contact: SiteContact!
   director: SitePersonPublic
+  honorStudents: [SiteHonorPublic!]!
+  mockTests: [SiteMockTestPublic!]!
+  openCourses: [SiteOpenCoursePublic!]!
   posts: [SitePostPublic!]!
   programs: [SiteProgramPublic!]!
   stats: SiteStats!
   team: [SitePersonPublic!]!
+}
+
+type SiteHonorPublic {
+  achievedOn: String!
+  className: String
+  competition: String!
+  id: String!
+  name: String!
+  photoUrl: String
+  place: Int
+  resultType: SiteHonorResult!
+  score: String
+  subject: String!
+}
+
+enum SiteHonorResult {
+  EXAM_SCORE
+  MEDAL
+}
+
+type SiteHonorStudentAdmin {
+  achievedOn: String!
+  className: String
+  competition: LocalizedText!
+  createdAt: DateTime!
+  id: String!
+  order: Int!
+  parentConsent: Boolean!
+  photoUrl: String
+  place: Int
+  resultType: SiteHonorResult!
+  score: String
+  showOnSite: Boolean!
+  student: SiteHonorStudentRef!
+  subject: LocalizedText!
+}
+
+type SiteHonorStudentRef {
+  firstName: String!
+  id: String!
+  lastName: String!
+  loginId: String!
 }
 
 enum SiteLocale {
@@ -1452,6 +1560,82 @@ enum SiteLocale {
   ko
   ru
   uz
+}
+
+enum SiteMockExam {
+  IELTS
+  OTHER
+  SAT
+  TOPIK
+}
+
+type SiteMockTestAdmin {
+  contactPerson: SiteTeacherRef
+  contactPhone: String
+  durationMin: Int!
+  exam: SiteMockExam!
+  examDate: String!
+  id: String!
+  included: LocalizedText!
+  isPast: Boolean!
+  location: LocalizedText!
+  price: Int!
+  showOnSite: Boolean!
+  startTime: String!
+  takenSeats: Int!
+  title: LocalizedText!
+  totalSeats: Int!
+  updatedAt: DateTime!
+}
+
+type SiteMockTestPublic {
+  contactName: String
+  contactPhone: String
+  contactRole: String
+  date: String!
+  durationMin: Int!
+  exam: SiteMockExam!
+  id: String!
+  included: String!
+  location: String!
+  price: Int!
+  seatsLeft: Int!
+  startTime: String!
+  title: String!
+}
+
+type SiteOpenCourseAdmin {
+  category: SiteCourseCategory!
+  description: LocalizedText
+  id: String!
+  lessons: [SiteOpenLesson!]!
+  source: String
+  status: SitePostStatus!
+  title: LocalizedText!
+  totalDurationSec: Int!
+  updatedAt: DateTime!
+}
+
+type SiteOpenCoursePublic {
+  category: SiteCourseCategory!
+  description: String
+  id: String!
+  lessons: [SiteOpenLesson!]!
+  source: String
+  title: String!
+  totalDurationSec: Int!
+}
+
+type SiteOpenLesson {
+  durationSec: Int
+  title: String!
+  youtubeId: String!
+}
+
+input SiteOpenLessonInput {
+  duration: String
+  title: String!
+  youtubeUrl: String!
 }
 
 type SitePersonAdmin {

@@ -3,16 +3,19 @@ import { PrismaService } from '../../database/prisma.service';
 import { SITE_CAROUSEL_MAX } from '../../libs/config';
 import type { SiteHome, SitePersonPublic } from '../../libs/dto/site/site';
 import type { SiteLocale } from '../../libs/enums/site.enum';
-import { fromDbDate } from '../../libs/utils/date';
+import { fromDbDate, toDbDate, todayInZone } from '../../libs/utils/date';
 import { SiteImages } from './site-images';
-import { inLocale } from './site-text';
+import { inLocale, shortName } from './site-text';
 
-/** The home page grid shows this many programs */
+/** The home page shows at most this many of each */
 const HOME_PROGRAMS = 6;
+const HOME_MOCK_TESTS = 6;
+const HOME_OPEN_COURSES = 8;
+const HOME_HONORS = 12;
 
 /**
  * The public home page in one query (@Public): numbers, the News & Events slider, Programs &
- * clubs, Our team and the school contact. Only published, not archived content, in the
+ * clubs, Our team, mock tests, open courses, honor students and the school contact. Only published, not archived content, in the
  * visitor's language (missing translations fall back to English). The Next.js page calls it
  * when it rebuilds (ISR), not on every visit.
  */
@@ -56,6 +59,41 @@ export class SitePublicService {
         }),
         this.prismaService.schoolSetting.findUnique({ where: { id: 1 } }),
       ]);
+    // A mock test stays on the site until its day is over in the school timezone
+    const today = toDbDate(todayInZone(settings?.timezone ?? 'Asia/Tashkent'));
+    const [mockRows, courseRows, honorRows] = await Promise.all([
+      this.prismaService.siteMockTest.findMany({
+        where: { showOnSite: true, archivedAt: null, examDate: { gte: today } },
+        include: {
+          contactPerson: {
+            select: { firstName: true, lastName: true, role: true },
+          },
+        },
+        orderBy: [{ examDate: 'asc' }, { startTime: 'asc' }],
+        take: HOME_MOCK_TESTS,
+      }),
+      this.prismaService.siteOpenCourse.findMany({
+        where: {
+          status: 'PUBLISHED',
+          archivedAt: null,
+          lessons: { some: {} },
+        },
+        include: { lessons: { orderBy: { order: 'asc' } } },
+        orderBy: { order: 'asc' },
+        take: HOME_OPEN_COURSES,
+      }),
+      // Children only with the parents' consent, and never the full last name
+      this.prismaService.siteHonorStudent.findMany({
+        where: { showOnSite: true, parentConsent: true, archivedAt: null },
+        include: {
+          student: { select: { firstName: true, lastName: true } },
+          photo: { select: { s3Key: true } },
+        },
+        orderBy: { order: 'asc' },
+        take: HOME_HONORS,
+      }),
+    ]);
+
     // Nothing chosen for the slider: the latest three published posts
     const posts = carousel.length
       ? carousel
@@ -112,6 +150,56 @@ export class SitePublicService {
       })),
       director: director ? person(director) : null,
       team: people.filter((p) => !p.isDirector).map(person),
+      mockTests: mockRows.map((m) => ({
+        id: m.id,
+        exam: m.exam,
+        title: inLocale(m.title, locale) ?? '',
+        included: inLocale(m.included, locale) ?? '',
+        date: fromDbDate(m.examDate),
+        startTime: m.startTime,
+        durationMin: m.durationMin,
+        location: inLocale(m.location, locale) ?? '',
+        price: m.price,
+        seatsLeft: Math.max(0, m.totalSeats - m.takenSeats),
+        contactName: m.contactPerson
+          ? `${m.contactPerson.firstName} ${m.contactPerson.lastName}`
+          : null,
+        contactRole: m.contactPerson
+          ? inLocale(m.contactPerson.role, locale)
+          : null,
+        contactPhone: m.contactPhone ?? settings?.contactPhone ?? null,
+      })),
+      openCourses: courseRows.map((c) => {
+        const lessons = c.lessons.map((l) => ({
+          title: l.title,
+          youtubeId: l.youtubeId,
+          durationSec: l.durationSec,
+        }));
+        return {
+          id: c.id,
+          category: c.category,
+          title: inLocale(c.title, locale) ?? '',
+          source: c.source,
+          description: inLocale(c.description, locale),
+          lessons,
+          totalDurationSec: lessons.reduce(
+            (sum, l) => sum + (l.durationSec ?? 0),
+            0,
+          ),
+        };
+      }),
+      honorStudents: honorRows.map((h) => ({
+        id: h.id,
+        name: shortName(h.student)!,
+        className: h.className,
+        resultType: h.resultType,
+        place: h.place,
+        score: h.score,
+        subject: inLocale(h.subject, locale) ?? '',
+        competition: inLocale(h.competition, locale) ?? '',
+        achievedOn: fromDbDate(h.achievedOn),
+        photoUrl: this.images.url({ asset: h.photo, path: h.photoPath }),
+      })),
       contact: {
         schoolName: settings?.schoolName ?? 'Campusly School',
         phone: settings?.contactPhone ?? null,

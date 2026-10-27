@@ -90,6 +90,7 @@ model User {
   sitePostsUpdated      SitePost[]          @relation("SitePostsUpdated")
   siteProgramsUpdated   SiteProgram[]       @relation("SiteProgramsUpdated")
   enquiriesHandled      Enquiry[]           @relation("EnquiriesHandled")
+  siteHonors            SiteHonorStudent[]  @relation("SiteHonorStudent")
   submissionsGraded     Submission[]        @relation("SubmissionsGraded")
   submissionComments    SubmissionComment[] @relation("SubmissionComments")
   periodGrades          PeriodGrade[]       @relation("PeriodGrades")
@@ -598,6 +599,7 @@ model MediaAsset {
   sitePostCovers    SitePost[]         @relation("SitePostCover")
   siteProgramPhotos SiteProgram[]      @relation("SiteProgramPhoto")
   sitePersonPhotos  SitePerson[]       @relation("SitePersonPhoto")
+  siteHonorPhotos   SiteHonorStudent[] @relation("SiteHonorPhoto")
 
   @@index([ownerId])
   @@index([status, createdAt])
@@ -1262,10 +1264,137 @@ model SitePerson {
   createdAt    DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime  @updatedAt @db.Timestamptz(3)
 
-  photo MediaAsset? @relation("SitePersonPhoto", fields: [photoAssetId], references: [id])
+  photo     MediaAsset?    @relation("SitePersonPhoto", fields: [photoAssetId], references: [id])
+  mockTests SiteMockTest[]
 
   @@index([showOnSite, order])
   @@map("site_people")
+}
+
+enum SiteMockExam {
+  IELTS
+  TOPIK
+  SAT
+  OTHER
+}
+
+/// A paid practice exam open to students from any school (Stitch "Website: Mock tests"). People
+/// register by phone; the admin updates the taken seats after each call. The site hides a test
+/// the day after the exam.
+model SiteMockTest {
+  id              String       @id @default(uuid(7)) @db.Uuid
+  exam            SiteMockExam
+  title           Json
+  /// "Listening, Reading, Writing, 1-on-1 Speaking" (≤ 100)
+  included        Json
+  examDate        DateTime     @db.Date
+  /// School time, "09:00"
+  startTime       String
+  durationMin     Int
+  location        Json
+  /// UZS
+  price           Int
+  totalSeats      Int
+  takenSeats      Int          @default(0)
+  /// Who answers the phone: a person from "Our team"
+  contactPersonId String?      @db.Uuid
+  /// "Use a different phone"; empty = the school phone
+  contactPhone    String?
+  showOnSite      Boolean      @default(true)
+  archivedAt      DateTime?    @db.Timestamptz(3)
+  createdAt       DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(3)
+
+  contactPerson SitePerson? @relation(fields: [contactPersonId], references: [id])
+
+  @@index([showOnSite, examDate])
+  @@map("site_mock_tests")
+}
+
+enum SiteCourseCategory {
+  IT
+  MATH
+  AI
+  STUDY_ABROAD
+}
+
+/// A free video course from YouTube on the public site, no sign-up (Stitch "Website: Open Courses")
+model SiteOpenCourse {
+  id          String             @id @default(uuid(7)) @db.Uuid
+  category    SiteCourseCategory
+  title       Json
+  /// "Khan Academy", "freeCodeCamp" (optional)
+  source      String?
+  /// ≤ 200
+  description Json?
+  /// DRAFT or PUBLISHED ("Hide from site" = back to DRAFT); ARCHIVED instead of delete
+  status      SitePostStatus     @default(DRAFT)
+  order       Int
+  archivedAt  DateTime?          @db.Timestamptz(3)
+  createdAt   DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime           @updatedAt @db.Timestamptz(3)
+
+  lessons SiteOpenLesson[]
+
+  @@index([status, order])
+  @@map("site_open_courses")
+}
+
+/// One YouTube video of an open course; the drawer saves the whole list at once
+model SiteOpenLesson {
+  id          String @id @default(uuid(7)) @db.Uuid
+  courseId    String @db.Uuid
+  order       Int
+  /// The video's own title (videos keep their language)
+  title       String
+  youtubeId   String
+  durationSec Int?
+
+  course SiteOpenCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, order])
+  @@map("site_open_lessons")
+}
+
+enum SiteHonorResult {
+  /// 1st · Gold, 2nd · Silver, 3rd · Bronze
+  MEDAL
+  /// "IELTS 8.0", "SAT 1480"
+  EXAM_SCORE
+}
+
+/// A student's achievement on the public site (Stitch "Website: Honor Students"). The name comes
+/// from the student's profile; the site shows it only with the parents' consent, and only the
+/// first name and the last name's initial.
+model SiteHonorStudent {
+  id            String          @id @default(uuid(7)) @db.Uuid
+  studentId     String          @db.Uuid
+  /// The class when it was won ("9B"): students change class every year
+  className     String?
+  resultType    SiteHonorResult
+  /// MEDAL: 1, 2 or 3
+  place         Int?
+  /// EXAM_SCORE: "IELTS 8.0"
+  score         String?
+  /// "Mathematics", "Boxing"
+  subject       Json
+  /// "Tashkent City Math Olympiad"
+  competition   Json
+  achievedOn    DateTime        @db.Date
+  photoAssetId  String?         @db.Uuid
+  photoPath     String?
+  parentConsent Boolean         @default(false)
+  showOnSite    Boolean         @default(false)
+  order         Int
+  archivedAt    DateTime?       @db.Timestamptz(3)
+  createdAt     DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime        @updatedAt @db.Timestamptz(3)
+
+  student User        @relation("SiteHonorStudent", fields: [studentId], references: [id])
+  photo   MediaAsset? @relation("SiteHonorPhoto", fields: [photoAssetId], references: [id])
+
+  @@index([showOnSite, order])
+  @@map("site_honor_students")
 }
 
 enum EnquiryStatus {

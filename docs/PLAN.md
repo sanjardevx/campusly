@@ -283,7 +283,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [x] Admin CMS pages: list + drawer, publish / archive (no hard delete, audited).
 - [x] Public pages from Stitch "Campusly Public": home, news, programs, team, contact form.
 - [x] Enquiry form: rate limit, admin inbox.
-- [ ] Deploy.
+- [x] Deploy (site content arrives with the nightly demo reset, 03:00 Tashkent).
 
 ---
 

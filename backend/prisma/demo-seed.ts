@@ -1260,6 +1260,11 @@ export async function seedDemo(client: SeedClient, options: SeedDemoOptions) {
   await seedAssignments(courses, users);
   await seedAttendance(courses, users);
   await seedAnnouncements(courses, users);
-  await seedSite(prisma, { adminId: users.adminId, day, tashkent });
+  await seedSite(prisma, {
+    adminId: users.adminId,
+    day,
+    tashkent,
+    students: users.students,
+  });
   return { shiftedWeeks: shiftMs / (7 * DAY_MS) };
 }
