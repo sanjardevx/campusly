@@ -1,22 +1,34 @@
 import { useState } from 'react';
+import Image from 'next/image';
 import { Box, ButtonBase, Collapse, Link, Stack, Typography } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import DirectionsCarOutlinedIcon from '@mui/icons-material/DirectionsCarOutlined';
 import DevicesOutlinedIcon from '@mui/icons-material/DevicesOutlined';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import MedicalServicesOutlinedIcon from '@mui/icons-material/MedicalServicesOutlined';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import PlayCircleFilledRoundedIcon from '@mui/icons-material/PlayCircleFilledRounded';
 import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
+import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import SportsSoccerOutlinedIcon from '@mui/icons-material/SportsSoccerOutlined';
+import SubwayOutlinedIcon from '@mui/icons-material/SubwayOutlined';
+import TerminalOutlinedIcon from '@mui/icons-material/TerminalOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { useReducedMotion } from '@/libs/components/dashboard/motion';
 import { SITE, type SiteData, containerSx, eyebrowSx, scrollToId, sectionTitleSx } from './tokens';
 
+/** A lighter green than the brand spruce for the icon tiles and the photo panel (the developer's reference) */
 const iconTile = (size: number, radius: string) => ({
   width: size,
   height: size,
@@ -78,6 +90,73 @@ export function SiteWhy() {
             )}
           </Box>
         ))}
+      </Box>
+    </Box>
+  );
+}
+
+// ───────────────────────── Facilities (day 20) ─────────────────────────
+
+/** A lighter green than the brand spruce for the facility tiles and the photo panel (the developer's reference) */
+const FRESH = { from: '#4FA383', to: '#2F7A63' } as const;
+
+const FEATURES_LEFT: { key: string; icon: SvgIconComponent }[] = [
+  { key: 'tech', icon: ExtensionOutlinedIcon },
+  { key: 'sports', icon: SportsSoccerOutlinedIcon },
+  { key: 'reading', icon: MenuBookOutlinedIcon },
+  { key: 'clubs', icon: TerminalOutlinedIcon },
+  { key: 'safe', icon: VerifiedUserOutlinedIcon },
+];
+const FEATURES_RIGHT: { key: string; icon: SvgIconComponent }[] = [
+  { key: 'parking', icon: DirectionsCarOutlinedIcon },
+  { key: 'meals', icon: RestaurantOutlinedIcon },
+  { key: 'medical', icon: MedicalServicesOutlinedIcon },
+  { key: 'metro', icon: SubwayOutlinedIcon },
+  { key: 'campus', icon: AccountBalanceOutlinedIcon },
+];
+
+/** Soft "play" triangles on the photo panel, like the reference's pattern */
+const TRIANGLES = `url("data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><path d="M0 0L60 60L0 120Z" fill="#fff" fill-opacity="0.09"/><path d="M60 0L120 60L60 120Z" fill="#fff" fill-opacity="0.05"/></svg>',
+)}")`;
+
+/**
+ * "Campusly School facilities" (the developer's reference: Jahon School's "imkoniyatlari"): five
+ * cards, a green panel with a student whose head rises above it, five cards. The photo is a
+ * Stitch-made lookalike of the reference pose (no other school's logo), its background cut out
+ * with macOS Vision, so the panel's pattern shows around the student.
+ * Phones show the photo first, then one column of cards.
+ */
+export function SiteFeatures() {
+  const { t } = useTranslation('site');
+  const card = ({ key, icon: Icon }: { key: string; icon: SvgIconComponent }) => (
+    <Stack key={key} direction="row" sx={{ alignItems: 'center', gap: 2.5, p: { xs: 2, md: 2.5 }, borderRadius: '20px', bgcolor: '#F6F7F6', border: '1px solid #EEF0EE', minHeight: { md: 104 } }}>
+      <Box sx={{ ...iconTile(56, '16px'), background: `linear-gradient(145deg, ${FRESH.from}, ${FRESH.to})`, boxShadow: '0 8px 16px -8px rgba(47,122,99,0.55), inset 0 1px 0 rgba(255,255,255,0.25)' }}>
+        <Icon />
+      </Box>
+      <Typography sx={{ fontSize: { xs: '1rem', md: '1.0625rem' }, fontWeight: 500, color: SITE.heading, lineHeight: 1.45 }}>{t(`features.${key}`)}</Typography>
+    </Stack>
+  );
+  return (
+    <Box component="section" id="facilities" aria-labelledby="facilities-title" sx={{ ...containerSx, py: { xs: 8, md: 10 } }}>
+      <Box sx={{ textAlign: 'center', maxWidth: 640, mx: 'auto', mb: { xs: 9, md: 8 } }}>
+        <Typography component="h2" id="facilities-title" sx={{ ...sectionTitleSx, fontWeight: 800, fontSize: { xs: '1.875rem', md: '2.75rem' }, color: SITE.ink }}>
+          {t('features.title')}
+        </Typography>
+        <Typography sx={{ color: SITE.stone500, fontSize: '1.125rem', mt: 1.5 }}>{t('features.subtitle')}</Typography>
+      </Box>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 280px 1fr', lg: '1fr 330px 1fr' }, gap: { xs: 2, md: 3 }, alignItems: 'stretch' }}>
+        <Box sx={{ order: { xs: 1, md: 0 }, display: 'grid', gap: 2, alignContent: 'space-between' }}>{FEATURES_LEFT.map(card)}</Box>
+        <Box sx={{ order: { xs: 0, md: 0 }, position: 'relative', mt: { xs: 6, md: 10 }, minHeight: { xs: 400, md: 0 }, width: { xs: '100%', sm: 360, md: 'auto' }, mx: { xs: 'auto', md: 0 } }}>
+          <Box aria-hidden sx={{ position: 'absolute', inset: 0, borderRadius: '32px', backgroundColor: FRESH.to, backgroundImage: `${TRIANGLES}, linear-gradient(160deg, #66BC98, ${FRESH.from} 40%, ${FRESH.to})`, backgroundSize: '120px 120px, cover' }} />
+          {/* Clips the sides and the rounded bottom, but not the top: the head rises above the panel */}
+          <Box sx={{ position: 'absolute', inset: 0, clipPath: 'inset(-140px 0 0 0 round 0 0 32px 32px)' }}>
+            <Box sx={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', height: 'calc(100% + 80px)', aspectRatio: '610 / 1121' }}>
+              <Image src="/site/features-student.png" alt={t('features.photoAlt')} fill sizes="(max-width: 900px) 300px, 340px" style={{ objectFit: 'contain', objectPosition: 'bottom' }} />
+            </Box>
+          </Box>
+        </Box>
+        <Box sx={{ order: { xs: 2, md: 0 }, display: 'grid', gap: 2, alignContent: 'space-between' }}>{FEATURES_RIGHT.map(card)}</Box>
       </Box>
     </Box>
   );

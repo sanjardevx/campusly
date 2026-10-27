@@ -185,6 +185,21 @@
     "instagram": "Instagram",
     "youtube": "YouTube"
   },
+  "features": {
+    "title": "Campusly School imkoniyatlari",
+    "subtitle": "Farzandingiz yaxshi o‘qishi va o‘zini uyidagidek his qilishi uchun hammasi bitta kampusda.",
+    "tech": "To‘liq texnologik maktab: o‘z portalimiz, AI yordamchi ustoz va LMS",
+    "sports": "Ochiq va yopiq sport majmuasi",
+    "reading": "Kitobxonlikka qiziqtiruvchi mutolaa darslari va kutubxona",
+    "clubs": "Har bir sinf uchun IT, sport va san’at to‘garaklari",
+    "safe": "Yopiq, qo‘riqlanadigan va xavfsiz hudud",
+    "parking": "Avtomobillar uchun alohida kirish-chiqish yo‘lagi",
+    "meals": "Kuniga to‘rt mahal yangi va muvozanatli ovqat",
+    "medical": "Hamshirali tibbiyot xonasi va maktab psixologi",
+    "metro": "Qulay joylashuv: Chilonzor metrosidan 5 daqiqa",
+    "campus": "1,5 gektardan ortiq hududdagi keng va shinam maktab",
+    "photoAlt": "Maktab formasidagi Campusly o‘quvchisi"
+  },
   "mock": {
     "eyebrow": "Hamma uchun ochiq",
     "title": "Sinov imtihonlari",

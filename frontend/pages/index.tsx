@@ -9,7 +9,7 @@ import { SiteFooter } from '@/libs/components/site/SiteFooter';
 import { SiteHero } from '@/libs/components/site/SiteHero';
 import { SiteNews } from '@/libs/components/site/SiteNews';
 import { SiteHonorStudents, SiteMockTests, SiteOpenCourses } from '@/libs/components/site/SiteOpenSections';
-import { SiteAdmission, SiteFaq, SitePrograms, SiteStages, SiteTeam, SiteWhy } from '@/libs/components/site/SiteSections';
+import { SiteAdmission, SiteFaq, SiteFeatures, SitePrograms, SiteStages, SiteTeam, SiteWhy } from '@/libs/components/site/SiteSections';
 import { SITE, type SiteData } from '@/libs/components/site/tokens';
 import { API_GRAPHQL_URL } from '@/libs/config';
 import type { SiteHomeQuery, SiteLocale } from '@/libs/gql/graphql';
@@ -77,6 +77,7 @@ export default function SiteHome({ site }: { site: SiteData }) {
         <Box component="main">
           <SiteNews posts={site.posts} />
           <SiteWhy />
+          <SiteFeatures />
           <SitePrograms programs={site.programs} />
           <SiteMockTests tests={site.mockTests} />
           <SiteOpenCourses courses={site.openCourses} />

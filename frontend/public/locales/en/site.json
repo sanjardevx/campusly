@@ -185,6 +185,21 @@
     "instagram": "Instagram",
     "youtube": "YouTube"
   },
+  "features": {
+    "title": "Campusly School facilities",
+    "subtitle": "Everything your child needs to learn well and feel at home, on one campus.",
+    "tech": "A technology school: our own portal, an AI study tutor and the LMS",
+    "sports": "Indoor and outdoor sports complex",
+    "reading": "Reading lessons and a library that makes children love books",
+    "clubs": "IT, sport and art clubs for every grade",
+    "safe": "A closed, guarded and safe campus",
+    "parking": "A separate lane for dropping off and picking up by car",
+    "meals": "Fresh, balanced meals four times a day",
+    "medical": "A medical room with a nurse and a school psychologist",
+    "metro": "Easy to reach: 5 minutes from Chilanzar metro",
+    "campus": "A spacious campus on more than 1.5 hectares",
+    "photoAlt": "A Campusly student in the school uniform"
+  },
   "mock": {
     "eyebrow": "Open to everyone",
     "title": "Mock tests",
