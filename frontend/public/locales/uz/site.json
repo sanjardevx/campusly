@@ -7,7 +7,17 @@
     "portal": "Campusly portali",
     "signIn": "Kirish",
     "enquire": "Ariza qoldirish",
-    "enquireShort": "Ariza"
+    "enquireShort": "Ariza",
+    "home": "Sahifa boshiga",
+    "sections": "Bo‘limlar",
+    "menu": "Menyu",
+    "close": "Yopish",
+    "programs": "Dasturlar",
+    "mockTests": "Sinov imtihonlari",
+    "courses": "Kurslar",
+    "team": "Jamoa",
+    "admission": "Qabul",
+    "faq": "Savollar"
   },
   "hero": {
     "pill": "Toshkent · 1–11-sinflar",

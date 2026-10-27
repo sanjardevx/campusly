@@ -7,7 +7,17 @@
     "portal": "Campusly 포털",
     "signIn": "로그인",
     "enquire": "입학 문의",
-    "enquireShort": "문의"
+    "enquireShort": "문의",
+    "home": "맨 위로",
+    "sections": "섹션",
+    "menu": "메뉴",
+    "close": "닫기",
+    "programs": "프로그램",
+    "mockTests": "모의시험",
+    "courses": "강좌",
+    "team": "팀",
+    "admission": "입학",
+    "faq": "자주 묻는 질문"
   },
   "hero": {
     "pill": "타슈켄트 · 1–11학년",

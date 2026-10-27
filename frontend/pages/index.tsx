@@ -7,6 +7,7 @@ import { SITE_HOME } from '@/apollo/site/query';
 import { SiteEnquiry } from '@/libs/components/site/SiteEnquiry';
 import { SiteFooter } from '@/libs/components/site/SiteFooter';
 import { SiteHero } from '@/libs/components/site/SiteHero';
+import { type NavSection, SiteNavbar } from '@/libs/components/site/SiteNavbar';
 import { SiteNews } from '@/libs/components/site/SiteNews';
 import { SiteHonorStudents, SiteMockTests, SiteOpenCourses } from '@/libs/components/site/SiteOpenSections';
 import { SmoothScroll } from '@/libs/components/site/motion';
@@ -64,6 +65,17 @@ export const getStaticProps: GetStaticProps<{ site: SiteData }> = async (ctx) =>
  */
 export default function SiteHome({ site }: { site: SiteData }) {
   const { t } = useTranslation('site');
+  // The top bar links only to sections that have content (CMS lists can be empty)
+  const sections: NavSection[] = [
+    { id: 'programs', label: t('nav.programs'), on: site.programs.length > 0 },
+    { id: 'mock-tests', label: t('nav.mockTests'), on: site.mockTests.length > 0 },
+    { id: 'open-courses', label: t('nav.courses'), on: site.openCourses.length > 0 },
+    { id: 'team', label: t('nav.team'), on: !!site.director || site.team.length > 0 },
+    { id: 'admissions', label: t('nav.admission'), on: true },
+    { id: 'faq', label: t('nav.faq'), on: true },
+  ]
+    .filter((s) => s.on)
+    .map(({ id, label }) => ({ id, label }));
   return (
     <>
       <Head>
@@ -74,6 +86,7 @@ export default function SiteHome({ site }: { site: SiteData }) {
         <meta property="og:image" content="/site/hero-campus.jpg" />
       </Head>
       <SmoothScroll />
+      <SiteNavbar sections={sections} />
       <Box sx={{ bgcolor: SITE.canvas, color: SITE.text, minHeight: '100vh' }}>
         <SiteHero stats={site.stats} />
         <Box component="main">

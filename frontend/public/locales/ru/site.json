@@ -7,7 +7,17 @@
     "portal": "Портал Campusly",
     "signIn": "Войти",
     "enquire": "Оставить заявку",
-    "enquireShort": "Заявка"
+    "enquireShort": "Заявка",
+    "home": "Наверх",
+    "sections": "Разделы",
+    "menu": "Меню",
+    "close": "Закрыть",
+    "programs": "Программы",
+    "mockTests": "Пробные экзамены",
+    "courses": "Курсы",
+    "team": "Команда",
+    "admission": "Поступление",
+    "faq": "Вопросы"
   },
   "hero": {
     "pill": "Ташкент · 1–11 классы",

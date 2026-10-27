@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
 import NextLink from 'next/link';
 import { Box, Button, ButtonBase, IconButton, Stack, Typography } from '@mui/material';
-import LoginRoundedIcon from '@mui/icons-material/LoginRounded';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
-import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import { useTranslation } from 'next-i18next/pages';
-import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
 import { useReducedMotion } from '@/libs/components/dashboard/motion';
 import { CountUp, Typewriter } from './motion';
 import { SITE, type SiteData, containerSx, scrollToId } from './tokens';
@@ -75,27 +72,6 @@ export function SiteHero({ stats }: { stats: SiteData['stats'] }) {
         ))}
         {/* Spruce scrim, dark on the left where the text is */}
         <Box sx={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: { xs: 'linear-gradient(to top, rgba(31,78,67,0.95), rgba(31,78,67,0.75) 55%, rgba(31,78,67,0.35))', md: 'linear-gradient(to right, rgba(31,78,67,0.95), rgba(31,78,67,0.85) 50%, transparent)' } }} />
-
-        {/* Transparent top bar */}
-        <Stack component="header" direction="row" sx={{ position: 'absolute', top: 0, insetInline: 0, zIndex: 2, px: { xs: 2, sm: 4, lg: 8 }, py: { xs: 2, md: 3 }, alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-          <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, color: '#fff' }}>
-            <SchoolOutlinedIcon sx={{ fontSize: { xs: 26, md: 30 } }} />
-            <Typography sx={{ fontSize: { xs: '1.0625rem', md: '1.25rem' }, fontWeight: 700, letterSpacing: '-0.025em', color: '#fff' }}>Campusly School</Typography>
-          </Stack>
-          <Stack direction="row" sx={{ alignItems: 'center', gap: { xs: 1, md: 2 } }}>
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-              <LanguageSwitcher tone="light" />
-            </Box>
-            <Button component={NextLink} href="/portal" variant="outlined" startIcon={<LoginRoundedIcon sx={{ fontSize: 18 }} />} sx={{ ...outlineBtn, px: { xs: 1.5, md: 2.5 }, py: { xs: 0.75, md: 1.25 }, fontSize: '0.875rem' }}>
-              <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>{t('nav.portal')}</Box>
-              <Box component="span" sx={{ display: { xs: 'inline', md: 'none' } }}>{t('nav.signIn')}</Box>
-            </Button>
-            <Button onClick={() => scrollToId('enquire')} variant="contained" disableElevation sx={{ ...solidBtn, px: { xs: 1.5, md: 2.5 }, py: { xs: 0.75, md: 1.25 }, fontSize: '0.875rem' }}>
-              <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>{t('nav.enquire')}</Box>
-              <Box component="span" sx={{ display: { xs: 'inline', md: 'none' } }}>{t('nav.enquireShort')}</Box>
-            </Button>
-          </Stack>
-        </Stack>
 
         {/* Hero text */}
         <Box sx={{ position: 'relative', zIndex: 2, maxWidth: 672, pt: { xs: 18, lg: 20 }, pb: { xs: 3, md: 14 }, px: { xs: 2, sm: 4, lg: 8 }, mt: { xs: 'auto', md: 0 } }}>

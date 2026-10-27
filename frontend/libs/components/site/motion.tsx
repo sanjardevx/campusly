@@ -20,15 +20,19 @@ const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia(R
 // ───────────────────────── smooth scroll ─────────────────────────
 
 let lenis: Lenis | null = null;
+/** Room for the fixed top bar (SiteNavbar) above a section we scroll to */
+const BAR_OFFSET = -88;
 
 /** Scroll to a section: through Lenis when it runs (one smooth motion), natively otherwise */
 export function scrollToElement(el: HTMLElement) {
-  if (lenis) lenis.scrollTo(el, { offset: -16 });
-  else
-    el.scrollIntoView({
-      behavior: reducedMotion() ? 'auto' : 'smooth',
-      block: 'start',
-    });
+  if (lenis) lenis.scrollTo(el, { offset: BAR_OFFSET });
+  else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + BAR_OFFSET, behavior: reducedMotion() ? 'auto' : 'smooth' });
+}
+
+/** Back to the top of the page (the logo in the top bar) */
+export function scrollToTop() {
+  if (lenis) lenis.scrollTo(0);
+  else window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
 }
 
 /**
@@ -40,7 +44,7 @@ export function SmoothScroll() {
     if (reducedMotion()) return;
     lenis = new Lenis({
       autoRaf: true,
-      anchors: true,
+      anchors: { offset: BAR_OFFSET },
       lerp: 0.1,
       prevent: (node) => !!node.closest('.MuiModal-root, .MuiPopover-root, .MuiMenu-root'),
     });

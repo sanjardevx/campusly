@@ -7,7 +7,17 @@
     "portal": "Campusly Portal",
     "signIn": "Sign in",
     "enquire": "Enquire now",
-    "enquireShort": "Enquire"
+    "enquireShort": "Enquire",
+    "home": "Back to the top",
+    "sections": "Sections",
+    "menu": "Menu",
+    "close": "Close",
+    "programs": "Programs",
+    "mockTests": "Mock tests",
+    "courses": "Courses",
+    "team": "Team",
+    "admission": "Admission",
+    "faq": "FAQ"
   },
   "hero": {
     "pill": "Tashkent · Grades 1–11",
