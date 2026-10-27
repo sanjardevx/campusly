@@ -414,6 +414,125 @@ export const ADMIN_ENQUIRIES = graphql(`
   }
 `);
 
+/** Stitch "Website: Mock tests": upcoming first, then past ones */
+export const ADMIN_SITE_MOCK_TESTS = graphql(`
+  query AdminSiteMockTests {
+    adminSiteMockTests {
+      id
+      exam
+      title {
+        en
+        uz
+        ru
+        ko
+      }
+      included {
+        en
+        uz
+        ru
+        ko
+      }
+      examDate
+      startTime
+      durationMin
+      location {
+        en
+        uz
+        ru
+        ko
+      }
+      price
+      totalSeats
+      takenSeats
+      contactPerson {
+        id
+        name
+        role {
+          en
+        }
+      }
+      contactPhone
+      showOnSite
+      isPast
+      updatedAt
+    }
+  }
+`);
+
+/** Stitch "Website: Open Courses": each course with its lessons, in order */
+export const ADMIN_SITE_OPEN_COURSES = graphql(`
+  query AdminSiteOpenCourses {
+    adminSiteOpenCourses {
+      id
+      category
+      title {
+        en
+        uz
+        ru
+        ko
+      }
+      source
+      description {
+        en
+        uz
+        ru
+        ko
+      }
+      status
+      lessons {
+        title
+        youtubeId
+        durationSec
+      }
+      totalDurationSec
+      updatedAt
+    }
+  }
+`);
+
+/** Stitch "Website: Honor Students": the admin's order */
+export const ADMIN_SITE_HONOR_STUDENTS = graphql(`
+  query AdminSiteHonorStudents {
+    adminSiteHonorStudents {
+      id
+      student {
+        id
+        firstName
+        lastName
+        loginId
+      }
+      className
+      resultType
+      place
+      score
+      subject {
+        en
+        uz
+        ru
+        ko
+      }
+      competition {
+        en
+        uz
+        ru
+        ko
+      }
+      location {
+        en
+        uz
+        ru
+        ko
+      }
+      achievedOn
+      photoUrl
+      parentConsent
+      showOnSite
+      order
+      createdAt
+    }
+  }
+`);
+
 export const SITE_TRANSLATE_AVAILABLE = graphql(`
   query SiteTranslateAvailable {
     siteTranslateAvailable

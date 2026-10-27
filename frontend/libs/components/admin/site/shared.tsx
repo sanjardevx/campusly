@@ -213,7 +213,7 @@ export function ImagePicker({
   value: ImageValue;
   onChange: (value: ImageValue) => void;
   hint: string;
-  shape?: 'wide' | 'card' | 'round';
+  shape?: 'wide' | 'card' | 'portrait' | 'round';
   label: string;
 }) {
   const { t } = useTranslation('admin');
@@ -239,7 +239,7 @@ export function ImagePicker({
   };
 
   const busy = !!phase;
-  const box = shape === 'round' ? { width: 96, height: 96, borderRadius: '50%' } : { width: '100%', aspectRatio: shape === 'wide' ? '16 / 9' : '4 / 3', borderRadius: 2 };
+  const box = shape === 'round' ? { width: 96, height: 96, borderRadius: '50%' } : { width: '100%', aspectRatio: shape === 'wide' ? '16 / 9' : shape === 'portrait' ? '3 / 4' : '4 / 3', borderRadius: 2 };
 
   return (
     <Box>
@@ -299,6 +299,7 @@ const TONES = {
   green: { bg: '#E8EFEA', fg: '#1F4E43', dot: '#2E7D5B' },
   amber: { bg: '#FEF3E2', fg: '#9A4A00', dot: '#D97706' },
   grey: { bg: '#F1F1EF', fg: '#57534E', dot: '#A8A29E' },
+  red: { bg: '#FDECEC', fg: '#B42318', dot: '#D92D20' },
 } as const;
 
 export function StatusPill({ tone, children }: { tone: keyof typeof TONES; children: ReactNode }) {
@@ -308,6 +309,25 @@ export function StatusPill({ tone, children }: { tone: keyof typeof TONES; child
       <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: c.dot }} />
       {children}
     </Box>
+  );
+}
+
+/** Stitch's underlined list tabs with a count: "Upcoming 3 · Past 12 · All 15" */
+export function UnderlineTabs<K extends string>({ tabs, value, onChange, label }: { tabs: { key: K; label: string; count: number }[]; value: K; onChange: (key: K) => void; label: string }) {
+  return (
+    <Stack direction="row" role="tablist" aria-label={label} sx={{ gap: 3, borderBottom: 1, borderColor: 'divider', flex: 1, minWidth: 0, overflowX: 'auto' }}>
+      {tabs.map((tab) => {
+        const on = tab.key === value;
+        return (
+          <ButtonBase key={tab.key} role="tab" aria-selected={on} onClick={() => onChange(tab.key)} sx={{ py: 1.25, gap: 1, fontSize: '0.875rem', fontWeight: 600, whiteSpace: 'nowrap', color: on ? 'text.primary' : 'text.secondary', borderBottom: 2, borderColor: on ? 'primary.main' : 'transparent', mb: '-1px' }}>
+            {tab.label}
+            <Box component="span" sx={{ px: 0.75, borderRadius: 1, fontSize: '0.75rem', bgcolor: on ? 'rgba(31,78,67,0.08)' : 'action.hover', color: on ? 'primary.main' : 'text.secondary' }}>
+              {tab.count}
+            </Box>
+          </ButtonBase>
+        );
+      })}
+    </Stack>
   );
 }
 

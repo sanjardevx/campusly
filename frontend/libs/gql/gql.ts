@@ -49,6 +49,17 @@ type Documents = {
     "\n  mutation SetSitePersonVisible($id: String!, $showOnSite: Boolean!) {\n    setSitePersonVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n": typeof types.SetSitePersonVisibleDocument,
     "\n  mutation ReorderSitePeople($ids: [String!]!) {\n    reorderSitePeople(ids: $ids) {\n      id\n      order\n    }\n  }\n": typeof types.ReorderSitePeopleDocument,
     "\n  mutation ArchiveSitePerson($id: String!) {\n    archiveSitePerson(id: $id) {\n      id\n    }\n  }\n": typeof types.ArchiveSitePersonDocument,
+    "\n  mutation SaveSiteMockTest($input: SaveSiteMockTestInput!) {\n    saveSiteMockTest(input: $input) {\n      id\n    }\n  }\n": typeof types.SaveSiteMockTestDocument,
+    "\n  mutation SetSiteMockTestSeats($id: String!, $takenSeats: Int!) {\n    setSiteMockTestSeats(id: $id, takenSeats: $takenSeats) {\n      id\n      takenSeats\n    }\n  }\n": typeof types.SetSiteMockTestSeatsDocument,
+    "\n  mutation SetSiteMockTestVisible($id: String!, $showOnSite: Boolean!) {\n    setSiteMockTestVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n": typeof types.SetSiteMockTestVisibleDocument,
+    "\n  mutation ArchiveSiteMockTest($id: String!) {\n    archiveSiteMockTest(id: $id) {\n      id\n    }\n  }\n": typeof types.ArchiveSiteMockTestDocument,
+    "\n  mutation SaveSiteOpenCourse($input: SaveSiteOpenCourseInput!) {\n    saveSiteOpenCourse(input: $input) {\n      id\n    }\n  }\n": typeof types.SaveSiteOpenCourseDocument,
+    "\n  mutation SetSiteOpenCoursePublished($id: String!, $published: Boolean!) {\n    setSiteOpenCoursePublished(id: $id, published: $published) {\n      id\n      status\n    }\n  }\n": typeof types.SetSiteOpenCoursePublishedDocument,
+    "\n  mutation ArchiveSiteOpenCourse($id: String!) {\n    archiveSiteOpenCourse(id: $id) {\n      id\n    }\n  }\n": typeof types.ArchiveSiteOpenCourseDocument,
+    "\n  mutation SaveSiteHonorStudent($input: SaveSiteHonorStudentInput!) {\n    saveSiteHonorStudent(input: $input) {\n      id\n    }\n  }\n": typeof types.SaveSiteHonorStudentDocument,
+    "\n  mutation SetSiteHonorStudentVisible($id: String!, $showOnSite: Boolean!) {\n    setSiteHonorStudentVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n": typeof types.SetSiteHonorStudentVisibleDocument,
+    "\n  mutation ReorderSiteHonorStudents($ids: [String!]!) {\n    reorderSiteHonorStudents(ids: $ids) {\n      id\n      order\n    }\n  }\n": typeof types.ReorderSiteHonorStudentsDocument,
+    "\n  mutation ArchiveSiteHonorStudent($id: String!) {\n    archiveSiteHonorStudent(id: $id) {\n      id\n    }\n  }\n": typeof types.ArchiveSiteHonorStudentDocument,
     "\n  mutation SetEnquiryStatus($id: String!, $status: EnquiryStatus!) {\n    setEnquiryStatus(id: $id, status: $status) {\n      id\n      status\n      handledBy\n      handledAt\n    }\n  }\n": typeof types.SetEnquiryStatusDocument,
     "\n  mutation TranslateSiteText($input: TranslateSiteTextInput!) {\n    translateSiteText(input: $input) {\n      uz\n      ru\n      ko\n    }\n  }\n": typeof types.TranslateSiteTextDocument,
     "\n  mutation CreateSiteUpload($input: UploadFileInput!) {\n    createSiteUpload(input: $input) {\n      assetId\n      uploadUrl\n    }\n  }\n": typeof types.CreateSiteUploadDocument,
@@ -71,6 +82,9 @@ type Documents = {
     "\n  query AdminSitePrograms {\n    adminSitePrograms {\n      id\n      category\n      name { en uz ru ko }\n      gradeFrom\n      gradeTo\n      levelNote { en uz ru ko }\n      days\n      startTime\n      endTime\n      room\n      teachers {\n        id\n        name\n        role { en uz ru ko }\n      }\n      description { en uz ru ko }\n      photoUrl\n      videoUrl\n      showOnSite\n      order\n      editedBy\n      updatedAt\n    }\n  }\n": typeof types.AdminSiteProgramsDocument,
     "\n  query AdminSitePeople {\n    adminSitePeople {\n      id\n      firstName\n      lastName\n      role { en uz ru ko }\n      note { en uz ru ko }\n      isDirector\n      photoUrl\n      showOnSite\n      order\n    }\n  }\n": typeof types.AdminSitePeopleDocument,
     "\n  query AdminEnquiries($input: EnquiriesInput!) {\n    adminEnquiries(input: $input) {\n      new\n      inProgress\n      resolved\n      items {\n        id\n        parentName\n        phone\n        childGrade\n        interest\n        locale\n        userAgent\n        status\n        handledBy\n        handledAt\n        createdAt\n      }\n    }\n  }\n": typeof types.AdminEnquiriesDocument,
+    "\n  query AdminSiteMockTests {\n    adminSiteMockTests {\n      id\n      exam\n      title {\n        en\n        uz\n        ru\n        ko\n      }\n      included {\n        en\n        uz\n        ru\n        ko\n      }\n      examDate\n      startTime\n      durationMin\n      location {\n        en\n        uz\n        ru\n        ko\n      }\n      price\n      totalSeats\n      takenSeats\n      contactPerson {\n        id\n        name\n        role {\n          en\n        }\n      }\n      contactPhone\n      showOnSite\n      isPast\n      updatedAt\n    }\n  }\n": typeof types.AdminSiteMockTestsDocument,
+    "\n  query AdminSiteOpenCourses {\n    adminSiteOpenCourses {\n      id\n      category\n      title {\n        en\n        uz\n        ru\n        ko\n      }\n      source\n      description {\n        en\n        uz\n        ru\n        ko\n      }\n      status\n      lessons {\n        title\n        youtubeId\n        durationSec\n      }\n      totalDurationSec\n      updatedAt\n    }\n  }\n": typeof types.AdminSiteOpenCoursesDocument,
+    "\n  query AdminSiteHonorStudents {\n    adminSiteHonorStudents {\n      id\n      student {\n        id\n        firstName\n        lastName\n        loginId\n      }\n      className\n      resultType\n      place\n      score\n      subject {\n        en\n        uz\n        ru\n        ko\n      }\n      competition {\n        en\n        uz\n        ru\n        ko\n      }\n      location {\n        en\n        uz\n        ru\n        ko\n      }\n      achievedOn\n      photoUrl\n      parentConsent\n      showOnSite\n      order\n      createdAt\n    }\n  }\n": typeof types.AdminSiteHonorStudentsDocument,
     "\n  query SiteTranslateAvailable {\n    siteTranslateAvailable\n  }\n": typeof types.SiteTranslateAvailableDocument,
     "\n  query Health {\n    health {\n      status\n      postgres\n      redis\n    }\n  }\n": typeof types.HealthDocument,
     "\n  query CurrentYear {\n    currentAcademicYear {\n      id\n      name\n    }\n  }\n": typeof types.CurrentYearDocument,
@@ -194,6 +208,17 @@ const documents: Documents = {
     "\n  mutation SetSitePersonVisible($id: String!, $showOnSite: Boolean!) {\n    setSitePersonVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n": types.SetSitePersonVisibleDocument,
     "\n  mutation ReorderSitePeople($ids: [String!]!) {\n    reorderSitePeople(ids: $ids) {\n      id\n      order\n    }\n  }\n": types.ReorderSitePeopleDocument,
     "\n  mutation ArchiveSitePerson($id: String!) {\n    archiveSitePerson(id: $id) {\n      id\n    }\n  }\n": types.ArchiveSitePersonDocument,
+    "\n  mutation SaveSiteMockTest($input: SaveSiteMockTestInput!) {\n    saveSiteMockTest(input: $input) {\n      id\n    }\n  }\n": types.SaveSiteMockTestDocument,
+    "\n  mutation SetSiteMockTestSeats($id: String!, $takenSeats: Int!) {\n    setSiteMockTestSeats(id: $id, takenSeats: $takenSeats) {\n      id\n      takenSeats\n    }\n  }\n": types.SetSiteMockTestSeatsDocument,
+    "\n  mutation SetSiteMockTestVisible($id: String!, $showOnSite: Boolean!) {\n    setSiteMockTestVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n": types.SetSiteMockTestVisibleDocument,
+    "\n  mutation ArchiveSiteMockTest($id: String!) {\n    archiveSiteMockTest(id: $id) {\n      id\n    }\n  }\n": types.ArchiveSiteMockTestDocument,
+    "\n  mutation SaveSiteOpenCourse($input: SaveSiteOpenCourseInput!) {\n    saveSiteOpenCourse(input: $input) {\n      id\n    }\n  }\n": types.SaveSiteOpenCourseDocument,
+    "\n  mutation SetSiteOpenCoursePublished($id: String!, $published: Boolean!) {\n    setSiteOpenCoursePublished(id: $id, published: $published) {\n      id\n      status\n    }\n  }\n": types.SetSiteOpenCoursePublishedDocument,
+    "\n  mutation ArchiveSiteOpenCourse($id: String!) {\n    archiveSiteOpenCourse(id: $id) {\n      id\n    }\n  }\n": types.ArchiveSiteOpenCourseDocument,
+    "\n  mutation SaveSiteHonorStudent($input: SaveSiteHonorStudentInput!) {\n    saveSiteHonorStudent(input: $input) {\n      id\n    }\n  }\n": types.SaveSiteHonorStudentDocument,
+    "\n  mutation SetSiteHonorStudentVisible($id: String!, $showOnSite: Boolean!) {\n    setSiteHonorStudentVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n": types.SetSiteHonorStudentVisibleDocument,
+    "\n  mutation ReorderSiteHonorStudents($ids: [String!]!) {\n    reorderSiteHonorStudents(ids: $ids) {\n      id\n      order\n    }\n  }\n": types.ReorderSiteHonorStudentsDocument,
+    "\n  mutation ArchiveSiteHonorStudent($id: String!) {\n    archiveSiteHonorStudent(id: $id) {\n      id\n    }\n  }\n": types.ArchiveSiteHonorStudentDocument,
     "\n  mutation SetEnquiryStatus($id: String!, $status: EnquiryStatus!) {\n    setEnquiryStatus(id: $id, status: $status) {\n      id\n      status\n      handledBy\n      handledAt\n    }\n  }\n": types.SetEnquiryStatusDocument,
     "\n  mutation TranslateSiteText($input: TranslateSiteTextInput!) {\n    translateSiteText(input: $input) {\n      uz\n      ru\n      ko\n    }\n  }\n": types.TranslateSiteTextDocument,
     "\n  mutation CreateSiteUpload($input: UploadFileInput!) {\n    createSiteUpload(input: $input) {\n      assetId\n      uploadUrl\n    }\n  }\n": types.CreateSiteUploadDocument,
@@ -216,6 +241,9 @@ const documents: Documents = {
     "\n  query AdminSitePrograms {\n    adminSitePrograms {\n      id\n      category\n      name { en uz ru ko }\n      gradeFrom\n      gradeTo\n      levelNote { en uz ru ko }\n      days\n      startTime\n      endTime\n      room\n      teachers {\n        id\n        name\n        role { en uz ru ko }\n      }\n      description { en uz ru ko }\n      photoUrl\n      videoUrl\n      showOnSite\n      order\n      editedBy\n      updatedAt\n    }\n  }\n": types.AdminSiteProgramsDocument,
     "\n  query AdminSitePeople {\n    adminSitePeople {\n      id\n      firstName\n      lastName\n      role { en uz ru ko }\n      note { en uz ru ko }\n      isDirector\n      photoUrl\n      showOnSite\n      order\n    }\n  }\n": types.AdminSitePeopleDocument,
     "\n  query AdminEnquiries($input: EnquiriesInput!) {\n    adminEnquiries(input: $input) {\n      new\n      inProgress\n      resolved\n      items {\n        id\n        parentName\n        phone\n        childGrade\n        interest\n        locale\n        userAgent\n        status\n        handledBy\n        handledAt\n        createdAt\n      }\n    }\n  }\n": types.AdminEnquiriesDocument,
+    "\n  query AdminSiteMockTests {\n    adminSiteMockTests {\n      id\n      exam\n      title {\n        en\n        uz\n        ru\n        ko\n      }\n      included {\n        en\n        uz\n        ru\n        ko\n      }\n      examDate\n      startTime\n      durationMin\n      location {\n        en\n        uz\n        ru\n        ko\n      }\n      price\n      totalSeats\n      takenSeats\n      contactPerson {\n        id\n        name\n        role {\n          en\n        }\n      }\n      contactPhone\n      showOnSite\n      isPast\n      updatedAt\n    }\n  }\n": types.AdminSiteMockTestsDocument,
+    "\n  query AdminSiteOpenCourses {\n    adminSiteOpenCourses {\n      id\n      category\n      title {\n        en\n        uz\n        ru\n        ko\n      }\n      source\n      description {\n        en\n        uz\n        ru\n        ko\n      }\n      status\n      lessons {\n        title\n        youtubeId\n        durationSec\n      }\n      totalDurationSec\n      updatedAt\n    }\n  }\n": types.AdminSiteOpenCoursesDocument,
+    "\n  query AdminSiteHonorStudents {\n    adminSiteHonorStudents {\n      id\n      student {\n        id\n        firstName\n        lastName\n        loginId\n      }\n      className\n      resultType\n      place\n      score\n      subject {\n        en\n        uz\n        ru\n        ko\n      }\n      competition {\n        en\n        uz\n        ru\n        ko\n      }\n      location {\n        en\n        uz\n        ru\n        ko\n      }\n      achievedOn\n      photoUrl\n      parentConsent\n      showOnSite\n      order\n      createdAt\n    }\n  }\n": types.AdminSiteHonorStudentsDocument,
     "\n  query SiteTranslateAvailable {\n    siteTranslateAvailable\n  }\n": types.SiteTranslateAvailableDocument,
     "\n  query Health {\n    health {\n      status\n      postgres\n      redis\n    }\n  }\n": types.HealthDocument,
     "\n  query CurrentYear {\n    currentAcademicYear {\n      id\n      name\n    }\n  }\n": types.CurrentYearDocument,
@@ -461,6 +489,50 @@ export function graphql(source: "\n  mutation ArchiveSitePerson($id: String!) {\
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation SaveSiteMockTest($input: SaveSiteMockTestInput!) {\n    saveSiteMockTest(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation SaveSiteMockTest($input: SaveSiteMockTestInput!) {\n    saveSiteMockTest(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetSiteMockTestSeats($id: String!, $takenSeats: Int!) {\n    setSiteMockTestSeats(id: $id, takenSeats: $takenSeats) {\n      id\n      takenSeats\n    }\n  }\n"): (typeof documents)["\n  mutation SetSiteMockTestSeats($id: String!, $takenSeats: Int!) {\n    setSiteMockTestSeats(id: $id, takenSeats: $takenSeats) {\n      id\n      takenSeats\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetSiteMockTestVisible($id: String!, $showOnSite: Boolean!) {\n    setSiteMockTestVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n"): (typeof documents)["\n  mutation SetSiteMockTestVisible($id: String!, $showOnSite: Boolean!) {\n    setSiteMockTestVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ArchiveSiteMockTest($id: String!) {\n    archiveSiteMockTest(id: $id) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation ArchiveSiteMockTest($id: String!) {\n    archiveSiteMockTest(id: $id) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SaveSiteOpenCourse($input: SaveSiteOpenCourseInput!) {\n    saveSiteOpenCourse(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation SaveSiteOpenCourse($input: SaveSiteOpenCourseInput!) {\n    saveSiteOpenCourse(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetSiteOpenCoursePublished($id: String!, $published: Boolean!) {\n    setSiteOpenCoursePublished(id: $id, published: $published) {\n      id\n      status\n    }\n  }\n"): (typeof documents)["\n  mutation SetSiteOpenCoursePublished($id: String!, $published: Boolean!) {\n    setSiteOpenCoursePublished(id: $id, published: $published) {\n      id\n      status\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ArchiveSiteOpenCourse($id: String!) {\n    archiveSiteOpenCourse(id: $id) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation ArchiveSiteOpenCourse($id: String!) {\n    archiveSiteOpenCourse(id: $id) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SaveSiteHonorStudent($input: SaveSiteHonorStudentInput!) {\n    saveSiteHonorStudent(input: $input) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation SaveSiteHonorStudent($input: SaveSiteHonorStudentInput!) {\n    saveSiteHonorStudent(input: $input) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SetSiteHonorStudentVisible($id: String!, $showOnSite: Boolean!) {\n    setSiteHonorStudentVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n"): (typeof documents)["\n  mutation SetSiteHonorStudentVisible($id: String!, $showOnSite: Boolean!) {\n    setSiteHonorStudentVisible(id: $id, showOnSite: $showOnSite) {\n      id\n      showOnSite\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ReorderSiteHonorStudents($ids: [String!]!) {\n    reorderSiteHonorStudents(ids: $ids) {\n      id\n      order\n    }\n  }\n"): (typeof documents)["\n  mutation ReorderSiteHonorStudents($ids: [String!]!) {\n    reorderSiteHonorStudents(ids: $ids) {\n      id\n      order\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ArchiveSiteHonorStudent($id: String!) {\n    archiveSiteHonorStudent(id: $id) {\n      id\n    }\n  }\n"): (typeof documents)["\n  mutation ArchiveSiteHonorStudent($id: String!) {\n    archiveSiteHonorStudent(id: $id) {\n      id\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation SetEnquiryStatus($id: String!, $status: EnquiryStatus!) {\n    setEnquiryStatus(id: $id, status: $status) {\n      id\n      status\n      handledBy\n      handledAt\n    }\n  }\n"): (typeof documents)["\n  mutation SetEnquiryStatus($id: String!, $status: EnquiryStatus!) {\n    setEnquiryStatus(id: $id, status: $status) {\n      id\n      status\n      handledBy\n      handledAt\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -546,6 +618,18 @@ export function graphql(source: "\n  query AdminSitePeople {\n    adminSitePeopl
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query AdminEnquiries($input: EnquiriesInput!) {\n    adminEnquiries(input: $input) {\n      new\n      inProgress\n      resolved\n      items {\n        id\n        parentName\n        phone\n        childGrade\n        interest\n        locale\n        userAgent\n        status\n        handledBy\n        handledAt\n        createdAt\n      }\n    }\n  }\n"): (typeof documents)["\n  query AdminEnquiries($input: EnquiriesInput!) {\n    adminEnquiries(input: $input) {\n      new\n      inProgress\n      resolved\n      items {\n        id\n        parentName\n        phone\n        childGrade\n        interest\n        locale\n        userAgent\n        status\n        handledBy\n        handledAt\n        createdAt\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AdminSiteMockTests {\n    adminSiteMockTests {\n      id\n      exam\n      title {\n        en\n        uz\n        ru\n        ko\n      }\n      included {\n        en\n        uz\n        ru\n        ko\n      }\n      examDate\n      startTime\n      durationMin\n      location {\n        en\n        uz\n        ru\n        ko\n      }\n      price\n      totalSeats\n      takenSeats\n      contactPerson {\n        id\n        name\n        role {\n          en\n        }\n      }\n      contactPhone\n      showOnSite\n      isPast\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query AdminSiteMockTests {\n    adminSiteMockTests {\n      id\n      exam\n      title {\n        en\n        uz\n        ru\n        ko\n      }\n      included {\n        en\n        uz\n        ru\n        ko\n      }\n      examDate\n      startTime\n      durationMin\n      location {\n        en\n        uz\n        ru\n        ko\n      }\n      price\n      totalSeats\n      takenSeats\n      contactPerson {\n        id\n        name\n        role {\n          en\n        }\n      }\n      contactPhone\n      showOnSite\n      isPast\n      updatedAt\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AdminSiteOpenCourses {\n    adminSiteOpenCourses {\n      id\n      category\n      title {\n        en\n        uz\n        ru\n        ko\n      }\n      source\n      description {\n        en\n        uz\n        ru\n        ko\n      }\n      status\n      lessons {\n        title\n        youtubeId\n        durationSec\n      }\n      totalDurationSec\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query AdminSiteOpenCourses {\n    adminSiteOpenCourses {\n      id\n      category\n      title {\n        en\n        uz\n        ru\n        ko\n      }\n      source\n      description {\n        en\n        uz\n        ru\n        ko\n      }\n      status\n      lessons {\n        title\n        youtubeId\n        durationSec\n      }\n      totalDurationSec\n      updatedAt\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AdminSiteHonorStudents {\n    adminSiteHonorStudents {\n      id\n      student {\n        id\n        firstName\n        lastName\n        loginId\n      }\n      className\n      resultType\n      place\n      score\n      subject {\n        en\n        uz\n        ru\n        ko\n      }\n      competition {\n        en\n        uz\n        ru\n        ko\n      }\n      location {\n        en\n        uz\n        ru\n        ko\n      }\n      achievedOn\n      photoUrl\n      parentConsent\n      showOnSite\n      order\n      createdAt\n    }\n  }\n"): (typeof documents)["\n  query AdminSiteHonorStudents {\n    adminSiteHonorStudents {\n      id\n      student {\n        id\n        firstName\n        lastName\n        loginId\n      }\n      className\n      resultType\n      place\n      score\n      subject {\n        en\n        uz\n        ru\n        ko\n      }\n      competition {\n        en\n        uz\n        ru\n        ko\n      }\n      location {\n        en\n        uz\n        ru\n        ko\n      }\n      achievedOn\n      photoUrl\n      parentConsent\n      showOnSite\n      order\n      createdAt\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

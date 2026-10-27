@@ -45,5 +45,6 @@
   "TUTOR_FAILED": "Tutor javob bera olmadi. Qaytadan urinib ko'ring — bu savol hisobga olinmadi.",
   "SITE_CAROUSEL_FULL": "Bosh sahifa slayderida allaqachon 5 ta xabar bor. Avval bittasini olib tashlang.",
   "SITE_IMAGE_INVALID": "Rasm to‘g‘ri yuklanmadi. Iltimos, qaytadan yuklang.",
-  "INVALID_PHONE": "O‘zbekiston mobil raqamini yozing, masalan 90 123 45 67."
+  "INVALID_PHONE": "O‘zbekiston mobil raqamini yozing, masalan 90 123 45 67.",
+  "SITE_CONSENT_REQUIRED": "Bola saytda faqat ota-ona roziligi bilan ko‘rsatiladi. Avval “Ota-ona rozi”ni yoqing."
 }

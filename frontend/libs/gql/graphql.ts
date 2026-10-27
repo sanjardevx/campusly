@@ -424,6 +424,49 @@ export type SaveQuizAnswerInput = {
   questionId: string;
 };
 
+export type SaveSiteHonorStudentInput = {
+  achievedOn: string;
+  competition: LocalizedTextInput;
+  id?: string | null | undefined;
+  location?: LocalizedTextInput | null | undefined;
+  parentConsent: boolean;
+  photoAssetId?: string | null | undefined;
+  place?: number | null | undefined;
+  removePhoto?: boolean | null | undefined;
+  resultType: SiteHonorResult;
+  score?: string | null | undefined;
+  showOnSite: boolean;
+  studentId: string;
+  subject: LocalizedTextInput;
+};
+
+export type SaveSiteMockTestInput = {
+  contactPersonId?: string | null | undefined;
+  contactPhone?: string | null | undefined;
+  durationMin: number;
+  exam: SiteMockExam;
+  examDate: string;
+  id?: string | null | undefined;
+  included: LocalizedTextInput;
+  location: LocalizedTextInput;
+  price: number;
+  showOnSite: boolean;
+  startTime: string;
+  takenSeats: number;
+  title: LocalizedTextInput;
+  totalSeats: number;
+};
+
+export type SaveSiteOpenCourseInput = {
+  category: SiteCourseCategory;
+  description?: LocalizedTextInput | null | undefined;
+  id?: string | null | undefined;
+  lessons: Array<SiteOpenLessonInput>;
+  publish: boolean;
+  source?: string | null | undefined;
+  title: LocalizedTextInput;
+};
+
 export type SaveSitePersonInput = {
   firstName: string;
   id?: string | null | undefined;
@@ -503,11 +546,33 @@ export type SetQuizQuestionsInput = {
   questions: Array<QuizQuestionInput>;
 };
 
+export type SiteCourseCategory =
+  | 'AI'
+  | 'IT'
+  | 'MATH'
+  | 'STUDY_ABROAD';
+
+export type SiteHonorResult =
+  | 'EXAM_SCORE'
+  | 'MEDAL';
+
 export type SiteLocale =
   | 'en'
   | 'ko'
   | 'ru'
   | 'uz';
+
+export type SiteMockExam =
+  | 'IELTS'
+  | 'OTHER'
+  | 'SAT'
+  | 'TOPIK';
+
+export type SiteOpenLessonInput = {
+  duration?: string | null | undefined;
+  title: string;
+  youtubeUrl: string;
+};
 
 export type SitePostStatus =
   | 'ARCHIVED'
@@ -950,6 +1015,87 @@ export type ArchiveSitePersonMutationVariables = Exact<{
 
 export type ArchiveSitePersonMutation = { archiveSitePerson: { id: string } };
 
+export type SaveSiteMockTestMutationVariables = Exact<{
+  input: SaveSiteMockTestInput;
+}>;
+
+
+export type SaveSiteMockTestMutation = { saveSiteMockTest: { id: string } };
+
+export type SetSiteMockTestSeatsMutationVariables = Exact<{
+  id: string;
+  takenSeats: number;
+}>;
+
+
+export type SetSiteMockTestSeatsMutation = { setSiteMockTestSeats: { id: string, takenSeats: number } };
+
+export type SetSiteMockTestVisibleMutationVariables = Exact<{
+  id: string;
+  showOnSite: boolean;
+}>;
+
+
+export type SetSiteMockTestVisibleMutation = { setSiteMockTestVisible: { id: string, showOnSite: boolean } };
+
+export type ArchiveSiteMockTestMutationVariables = Exact<{
+  id: string;
+}>;
+
+
+export type ArchiveSiteMockTestMutation = { archiveSiteMockTest: { id: string } };
+
+export type SaveSiteOpenCourseMutationVariables = Exact<{
+  input: SaveSiteOpenCourseInput;
+}>;
+
+
+export type SaveSiteOpenCourseMutation = { saveSiteOpenCourse: { id: string } };
+
+export type SetSiteOpenCoursePublishedMutationVariables = Exact<{
+  id: string;
+  published: boolean;
+}>;
+
+
+export type SetSiteOpenCoursePublishedMutation = { setSiteOpenCoursePublished: { id: string, status: SitePostStatus } };
+
+export type ArchiveSiteOpenCourseMutationVariables = Exact<{
+  id: string;
+}>;
+
+
+export type ArchiveSiteOpenCourseMutation = { archiveSiteOpenCourse: { id: string } };
+
+export type SaveSiteHonorStudentMutationVariables = Exact<{
+  input: SaveSiteHonorStudentInput;
+}>;
+
+
+export type SaveSiteHonorStudentMutation = { saveSiteHonorStudent: { id: string } };
+
+export type SetSiteHonorStudentVisibleMutationVariables = Exact<{
+  id: string;
+  showOnSite: boolean;
+}>;
+
+
+export type SetSiteHonorStudentVisibleMutation = { setSiteHonorStudentVisible: { id: string, showOnSite: boolean } };
+
+export type ReorderSiteHonorStudentsMutationVariables = Exact<{
+  ids: Array<string> | string;
+}>;
+
+
+export type ReorderSiteHonorStudentsMutation = { reorderSiteHonorStudents: Array<{ id: string, order: number }> };
+
+export type ArchiveSiteHonorStudentMutationVariables = Exact<{
+  id: string;
+}>;
+
+
+export type ArchiveSiteHonorStudentMutation = { archiveSiteHonorStudent: { id: string } };
+
 export type SetEnquiryStatusMutationVariables = Exact<{
   id: string;
   status: EnquiryStatus;
@@ -1091,6 +1237,21 @@ export type AdminEnquiriesQueryVariables = Exact<{
 
 
 export type AdminEnquiriesQuery = { adminEnquiries: { new: number, inProgress: number, resolved: number, items: Array<{ id: string, parentName: string, phone: string, childGrade: number | null, interest: string | null, locale: string, userAgent: string | null, status: EnquiryStatus, handledBy: string | null, handledAt: string | null, createdAt: string }> } };
+
+export type AdminSiteMockTestsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AdminSiteMockTestsQuery = { adminSiteMockTests: Array<{ id: string, exam: SiteMockExam, examDate: string, startTime: string, durationMin: number, price: number, totalSeats: number, takenSeats: number, contactPhone: string | null, showOnSite: boolean, isPast: boolean, updatedAt: string, title: { en: string, uz: string | null, ru: string | null, ko: string | null }, included: { en: string, uz: string | null, ru: string | null, ko: string | null }, location: { en: string, uz: string | null, ru: string | null, ko: string | null }, contactPerson: { id: string, name: string, role: { en: string } } | null }> };
+
+export type AdminSiteOpenCoursesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AdminSiteOpenCoursesQuery = { adminSiteOpenCourses: Array<{ id: string, category: SiteCourseCategory, source: string | null, status: SitePostStatus, totalDurationSec: number, updatedAt: string, title: { en: string, uz: string | null, ru: string | null, ko: string | null }, description: { en: string, uz: string | null, ru: string | null, ko: string | null } | null, lessons: Array<{ title: string, youtubeId: string, durationSec: number | null }> }> };
+
+export type AdminSiteHonorStudentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AdminSiteHonorStudentsQuery = { adminSiteHonorStudents: Array<{ id: string, className: string | null, resultType: SiteHonorResult, place: number | null, score: string | null, achievedOn: string, photoUrl: string | null, parentConsent: boolean, showOnSite: boolean, order: number, createdAt: string, student: { id: string, firstName: string, lastName: string, loginId: string }, subject: { en: string, uz: string | null, ru: string | null, ko: string | null }, competition: { en: string, uz: string | null, ru: string | null, ko: string | null }, location: { en: string, uz: string | null, ru: string | null, ko: string | null } | null }> };
 
 export type SiteTranslateAvailableQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1708,6 +1869,17 @@ export const SaveSitePersonDocument = {"kind":"Document","definitions":[{"kind":
 export const SetSitePersonVisibleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetSitePersonVisible"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"showOnSite"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setSitePersonVisible"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"showOnSite"},"value":{"kind":"Variable","name":{"kind":"Name","value":"showOnSite"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"showOnSite"}}]}}]}}]} as unknown as DocumentNode<SetSitePersonVisibleMutation, SetSitePersonVisibleMutationVariables>;
 export const ReorderSitePeopleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ReorderSitePeople"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reorderSitePeople"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"ids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}}]}}]} as unknown as DocumentNode<ReorderSitePeopleMutation, ReorderSitePeopleMutationVariables>;
 export const ArchiveSitePersonDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ArchiveSitePerson"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"archiveSitePerson"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ArchiveSitePersonMutation, ArchiveSitePersonMutationVariables>;
+export const SaveSiteMockTestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SaveSiteMockTest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SaveSiteMockTestInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"saveSiteMockTest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<SaveSiteMockTestMutation, SaveSiteMockTestMutationVariables>;
+export const SetSiteMockTestSeatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetSiteMockTestSeats"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"takenSeats"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setSiteMockTestSeats"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"takenSeats"},"value":{"kind":"Variable","name":{"kind":"Name","value":"takenSeats"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"takenSeats"}}]}}]}}]} as unknown as DocumentNode<SetSiteMockTestSeatsMutation, SetSiteMockTestSeatsMutationVariables>;
+export const SetSiteMockTestVisibleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetSiteMockTestVisible"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"showOnSite"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setSiteMockTestVisible"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"showOnSite"},"value":{"kind":"Variable","name":{"kind":"Name","value":"showOnSite"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"showOnSite"}}]}}]}}]} as unknown as DocumentNode<SetSiteMockTestVisibleMutation, SetSiteMockTestVisibleMutationVariables>;
+export const ArchiveSiteMockTestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ArchiveSiteMockTest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"archiveSiteMockTest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ArchiveSiteMockTestMutation, ArchiveSiteMockTestMutationVariables>;
+export const SaveSiteOpenCourseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SaveSiteOpenCourse"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SaveSiteOpenCourseInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"saveSiteOpenCourse"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<SaveSiteOpenCourseMutation, SaveSiteOpenCourseMutationVariables>;
+export const SetSiteOpenCoursePublishedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetSiteOpenCoursePublished"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"published"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setSiteOpenCoursePublished"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"published"},"value":{"kind":"Variable","name":{"kind":"Name","value":"published"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<SetSiteOpenCoursePublishedMutation, SetSiteOpenCoursePublishedMutationVariables>;
+export const ArchiveSiteOpenCourseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ArchiveSiteOpenCourse"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"archiveSiteOpenCourse"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ArchiveSiteOpenCourseMutation, ArchiveSiteOpenCourseMutationVariables>;
+export const SaveSiteHonorStudentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SaveSiteHonorStudent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SaveSiteHonorStudentInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"saveSiteHonorStudent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<SaveSiteHonorStudentMutation, SaveSiteHonorStudentMutationVariables>;
+export const SetSiteHonorStudentVisibleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetSiteHonorStudentVisible"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"showOnSite"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setSiteHonorStudentVisible"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"showOnSite"},"value":{"kind":"Variable","name":{"kind":"Name","value":"showOnSite"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"showOnSite"}}]}}]}}]} as unknown as DocumentNode<SetSiteHonorStudentVisibleMutation, SetSiteHonorStudentVisibleMutationVariables>;
+export const ReorderSiteHonorStudentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ReorderSiteHonorStudents"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reorderSiteHonorStudents"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"ids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}}]}}]} as unknown as DocumentNode<ReorderSiteHonorStudentsMutation, ReorderSiteHonorStudentsMutationVariables>;
+export const ArchiveSiteHonorStudentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ArchiveSiteHonorStudent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"archiveSiteHonorStudent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ArchiveSiteHonorStudentMutation, ArchiveSiteHonorStudentMutationVariables>;
 export const SetEnquiryStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetEnquiryStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"status"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EnquiryStatus"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setEnquiryStatus"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"status"},"value":{"kind":"Variable","name":{"kind":"Name","value":"status"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"handledBy"}},{"kind":"Field","name":{"kind":"Name","value":"handledAt"}}]}}]}}]} as unknown as DocumentNode<SetEnquiryStatusMutation, SetEnquiryStatusMutationVariables>;
 export const TranslateSiteTextDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"TranslateSiteText"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TranslateSiteTextInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"translateSiteText"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}}]}}]} as unknown as DocumentNode<TranslateSiteTextMutation, TranslateSiteTextMutationVariables>;
 export const CreateSiteUploadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateSiteUpload"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UploadFileInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createSiteUpload"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"assetId"}},{"kind":"Field","name":{"kind":"Name","value":"uploadUrl"}}]}}]}}]} as unknown as DocumentNode<CreateSiteUploadMutation, CreateSiteUploadMutationVariables>;
@@ -1730,6 +1902,9 @@ export const AdminSitePostsDocument = {"kind":"Document","definitions":[{"kind":
 export const AdminSiteProgramsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdminSitePrograms"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"adminSitePrograms"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"name"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"gradeFrom"}},{"kind":"Field","name":{"kind":"Name","value":"gradeTo"}},{"kind":"Field","name":{"kind":"Name","value":"levelNote"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"days"}},{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}},{"kind":"Field","name":{"kind":"Name","value":"room"}},{"kind":"Field","name":{"kind":"Name","value":"teachers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"role"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"description"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"photoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"videoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"showOnSite"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"editedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<AdminSiteProgramsQuery, AdminSiteProgramsQueryVariables>;
 export const AdminSitePeopleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdminSitePeople"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"adminSitePeople"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"role"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"note"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"isDirector"}},{"kind":"Field","name":{"kind":"Name","value":"photoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"showOnSite"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}}]}}]} as unknown as DocumentNode<AdminSitePeopleQuery, AdminSitePeopleQueryVariables>;
 export const AdminEnquiriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdminEnquiries"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EnquiriesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"adminEnquiries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"new"}},{"kind":"Field","name":{"kind":"Name","value":"inProgress"}},{"kind":"Field","name":{"kind":"Name","value":"resolved"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"parentName"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"childGrade"}},{"kind":"Field","name":{"kind":"Name","value":"interest"}},{"kind":"Field","name":{"kind":"Name","value":"locale"}},{"kind":"Field","name":{"kind":"Name","value":"userAgent"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"handledBy"}},{"kind":"Field","name":{"kind":"Name","value":"handledAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<AdminEnquiriesQuery, AdminEnquiriesQueryVariables>;
+export const AdminSiteMockTestsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdminSiteMockTests"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"adminSiteMockTests"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"exam"}},{"kind":"Field","name":{"kind":"Name","value":"title"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"included"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"examDate"}},{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"durationMin"}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"price"}},{"kind":"Field","name":{"kind":"Name","value":"totalSeats"}},{"kind":"Field","name":{"kind":"Name","value":"takenSeats"}},{"kind":"Field","name":{"kind":"Name","value":"contactPerson"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"role"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"contactPhone"}},{"kind":"Field","name":{"kind":"Name","value":"showOnSite"}},{"kind":"Field","name":{"kind":"Name","value":"isPast"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<AdminSiteMockTestsQuery, AdminSiteMockTestsQueryVariables>;
+export const AdminSiteOpenCoursesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdminSiteOpenCourses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"adminSiteOpenCourses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"title"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"source"}},{"kind":"Field","name":{"kind":"Name","value":"description"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"lessons"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"youtubeId"}},{"kind":"Field","name":{"kind":"Name","value":"durationSec"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalDurationSec"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<AdminSiteOpenCoursesQuery, AdminSiteOpenCoursesQueryVariables>;
+export const AdminSiteHonorStudentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdminSiteHonorStudents"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"adminSiteHonorStudents"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"student"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"loginId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"className"}},{"kind":"Field","name":{"kind":"Name","value":"resultType"}},{"kind":"Field","name":{"kind":"Name","value":"place"}},{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"subject"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"competition"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"location"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"en"}},{"kind":"Field","name":{"kind":"Name","value":"uz"}},{"kind":"Field","name":{"kind":"Name","value":"ru"}},{"kind":"Field","name":{"kind":"Name","value":"ko"}}]}},{"kind":"Field","name":{"kind":"Name","value":"achievedOn"}},{"kind":"Field","name":{"kind":"Name","value":"photoUrl"}},{"kind":"Field","name":{"kind":"Name","value":"parentConsent"}},{"kind":"Field","name":{"kind":"Name","value":"showOnSite"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<AdminSiteHonorStudentsQuery, AdminSiteHonorStudentsQueryVariables>;
 export const SiteTranslateAvailableDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SiteTranslateAvailable"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"siteTranslateAvailable"}}]}}]} as unknown as DocumentNode<SiteTranslateAvailableQuery, SiteTranslateAvailableQueryVariables>;
 export const HealthDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Health"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"health"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"postgres"}},{"kind":"Field","name":{"kind":"Name","value":"redis"}}]}}]}}]} as unknown as DocumentNode<HealthQuery, HealthQueryVariables>;
 export const CurrentYearDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CurrentYear"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"currentAcademicYear"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CurrentYearQuery, CurrentYearQueryVariables>;

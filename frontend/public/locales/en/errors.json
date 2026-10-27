@@ -45,5 +45,6 @@
   "TUTOR_FAILED": "The tutor couldn't answer. Please try again — this question was not counted.",
   "SITE_CAROUSEL_FULL": "The home page slider already has 5 posts. Take one out first.",
   "SITE_IMAGE_INVALID": "The picture did not upload correctly. Please upload it again.",
-  "INVALID_PHONE": "Please write an Uzbek mobile number, e.g. 90 123 45 67."
+  "INVALID_PHONE": "Please write an Uzbek mobile number, e.g. 90 123 45 67.",
+  "SITE_CONSENT_REQUIRED": "A child is shown on the website only with the parents’ consent. Turn on “Parents agreed” first."
 }

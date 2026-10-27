@@ -405,6 +405,101 @@ export const ARCHIVE_SITE_PERSON = graphql(`
   }
 `);
 
+export const SAVE_SITE_MOCK_TEST = graphql(`
+  mutation SaveSiteMockTest($input: SaveSiteMockTestInput!) {
+    saveSiteMockTest(input: $input) {
+      id
+    }
+  }
+`);
+
+/** "Seat registration" − / +: the number of people who registered by phone */
+export const SET_SITE_MOCK_TEST_SEATS = graphql(`
+  mutation SetSiteMockTestSeats($id: String!, $takenSeats: Int!) {
+    setSiteMockTestSeats(id: $id, takenSeats: $takenSeats) {
+      id
+      takenSeats
+    }
+  }
+`);
+
+export const SET_SITE_MOCK_TEST_VISIBLE = graphql(`
+  mutation SetSiteMockTestVisible($id: String!, $showOnSite: Boolean!) {
+    setSiteMockTestVisible(id: $id, showOnSite: $showOnSite) {
+      id
+      showOnSite
+    }
+  }
+`);
+
+export const ARCHIVE_SITE_MOCK_TEST = graphql(`
+  mutation ArchiveSiteMockTest($id: String!) {
+    archiveSiteMockTest(id: $id) {
+      id
+    }
+  }
+`);
+
+export const SAVE_SITE_OPEN_COURSE = graphql(`
+  mutation SaveSiteOpenCourse($input: SaveSiteOpenCourseInput!) {
+    saveSiteOpenCourse(input: $input) {
+      id
+    }
+  }
+`);
+
+/** "Hide from site" (back to draft) and the on-site switch */
+export const SET_SITE_OPEN_COURSE_PUBLISHED = graphql(`
+  mutation SetSiteOpenCoursePublished($id: String!, $published: Boolean!) {
+    setSiteOpenCoursePublished(id: $id, published: $published) {
+      id
+      status
+    }
+  }
+`);
+
+export const ARCHIVE_SITE_OPEN_COURSE = graphql(`
+  mutation ArchiveSiteOpenCourse($id: String!) {
+    archiveSiteOpenCourse(id: $id) {
+      id
+    }
+  }
+`);
+
+export const SAVE_SITE_HONOR_STUDENT = graphql(`
+  mutation SaveSiteHonorStudent($input: SaveSiteHonorStudentInput!) {
+    saveSiteHonorStudent(input: $input) {
+      id
+    }
+  }
+`);
+
+export const SET_SITE_HONOR_STUDENT_VISIBLE = graphql(`
+  mutation SetSiteHonorStudentVisible($id: String!, $showOnSite: Boolean!) {
+    setSiteHonorStudentVisible(id: $id, showOnSite: $showOnSite) {
+      id
+      showOnSite
+    }
+  }
+`);
+
+export const REORDER_SITE_HONOR_STUDENTS = graphql(`
+  mutation ReorderSiteHonorStudents($ids: [String!]!) {
+    reorderSiteHonorStudents(ids: $ids) {
+      id
+      order
+    }
+  }
+`);
+
+export const ARCHIVE_SITE_HONOR_STUDENT = graphql(`
+  mutation ArchiveSiteHonorStudent($id: String!) {
+    archiveSiteHonorStudent(id: $id) {
+      id
+    }
+  }
+`);
+
 export const SET_ENQUIRY_STATUS = graphql(`
   mutation SetEnquiryStatus($id: String!, $status: EnquiryStatus!) {
     setEnquiryStatus(id: $id, status: $status) {

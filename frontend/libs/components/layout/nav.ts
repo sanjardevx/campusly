@@ -87,16 +87,15 @@ export const NAV: Record<Role, NavSection[]> = {
         { key: 'records', href: '/_admin/records', icon: FolderOpenOutlinedIcon, day: 10 },
       ],
     },
-    // The public website CMS (day 19). Mock tests, Open Courses and Honor Students are in the
-    // backlog (DECISIONS §14): the menu matches Stitch, those pages say "later phase"
+    // The public website CMS (day 19; mock tests, open courses and honor students day 20)
     {
       title: 'website',
       items: [
         { key: 'news', href: '/_admin/news', icon: EventNoteOutlinedIcon, day: 19 },
         { key: 'programs', href: '/_admin/programs', icon: SchoolOutlinedIcon, day: 19 },
-        { key: 'mockTests', href: '/_admin/mock-tests', icon: QuizOutlinedIcon },
-        { key: 'openCourses', href: '/_admin/open-courses', icon: LibraryBooksOutlinedIcon },
-        { key: 'honorStudents', href: '/_admin/honor-students', icon: WorkspacePremiumOutlinedIcon },
+        { key: 'mockTests', href: '/_admin/mock-tests', icon: QuizOutlinedIcon, day: 20 },
+        { key: 'openCourses', href: '/_admin/open-courses', icon: LibraryBooksOutlinedIcon, day: 20 },
+        { key: 'honorStudents', href: '/_admin/honor-students', icon: WorkspacePremiumOutlinedIcon, day: 20 },
         { key: 'team', href: '/_admin/team', icon: BadgeOutlinedIcon, day: 19 },
         { key: 'enquiries', href: '/_admin/enquiries', icon: MarkEmailUnreadOutlinedIcon, day: 19 },
       ],
