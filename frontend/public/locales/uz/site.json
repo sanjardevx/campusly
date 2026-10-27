@@ -184,5 +184,45 @@
     "telegram": "Telegram",
     "instagram": "Instagram",
     "youtube": "YouTube"
+  },
+  "mock": {
+    "eyebrow": "Hamma uchun ochiq",
+    "title": "Sinov imtihonlari",
+    "subtitle": "IELTS, TOPIK va SAT bo‘yicha sinov imtihonlari — pullik, istalgan maktab o‘quvchilari uchun ochiq.",
+    "seatsLeft_one": "{{count}} ta o‘rin qoldi",
+    "seatsLeft_other": "{{count}} ta o‘rin qoldi",
+    "full": "O‘rin qolmadi",
+    "toJoin": "Yozilish uchun bog‘laning:",
+    "call": "Qo‘ng‘iroq: {{phone}}"
+  },
+  "courses": {
+    "eyebrow": "Bepul · Ro‘yxatdan o‘tishsiz",
+    "title": "Ochiq kurslar",
+    "subtitle": "freeCodeCamp, 3Blue1Brown va boshqalardan saralangan darslar — bugun kechqurunoq boshlang, akkaunt shart emas.",
+    "cat": {
+      "IT": "IT",
+      "MATH": "Matematika",
+      "AI": "Sun’iy intellekt",
+      "STUDY_ABROAD": "Xorijda o‘qish"
+    },
+    "lessons_one": "{{count}} ta dars",
+    "lessons_other": "{{count}} ta dars",
+    "source": "Manba: {{source}}",
+    "start": "O‘rganishni boshlash",
+    "close": "Yopish",
+    "onYoutube": "Videolar YouTube’da ochiladi"
+  },
+  "honor": {
+    "eyebrow": "O‘quvchilar yutuqlari",
+    "title": "Faxriy o‘quvchilar",
+    "seeAll": "Barcha faxriy o‘quvchilar",
+    "showLess": "Kamroq ko‘rsatish",
+    "place1": "1-o‘rin",
+    "place2": "2-o‘rin",
+    "place3": "3-o‘rin",
+    "placeLine": "{{place}} — {{competition}}",
+    "medal1": "Oltin medal",
+    "medal2": "Kumush medal",
+    "medal3": "Bronza medal"
   }
 }

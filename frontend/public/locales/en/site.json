@@ -184,5 +184,45 @@
     "telegram": "Telegram",
     "instagram": "Instagram",
     "youtube": "YouTube"
+  },
+  "mock": {
+    "eyebrow": "Open to everyone",
+    "title": "Mock tests",
+    "subtitle": "Practice exams for IELTS, TOPIK and SAT — paid, open to students from any school.",
+    "seatsLeft_one": "{{count}} seat left",
+    "seatsLeft_other": "{{count}} seats left",
+    "full": "Full",
+    "toJoin": "To join, contact:",
+    "call": "Call {{phone}}"
+  },
+  "courses": {
+    "eyebrow": "Free · No sign-up",
+    "title": "Open Courses",
+    "subtitle": "Hand-picked lessons from freeCodeCamp, 3Blue1Brown and more — start tonight, no account needed.",
+    "cat": {
+      "IT": "IT",
+      "MATH": "Math",
+      "AI": "AI",
+      "STUDY_ABROAD": "Study abroad"
+    },
+    "lessons_one": "{{count}} lesson",
+    "lessons_other": "{{count}} lessons",
+    "source": "Source: {{source}}",
+    "start": "Start learning",
+    "close": "Close",
+    "onYoutube": "Videos open on YouTube"
+  },
+  "honor": {
+    "eyebrow": "Student excellence",
+    "title": "Honor Students",
+    "seeAll": "See all honor students",
+    "showLess": "Show fewer",
+    "place1": "1st place",
+    "place2": "2nd place",
+    "place3": "3rd place",
+    "placeLine": "{{place}} — {{competition}}",
+    "medal1": "Gold medal",
+    "medal2": "Silver medal",
+    "medal3": "Bronze medal"
   }
 }

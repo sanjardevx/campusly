@@ -184,5 +184,49 @@
     "telegram": "Telegram",
     "instagram": "Instagram",
     "youtube": "YouTube"
+  },
+  "mock": {
+    "eyebrow": "Открыто для всех",
+    "title": "Пробные экзамены",
+    "subtitle": "Пробные экзамены IELTS, TOPIK и SAT — платные, для учеников любой школы.",
+    "seatsLeft_one": "Осталось {{count}} место",
+    "seatsLeft_few": "Осталось {{count}} места",
+    "seatsLeft_many": "Осталось {{count}} мест",
+    "seatsLeft_other": "Осталось {{count}} места",
+    "full": "Мест нет",
+    "toJoin": "Для записи обращайтесь:",
+    "call": "Позвонить {{phone}}"
+  },
+  "courses": {
+    "eyebrow": "Бесплатно · Без регистрации",
+    "title": "Открытые курсы",
+    "subtitle": "Отобранные уроки freeCodeCamp, 3Blue1Brown и других — начните сегодня вечером, аккаунт не нужен.",
+    "cat": {
+      "IT": "IT",
+      "MATH": "Математика",
+      "AI": "ИИ",
+      "STUDY_ABROAD": "Учёба за рубежом"
+    },
+    "lessons_one": "{{count}} урок",
+    "lessons_few": "{{count}} урока",
+    "lessons_many": "{{count}} уроков",
+    "lessons_other": "{{count}} урока",
+    "source": "Источник: {{source}}",
+    "start": "Начать учиться",
+    "close": "Закрыть",
+    "onYoutube": "Видео открываются на YouTube"
+  },
+  "honor": {
+    "eyebrow": "Достижения учеников",
+    "title": "Отличники",
+    "seeAll": "Все отличники",
+    "showLess": "Показать меньше",
+    "place1": "1-е место",
+    "place2": "2-е место",
+    "place3": "3-е место",
+    "placeLine": "{{place}} — {{competition}}",
+    "medal1": "Золотая медаль",
+    "medal2": "Серебряная медаль",
+    "medal3": "Бронзовая медаль"
   }
 }

@@ -831,6 +831,28 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
   );
   await course(
     4,
+    'IT',
+    t(
+      'JavaScript for beginners',
+      'Boshlovchilar uchun JavaScript',
+      'JavaScript для начинающих',
+      '초보자를 위한 자바스크립트',
+    ),
+    'Programming with Mosh · freeCodeCamp',
+    t(
+      'The language of the web: variables, functions, objects and the DOM.',
+      'Veb tili: o‘zgaruvchilar, funksiyalar, obyektlar va DOM.',
+      'Язык веба: переменные, функции, объекты и DOM.',
+      '웹의 언어: 변수, 함수, 객체, DOM.',
+    ),
+    [
+      ['W6NZfCO5SIk', 'JavaScript Course for Beginners'],
+      ['PkZNo7MFNFg', 'Learn JavaScript – Full Course for Beginners'],
+      ['jS4aFq5-91M', 'JavaScript Programming – Full Course'],
+    ],
+  );
+  await course(
+    5,
     'MATH',
     t(
       'Essence of linear algebra',
@@ -852,7 +874,7 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
     ],
   );
   await course(
-    5,
+    6,
     'AI',
     t(
       'What is AI?',
@@ -874,7 +896,7 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
     ],
   );
   await course(
-    6,
+    7,
     'AI',
     t(
       'How neural networks learn',

@@ -8,6 +8,7 @@ import { SiteEnquiry } from '@/libs/components/site/SiteEnquiry';
 import { SiteFooter } from '@/libs/components/site/SiteFooter';
 import { SiteHero } from '@/libs/components/site/SiteHero';
 import { SiteNews } from '@/libs/components/site/SiteNews';
+import { SiteHonorStudents, SiteMockTests, SiteOpenCourses } from '@/libs/components/site/SiteOpenSections';
 import { SiteAdmission, SiteFaq, SitePrograms, SiteStages, SiteTeam, SiteWhy } from '@/libs/components/site/SiteSections';
 import { SITE, type SiteData } from '@/libs/components/site/tokens';
 import { API_GRAPHQL_URL } from '@/libs/config';
@@ -24,6 +25,9 @@ const EMPTY: SiteData = {
   programs: [],
   director: null,
   team: [],
+  mockTests: [],
+  openCourses: [],
+  honorStudents: [],
   contact: { schoolName: 'Campusly School', phone: null, officeHours: null, address: null, metro: null, email: null, telegramUrl: null, instagramUrl: null, youtubeUrl: null },
 };
 
@@ -55,7 +59,7 @@ export const getStaticProps: GetStaticProps<{ site: SiteData }> = async (ctx) =>
  * The public school website at / (DECISIONS §14, day 19), built from the Stitch "Campusly Public"
  * landing (Part A, B, C — desktop and mobile). Static content comes from the `site` translations;
  * news, programs, team, numbers and contact from the CMS through `siteHome`. The portal's own front
- * door moved to /portal. Mock tests, Open Courses and Honor Students are in the backlog.
+ * door moved to /portal. Mock tests, Open Courses and Honor Students follow Programs (day 20).
  */
 export default function SiteHome({ site }: { site: SiteData }) {
   const { t } = useTranslation('site');
@@ -74,6 +78,9 @@ export default function SiteHome({ site }: { site: SiteData }) {
           <SiteNews posts={site.posts} />
           <SiteWhy />
           <SitePrograms programs={site.programs} />
+          <SiteMockTests tests={site.mockTests} />
+          <SiteOpenCourses courses={site.openCourses} />
+          <SiteHonorStudents honors={site.honorStudents} />
           <SiteTeam director={site.director} team={site.team} />
           <SiteStages />
           <SiteAdmission />

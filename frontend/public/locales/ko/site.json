@@ -184,5 +184,43 @@
     "telegram": "텔레그램",
     "instagram": "인스타그램",
     "youtube": "유튜브"
+  },
+  "mock": {
+    "eyebrow": "누구나 응시 가능",
+    "title": "모의시험",
+    "subtitle": "IELTS, TOPIK, SAT 모의시험 — 유료이며 어느 학교 학생이나 응시할 수 있습니다.",
+    "seatsLeft_other": "{{count}}석 남음",
+    "full": "마감",
+    "toJoin": "신청 문의:",
+    "call": "전화 {{phone}}"
+  },
+  "courses": {
+    "eyebrow": "무료 · 가입 불필요",
+    "title": "공개 강좌",
+    "subtitle": "freeCodeCamp, 3Blue1Brown 등에서 고른 수업 — 계정 없이 오늘 밤 바로 시작하세요.",
+    "cat": {
+      "IT": "IT",
+      "MATH": "수학",
+      "AI": "AI",
+      "STUDY_ABROAD": "해외 유학"
+    },
+    "lessons_other": "수업 {{count}}개",
+    "source": "출처: {{source}}",
+    "start": "학습 시작",
+    "close": "닫기",
+    "onYoutube": "동영상은 YouTube에서 열립니다"
+  },
+  "honor": {
+    "eyebrow": "학생 성과",
+    "title": "우수 학생",
+    "seeAll": "우수 학생 모두 보기",
+    "showLess": "접기",
+    "place1": "1위",
+    "place2": "2위",
+    "place3": "3위",
+    "placeLine": "{{place}} — {{competition}}",
+    "medal1": "금메달",
+    "medal2": "은메달",
+    "medal3": "동메달"
   }
 }

@@ -50,6 +50,46 @@ export const SITE_HOME = graphql(`
         note
         photoUrl
       }
+      mockTests {
+        id
+        exam
+        title
+        included
+        date
+        startTime
+        durationMin
+        location
+        price
+        seatsLeft
+        contactName
+        contactRole
+        contactPhone
+      }
+      openCourses {
+        id
+        category
+        title
+        source
+        description
+        lessons {
+          title
+          youtubeId
+          durationSec
+        }
+        totalDurationSec
+      }
+      honorStudents {
+        id
+        name
+        className
+        resultType
+        place
+        score
+        subject
+        competition
+        achievedOn
+        photoUrl
+      }
       contact {
         schoolName
         phone
