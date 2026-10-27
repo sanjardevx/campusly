@@ -29,11 +29,14 @@ import { useReducedMotion } from '@/libs/components/dashboard/motion';
 import { SITE, type SiteData, containerSx, eyebrowSx, scrollToId, sectionTitleSx } from './tokens';
 
 /** A lighter green than the brand spruce for the icon tiles and the photo panel (the developer's reference) */
+const FRESH = { from: '#4FA383', to: '#2F7A63' } as const;
+
 const iconTile = (size: number, radius: string) => ({
   width: size,
   height: size,
   borderRadius: radius,
-  bgcolor: SITE.spruce,
+  background: `linear-gradient(145deg, ${FRESH.from}, ${FRESH.to})`,
+  boxShadow: '0 8px 16px -8px rgba(47,122,99,0.55), inset 0 1px 0 rgba(255,255,255,0.25)',
   color: '#fff',
   display: 'flex',
   alignItems: 'center',
@@ -70,7 +73,7 @@ export function SiteWhy() {
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
         {panels.map(({ key, icon: Icon, list }) => (
           <Box key={key} sx={{ bgcolor: SITE.soft, borderRadius: '10px', p: 4 }}>
-            <Box sx={{ ...iconTile(56, '12px'), mb: 3, boxShadow: SITE.cardShadow }}>
+            <Box sx={{ ...iconTile(56, '12px'), mb: 3 }}>
               <Icon />
             </Box>
             <Typography component="h3" sx={{ fontSize: '1.25rem', fontWeight: 700, color: SITE.heading, mb: list ? 2 : 1.5 }}>
@@ -96,9 +99,6 @@ export function SiteWhy() {
 }
 
 // ───────────────────────── Facilities (day 20) ─────────────────────────
-
-/** A lighter green than the brand spruce for the facility tiles and the photo panel (the developer's reference) */
-const FRESH = { from: '#4FA383', to: '#2F7A63' } as const;
 
 const FEATURES_LEFT: { key: string; icon: SvgIconComponent }[] = [
   { key: 'tech', icon: ExtensionOutlinedIcon },
@@ -131,7 +131,7 @@ export function SiteFeatures() {
   const { t } = useTranslation('site');
   const card = ({ key, icon: Icon }: { key: string; icon: SvgIconComponent }) => (
     <Stack key={key} direction="row" sx={{ alignItems: 'center', gap: 2.5, p: { xs: 2, md: 2.5 }, borderRadius: '20px', bgcolor: '#F6F7F6', border: '1px solid #EEF0EE', minHeight: { md: 104 } }}>
-      <Box sx={{ ...iconTile(56, '16px'), background: `linear-gradient(145deg, ${FRESH.from}, ${FRESH.to})`, boxShadow: '0 8px 16px -8px rgba(47,122,99,0.55), inset 0 1px 0 rgba(255,255,255,0.25)' }}>
+      <Box sx={iconTile(56, '16px')}>
         <Icon />
       </Box>
       <Typography sx={{ fontSize: { xs: '1rem', md: '1.0625rem' }, fontWeight: 500, color: SITE.heading, lineHeight: 1.45 }}>{t(`features.${key}`)}</Typography>
@@ -236,7 +236,13 @@ export function SitePrograms({ programs }: { programs: SiteData['programs'] }) {
 
 // ───────────────────────── Our team (Part C) ─────────────────────────
 
-/** Stitch Part C "Our team": the director's card with the quote, then a row of 4 cards */
+/** MUI spacing units between team cards (2.5 × 8 px) */
+const GAP = 2.5;
+
+/**
+ * Stitch Part C "Our team": the director's card with the quote, then the team in rows of four
+ * with large photos; a shorter last row is centred (the developer's 4 + 3 layout).
+ */
 export function SiteTeam({ director, team }: { director: SiteData['director']; team: SiteData['team'] }) {
   const { t } = useTranslation('site');
   if (!director && team.length === 0) return null;
@@ -268,14 +274,17 @@ export function SiteTeam({ director, team }: { director: SiteData['director']; t
           </Box>
         </Stack>
       )}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(4, 1fr)' }, gap: 2.5 }}>
+      {/* Rows of four; a shorter last row is centred (7 people: 4 + 3) */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: GAP }}>
         {team.map((p) => (
-          <Box key={p.id} sx={{ bgcolor: '#fff', borderRadius: '10px', p: 3, border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, textAlign: 'center' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>{portrait(p.photoUrl, 80)}</Box>
-            <Typography component="h4" sx={{ fontWeight: 700, color: '#111827' }}>
-              {p.name}
-            </Typography>
-            <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: SITE.spruce, mt: 0.25 }}>{p.role}</Typography>
+          <Box key={p.id} component="article" sx={{ width: { xs: '100%', sm: `calc((100% - ${GAP * 8}px) / 2)`, lg: `calc((100% - ${GAP * 3 * 8}px) / 4)` }, bgcolor: '#fff', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow }}>
+            <Box sx={{ aspectRatio: '1 / 1', bgcolor: SITE.tint }}>{p.photoUrl && <Box component="img" src={p.photoUrl} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}</Box>
+            <Box sx={{ p: 2.5, textAlign: 'center' }}>
+              <Typography component="h4" sx={{ fontWeight: 700, fontSize: '1.0625rem', color: '#111827' }}>
+                {p.name}
+              </Typography>
+              <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: SITE.spruce, mt: 0.25 }}>{p.role}</Typography>
+            </Box>
           </Box>
         ))}
       </Box>
@@ -325,46 +334,58 @@ export function SiteStages() {
 // ───────────────────────── Admission process (Part C) ─────────────────────────
 
 const STEP_ICONS: SvgIconComponent[] = [LocationOnOutlinedIcon, ForumOutlinedIcon, GroupsOutlinedIcon, EditNoteOutlinedIcon, PsychologyOutlinedIcon, VerifiedOutlinedIcon];
-const dashed = `2px dashed rgba(31,78,67,0.4)`;
+const dashed = '2px dashed #CBD2DC';
+/** The lane for the centre line: a short dashed arm on each side (the developer's reference) */
+const LANE = 140;
+/** Card width on wide screens; the list is centred, so the arms stay short */
+const CARD_W = 420;
+/** Each card starts this far above the end of the previous one (~20 % of a card: an 80 % step) */
+const OVERLAP = 56;
 
 /**
- * Stitch Part C "Admission process": a zig-zag timeline on a dashed centre line (steps left,
- * right, left …); phones get one column on a line at the left.
+ * "Admission process" laid out like the developer's reference (Jahon School), sizes measured on
+ * it: cards with the icon on top and "01. Title", alternating left and right with a wide lane for
+ * the dashed centre line. Each card starts a little above the end of the previous one, so the
+ * steps read as a zig-zag; a dashed arm joins the card to its dot on the line. Phones get one
+ * column on a line at the left.
  */
 export function SiteAdmission() {
   const { t } = useTranslation('site');
   return (
-    <Box component="section" id="admissions" sx={{ ...containerSx, py: { xs: 6, md: 8 } }}>
+    <Box component="section" id="admissions" sx={{ ...containerSx, py: { xs: 6, md: 10 } }}>
       <CenteredHeader title={t('admission.title')} subtitle={t('admission.subtitle')} />
-      <Box sx={{ position: 'relative', maxWidth: 896, mx: 'auto' }}>
-        <Box sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 16, md: '50%' }, borderLeft: dashed, transform: { md: 'translateX(-50%)' } }} />
-        <Stack sx={{ gap: { xs: 5, md: 6 } }}>
-          {STEP_ICONS.map((Icon, i) => {
-            const left = i % 2 === 0;
-            const n = i + 1;
-            return (
-              <Box key={n} sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: { md: left ? 'flex-start' : 'flex-end' } }}>
-                <Box sx={{ position: 'absolute', zIndex: 1, width: 16, height: 16, borderRadius: '50%', bgcolor: '#fff', border: `2px solid ${SITE.spruce}`, left: { xs: 16, md: '50%' }, top: { xs: 24, md: '50%' }, transform: { xs: 'translateX(-50%)', md: 'translate(-50%, -50%)' } }} />
-                <Box sx={{ width: { xs: '100%', md: '50%' }, pl: { xs: 5, md: left ? 0 : 6 }, pr: { md: left ? 6 : 0 } }}>
-                  <Box sx={{ position: 'relative', bgcolor: SITE.soft, borderRadius: '10px', p: 3, boxShadow: SITE.cardShadow, transition: 'box-shadow 200ms ease', '&:hover': { boxShadow: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)' } }}>
-                    <Box sx={{ display: { xs: 'none', md: 'block' }, position: 'absolute', top: '50%', width: 48, borderTop: dashed, ...(left ? { right: -48 } : { left: -48 }) }} />
-                    <Stack direction="row" sx={{ gap: 2, alignItems: 'flex-start' }}>
-                      <Box sx={iconTile(40, '8px')}>
-                        <Icon sx={{ fontSize: 20 }} />
-                      </Box>
-                      <Box>
-                        <Typography component="h3" sx={{ fontSize: '1rem', fontWeight: 700, color: '#111827' }}>
-                          {String(n).padStart(2, '0')} {t(`admission.step${n}.title`)}
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.875rem', color: SITE.stone600, mt: 0.5, lineHeight: 1.625 }}>{t(`admission.step${n}.body`)}</Typography>
-                      </Box>
-                    </Stack>
-                  </Box>
+      <Box component="ol" sx={{ position: 'relative', listStyle: 'none', m: 0, p: 0, mx: 'auto', maxWidth: { md: CARD_W * 2 + LANE }, display: 'flex', flexDirection: 'column' }}>
+        <Box aria-hidden sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 15, md: '50%' }, borderLeft: dashed }} />
+        {STEP_ICONS.map((Icon, i) => {
+          const left = i % 2 === 0;
+          const n = i + 1;
+          return (
+            <Box
+              component="li"
+              key={n}
+              sx={{
+                position: 'relative',
+                width: { xs: '100%', md: `calc(50% - ${LANE / 2}px)` },
+                alignSelf: { md: left ? 'flex-start' : 'flex-end' },
+                mt: { xs: i ? 3 : 0, md: i ? `-${OVERLAP}px` : 0 },
+                pl: { xs: 5, md: 0 },
+              }}
+            >
+              {/* The dot on the centre line and the dashed arm to the card */}
+              <Box aria-hidden sx={{ position: 'absolute', zIndex: 1, top: { xs: 30, md: '48%' }, width: 18, height: 18, borderRadius: '50%', bgcolor: '#D5DBE3', border: '3px solid #fff', boxShadow: '0 0 0 1px #D5DBE3', left: { xs: 15, md: left ? `calc(100% + ${LANE / 2}px)` : `-${LANE / 2}px` }, transform: 'translate(-50%, -50%)' }} />
+              <Box aria-hidden sx={{ display: { xs: 'none', md: 'block' }, position: 'absolute', top: '48%', width: LANE / 2 - 10, borderTop: dashed, ...(left ? { right: -(LANE / 2 - 10) } : { left: -(LANE / 2 - 10) }) }} />
+              <Box sx={{ minHeight: { md: 232 }, bgcolor: '#F8F9FA', border: '1px solid #EEF0EE', borderRadius: '24px', p: { xs: 2.5, md: 2.75 }, transition: 'box-shadow 200ms ease, transform 200ms ease', '@media (hover: hover) and (pointer: fine)': { '&:hover': { boxShadow: '0 12px 28px -16px rgba(31,78,67,0.3)', transform: 'translateY(-2px)' } } }}>
+                <Box sx={{ ...iconTile(52, '14px'), mb: 1.5 }}>
+                  <Icon sx={{ fontSize: 26 }} />
                 </Box>
+                <Typography component="h3" sx={{ fontSize: { xs: '1.25rem', md: '1.375rem' }, fontWeight: 600, color: SITE.ink, letterSpacing: '-0.01em', lineHeight: 1.3 }}>
+                  {String(n).padStart(2, '0')}. {t(`admission.step${n}.title`)}
+                </Typography>
+                <Typography sx={{ fontSize: '1rem', color: SITE.stone500, mt: 0.75, lineHeight: 1.5 }}>{t(`admission.step${n}.body`)}</Typography>
               </Box>
-            );
-          })}
-        </Stack>
+            </Box>
+          );
+        })}
       </Box>
     </Box>
   );
