@@ -315,6 +315,9 @@ export class SiteHonorStudentAdmin {
   @Field(() => LocalizedText)
   competition: LocalizedText;
 
+  @Field(() => LocalizedText, { nullable: true })
+  location: LocalizedText | null;
+
   @Field(() => String)
   achievedOn: string;
 

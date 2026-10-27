@@ -467,6 +467,13 @@ export class SaveSiteHonorStudentInput {
   @Type(() => LocalizedTextInput)
   competition: LocalizedTextInput;
 
+  /** "Almaty, Kazakhstan" */
+  @Field(() => LocalizedTextInput, { nullable: true })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => LocalizedTextInput)
+  location?: LocalizedTextInput;
+
   /** "YYYY-MM-DD" */
   @Field(() => String)
   @IsDateString({ strict: true })

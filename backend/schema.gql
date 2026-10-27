@@ -1318,6 +1318,7 @@ input SaveSiteHonorStudentInput {
   achievedOn: String!
   competition: LocalizedTextInput!
   id: String
+  location: LocalizedTextInput
   parentConsent: Boolean!
   photoAssetId: String
   place: Int
@@ -1537,6 +1538,7 @@ type SiteHonorStudentAdmin {
   competition: LocalizedText!
   createdAt: DateTime!
   id: String!
+  location: LocalizedText
   order: Int!
   parentConsent: Boolean!
   photoUrl: String

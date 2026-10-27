@@ -1380,6 +1380,8 @@ model SiteHonorStudent {
   subject       Json
   /// "Tashkent City Math Olympiad"
   competition   Json
+  /// Where it took place: "Almaty, Kazakhstan" (optional)
+  location      Json?
   achievedOn    DateTime        @db.Date
   photoAssetId  String?         @db.Uuid
   photoPath     String?
