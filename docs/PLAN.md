@@ -1,7 +1,7 @@
-# Campusly — Plan (MVP days 1–14, phase 2 days 15–21)
+# Campusly — Plan (MVP days 1–14, phase 2 days 15–21, school data + demo days 22–25)
 
 Time box: days 1–13 built the MVP (~85 hours); days 14–20 are all **L** days: deploy first, then the phase 2 features in a **minimal working version**, each deployed the same day. **L** = long day (8 h), **S** = short day (3–4 h).
-The project must be finished by **day 21** (re-planned 2026-10-26; the old phase 2 estimate was ~18 days; day 21 added 2026-10-28 for the website's second part).
+The project must be finished by **day 25** (re-planned 2026-10-26; the old phase 2 estimate was ~18 days; day 21 added 2026-10-28 for the website's second part; days 22–25 added 2026-10-29 for the full school data, demo v2 and the finish).
 Decisions live in [DECISIONS.md](DECISIONS.md). Working rules for the agent live in [../CLAUDE.md](../CLAUDE.md).
 
 When the user says **"start day N"**: read this file and DECISIONS.md, then follow the teaching format in CLAUDE.md.
@@ -12,7 +12,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 3. Write `docs/journal/day-N.md` (local only, git-ignored): what was done (3–5 lines), what was deferred, and 3 interview questions with short answers.
 4. Tick the checkboxes below.
 
-**No buffer.** If days 15–21 fall behind, cut in this order: Q&A → CMS reduced to News + Enquiries → quiz Number questions → Telegram notifications (password reset stays). Cut items go to the [Backlog](#backlog-after-day-21).
+**No buffer.** If days 15–21 fall behind, cut in this order: Q&A → CMS reduced to News + Enquiries → quiz Number questions → Telegram notifications (password reset stays). Cut items go to the [Backlog](#backlog-after-day-25).
 
 ---
 
@@ -40,9 +40,13 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 | 18 | L | AI Study Tutor backend: PDF → pgvector, Bedrock Haiku 5.5, SSE chat, limits; connect the UI |
 | 19 | L | Public website + minimal CMS: News & Events, Programs, Our team, Enquiries |
 | 20 | L | Public website, part 2: Mock tests, Open Courses, Honor Students; motion, sticky navbar, portal showcase, partners |
-| 21 | L | Q&A, student / parent calendar page, final fixes, README, public-repo prep → **done** |
+| 21 | L | Q&A, student / parent calendar page, bug fixes |
+| 22 | L | Full school data: 1A–11B × 15 students, subjects by level, ~30 teachers, demo accounts in 9A / 11A |
+| 23 | L | Partial nightly reset (only 9A / 11A + demo traces), demo rules, ADMIN out of the demo, prod switch |
+| 24 | L | Demo entry (`/demo`, "Live demo"), demo bar, Programs (IELTS / SAT / TOPIK / IT / Sport), footer disclaimer, real photos |
+| 25 | L | AI tutor live, final smoke test, screenshots, OG image, uptime monitor, README, public-repo prep → **done** |
 
-**External prerequisites:** AWS account ready by the end of day 4 (S3 on day 6). Domain `campusly.uz` active with DNS access by day 15 (if not, days 15 and 16 swap). Bedrock Anthropic model access requested on day 14 (needed on day 18). Telegram bot token from BotFather by day 16.
+**External prerequisites:** AWS account ready by the end of day 4 (S3 on day 6). Domain `campusly.uz` active with DNS access by day 15 (if not, days 15 and 16 swap). Bedrock Anthropic model access requested on day 14 (needed on day 18). Telegram bot token from BotFather by day 16. Real photos folder from the developer by day 24. Anthropic API key bought on day 25.
 
 ---
 
@@ -297,7 +301,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [x] Sticky glass navbar with the section links (a bottom sheet on phones).
 - [x] Portal showcase: a MacBook and iPhones playing screenshots of the real portal (student / parent, 4 languages, `frontend/scripts/capture-portal-shots.mjs`); partners marquee.
 - [x] Lighter site green (#2F7A63), faster hero slides.
-- [ ] Deploy (migrations + API; the site content arrives with the nightly demo reset, 03:00 Tashkent).
+- [x] Deploy (migrations + API; the site content arrives with the nightly demo reset, 03:00 Tashkent).
 
 ---
 
@@ -305,16 +309,61 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 - [x] Q&A: a student asks under a lesson, the teacher answers (`CourseQuestion`); the teacher dashboard card goes live.
 - [x] Calendar page for students and parents (the `studentCalendar` API already exists).
-- [ ] AI tutor live: buy the Anthropic API key ($5 prepaid, auto-reload off) → test call → SSM `ANTHROPIC_API_KEY` + `TUTOR_PROVIDER=anthropic` together → deploy → smoke-test the tutor on campusly.uz (deploy README §14).
-- [ ] Bug fixes; final smoke test of all 4 roles.
-- [ ] README: architecture diagram, demo accounts, screenshots.
-- [ ] Public-repo prep (see CLAUDE.md "Before the repo goes public"; purging the journal history only after the developer approves).
+- [ ] ~~AI tutor live~~ → moved to day 25.
+- [x] Bug fixes; final smoke test of all 4 roles.
+- [ ] ~~README, public-repo prep~~ → moved to day 25 (the screenshots need the day 22 data).
 
-**Done when:** every day 15–21 feature works on `campusly.uz`, and the repo is ready to go public.
+**Done when:** every day 15–21 feature works on `campusly.uz`.
 
 ---
 
-## Backlog (after day 21)
+## Day 22 (L) — Full school data
+
+- [x] Subjects by level (grades 1–4 / 5–9 / 10–11); ~30 teachers with realistic loads.
+- [x] Classes 1A–11B, 15 students each (330), ~260 parents (siblings share a parent); invented Uzbek names.
+- [x] Full data for every class: weeks, lessons, homework, quizzes, grades (bell curve), attendance (~93 %), late / missing work, announcements, Q&A.
+- [x] Demo accounts: student in 9A, student in 11A, one parent with both of them, one teacher with many courses in 9A and 11A only. ADMIN is no longer a demo account.
+- [x] `createMany`; the full seed runs in under 2 minutes; admin, teacher and Records pages checked with 330 students (pagination, speed).
+
+---
+
+## Day 23 (L) — Partial reset and demo rules
+
+- [ ] Nightly reset rewrites only the 9A / 11A course data and the demo accounts' traces (submissions, attempts, tutor chats, reads, questions), moved to the current week; admin data and every other class stay untouched.
+- [ ] Demo accounts may write inside 9A / 11A; demo students may retake quizzes and resubmit homework; a small daily tutor limit for demo accounts; upload, password change, Telegram and admin stay blocked.
+- [ ] ADMIN removed from the demo login (API input + frontend).
+- [ ] e2e: the reset leaves admin rows and other classes untouched; a demo account cannot write outside 9A / 11A; blocked actions refuse.
+- [ ] Prod switch: one last full seed → the developer changes the `simon` password → from then on admin content persists.
+
+**Developer:** change the admin password after the switch; enter real content (news etc.) only after it.
+
+---
+
+## Day 24 (L) — Demo entry and public site
+
+- [ ] "Live demo" button on the public site → `/demo`: Student (9A or 11A), Parent, Teacher cards; `?role=` deep link.
+- [ ] Demo bar: role switcher + "what to try" list.
+- [ ] Programs: IELTS, SAT, TOPIK, IT, Sport (4 languages) — public site only, the portal does not change.
+- [ ] Footer disclaimer: "Campusly is a portfolio project; the school and its people are fictional."
+- [ ] The developer's photos → WebP + alt text, in the seed (they survive any future full seed).
+
+**Developer:** photos folder outside the repo (e.g. `~/DEVELOPMENT/DEVEX/campusly-photos/`), with consent for any real people.
+
+---
+
+## Day 25 (L) — Finish
+
+- [ ] AI tutor live: buy the Anthropic API key ($5 prepaid, auto-reload off) → test call → SSM `ANTHROPIC_API_KEY` + `TUTOR_PROVIDER=anthropic` together → deploy → smoke-test the tutor on campusly.uz (deploy README §14).
+- [ ] Bug fixes; final smoke test of all 4 roles and the demo.
+- [ ] Portal screenshots taken again with the new data; OG image for link previews; uptime monitor on `/health`.
+- [ ] README: architecture diagram, demo link + GIF, screenshots.
+- [ ] Public-repo prep (see CLAUDE.md "Before the repo goes public"; purging the journal history only after the developer approves).
+
+**Done when:** the demo and the full school work on `campusly.uz`, and the repo is ready to go public.
+
+---
+
+## Backlog (after day 25)
 
 Only if needed after the school's feedback:
 

@@ -1,12 +1,45 @@
 // Demo data for local development and the public demo (DECISIONS §12).
 // Used by `pnpm prisma db seed` (prisma/seed.ts) and by the batch app's nightly demo reset.
 // It WIPES all tables first, so every run gives the same data.
-// Names follow the Stitch design (Aziz Karimov 26100042, teacher Nilufar Karimova, ...).
+// A whole school (DECISIONS §12 "School data and demo v2"): classes 1A–11B with 15 students each,
+// their parents and ~30 teachers, all invented. The generators live in prisma/seed/; the names of
+// the Stitch design stay (Aziz Karimov 26100042 in 9A, teacher Nilufar Karimova …).
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '../generated/prisma/client';
-import type { ParentRelation, UserStatus } from '../generated/prisma/enums';
+import { type Prisma, PrismaClient } from '../generated/prisma/client';
 import { SITE_SETTINGS, seedSite } from './demo-site';
+import {
+  ALGEBRA_QUIZZES,
+  ALL_SUBJECTS,
+  type Band,
+  LESSON_DAYS,
+  QUIZ_QUESTIONS,
+  SUBJECTS_BY_BAND,
+  TOPICS,
+  bandOf,
+} from './seed/curriculum';
+import {
+  TODAY,
+  addDays,
+  day,
+  pick,
+  random,
+  shiftedWeeks,
+  startRun,
+  tashkent,
+  weekShiftMs,
+  weekday,
+} from './seed/clock';
+import { insertAll, uuidv7 } from './seed/ids';
+import {
+  CLASSES,
+  type TempPassword,
+  generateStudentsAndParents,
+  generateTeachers,
+  gradeOf,
+} from './seed/people';
+
+export { weekShiftMs };
 
 /** A plain client for the seed (the API's PrismaService hides columns the seed writes) */
 export const createSeedClient = (databaseUrl: string) =>
@@ -18,7 +51,7 @@ type SeedClient = ReturnType<typeof createSeedClient>;
 export interface SeedDemoOptions {
   /** Every seeded account gets this password (from env, never from git) */
   password: string;
-  /** DEMO_MODE=true: flag the showcase accounts for "Demo login" */
+  /** DEMO_MODE=true: flag the demo accounts for "Demo login" */
   demoMode: boolean;
   /** Move the demo story forward in whole weeks so "today" is close to this day (nightly reset) */
   shiftTo?: Date;
@@ -28,49 +61,6 @@ export interface SeedDemoOptions {
 let prisma: SeedClient;
 let SEED_PASSWORD = '';
 let DEMO_ACCOUNTS = new Set<string>();
-let shiftMs = 0;
-
-// ───────────────────────────── helpers ─────────────────────────────
-
-const DAY_MS = 24 * 60 * 60 * 1000;
-/** Calendar date for @db.Date columns (no time, no timezone), moved by the week shift */
-const day = (iso: string) =>
-  new Date(new Date(`${iso}T00:00:00.000Z`).getTime() + shiftMs);
-/** A moment in Tashkent time (UTC+5), stored as UTC, moved by the week shift */
-const tashkent = (iso: string, time = '23:59') =>
-  new Date(new Date(`${iso}T${time}:00+05:00`).getTime() + shiftMs);
-/** YYYY-MM-DD of a calendar date plus n days (story dates: not shifted) */
-const addDays = (iso: string, n: number) =>
-  new Date(new Date(`${iso}T00:00:00.000Z`).getTime() + n * DAY_MS)
-    .toISOString()
-    .slice(0, 10);
-
-/** Seeded random numbers (mulberry32): the same "random" scores and attendance on every run */
-let randomState = 2026;
-function random() {
-  randomState = (randomState + 0x6d2b79f5) | 0;
-  let t = randomState;
-  t = Math.imul(t ^ (t >>> 15), t | 1);
-  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-}
-
-/**
- * "Today" of the demo story. The data is written around this date (string comparisons below);
- * day() / tashkent() add the week shift when the nightly reset moves the story forward.
- */
-const TODAY = '2026-10-17';
-
-/** Whole weeks from TODAY to `to` in Tashkent: weekdays stay the same (no lessons on Sunday) */
-export function weekShiftMs(to: Date): number {
-  const tashkentToday = new Date(to.getTime() + 5 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
-  const days = Math.round(
-    (Date.parse(tashkentToday) - Date.parse(TODAY)) / DAY_MS,
-  );
-  return Math.max(0, Math.floor(days / 7)) * 7 * DAY_MS;
-}
 
 // ───────────────────────────── 0. reset ─────────────────────────────
 
@@ -128,308 +118,26 @@ async function seedSchool() {
     );
   }
 
+  // Subjects by level and the classes 1A … 11B (DECISIONS §12 "School data and demo v2")
   const subjects: Record<string, string> = {};
-  for (const name of [
-    'Algebra',
-    'English',
-    'Physics',
-    'World History',
-    'Korean',
-  ]) {
-    subjects[name] = (await prisma.subject.create({ data: { name } })).id;
-  }
-
+  for (const name of ALL_SUBJECTS) subjects[name] = uuidv7();
+  await prisma.subject.createMany({
+    data: Object.entries(subjects).map(([name, id]) => ({ id, name })),
+  });
   const groups: Record<string, string> = {};
-  for (const name of ['9A', '9B']) {
-    groups[name] = (
-      await prisma.group.create({ data: { academicYearId: year.id, name } })
-    ).id;
-  }
+  for (const name of CLASSES) groups[name] = uuidv7();
+  await prisma.group.createMany({
+    data: Object.entries(groups).map(([name, id]) => ({
+      id,
+      name,
+      academicYearId: year.id,
+    })),
+  });
 
   return { yearId: year.id, quarters, subjects, groups };
 }
 
 // ──────────────────────────── 2. users ────────────────────────────
-
-type TempPassword = 'ACTIVE_2_LEFT' | 'ACTIVE_1_LEFT' | 'EXPIRED';
-
-interface StudentSeed {
-  loginId: string;
-  firstName: string;
-  lastName: string;
-  group: '9A' | '9B';
-  status?: UserStatus;
-  temp?: TempPassword;
-}
-
-// Names and IDs from the Stitch design (admin "Users: Students", teacher grading, parent dashboard)
-const STUDENTS: StudentSeed[] = [
-  { loginId: '26100042', firstName: 'Aziz', lastName: 'Karimov', group: '9A' },
-  {
-    loginId: '26100031',
-    firstName: 'Azizbek',
-    lastName: 'Aliyev',
-    group: '9A',
-  },
-  {
-    loginId: '26100032',
-    firstName: 'Dilnoza',
-    lastName: 'Karimova',
-    group: '9A',
-  },
-  {
-    loginId: '26100055',
-    firstName: 'Madina',
-    lastName: 'Aliyeva',
-    group: '9A',
-  },
-  {
-    loginId: '26100089',
-    firstName: 'Jasur',
-    lastName: 'Mirzayev',
-    group: '9A',
-  },
-  { loginId: '26100104', firstName: 'Elena', lastName: 'Rostova', group: '9A' },
-  {
-    loginId: '26100118',
-    firstName: 'Sardor',
-    lastName: 'Bekmuratov',
-    group: '9A',
-  },
-  {
-    loginId: '26100012',
-    firstName: 'Kamilla',
-    lastName: 'Bakhromova',
-    group: '9A',
-  },
-  {
-    loginId: '26100067',
-    firstName: 'Farrukh',
-    lastName: 'Tursunov',
-    group: '9A',
-  },
-  {
-    loginId: '26100035',
-    firstName: 'Nodirbek',
-    lastName: 'Saidov',
-    group: '9A',
-  },
-  {
-    loginId: '26100043',
-    firstName: 'Madina',
-    lastName: 'Karimova',
-    group: '9B',
-  },
-  {
-    loginId: '26100033',
-    firstName: 'Jasurbek',
-    lastName: 'Tursunov',
-    group: '9B',
-    temp: 'ACTIVE_2_LEFT',
-  },
-  {
-    loginId: '26100034',
-    firstName: 'Madina',
-    lastName: 'Yusupova',
-    group: '9B',
-  },
-  {
-    loginId: '26100036',
-    firstName: 'Rayhona',
-    lastName: 'Umarova',
-    group: '9B',
-  },
-  {
-    loginId: '26100037',
-    firstName: 'Sarvar',
-    lastName: 'Kadyrov',
-    group: '9B',
-    status: 'BLOCKED',
-    temp: 'ACTIVE_1_LEFT',
-  },
-  {
-    loginId: '26100038',
-    firstName: 'Shakhzoda',
-    lastName: 'Ibragimova',
-    group: '9B',
-    temp: 'EXPIRED',
-  },
-  {
-    loginId: '26100039',
-    firstName: 'Temur',
-    lastName: 'Mahmudov',
-    group: '9B',
-  },
-  {
-    loginId: '26100040',
-    firstName: 'Umida',
-    lastName: 'Nazarova',
-    group: '9B',
-  },
-  {
-    loginId: '26100044',
-    firstName: 'Bekzod',
-    lastName: 'Rasulov',
-    group: '9B',
-  },
-  {
-    loginId: '26100045',
-    firstName: 'Laylo',
-    lastName: 'Ergasheva',
-    group: '9B',
-  },
-];
-
-// phone (9 digits after +998) → parent; children by student login ID
-const PARENTS: {
-  phone: string;
-  firstName: string;
-  lastName: string;
-  relation: ParentRelation;
-  children: string[];
-}[] = [
-  // One family, two parents, two children: shows ParentStudent is many-to-many in both directions
-  {
-    phone: '901112233',
-    firstName: 'Farrukh',
-    lastName: 'Karimov',
-    relation: 'FATHER',
-    children: ['26100042', '26100043'],
-  },
-  {
-    phone: '901114455',
-    firstName: 'Gulchehra',
-    lastName: 'Karimova',
-    relation: 'MOTHER',
-    children: ['26100042', '26100043'],
-  },
-  {
-    phone: '901234567',
-    firstName: 'Sardor',
-    lastName: 'Aliyev',
-    relation: 'FATHER',
-    children: ['26100031'],
-  },
-  {
-    phone: '912345678',
-    firstName: 'Rustam',
-    lastName: 'Karimov',
-    relation: 'FATHER',
-    children: ['26100032'],
-  },
-  {
-    phone: '933456789',
-    firstName: 'Malika',
-    lastName: 'Tursunova',
-    relation: 'MOTHER',
-    children: ['26100033'],
-  },
-  {
-    phone: '974567890',
-    firstName: 'Bekzod',
-    lastName: 'Yusupov',
-    relation: 'FATHER',
-    children: ['26100034'],
-  },
-  {
-    phone: '905678901',
-    firstName: 'Olim',
-    lastName: 'Saidov',
-    relation: 'FATHER',
-    children: ['26100035'],
-  },
-  {
-    phone: '946789012',
-    firstName: 'Shakhnoza',
-    lastName: 'Umarova',
-    relation: 'MOTHER',
-    children: ['26100036'],
-  },
-  {
-    phone: '997890123',
-    firstName: 'Farrukh',
-    lastName: 'Kadyrov',
-    relation: 'FATHER',
-    children: ['26100037'],
-  },
-  {
-    phone: '918901234',
-    firstName: 'Ravshan',
-    lastName: 'Ibragimov',
-    relation: 'FATHER',
-    children: ['26100038'],
-  },
-  {
-    phone: '939012345',
-    firstName: 'Gulnora',
-    lastName: 'Mahmudova',
-    relation: 'MOTHER',
-    children: ['26100039'],
-  },
-  {
-    phone: '970123456',
-    firstName: 'Sherzod',
-    lastName: 'Nazarov',
-    relation: 'FATHER',
-    children: ['26100040'],
-  },
-  {
-    phone: '903210055',
-    firstName: 'Nodira',
-    lastName: 'Aliyeva',
-    relation: 'MOTHER',
-    children: ['26100055'],
-  },
-  {
-    phone: '903210089',
-    firstName: 'Anvar',
-    lastName: 'Mirzayev',
-    relation: 'FATHER',
-    children: ['26100089'],
-  },
-  {
-    phone: '903210104',
-    firstName: 'Irina',
-    lastName: 'Rostova',
-    relation: 'MOTHER',
-    children: ['26100104'],
-  },
-  {
-    phone: '903210118',
-    firstName: 'Ulugbek',
-    lastName: 'Bekmuratov',
-    relation: 'FATHER',
-    children: ['26100118'],
-  },
-  {
-    phone: '903210012',
-    firstName: 'Zarina',
-    lastName: 'Bakhromova',
-    relation: 'MOTHER',
-    children: ['26100012'],
-  },
-  {
-    phone: '903210067',
-    firstName: 'Akmal',
-    lastName: 'Tursunov',
-    relation: 'FATHER',
-    children: ['26100067'],
-  },
-  {
-    phone: '903210044',
-    firstName: 'Dilshod',
-    lastName: 'Rasulov',
-    relation: 'FATHER',
-    children: ['26100044'],
-  },
-  {
-    phone: '903210045',
-    firstName: 'Feruza',
-    lastName: 'Ergasheva',
-    relation: 'GUARDIAN',
-    children: ['26100045'],
-  },
-];
 
 /** Temporary password states from DECISIONS §6 (3 sign-ins or 14 days) */
 function tempPasswordFields(temp: TempPassword | undefined) {
@@ -452,13 +160,14 @@ function tempPasswordFields(temp: TempPassword | undefined) {
   }
 }
 
-// DEMO_MODE=true (the public demo server): one showcase account per role opens from the landing
-// page's "Demo login" (DECISIONS §12). Locally these stay normal accounts.
-const SHOWCASE_ACCOUNTS = ['simon', '26200001', '26100042', '901112233'];
+// DEMO_MODE=true: the demo accounts that "Demo login" opens (DECISIONS §12, demo v2): a student
+// in 9A, a student in 11A, their parent and a teacher of 9A / 11A. No admin demo: simon is a
+// normal admin. Locally these stay normal accounts.
+const SHOWCASE_ACCOUNTS = ['26200001', '26100042', '26100043', '901112233'];
 const isDemo = (loginId: string) => DEMO_ACCOUNTS.has(loginId);
 
 async function seedUsers(groups: Record<string, string>) {
-  // Hash once: bcrypt is slow on purpose, and every demo account shares the password
+  // Hash once: bcrypt is slow on purpose, and every seeded account shares the password
   const passwordHash = await bcrypt.hash(SEED_PASSWORD, 10);
 
   const admin = await prisma.user.create({
@@ -466,111 +175,128 @@ async function seedUsers(groups: Record<string, string>) {
       loginId: 'simon',
       role: 'ADMIN',
       passwordHash,
-      isDemo: isDemo('simon'),
       firstName: 'Simon',
       lastName: '',
     },
   });
 
-  const teacherSeeds = [
-    {
-      loginId: '26200001',
-      firstName: 'Nilufar',
-      lastName: 'Karimova',
-      title: 'Mathematics',
-    },
-    {
-      loginId: '26200002',
-      firstName: 'John',
-      lastName: 'Smith',
-      title: 'English',
-    },
-    {
-      loginId: '26200003',
-      firstName: 'Bobur',
-      lastName: 'Aliyev',
-      title: 'Physics',
-    },
-  ];
+  const teacherSeeds = generateTeachers();
+  const {
+    students: studentSeeds,
+    parents: parentSeeds,
+    lastStudentNumber,
+  } = generateStudentsAndParents();
+
+  // Everyone in one createMany per table: ids are made here, so the profiles and links follow
+  const users: Prisma.UserCreateManyInput[] = [];
   const teachers: Record<string, string> = {};
-  for (const { title, ...t } of teacherSeeds) {
-    const teacher = await prisma.user.create({
-      data: {
-        ...t,
-        role: 'TEACHER',
-        passwordHash,
-        isDemo: isDemo(t.loginId),
-        teacherProfile: { create: { title } },
-      },
-    });
-    teachers[t.lastName] = teacher.id;
-  }
-
-  const students: Record<string, { id: string; group: '9A' | '9B' }> = {};
-  for (const [i, s] of STUDENTS.entries()) {
-    const student = await prisma.user.create({
-      data: {
-        loginId: s.loginId,
-        role: 'STUDENT',
-        status: s.status ?? 'ACTIVE',
-        passwordHash,
-        isDemo: isDemo(s.loginId),
-        ...tempPasswordFields(s.temp),
-        firstName: s.firstName,
-        lastName: s.lastName,
-        // Grade 9 in 2026–27: born in 2011, started school in 2018
-        studentProfile: {
-          create: {
-            birthDate: day(
-              `2011-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 27) + 1).padStart(2, '0')}`,
-            ),
-            admissionYear: 2018,
-          },
-        },
-        groupMemberships: { create: { groupId: groups[s.group] } },
-      },
-    });
-    students[s.loginId] = { id: student.id, group: s.group };
-  }
-
-  for (const p of PARENTS) {
-    await prisma.user.create({
-      data: {
-        loginId: p.phone, // parent login ID = last 9 digits of the phone
-        role: 'PARENT',
-        passwordHash,
-        isDemo: isDemo(p.phone),
-        firstName: p.firstName,
-        lastName: p.lastName,
-        parentProfile: { create: { phone: `+998${p.phone}` } },
-        children: {
-          create: p.children.map((loginId) => ({
-            studentId: students[loginId].id,
-            relation: p.relation,
-            createdById: admin.id,
-          })),
-        },
-      },
+  const teacherOf = new Map<string, string>(); // "Algebra · 9A" → teacher id
+  for (const t of teacherSeeds) {
+    const id = uuidv7();
+    teachers[t.lastName] = id;
+    for (const course of t.courses) teacherOf.set(course, id);
+    users.push({
+      id,
+      loginId: t.loginId,
+      role: 'TEACHER',
+      passwordHash,
+      isDemo: isDemo(t.loginId),
+      firstName: t.firstName,
+      lastName: t.lastName,
     });
   }
+  const students: Record<string, { id: string; group: string }> = {};
+  for (const s of studentSeeds) {
+    const id = uuidv7();
+    students[s.loginId] = { id, group: s.group };
+    users.push({
+      id,
+      loginId: s.loginId,
+      role: 'STUDENT',
+      status: s.status ?? 'ACTIVE',
+      passwordHash,
+      isDemo: isDemo(s.loginId),
+      ...tempPasswordFields(s.temp),
+      firstName: s.firstName,
+      lastName: s.lastName,
+    });
+  }
+  const parentIds: string[] = [];
+  for (const p of parentSeeds) {
+    const id = uuidv7();
+    parentIds.push(id);
+    users.push({
+      id,
+      loginId: p.phone, // parent login ID = last 9 digits of the phone
+      role: 'PARENT',
+      passwordHash,
+      isDemo: isDemo(p.phone),
+      firstName: p.firstName,
+      lastName: p.lastName,
+    });
+  }
+  await insertAll(users, (data) => prisma.user.createMany({ data }));
 
-  // Next generated IDs continue after the seeded ones: 26100119 and 26200004
-  const lastStudent = Math.max(
-    ...STUDENTS.map((s) => Number(s.loginId.slice(3))),
+  await prisma.teacherProfile.createMany({
+    data: teacherSeeds.map((t) => ({
+      userId: teachers[t.lastName],
+      title: t.title,
+    })),
+  });
+  await insertAll(
+    studentSeeds.map((s, i) => {
+      // Grade g in 2026–27: started school at 7, so born in 2020 − g
+      const grade = gradeOf(s.group);
+      const month = String((i % 12) + 1).padStart(2, '0');
+      const date = String((i % 27) + 1).padStart(2, '0');
+      return {
+        userId: students[s.loginId].id,
+        birthDate: day(`${2020 - grade}-${month}-${date}`),
+        admissionYear: 2027 - grade,
+      };
+    }),
+    (data) => prisma.studentProfile.createMany({ data }),
   );
+  await insertAll(
+    studentSeeds.map((s) => ({
+      groupId: groups[s.group],
+      studentId: students[s.loginId].id,
+    })),
+    (data) => prisma.groupMember.createMany({ data }),
+  );
+  await insertAll(
+    parentSeeds.map((p, i) => ({
+      userId: parentIds[i],
+      phone: `+998${p.phone}`,
+    })),
+    (data) => prisma.parentProfile.createMany({ data }),
+  );
+  await insertAll(
+    parentSeeds.flatMap((p, i) =>
+      p.children.map((loginId) => ({
+        parentId: parentIds[i],
+        studentId: students[loginId].id,
+        relation: p.relation,
+        createdById: admin.id,
+      })),
+    ),
+    (data) => prisma.parentStudent.createMany({ data }),
+  );
+
+  // The next generated IDs continue after the seeded ones
   await prisma.idCounter.createMany({
     data: [
-      { year: 2026, roleCode: 1, lastValue: lastStudent },
+      { year: 2026, roleCode: 1, lastValue: lastStudentNumber },
       { year: 2026, roleCode: 2, lastValue: teacherSeeds.length },
     ],
   });
 
-  return { adminId: admin.id, teachers, students };
+  return { adminId: admin.id, teachers, teacherOf, students };
 }
 
 // ─────────────────────── 3. courses and lessons ───────────────────────
 
-// 8 weeks of quarter 1 (Mondays). Topics follow the Stitch design (Algebra 9A course page).
+// 8 weeks of quarter 1 (Mondays)
 const WEEK_STARTS = [
   '2026-09-07',
   '2026-09-14',
@@ -581,43 +307,12 @@ const WEEK_STARTS = [
   '2026-10-19',
   '2026-10-26',
 ];
-const TOPICS: Record<string, string[]> = {
-  Algebra: [
-    'Linear Equations Review',
-    'Quadratic Equations',
-    'Factoring Trinomials',
-    'Quadratic Roots',
-    'Factoring Higher Degree Polynomials',
-    'The Discriminant',
-    'Rational Root Test',
-    'Quarter 1 Review',
-  ],
-  English: [
-    'Present Tenses',
-    'Narrative Writing',
-    'Animal Farm: Chapters 1–3',
-    'Animal Farm: Chapters 4–6',
-    'Essay Structure',
-    'Essay on Orwell',
-    'Debate Skills',
-    'Quarter 1 Review',
-  ],
-  Physics: [
-    'Units and Measurement',
-    'Motion in a Straight Line',
-    'Kinematic Equations',
-    'Free Fall',
-    'Lab Protocol 3: Pendulum',
-    'Newton’s Laws',
-    'Lab Protocol 4: Friction',
-    'Quarter 1 Review',
-  ],
-};
 
 interface SeededCourse {
   id: string;
   subject: string;
-  group: '9A' | '9B';
+  group: string;
+  band: Band;
   teacherId: string;
   studentIds: string[];
   categories: Record<'HOMEWORK' | 'QUIZ' | 'EXAM', string>;
@@ -625,107 +320,125 @@ interface SeededCourse {
   lessonsByWeek: string[][];
   /** module (week) ids, index 0 = week 1 */
   moduleIds: string[];
+  topics: string[];
 }
 
+/** Every class takes every subject of its level: ~184 whole-class courses, 8 weeks each */
 async function seedCourses(
   school: Awaited<ReturnType<typeof seedSchool>>,
   users: Awaited<ReturnType<typeof seedUsers>>,
 ) {
-  const plan = [
-    { subject: 'Algebra', group: '9A', teacher: 'Karimova' },
-    { subject: 'Algebra', group: '9B', teacher: 'Karimova' },
-    { subject: 'English', group: '9A', teacher: 'Smith' },
-    { subject: 'Physics', group: '9A', teacher: 'Aliyev' },
-  ] as const;
+  const byGroup = new Map<string, string[]>();
+  for (const s of Object.values(users.students)) {
+    byGroup.set(s.group, [...(byGroup.get(s.group) ?? []), s.id]);
+  }
 
   const courses: SeededCourse[] = [];
-  for (const p of plan) {
-    // Whole-class course: every student of the class is enrolled automatically
-    const studentIds = Object.values(users.students)
-      .filter((s) => s.group === p.group)
-      .map((s) => s.id);
-    const teacherId = users.teachers[p.teacher];
+  const rows = {
+    courses: [] as Prisma.CourseCreateManyInput[],
+    teachers: [] as Prisma.CourseTeacherCreateManyInput[],
+    enrollments: [] as Prisma.EnrollmentCreateManyInput[],
+    categories: [] as Prisma.GradeCategoryCreateManyInput[],
+    modules: [] as Prisma.ModuleCreateManyInput[],
+    lessons: [] as Prisma.LessonCreateManyInput[],
+    progress: [] as Prisma.LessonProgressCreateManyInput[],
+  };
 
-    const course = await prisma.course.create({
-      data: {
+  for (const group of CLASSES) {
+    const band = bandOf(gradeOf(group));
+    for (const subject of SUBJECTS_BY_BAND[band]) {
+      const title = `${subject} · ${group}`;
+      const teacherId = users.teacherOf.get(title);
+      if (!teacherId) throw new Error(`No teacher for ${title}`);
+      const studentIds = byGroup.get(group) ?? [];
+      const id = uuidv7();
+      rows.courses.push({
+        id,
         academicYearId: school.yearId,
-        groupId: school.groups[p.group],
-        subjectId: school.subjects[p.subject],
-        title: `${p.subject} · ${p.group}`,
+        groupId: school.groups[group],
+        subjectId: school.subjects[subject],
+        title,
         status: 'ACTIVE',
-        teachers: { create: { teacherId, role: 'OWNER' } },
-        enrollments: { create: studentIds.map((studentId) => ({ studentId })) },
-      },
-    });
+      });
+      rows.teachers.push({ courseId: id, teacherId, role: 'OWNER' });
+      // Whole-class course: every student of the class is enrolled
+      for (const studentId of studentIds) {
+        rows.enrollments.push({ courseId: id, studentId });
+      }
 
-    // School default weights: Homework 30 / Quizzes 30 / Exams 40
-    const categories = {} as SeededCourse['categories'];
-    for (const [order, [kind, name, weight]] of (
-      [
-        ['HOMEWORK', 'Homework', 30],
-        ['QUIZ', 'Quizzes', 30],
-        ['EXAM', 'Exams', 40],
-      ] as const
-    ).entries()) {
-      categories[kind] = (
-        await prisma.gradeCategory.create({
-          data: { courseId: course.id, name, weight, order },
-        })
-      ).id;
-    }
+      // School default weights: Homework 30 / Quizzes 30 / Exams 40
+      const categories = {} as SeededCourse['categories'];
+      for (const [order, [kind, name, weight]] of (
+        [
+          ['HOMEWORK', 'Homework', 30],
+          ['QUIZ', 'Quizzes', 30],
+          ['EXAM', 'Exams', 40],
+        ] as const
+      ).entries()) {
+        categories[kind] = uuidv7();
+        rows.categories.push({
+          id: categories[kind],
+          courseId: id,
+          name,
+          weight,
+          order,
+        });
+      }
 
-    const lessonsByWeek: string[][] = [];
-    const moduleIds: string[] = [];
-    for (const [w, startsAt] of WEEK_STARTS.entries()) {
-      const topic = TOPICS[p.subject][w];
-      // Weeks that have started (plus next week) are published; later ones are still drafts
-      const isPublished = startsAt <= addDays(TODAY, 7);
-      const publishedAt = isPublished
-        ? tashkent(addDays(startsAt, -2), '18:00')
-        : null;
-      const module = await prisma.module.create({
-        data: {
-          courseId: course.id,
+      const topics = TOPICS[band][subject];
+      const lessonsByWeek: string[][] = [];
+      const moduleIds: string[] = [];
+      for (const [w, startsAt] of WEEK_STARTS.entries()) {
+        const topic = topics[w];
+        // Weeks that have started (plus next week) are published; later ones are still drafts
+        const publishedAt =
+          startsAt <= addDays(TODAY, 7)
+            ? tashkent(addDays(startsAt, -2), '18:00')
+            : null;
+        const moduleId = uuidv7();
+        moduleIds.push(moduleId);
+        rows.modules.push({
+          id: moduleId,
+          courseId: id,
           title: `Week ${w + 1}: ${topic}`,
           order: w + 1,
           startsAt: day(startsAt),
           endsAt: day(addDays(startsAt, 4)),
           publishedAt,
-          lessons: {
-            create: [
-              {
-                title: topic,
-                type: 'READING',
-                body: `Notes for “${topic}”.`,
-                completionType: 'VIEW',
-                order: 1,
-                publishedAt,
-              },
-              {
-                title: `Practice: ${topic}`,
-                type: 'READING',
-                body: `Practice problems for “${topic}”.`,
-                completionType: 'MANUAL',
-                order: 2,
-                publishedAt,
-              },
-            ],
+        });
+        const lessonIds = [uuidv7(), uuidv7()];
+        lessonsByWeek.push(lessonIds);
+        rows.lessons.push(
+          {
+            id: lessonIds[0],
+            moduleId,
+            title: topic,
+            type: 'READING',
+            body: `Notes for “${topic}”.`,
+            completionType: 'VIEW',
+            order: 1,
+            publishedAt,
           },
-        },
-        include: { lessons: { orderBy: { order: 'asc' } } },
-      });
-      lessonsByWeek.push(module.lessons.map((l) => l.id));
-      moduleIds.push(module.id);
+          {
+            id: lessonIds[1],
+            moduleId,
+            title: `Practice: ${topic}`,
+            type: 'READING',
+            body: `Practice problems for “${topic}”.`,
+            completionType: 'MANUAL',
+            order: 2,
+            publishedAt,
+          },
+        );
 
-      // Progress only for lessons of weeks that are already over or running
-      if (startsAt <= TODAY) {
-        for (const lessonId of lessonsByWeek[w]) {
-          for (const studentId of studentIds) {
-            const r = random();
-            if (r < 0.12) continue; // not opened yet
-            const done = r > 0.3;
-            await prisma.lessonProgress.create({
-              data: {
+        // Progress only for lessons of weeks that are already over or running
+        if (startsAt <= TODAY) {
+          for (const lessonId of lessonIds) {
+            for (const studentId of studentIds) {
+              const r = random();
+              if (r < 0.12) continue; // not opened yet
+              const done = r > 0.3;
+              rows.progress.push({
                 studentId,
                 lessonId,
                 status: done ? 'COMPLETED' : 'IN_PROGRESS',
@@ -735,113 +448,47 @@ async function seedCourses(
                       '19:30',
                     )
                   : null,
-              },
-            });
+              });
+            }
           }
         }
       }
-    }
 
-    courses.push({
-      id: course.id,
-      subject: p.subject,
-      group: p.group,
-      teacherId,
-      studentIds,
-      categories,
-      lessonsByWeek,
-      moduleIds,
-    });
+      courses.push({
+        id,
+        subject,
+        group,
+        band,
+        teacherId,
+        studentIds,
+        categories,
+        lessonsByWeek,
+        moduleIds,
+        topics,
+      });
+    }
   }
+
+  await insertAll(rows.courses, (data) => prisma.course.createMany({ data }));
+  await insertAll(rows.teachers, (data) =>
+    prisma.courseTeacher.createMany({ data }),
+  );
+  await insertAll(rows.enrollments, (data) =>
+    prisma.enrollment.createMany({ data }),
+  );
+  await insertAll(rows.categories, (data) =>
+    prisma.gradeCategory.createMany({ data }),
+  );
+  await insertAll(rows.modules, (data) => prisma.module.createMany({ data }));
+  await insertAll(rows.lessons, (data) => prisma.lesson.createMany({ data }));
+  await insertAll(rows.progress, (data) =>
+    prisma.lessonProgress.createMany({ data }),
+  );
   return courses;
 }
 
 // ─────────────────────── 4. assignments and grades ───────────────────────
 
-type SeedQuestion = {
-  type: 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'NUMBER';
-  text: string;
-  options: string[];
-  correctOption: number | null;
-  correctNumber: number | null;
-  tolerance: number | null;
-};
-const mc = (
-  text: string,
-  options: string[],
-  correctOption: number,
-): SeedQuestion => ({
-  type: 'MULTIPLE_CHOICE',
-  text,
-  options,
-  correctOption,
-  correctNumber: null,
-  tolerance: null,
-});
-const tf = (text: string, correct: boolean): SeedQuestion => ({
-  type: 'TRUE_FALSE',
-  text,
-  options: [],
-  correctOption: correct ? 1 : 0,
-  correctNumber: null,
-  tolerance: null,
-});
-const numeric = (
-  text: string,
-  correctNumber: number,
-  tolerance = 0,
-): SeedQuestion => ({
-  type: 'NUMBER',
-  text,
-  options: [],
-  correctOption: null,
-  correctNumber,
-  tolerance,
-});
-
-/** Sample questions per subject (the same four for each quiz of a course: demo data) */
-const QUIZ_QUESTIONS: Record<string, SeedQuestion[]> = {
-  Algebra: [
-    mc('What is the discriminant of x² − 5x + 6?', ['1', '25', '−1', '49'], 0),
-    tf('A quadratic with a negative discriminant has two real roots.', false),
-    numeric('Solve 3x + 7 = 22. What is x?', 5),
-    mc('Which number is a root of x² − 9 = 0?', ['3', '9', '0', '81'], 0),
-  ],
-  English: [
-    mc('She ___ to school every day.', ['go', 'goes', 'going', 'gone'], 1),
-    tf('"Their" and "there" mean the same thing.', false),
-    mc(
-      'Which word is an adjective?',
-      ['quickly', 'happiness', 'bright', 'run'],
-      2,
-    ),
-    numeric('How many syllables are in the word "education"?', 4),
-  ],
-  Physics: [
-    mc(
-      'The SI unit of force is the …',
-      ['joule', 'newton', 'watt', 'pascal'],
-      1,
-    ),
-    tf(
-      'Without air, a heavy ball and a light ball dropped together land at the same time.',
-      true,
-    ),
-    numeric('A car travels 120 m in 10 s. What is its speed in m/s?', 12),
-    mc(
-      'Which quantity is a vector?',
-      ['mass', 'time', 'velocity', 'temperature'],
-      2,
-    ),
-  ],
-};
-
-const ALGEBRA_QUIZZES = [
-  'Linear Equations',
-  'Quadratic Equations',
-  'Quadratic Roots',
-  'Discriminant',
-];
 // Quiz n is written at the end of these weeks
 const QUIZ_WEEKS = [2, 4, 5, 7];
 /** Up to this date grades are already published; later ones are graded but still hidden */
@@ -855,11 +502,22 @@ async function seedAssignments(
   courses: SeededCourse[],
   users: Awaited<ReturnType<typeof seedUsers>>,
 ) {
-  // A stable "ability" per student, so the same student is strong in every assignment
+  // A stable "ability" per student (a rough bell curve around 78 %), so the same student is
+  // strong or weak in every assignment
   const ability: Record<string, number> = {};
-  for (const s of Object.values(users.students))
-    ability[s.id] = 0.62 + random() * 0.36;
+  for (const s of Object.values(users.students)) {
+    const bell = (random() + random() + random()) / 3 - 0.5;
+    ability[s.id] = Math.min(0.99, Math.max(0.45, 0.78 + bell * 0.5));
+  }
   const aziz = users.students['26100042'].id;
+
+  const rows = {
+    assignments: [] as Prisma.AssignmentCreateManyInput[],
+    questions: [] as Prisma.QuizQuestionCreateManyInput[],
+    submissions: [] as Prisma.SubmissionCreateManyInput[],
+    attempts: [] as Prisma.SubmissionAttemptCreateManyInput[],
+    comments: [] as Prisma.SubmissionCommentCreateManyInput[],
+  };
 
   for (const course of courses) {
     const items: {
@@ -870,26 +528,25 @@ async function seedAssignments(
       week: number;
     }[] = [];
     // Homework n belongs to week n: same topic, due on that week's Saturday
-    // (Algebra: "Homework 5: Factoring Higher Degree Polynomials", as in the design)
+    // (Algebra 9A: "Homework 5: Factoring Higher Degree Polynomials", as in the design)
     for (let n = 1; n <= 8; n++) {
-      const topic = TOPICS[course.subject][n - 1];
       items.push({
         type: 'HOMEWORK',
-        title: `Homework ${n}: ${topic}`,
+        title: `Homework ${n}: ${course.topics[n - 1]}`,
         due: addDays(WEEK_STARTS[n - 1], 5),
         maxScore: 10,
         week: n,
       });
     }
     for (let n = 1; n <= 4; n++) {
-      const title =
-        course.subject === 'Algebra'
-          ? `Quiz ${n}: ${ALGEBRA_QUIZZES[n - 1]}`
-          : `Quiz ${n}`;
       const week = QUIZ_WEEKS[n - 1];
+      const name =
+        course.subject === 'Algebra' && course.band === 'MIDDLE'
+          ? ALGEBRA_QUIZZES[n - 1]
+          : course.topics[week - 1];
       items.push({
         type: 'QUIZ',
-        title,
+        title: `Quiz ${n}: ${name}`,
         due: addDays(WEEK_STARTS[week - 1], 5),
         maxScore: 20,
         week,
@@ -904,50 +561,44 @@ async function seedAssignments(
     });
 
     for (const item of items) {
-      const dueAt = tashkent(item.due);
       const isPast = item.due < TODAY;
       const isPublished = item.due <= PUBLISHED_UNTIL;
-      const assignment = await prisma.assignment.create({
-        data: {
-          courseId: course.id,
-          // The week it sits in on the course page
-          moduleId: course.moduleIds[item.week - 1],
-          lessonId: course.lessonsByWeek[item.week - 1][1],
-          categoryId: course.categories[item.type],
-          type: item.type,
-          title: item.title,
-          instructions:
-            item.type === 'EXAM'
-              ? 'Written exam in class. Grade only, no upload.'
-              : item.type === 'QUIZ'
-                ? 'Answer every question in 15 minutes. One attempt.'
-                : 'Upload your solution as a PDF or photo.',
-          maxScore: item.maxScore,
-          dueAt,
-          allowLate: item.type === 'HOMEWORK',
-          maxAttempts: item.type === 'HOMEWORK' ? 2 : 1,
-          acceptedFileTypes:
-            item.type === 'HOMEWORK' ? ['pdf', 'jpg', 'png'] : [],
-          timeLimitMin: item.type === 'QUIZ' ? 15 : null,
-          tutorMode: item.type === 'HOMEWORK' ? 'HINTS' : 'OFF',
-          publishedAt: tashkent(addDays(item.due, -6), '18:00'),
-          gradesPublishedAt: isPublished
-            ? tashkent(addDays(item.due, 3), '17:00')
-            : null,
-          createdById: course.teacherId,
-        },
+      const assignmentId = uuidv7();
+      rows.assignments.push({
+        id: assignmentId,
+        courseId: course.id,
+        // The week it sits in on the course page
+        moduleId: course.moduleIds[item.week - 1],
+        lessonId: course.lessonsByWeek[item.week - 1][1],
+        categoryId: course.categories[item.type],
+        type: item.type,
+        title: item.title,
+        instructions:
+          item.type === 'EXAM'
+            ? 'Written exam in class. Grade only, no upload.'
+            : item.type === 'QUIZ'
+              ? 'Answer every question in 15 minutes. One attempt.'
+              : 'Upload your solution as a PDF or photo.',
+        maxScore: item.maxScore,
+        dueAt: tashkent(item.due),
+        allowLate: item.type === 'HOMEWORK',
+        maxAttempts: item.type === 'HOMEWORK' ? 2 : 1,
+        acceptedFileTypes:
+          item.type === 'HOMEWORK' ? ['pdf', 'jpg', 'png'] : [],
+        timeLimitMin: item.type === 'QUIZ' ? 15 : null,
+        tutorMode: item.type === 'HOMEWORK' ? 'HINTS' : 'OFF',
+        publishedAt: tashkent(addDays(item.due, -6), '18:00'),
+        gradesPublishedAt: isPublished
+          ? tashkent(addDays(item.due, 3), '17:00')
+          : null,
+        createdById: course.teacherId,
       });
 
       // Every quiz gets four questions worth 5 points each (= maxScore 20)
       if (item.type === 'QUIZ') {
-        await prisma.quizQuestion.createMany({
-          data: QUIZ_QUESTIONS[course.subject].map((q, order) => ({
-            ...q,
-            assignmentId: assignment.id,
-            order,
-            points: 5,
-          })),
-        });
+        for (const [order, q] of QUIZ_QUESTIONS[course.subject].entries()) {
+          rows.questions.push({ ...q, assignmentId, order, points: 5 });
+        }
       }
 
       // Exams are offline; future and today's work has no grades yet
@@ -956,21 +607,21 @@ async function seedAssignments(
       for (const studentId of course.studentIds) {
         const isAzizHw5 =
           studentId === aziz &&
-          item.title.startsWith('Homework 5') &&
-          course.group === '9A';
+          course.subject === 'Algebra' &&
+          course.group === '9A' &&
+          item.title.startsWith('Homework 5');
         const r = random();
-        if (r < 0.1 && !isAzizHw5) {
+        // Weaker students miss more work
+        if (r < 0.04 + (1 - ability[studentId]) * 0.15 && !isAzizHw5) {
           // Did not submit: after publishing the teacher pressed "Give 0 to not submitted"
           if (isPublished) {
-            await prisma.submission.create({
-              data: {
-                assignmentId: assignment.id,
-                studentId,
-                status: 'MISSING',
-                score: 0,
-                gradedById: course.teacherId,
-                gradedAt: tashkent(addDays(item.due, 2), '16:00'),
-              },
+            rows.submissions.push({
+              assignmentId,
+              studentId,
+              status: 'MISSING',
+              score: 0,
+              gradedById: course.teacherId,
+              gradedAt: tashkent(addDays(item.due, 2), '16:00'),
             });
           }
           continue;
@@ -991,115 +642,132 @@ async function seedAssignments(
               item.maxScore,
             );
 
-        await prisma.submission.create({
-          data: {
-            assignmentId: assignment.id,
-            studentId,
-            status: isGraded ? 'GRADED' : isLate ? 'LATE' : 'SUBMITTED',
-            score: isGraded ? score : null,
-            feedback:
-              isGraded && score >= item.maxScore * 0.9
-                ? 'Excellent work, keep it up!'
-                : null,
-            gradedById: isGraded ? course.teacherId : null,
-            gradedAt: isGraded ? tashkent(addDays(item.due, 2), '16:00') : null,
-            submittedAt,
-            attempts: {
-              create: {
-                number: 1,
-                text: isAzizHw5 ? 'My solution is in the attached PDF.' : null,
-                isLate,
-                submittedAt,
-              },
-            },
-            comments: isAzizHw5
-              ? {
-                  create: [
-                    {
-                      authorId: aziz,
-                      body: 'I double-checked problem 6 using synthetic division as recommended in Wednesday’s lecture. Hope the grouping notation is clear!',
-                      createdAt: submittedAt,
-                    },
-                    {
-                      authorId: course.teacherId,
-                      body: 'Watch sign distribution when factoring -(2x - 3). Remember (x² - 3) factors further over the reals into (x - √3)(x + √3).',
-                      createdAt: tashkent(addDays(item.due, 2), '15:40'),
-                    },
-                  ],
-                }
-              : undefined,
-          },
+        const submissionId = uuidv7();
+        rows.submissions.push({
+          id: submissionId,
+          assignmentId,
+          studentId,
+          status: isGraded ? 'GRADED' : isLate ? 'LATE' : 'SUBMITTED',
+          score: isGraded ? score : null,
+          feedback:
+            isGraded && score >= item.maxScore * 0.9
+              ? 'Excellent work, keep it up!'
+              : null,
+          gradedById: isGraded ? course.teacherId : null,
+          gradedAt: isGraded ? tashkent(addDays(item.due, 2), '16:00') : null,
+          submittedAt,
         });
+        rows.attempts.push({
+          submissionId,
+          number: 1,
+          text: isAzizHw5 ? 'My solution is in the attached PDF.' : null,
+          isLate,
+          submittedAt,
+        });
+        if (isAzizHw5) {
+          rows.comments.push(
+            {
+              submissionId,
+              authorId: aziz,
+              body: 'I double-checked problem 6 using synthetic division as recommended in Wednesday’s lecture. Hope the grouping notation is clear!',
+              createdAt: submittedAt,
+            },
+            {
+              submissionId,
+              authorId: course.teacherId,
+              body: 'Watch sign distribution when factoring -(2x - 3). Remember (x² - 3) factors further over the reals into (x - √3)(x + √3).',
+              createdAt: tashkent(addDays(item.due, 2), '15:40'),
+            },
+          );
+        }
       }
     }
   }
+
+  await insertAll(rows.assignments, (data) =>
+    prisma.assignment.createMany({ data }),
+  );
+  await insertAll(rows.questions, (data) =>
+    prisma.quizQuestion.createMany({ data }),
+  );
+  await insertAll(rows.submissions, (data) =>
+    prisma.submission.createMany({ data }),
+  );
+  await insertAll(rows.attempts, (data) =>
+    prisma.submissionAttempt.createMany({ data }),
+  );
+  await prisma.submissionComment.createMany({ data: rows.comments });
 }
 
 // ─────────────────── 5. attendance and announcements ───────────────────
 
-/** Weekdays a subject is taught: 1 = Monday ... 5 = Friday */
-const LESSON_DAYS: Record<string, number[]> = {
-  Algebra: [1, 3, 5],
-  English: [2, 4],
-  Physics: [1, 4],
-};
 /** Aziz's two excused absences from the parent dashboard design */
 const AZIZ_EXCUSED = ['2026-09-18', '2026-10-02'];
 
+/** One session per lesson day since the start of week 1; ~93 % present overall */
 async function seedAttendance(
   courses: SeededCourse[],
   users: Awaited<ReturnType<typeof seedUsers>>,
 ) {
   const aziz = users.students['26100042'].id;
+  const sessions: Prisma.ClassSessionCreateManyInput[] = [];
+  const records: Prisma.AttendanceRecordCreateManyInput[] = [];
 
   for (const course of courses) {
     const dates: string[] = [];
-    for (let d = '2026-09-07'; d < TODAY; d = addDays(d, 1)) {
-      if (LESSON_DAYS[course.subject].includes(day(d).getUTCDay()))
-        dates.push(d);
+    for (let d = WEEK_STARTS[0]; d < TODAY; d = addDays(d, 1)) {
+      if (LESSON_DAYS[course.subject].includes(weekday(d))) dates.push(d);
     }
 
     for (const [i, date] of dates.entries()) {
       const week = WEEK_STARTS.filter((w) => w <= date).length; // 1-based week of this date
-      const session = await prisma.classSession.create({
-        data: {
-          courseId: course.id,
-          date: day(date),
-          lessonId: course.lessonsByWeek[week - 1][0],
-          createdById: course.teacherId,
-        },
+      const sessionId = uuidv7();
+      sessions.push({
+        id: sessionId,
+        courseId: course.id,
+        date: day(date),
+        lessonId: course.lessonsByWeek[week - 1][0],
+        createdById: course.teacherId,
       });
 
-      // The last English lesson is left unmarked: it shows up in "Attendance to take"
-      if (course.subject === 'English' && i === dates.length - 1) continue;
+      // English 9A's last lesson is left unmarked: it shows up in "Attendance to take"
+      if (
+        course.subject === 'English' &&
+        course.group === '9A' &&
+        i === dates.length - 1
+      )
+        continue;
 
-      await prisma.attendanceRecord.createMany({
-        data: course.studentIds.map((studentId) => {
-          const r = random();
-          const status =
-            studentId === aziz && AZIZ_EXCUSED.includes(date)
-              ? 'EXCUSED'
-              : studentId === aziz
+      for (const studentId of course.studentIds) {
+        const r = random();
+        const status =
+          studentId === aziz && AZIZ_EXCUSED.includes(date)
+            ? 'EXCUSED'
+            : studentId === aziz
+              ? 'PRESENT'
+              : r < 0.93
                 ? 'PRESENT'
-                : r < 0.92
-                  ? 'PRESENT'
-                  : r < 0.95
-                    ? 'LATE'
-                    : r < 0.98
-                      ? 'ABSENT'
-                      : 'EXCUSED';
-          return {
-            sessionId: session.id,
-            studentId,
-            status,
-            note: status === 'EXCUSED' ? 'Note from parent' : null,
-            markedById: course.teacherId,
-            markedAt: tashkent(date, '09:10'),
-          };
-        }),
-      });
+                : r < 0.96
+                  ? 'LATE'
+                  : r < 0.985
+                    ? 'ABSENT'
+                    : 'EXCUSED';
+        records.push({
+          sessionId,
+          studentId,
+          status,
+          note: status === 'EXCUSED' ? 'Note from parent' : null,
+          markedById: course.teacherId,
+          markedAt: tashkent(date, '09:10'),
+        });
+      }
     }
   }
+
+  await insertAll(sessions, (data) => prisma.classSession.createMany({ data }));
+  await insertAll(records, (data) =>
+    prisma.attendanceRecord.createMany({ data }),
+  );
 }
 
 async function seedAnnouncements(
@@ -1165,32 +833,78 @@ async function seedAnnouncements(
     },
   ];
 
-  const readers = [...Object.values(users.students).map((s) => s.id)];
-  for (const a of items) {
-    const publishedAt = tashkent(a.at, '12:00');
-    const announcement = await prisma.announcement.create({
-      data: {
-        courseId: a.courseId,
-        authorId: a.authorId,
-        title: a.title,
-        body: a.body,
-        isPinned: a.isPinned,
-        eventDate: a.eventDate ? day(a.eventDate) : null,
-        publishedAt,
-        createdAt: publishedAt,
-      },
+  // Every other course gets one note from its teacher (the courses above keep the design's ones)
+  const notes = [
+    (c: SeededCourse) => ({
+      title: 'Quiz 4 next week',
+      body: `Quiz 4 covers “${c.topics[6]}”. Review the practice lessons of weeks 6–7.`,
+      at: '2026-10-16',
+    }),
+    (c: SeededCourse) => ({
+      title: 'Bring your notebooks on Monday',
+      body: `We start “${c.topics[6]}”. Please bring your notebook and a pencil.`,
+      at: '2026-10-15',
+    }),
+    () => ({
+      title: 'Quarter 1 exam on October 29',
+      body: 'The exam covers weeks 1–7. Week 8 is for review.',
+      at: '2026-10-14',
+    }),
+    (c: SeededCourse) => ({
+      title: 'Great work on Homework 5',
+      body: `Most of you did very well on “${c.topics[4]}”. Corrections are in your feedback.`,
+      at: '2026-10-13',
+    }),
+  ];
+  const covered = new Set(items.map((a) => a.courseId));
+  courses
+    .filter((c) => !covered.has(c.id))
+    .forEach((c, i) => {
+      const note = notes[i % notes.length](c);
+      items.push({
+        courseId: c.id,
+        authorId: c.teacherId,
+        isPinned: false,
+        eventDate: null,
+        ...note,
+      });
     });
-    // About two thirds of the students have read it (read receipts on the teacher side)
-    await prisma.announcementRead.createMany({
-      data: readers
-        .filter(() => random() < 0.66)
-        .map((userId) => ({
-          announcementId: announcement.id,
+
+  // About two thirds of the audience has read each one (read receipts on the teacher side)
+  const everyone = Object.values(users.students).map((s) => s.id);
+  const audience = new Map(courses.map((c) => [c.id, c.studentIds]));
+  const announcements: Prisma.AnnouncementCreateManyInput[] = [];
+  const reads: Prisma.AnnouncementReadCreateManyInput[] = [];
+  for (const a of items) {
+    const id = uuidv7();
+    const publishedAt = tashkent(a.at, '12:00');
+    announcements.push({
+      id,
+      courseId: a.courseId,
+      authorId: a.authorId,
+      title: a.title,
+      body: a.body,
+      isPinned: a.isPinned,
+      eventDate: a.eventDate ? day(a.eventDate) : null,
+      publishedAt,
+      createdAt: publishedAt,
+    });
+    for (const userId of a.courseId
+      ? (audience.get(a.courseId) ?? [])
+      : everyone) {
+      if (random() < 0.66) {
+        reads.push({
+          announcementId: id,
           userId,
           readAt: tashkent(addDays(a.at, 1), '08:30'),
-        })),
-    });
+        });
+      }
+    }
   }
+  await prisma.announcement.createMany({ data: announcements });
+  await insertAll(reads, (data) =>
+    prisma.announcementRead.createMany({ data }),
+  );
 
   const aziz = users.students['26100042'].id;
   await prisma.notification.createMany({
@@ -1367,6 +1081,69 @@ async function seedQuestions(
     },
   ];
 
+  // Every other grade 5–11 course: most get a question from a student about this week's topic,
+  // usually answered by the teacher, sometimes only by a classmate
+  const asks = [
+    (topic: string) => ({
+      title: `Can you explain “${topic}” again?`,
+      body: 'I did not understand the example from the last lesson.',
+      answer:
+        'Of course! Look at the practice lesson of this week — I added two worked examples.',
+    }),
+    (topic: string) => ({
+      title: `Is there extra practice for “${topic}”?`,
+      body: 'I want to prepare better before the quiz.',
+      answer:
+        'Yes — the practice lesson has extra problems. Bring your questions to class.',
+    }),
+    () => ({
+      title: 'What will the Quarter 1 exam look like?',
+      body: 'Will it be like the quizzes or longer problems?',
+      answer:
+        'Like the quizzes, plus two longer problems. Week 8 is for review.',
+    }),
+  ];
+  const story = new Set([algebra.id, physics.id]);
+  for (const c of courses) {
+    if (c.band === 'PRIMARY' || story.has(c.id) || random() < 0.35) continue;
+    const ask = pick(asks)(c.topics[5]);
+    const by = pick(c.studentIds);
+    const classmate = pick(c.studentIds.filter((id) => id !== by));
+    const date = addDays('2026-10-12', Math.floor(random() * 5));
+    const r = random();
+    const replies: Reply[] =
+      r < 0.65
+        ? [
+            {
+              by: c.teacherId,
+              staff: true,
+              body: ask.answer,
+              at: `${addDays(date, 1)} 16:30`,
+            },
+          ]
+        : r < 0.85
+          ? [
+              {
+                by: classmate,
+                body: 'Check the practice lesson, it helped me.',
+                at: `${date} 21:10`,
+              },
+            ]
+          : [];
+    items.push({
+      courseId: c.id,
+      by,
+      title: ask.title,
+      body: ask.body,
+      at: `${date} 18:${String(Math.floor(random() * 50) + 10)}`,
+      lessonId: ask.answer.startsWith('Like')
+        ? undefined
+        : c.lessonsByWeek[5][0],
+      resolved: r < 0.3 ? true : undefined,
+      replies,
+    });
+  }
+
   /** "2026-10-16 19:40" → that moment in Tashkent (moved by the week shift) */
   const at = (value: string) => {
     const [date, time] = value.split(' ');
@@ -1431,8 +1208,7 @@ export async function seedDemo(client: SeedClient, options: SeedDemoOptions) {
   prisma = client;
   SEED_PASSWORD = options.password;
   DEMO_ACCOUNTS = new Set(options.demoMode ? SHOWCASE_ACCOUNTS : []);
-  shiftMs = options.shiftTo ? weekShiftMs(options.shiftTo) : 0;
-  randomState = 2026; // same "random" scores on every run, also in a long-running worker
+  startRun(options.shiftTo ? weekShiftMs(options.shiftTo) : 0);
 
   await reset();
   const school = await seedSchool();
@@ -1448,5 +1224,5 @@ export async function seedDemo(client: SeedClient, options: SeedDemoOptions) {
     tashkent,
     students: users.students,
   });
-  return { shiftedWeeks: shiftMs / (7 * DAY_MS) };
+  return { shiftedWeeks: shiftedWeeks() };
 }
