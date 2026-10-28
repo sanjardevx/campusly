@@ -249,5 +249,52 @@
     "medal1": "Gold medal",
     "medal2": "Silver medal",
     "medal3": "Bronze medal"
+  },
+  "showcase": {
+    "eyebrow": "Campusly Portal",
+    "title": "Campusly Portal: your child’s school day in one app",
+    "subtitle": "Campusly brings parents, students and teachers into one portal. Everything about the school day is at your fingertips.",
+    "roles": {
+      "label": "Show the portal for",
+      "student": "Student",
+      "parent": "Parent"
+    },
+    "points": {
+      "student": {
+        "a": {
+          "lead": "Learning under control.",
+          "text": "Lessons, homework and quizzes for the week on one screen."
+        },
+        "b": {
+          "lead": "AI study tutor.",
+          "text": "Hints on every lesson, never ready answers."
+        },
+        "c": {
+          "lead": "Grades right away.",
+          "text": "A teacher publishes a grade and you see it with their comment."
+        }
+      },
+      "parent": {
+        "a": {
+          "lead": "Grades and attendance live.",
+          "text": "Every grade and every absence on the same day."
+        },
+        "b": {
+          "lead": "A weekly summary.",
+          "text": "On Telegram every Friday, plus every school announcement."
+        },
+        "c": {
+          "lead": "Direct line to teachers.",
+          "text": "Ask a question and get the answer inside the portal."
+        }
+      }
+    },
+    "live": "Live preview",
+    "web": "Web",
+    "mobile": "Mobile"
+  },
+  "partners": {
+    "eyebrow": "Partners",
+    "title": "Who we work with"
   }
 }

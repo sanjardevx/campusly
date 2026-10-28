@@ -249,5 +249,52 @@
     "medal1": "Oltin medal",
     "medal2": "Kumush medal",
     "medal3": "Bronza medal"
+  },
+  "showcase": {
+    "eyebrow": "Campusly portali",
+    "title": "Campusly portali: farzandingizning maktab kuni bitta ilovada",
+    "subtitle": "Campusly ota-onalar, o‘quvchilar va o‘qituvchilarni bitta portalga jamlaydi. Maktab kuni haqidagi hamma narsa qo‘lingiz ostida.",
+    "roles": {
+      "label": "Portalni ko‘rsatish",
+      "student": "O‘quvchi",
+      "parent": "Ota-ona"
+    },
+    "points": {
+      "student": {
+        "a": {
+          "lead": "O‘qish nazoratda.",
+          "text": "Haftalik darslar, uy vazifalari va testlar bitta ekranda."
+        },
+        "b": {
+          "lead": "AI yordamchi ustoz.",
+          "text": "Har bir darsda yo‘l-yo‘riq beradi, tayyor javob emas."
+        },
+        "c": {
+          "lead": "Baholar darhol.",
+          "text": "O‘qituvchi bahoni e’lon qiladi, siz uni izohi bilan ko‘rasiz."
+        }
+      },
+      "parent": {
+        "a": {
+          "lead": "Baholar va davomat jonli.",
+          "text": "Har bir baho va har bir qoldirilgan dars o‘sha kuniyoq."
+        },
+        "b": {
+          "lead": "Haftalik hisobot.",
+          "text": "Har juma Telegram’da, hamda maktabning har bir e’loni."
+        },
+        "c": {
+          "lead": "O‘qituvchilar bilan to‘g‘ridan-to‘g‘ri aloqa.",
+          "text": "Savol bering va javobni portalning o‘zida oling."
+        }
+      }
+    },
+    "live": "Jonli ko‘rinish",
+    "web": "Veb",
+    "mobile": "Mobil"
+  },
+  "partners": {
+    "eyebrow": "Hamkorlar",
+    "title": "Biz bilan hamkorlik qiladiganlar"
   }
 }

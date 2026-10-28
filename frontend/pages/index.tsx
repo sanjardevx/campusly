@@ -7,6 +7,7 @@ import { SITE_HOME } from '@/apollo/site/query';
 import { SiteEnquiry } from '@/libs/components/site/SiteEnquiry';
 import { SiteFooter } from '@/libs/components/site/SiteFooter';
 import { SiteHero } from '@/libs/components/site/SiteHero';
+import { SitePartners, SitePortalShowcase } from '@/libs/components/site/SiteShowcase';
 import { type NavSection, SiteNavbar } from '@/libs/components/site/SiteNavbar';
 import { SiteNews } from '@/libs/components/site/SiteNews';
 import { SiteHonorStudents, SiteMockTests, SiteOpenCourses } from '@/libs/components/site/SiteOpenSections';
@@ -93,6 +94,8 @@ export default function SiteHome({ site }: { site: SiteData }) {
           <SiteNews posts={site.posts} />
           <SiteWhy />
           <SiteFeatures />
+          <SitePortalShowcase />
+          <SitePartners />
           <SitePrograms programs={site.programs} />
           <SiteMockTests tests={site.mockTests} />
           <SiteOpenCourses courses={site.openCourses} />
