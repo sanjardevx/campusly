@@ -29,8 +29,8 @@ import { useReducedMotion } from '@/libs/components/dashboard/motion';
 import { EASE, HOVER, Reveal, hoverLift, hoverZoom, useScrollDraw } from './motion';
 import { SITE, type SiteData, containerSx, eyebrowSx, scrollToId, sectionTitleSx } from './tokens';
 
-/** A lighter green than the brand spruce for the icon tiles and the photo panel (the developer's reference) */
-const FRESH = { from: '#4FA383', to: '#2F7A63' } as const;
+/** The site green as a gradient for the icon tiles and the photo panel (the developer's reference) */
+const FRESH = { from: '#4FA383', to: SITE.spruce } as const;
 
 const iconTile = (size: number, radius: string) => ({
   width: size,

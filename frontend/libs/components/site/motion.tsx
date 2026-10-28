@@ -148,7 +148,7 @@ export const hoverLift = {
   [HOVER]: {
     '&:hover': {
       transform: 'translateY(-4px)',
-      boxShadow: '0 18px 36px -20px rgba(31,78,67,0.4)',
+      boxShadow: '0 18px 36px -20px rgba(47,122,99,0.4)',
     },
   },
 } as const;

@@ -3,12 +3,13 @@ import { scrollToElement } from './motion';
 
 /**
  * Colours and sizes of the Stitch "Campusly Public" screens (Landing Page A/B/C), copied from their
- * Tailwind classes: spruce #1F4E43, the warm canvas #FAF8F4, soft panels #F3F5F2, stone greys.
+ * Tailwind classes: the warm canvas #FAF8F4, soft panels #F3F5F2, stone greys. The green is the lighter
+ * one the developer picked on day 20 (#2F7A63) instead of Stitch's spruce #1F4E43.
  */
 export const SITE = {
-  spruce: '#1F4E43',
-  spruceHover: '#163931',
-  tint: '#E8EFEA',
+  spruce: '#2F7A63',
+  spruceHover: '#276852',
+  tint: '#E5F1EB',
   soft: '#F3F5F2',
   canvas: '#FAF8F4',
   ink: '#111827',

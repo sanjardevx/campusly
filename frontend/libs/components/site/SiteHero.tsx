@@ -10,7 +10,7 @@ import { SITE, type SiteData, containerSx, scrollToId } from './tokens';
 
 /** Hero photos (Stitch placeholders until the school's own; frontend/public/site) */
 const SLIDES = ['/site/hero-campus.jpg', '/site/hero-open-day.jpg', '/site/stage-high.jpg', '/site/stage-middle.jpg'];
-const SLIDE_MS = 6000;
+const SLIDE_MS = 4500;
 
 const outlineBtn = {
   borderRadius: '8px',
@@ -70,8 +70,8 @@ export function SiteHero({ stats }: { stats: SiteData['stats'] }) {
             sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', opacity: i === slide ? 1 : 0, transition: reduced ? 'none' : 'opacity 1200ms ease' }}
           />
         ))}
-        {/* Spruce scrim, dark on the left where the text is */}
-        <Box sx={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: { xs: 'linear-gradient(to top, rgba(31,78,67,0.95), rgba(31,78,67,0.75) 55%, rgba(31,78,67,0.35))', md: 'linear-gradient(to right, rgba(31,78,67,0.95), rgba(31,78,67,0.85) 50%, transparent)' } }} />
+        {/* Green scrim, strongest on the left where the text is */}
+        <Box sx={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: { xs: 'linear-gradient(to top, rgba(47,122,99,0.9), rgba(47,122,99,0.68) 55%, rgba(47,122,99,0.25))', md: 'linear-gradient(to right, rgba(47,122,99,0.9), rgba(47,122,99,0.75) 50%, transparent)' } }} />
 
         {/* Hero text */}
         <Box sx={{ position: 'relative', zIndex: 2, maxWidth: 672, pt: { xs: 18, lg: 20 }, pb: { xs: 3, md: 14 }, px: { xs: 2, sm: 4, lg: 8 }, mt: { xs: 'auto', md: 0 } }}>

@@ -91,7 +91,7 @@ export function SiteEnquiry({ contact }: { contact: SiteData['contact'] }) {
             <Typography sx={{ color: SITE.stone600, mb: 3, lineHeight: 1.625 }}>{t('enquiry.body')}</Typography>
           </Box>
           {(contact.phone || contact.officeHours) && (
-            <Box sx={{ bgcolor: SITE.tint, borderRadius: '12px', p: 2.5, border: '1px solid rgba(31,78,67,0.15)' }}>
+            <Box sx={{ bgcolor: SITE.tint, borderRadius: '12px', p: 2.5, border: '1px solid rgba(47,122,99,0.15)' }}>
               {contact.phone && (
                 <Stack component="a" href={`tel:${contact.phone.replace(/[^\d+]/g, '')}`} direction="row" sx={{ alignItems: 'center', gap: 1, fontSize: '1.25rem', fontWeight: 700, color: SITE.spruce, textDecoration: 'none' }}>
                   <PhoneOutlinedIcon />
@@ -178,7 +178,7 @@ export function SiteEnquiry({ contact }: { contact: SiteData['contact'] }) {
                 fullWidth
                 disabled={!valid || loading}
                 endIcon={loading ? <CircularProgress size={18} color="inherit" /> : <ArrowForwardRoundedIcon />}
-                sx={{ bgcolor: SITE.spruce, color: '#fff', py: 1.75, borderRadius: '12px', fontWeight: 600, fontSize: '1rem', textTransform: 'none', boxShadow: SITE.cardShadow, '&:hover': { bgcolor: SITE.spruceHover }, '&.Mui-disabled': { bgcolor: 'rgba(31,78,67,0.45)', color: '#fff' } }}
+                sx={{ bgcolor: SITE.spruce, color: '#fff', py: 1.75, borderRadius: '12px', fontWeight: 600, fontSize: '1rem', textTransform: 'none', boxShadow: SITE.cardShadow, '&:hover': { bgcolor: SITE.spruceHover }, '&.Mui-disabled': { bgcolor: 'rgba(47,122,99,0.45)', color: '#fff' } }}
               >
                 {t('enquiry.submit')}
               </Button>
