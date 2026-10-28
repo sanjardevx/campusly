@@ -1,7 +1,7 @@
-# Campusly — Plan (MVP days 1–14, phase 2 days 15–20)
+# Campusly — Plan (MVP days 1–14, phase 2 days 15–21)
 
 Time box: days 1–13 built the MVP (~85 hours); days 14–20 are all **L** days: deploy first, then the phase 2 features in a **minimal working version**, each deployed the same day. **L** = long day (8 h), **S** = short day (3–4 h).
-The project must be finished by **day 20** (re-planned 2026-10-26; the old phase 2 estimate was ~18 days).
+The project must be finished by **day 21** (re-planned 2026-10-26; the old phase 2 estimate was ~18 days; day 21 added 2026-10-28 for the website's second part).
 Decisions live in [DECISIONS.md](DECISIONS.md). Working rules for the agent live in [../CLAUDE.md](../CLAUDE.md).
 
 When the user says **"start day N"**: read this file and DECISIONS.md, then follow the teaching format in CLAUDE.md.
@@ -12,7 +12,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 3. Write `docs/journal/day-N.md` (local only, git-ignored): what was done (3–5 lines), what was deferred, and 3 interview questions with short answers.
 4. Tick the checkboxes below.
 
-**No buffer.** If days 15–20 fall behind, cut in this order: Q&A → CMS reduced to News + Enquiries → quiz Number questions → Telegram notifications (password reset stays). Cut items go to the [Backlog](#backlog-after-day-20).
+**No buffer.** If days 15–21 fall behind, cut in this order: Q&A → CMS reduced to News + Enquiries → quiz Number questions → Telegram notifications (password reset stays). Cut items go to the [Backlog](#backlog-after-day-21).
 
 ---
 
@@ -39,7 +39,8 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 | 17 | L | Quiz engine: MC / True-False / Number, timer, 1 attempt, auto-grade → gradebook |
 | 18 | L | AI Study Tutor backend: PDF → pgvector, Bedrock Haiku 5.5, SSE chat, limits; connect the UI |
 | 19 | L | Public website + minimal CMS: News & Events, Programs, Our team, Enquiries |
-| 20 | L | Q&A, student / parent calendar page, final fixes, README, public-repo prep → **done** |
+| 20 | L | Public website, part 2: Mock tests, Open Courses, Honor Students; motion, sticky navbar, portal showcase, partners |
+| 21 | L | Q&A, student / parent calendar page, final fixes, README, public-repo prep → **done** |
 
 **External prerequisites:** AWS account ready by the end of day 4 (S3 on day 6). Domain `campusly.uz` active with DNS access by day 15 (if not, days 15 and 16 swap). Bedrock Anthropic model access requested on day 14 (needed on day 18). Telegram bot token from BotFather by day 16.
 
@@ -287,7 +288,20 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ---
 
-## Day 20 (L) — Q&A, calendar, finish
+## Day 20 (L) — Public website, part 2
+
+- [x] CMS tables + admin pages: Mock tests (date, start time, seats, price, contact person or phone; past tests drop off the site), Open Courses (YouTube lessons, publishing needs a lesson), Honor Students (a real student, the class at that time, shown only with the parent's consent and as a short name "Madina A.") + migrations, audited, archive instead of delete.
+- [x] Their sections on the home page, in 4 languages; e2e tests for the new APIs.
+- [x] Motion: Lenis smooth scroll, reveal on scroll, typewriter headline, numbers counting up, hover lifts; nothing moves with reduced motion.
+- [x] Facilities section, team in rows of 4 + 3, admission timeline after the Jahon School reference that fills while scrolling.
+- [x] Sticky glass navbar with the section links (a bottom sheet on phones).
+- [x] Portal showcase: a MacBook and iPhones playing screenshots of the real portal (student / parent, 4 languages, `frontend/scripts/capture-portal-shots.mjs`); partners marquee.
+- [x] Lighter site green (#2F7A63), faster hero slides.
+- [ ] Deploy (migrations + API; the site content arrives with the nightly demo reset, 03:00 Tashkent).
+
+---
+
+## Day 21 (L) — Q&A, calendar, finish
 
 - [ ] Q&A: a student asks under a lesson, the teacher answers (`CourseQuestion`); the teacher dashboard card goes live.
 - [ ] Calendar page for students and parents (the `studentCalendar` API already exists).
@@ -296,16 +310,15 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [ ] README: architecture diagram, demo accounts, screenshots.
 - [ ] Public-repo prep (see CLAUDE.md "Before the repo goes public"; purging the journal history only after the developer approves).
 
-**Done when:** every day 15–20 feature works on `campusly.uz`, and the repo is ready to go public.
+**Done when:** every day 15–21 feature works on `campusly.uz`, and the repo is ready to go public.
 
 ---
 
-## Backlog (after day 20)
+## Backlog (after day 21)
 
 Only if needed after the school's feedback:
 
 - HLS (MediaConvert) + multipart upload — MP4 is enough for now.
 - Socket.IO notifications — Telegram covers notifications.
-- Public site: Mock tests, Open Courses, Honor Students.
 - Tutor: PPTX ingestion (PDF only for now).
 - Manual `finalScore` override UI; parent "More" page (notifications, Telegram, report a problem); longer refresh grace window for interrupted `/auth/refresh` calls.
