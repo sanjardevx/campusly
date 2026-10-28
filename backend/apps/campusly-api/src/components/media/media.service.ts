@@ -119,7 +119,13 @@ export class MediaService {
       where: { id: user.id },
       select: { isDemo: true },
     });
-    if (account.isDemo) throw forbidden('Demo accounts cannot upload files');
+    // Its own code, so the page says "not available in the demo" instead of "no access"
+    if (account.isDemo) {
+      throw new ForbiddenException({
+        code: ErrorCode.DEMO_READ_ONLY,
+        message: 'Demo accounts cannot upload files',
+      });
+    }
   }
 
   /** Type/size rules, pending limit, the asset row and the presigned PUT */
@@ -388,10 +394,6 @@ function toMediaAsset(asset: {
 
 function badRequest(message: string) {
   return new BadRequestException({ code: ErrorCode.BAD_REQUEST, message });
-}
-
-function forbidden(message: string) {
-  return new ForbiddenException({ code: ErrorCode.FORBIDDEN, message });
 }
 
 function notFound(message: string) {

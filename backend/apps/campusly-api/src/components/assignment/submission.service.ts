@@ -151,12 +151,18 @@ export class SubmissionService {
       },
       include: { _count: { select: { attempts: true } } },
     });
-    if (existing?.status === 'GRADED') {
+    // Demo students may hand in again, also graded work, while the grades are not published
+    // (DECISIONS §12, demo v2); the nightly reset puts the demo classes back
+    if (existing?.status === 'GRADED' && !user.isDemo) {
       throw badRequest('Already graded: ask the teacher to return it');
     }
     const used = existing?._count.attempts ?? 0;
     // RETURNED ("please redo") gives one more attempt even when all were used
-    if (used >= assignment.maxAttempts && existing?.status !== 'RETURNED') {
+    if (
+      used >= assignment.maxAttempts &&
+      existing?.status !== 'RETURNED' &&
+      !user.isDemo
+    ) {
       throw badRequest('No attempts left');
     }
 
@@ -308,8 +314,9 @@ export class SubmissionService {
         hidden || !row.gradedBy
           ? null
           : `${row.gradedBy.firstName} ${row.gradedBy.lastName}`,
+      // RETURNED gives one more; a demo student always may hand in again (DECISIONS §12, demo v2)
       attemptsLeft:
-        row.status === 'RETURNED'
+        row.status === 'RETURNED' || viewer.isDemo
           ? Math.max(1, rules.maxAttempts - row.attempts.length)
           : Math.max(0, rules.maxAttempts - row.attempts.length),
       attempts: row.attempts.map((a) => ({

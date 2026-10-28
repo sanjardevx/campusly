@@ -141,7 +141,9 @@ export class QuizService {
     return {
       ...base,
       state: open ? QuizState.IN_PROGRESS : QuizState.SUBMITTED,
-      canStart: false,
+      // Demo students may try a finished quiz again while it is open (DECISIONS §12, demo v2)
+      canStart:
+        !open && user.isDemo && this.canStart(quiz, questions.length, now),
       startedAt: attempt.startedAt,
       deadlineAt: attempt.deadlineAt,
       submittedAt: attempt.submittedAt,
@@ -169,6 +171,7 @@ export class QuizService {
         message: 'This quiz cannot be started',
       });
     }
+    if (user.isDemo) await this.clearDemoAttempt(quiz.id, user.id);
     const byLimit = new Date(now.getTime() + (quiz.timeLimitMin ?? 0) * 60_000);
     const deadlineAt =
       quiz.dueAt && quiz.dueAt < byLimit ? quiz.dueAt : byLimit;
@@ -374,6 +377,33 @@ export class QuizService {
     });
     if (!attempt) throw notFound('Start the quiz first');
     return attempt;
+  }
+
+  /**
+   * Demo students may retake a quiz (DECISIONS §12, demo v2): a finished attempt, its answers and
+   * its score are removed before the new start. Demo data is rebuilt every night, so these rows
+   * are not records; an attempt still running is kept (a double click must not restart it).
+   */
+  private async clearDemoAttempt(assignmentId: string, studentId: string) {
+    const done = await this.prismaService.quizAttempt.findFirst({
+      where: { assignmentId, studentId, submittedAt: { not: null } },
+      select: { id: true },
+    });
+    if (!done) return;
+    const submission = { assignmentId, studentId };
+    await this.prismaService.$transaction([
+      this.prismaService.quizAnswer.deleteMany({
+        where: { attemptId: done.id },
+      }),
+      this.prismaService.quizAttempt.delete({ where: { id: done.id } }),
+      this.prismaService.submissionComment.deleteMany({
+        where: { submission },
+      }),
+      this.prismaService.submissionAttempt.deleteMany({
+        where: { submission },
+      }),
+      this.prismaService.submission.deleteMany({ where: submission }),
+    ]);
   }
 
   private canStart(

@@ -412,6 +412,8 @@
     "due": "마감 {{date}}",
     "submittedTitle": "답안을 제출했습니다",
     "submittedBody": "선생님이 성적을 공개하면 점수와 정답을 볼 수 있습니다.",
+    "retake": "다시 풀기",
+    "retakeHint": "데모: 이 퀴즈는 원하는 만큼 다시 풀 수 있습니다.",
     "readyTitle": "준비되었나요?",
     "start": "퀴즈 시작",
     "notReady": "선생님이 아직 문제를 추가하지 않았습니다.",

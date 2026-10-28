@@ -32,10 +32,6 @@
       "TEACHER": {
         "name": "O'qituvchi",
         "text": "Kurslar va haftalar, baholash, jurnal va davomat."
-      },
-      "ADMIN": {
-        "name": "Administrator",
-        "text": "Foydalanuvchilar, sinflar va kurslar, sozlamalar va hisobotlar."
       }
     }
   },

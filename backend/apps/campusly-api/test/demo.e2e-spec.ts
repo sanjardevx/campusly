@@ -10,7 +10,8 @@ import { RedisService } from '../src/database/redis.service';
 import { PrismaService } from '../src/database/prisma.service';
 import { REFRESH_COOKIE } from '../src/libs/config';
 
-// Needs Docker Postgres + Redis. Two demo accounts (student, admin); DEMO_MODE is switched by a
+// Needs Docker Postgres + Redis. Two demo-flagged accounts (student, admin — there is no admin demo
+// login since demo v2, but the guard still protects such an account); DEMO_MODE is switched by a
 // spy on ConfigService, so the real .env (DEMO_MODE=false) stays as it is.
 const TAG = 'E2E Demo';
 
@@ -35,6 +36,8 @@ describe('Demo login (e2e)', () => {
         .send({ query })
     ).body as GqlBody;
   const code = (body: GqlBody) => body.errors?.[0].extensions.code ?? 'OK';
+
+  let seededDemoIds: string[] = [];
 
   async function cleanUp() {
     const users = await prisma.user.findMany({
@@ -66,6 +69,17 @@ describe('Demo login (e2e)', () => {
       .mockImplementation((key) => (key === 'DEMO_MODE' ? demoOn : get(key)));
 
     await cleanUp();
+    // The seeded school's demo accounts would win the role (an e2e run may have seeded it):
+    // only this file's accounts are demo while it runs, the others get their flag back after
+    const seeded = await prisma.user.findMany({
+      where: { isDemo: true },
+      select: { id: true },
+    });
+    seededDemoIds = seeded.map((u) => u.id);
+    await prisma.user.updateMany({
+      where: { id: { in: seededDemoIds } },
+      data: { isDemo: false },
+    });
     const passwordHash = await bcrypt.hash('E2e-Demo-Password-1', 10);
     await prisma.user.createMany({
       data: [
@@ -94,6 +108,10 @@ describe('Demo login (e2e)', () => {
 
   afterAll(async () => {
     await cleanUp();
+    await prisma.user.updateMany({
+      where: { id: { in: seededDemoIds } },
+      data: { isDemo: true },
+    });
     await app.close();
   });
 
@@ -121,7 +139,13 @@ describe('Demo login (e2e)', () => {
     const change = `mutation { changePassword(input: { currentPassword: "E2e-Demo-Password-1", newPassword: "Another-Password-2" }) { accessToken } }`;
     expect(code(await gql(change, student.accessToken))).toBe('DEMO_READ_ONLY');
 
-    const admin = (await demo('ADMIN')).body as { accessToken: string };
+    // No admin demo login (DECISIONS §12, demo v2); a demo-flagged admin signed in with a password
+    // is still kept away from user management by the guard
+    const admin = (
+      await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ loginId: 'e2e-demo-admin', password: 'E2e-Demo-Password-1' })
+    ).body as { accessToken: string };
     const block = `mutation { blockUser(userId: "01a00000-0000-7000-8000-000000000000") }`;
     expect(code(await gql(block, admin.accessToken))).toBe('DEMO_READ_ONLY');
     // Reading is fine
@@ -135,10 +159,11 @@ describe('Demo login (e2e)', () => {
     ).toBe('OK');
   });
 
-  it('no demo account for the role → 404; an unknown role → 400', async () => {
+  it('no demo account for the role → 404; ADMIN or an unknown role → 400', async () => {
     expect((await demo('PARENT').expect(404)).body).toMatchObject({
       code: 'NOT_FOUND',
     });
+    await demo('ADMIN').expect(400);
     await demo('ROOT').expect(400);
   });
 

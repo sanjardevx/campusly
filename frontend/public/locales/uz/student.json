@@ -430,6 +430,8 @@
     "due": "Muddat: {{date}}",
     "submittedTitle": "Javoblaringiz topshirildi",
     "submittedBody": "O‘qituvchi baholarni e’lon qilgach, ballingiz va to‘g‘ri javoblarni ko‘rasiz.",
+    "retake": "Qayta yechish",
+    "retakeHint": "Demo: bu testni xohlagancha qayta yechishingiz mumkin.",
     "readyTitle": "Tayyormisiz?",
     "start": "Quiz’ni boshlash",
     "notReady": "O‘qituvchi hali savollar qo‘shmagan.",

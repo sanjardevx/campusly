@@ -210,7 +210,7 @@ describe('Uploads: createUpload → confirmUpload (e2e)', () => {
   it('createUpload: only the course’s teachers, never a demo account', async () => {
     expect(code(await gql(CREATE, video(), 'tB'))).toBe('NOT_FOUND');
     expect(code(await gql(CREATE, video(), 'student'))).toBe('FORBIDDEN');
-    expect(code(await gql(CREATE, video(), 'demo'))).toBe('FORBIDDEN');
+    expect(code(await gql(CREATE, video(), 'demo'))).toBe('DEMO_READ_ONLY');
   });
 
   it('confirmUpload: checks S3 itself; READY once, the same answer on a retry', async () => {

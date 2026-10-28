@@ -22,7 +22,8 @@ const envSchema = z
       .enum(['true', 'false'])
       .default('false')
       .transform((v) => v === 'true'),
-    // The batch's nightly demo reset gives every seeded account this password (DEMO_MODE only)
+    // The password every account gets when the full seed runs (`prisma db seed`); the nightly
+    // demo reset creates no accounts, so it does not use it (DECISIONS §12, demo v2)
     SEED_PASSWORD: optional(z.string().min(8)),
 
     // Media (S3 + CloudFront). All or nothing: without them uploads and videos are off (CI, tests).
@@ -51,6 +52,8 @@ const envSchema = z
       .default('off'),
     // Requests per student per day ("Show another hint" counts too)
     TUTOR_DAILY_LIMIT: z.coerce.number().int().min(1).max(200).default(20),
+    // Demo accounts are shared by every visitor: a small daily limit each (DECISIONS §12, demo v2)
+    TUTOR_DEMO_DAILY_LIMIT: z.coerce.number().int().min(1).max(200).default(5),
     // Anthropic API (TUTOR_PROVIDER=anthropic): the key lives in SSM as a SecureString
     ANTHROPIC_API_KEY: optional(z.string().regex(/^sk-ant-[\w-]{20,}$/)),
     ANTHROPIC_CHAT_MODEL_ID: z.string().min(3).default('claude-haiku-5-5'),

@@ -32,10 +32,6 @@
       "TEACHER": {
         "name": "Teacher",
         "text": "Courses and weeks, grading, gradebook and attendance."
-      },
-      "ADMIN": {
-        "name": "Admin",
-        "text": "Users, classes and courses, school settings and records."
       }
     }
   },

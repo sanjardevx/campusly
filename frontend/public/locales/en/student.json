@@ -430,6 +430,8 @@
     "due": "Due {{date}}",
     "submittedTitle": "Your answers are submitted",
     "submittedBody": "You will see your score and the right answers when your teacher publishes the grades.",
+    "retake": "Take it again",
+    "retakeHint": "Demo: you can take this quiz as many times as you like.",
     "readyTitle": "Ready?",
     "start": "Start quiz",
     "notReady": "The teacher has not added questions yet.",

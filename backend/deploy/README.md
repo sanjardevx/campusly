@@ -158,7 +158,9 @@ docker compose -f docker-compose.prod.yml up -d
 docker compose -f docker-compose.prod.yml ps                         # api, batch, caddy, redis: Up
 ```
 
-The seed **empties every table** first, so it refuses any non-local database unless `SEED_ALLOW_RESET=true` is passed. Pass it only for this demo database.
+The seed **empties every table** first, so it refuses any non-local database unless `SEED_ALLOW_RESET=true` is passed. Since demo v2 (day 23) the admin's content lives in this database too: run the full seed on prod **only once more** (the switch below), never again after the admin has entered real content.
+
+**Switch to demo v2 (day 23, once):** after the deploy, run the seed command above one last time, then sign in at `campusly.uz/login/teacher` as `simon` with the `SEED_PASSWORD` from SSM (`aws ssm get-parameter --name /campusly/prod/SEED_PASSWORD --with-decryption --query Parameter.Value --output text`) and change the password right away (account menu → Change password). From then on `simon` is a normal admin: uploads, users and website content persist; `SEED_PASSWORD` is only read when a full seed runs.
 
 Health, on the box and from the Mac:
 
@@ -168,7 +170,7 @@ curl -s http://<ELASTIC_IP>/graphql -H 'content-type: application/json' \
 # {"data":{"health":{"status":"ok","postgres":true,"redis":true,"migration":"2026..."}}}
 ```
 
-Nightly demo reset: with `DEMO_MODE=true` the batch puts the demo data back at **03:00 Tashkent** (moved to the current week). Check the next morning: `docker compose -f docker-compose.prod.yml logs batch | grep BATCH_DEMO_RESET`. The batch reads the new code only after a rebuild: `docker compose -f docker-compose.prod.yml up -d --build`.
+Nightly demo reset: with `DEMO_MODE=true` the batch puts **only the demo classes 9A / 11A and the demo accounts' traces** back at **03:00 Tashkent** (moved to the current week); the admin's data and the other classes are never touched (DECISIONS §12, demo v2). Check the next morning: `docker compose -f docker-compose.prod.yml logs batch | grep BATCH_DEMO_RESET`. The batch reads the new code only after a rebuild: `docker compose -f docker-compose.prod.yml up -d --build`.
 
 `API_DOMAIN` is the address Caddy serves: `:80` (plain HTTP on the Elastic IP) before the domain worked, `api.campusly.uz` since day 15 — Caddy then gets and renews the Let's Encrypt certificate by itself (HTTP → 308 HTTPS).
 

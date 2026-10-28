@@ -329,10 +329,10 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 23 (L) — Partial reset and demo rules
 
-- [ ] Nightly reset rewrites only the 9A / 11A course data and the demo accounts' traces (submissions, attempts, tutor chats, reads, questions), moved to the current week; admin data and every other class stay untouched.
-- [ ] Demo accounts may write inside 9A / 11A; demo students may retake quizzes and resubmit homework; a small daily tutor limit for demo accounts; upload, password change, Telegram and admin stay blocked.
-- [ ] ADMIN removed from the demo login (API input + frontend).
-- [ ] e2e: the reset leaves admin rows and other classes untouched; a demo account cannot write outside 9A / 11A; blocked actions refuse.
+- [x] Nightly reset rewrites only the 9A / 11A course data and the demo accounts' traces (submissions, attempts, tutor chats, reads, questions), moved to the current week; admin data and every other class stay untouched.
+- [x] Demo accounts may write inside 9A / 11A; demo students may retake quizzes and resubmit homework; a small daily tutor limit for demo accounts; upload, password change, Telegram and admin stay blocked.
+- [x] ADMIN removed from the demo login (API input + frontend).
+- [x] e2e: the reset leaves admin rows and other classes untouched; a demo account cannot write outside 9A / 11A; blocked actions refuse.
 - [ ] Prod switch: one last full seed → the developer changes the `simon` password → from then on admin content persists.
 
 **Developer:** change the admin password after the switch; enter real content (news etc.) only after it.

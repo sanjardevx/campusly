@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createSeedClient, seedDemo } from '../../../prisma/demo-seed';
+import { createSeedClient, resetDemoClasses } from '../../../prisma/demo-seed';
 import { finishQuizAttempt } from '../../campusly-api/src/components/assignment/quiz-grading';
 import { StorageService } from '../../campusly-api/src/components/media/storage.service';
 import { PrismaService } from '../../campusly-api/src/database/prisma.service';
@@ -60,19 +60,19 @@ export class CampuslyBatchService {
   }
 
   /**
-   * The public demo goes back to fresh seed data every night, so one visitor's changes do not
-   * stay for the next. The story is moved forward in whole weeks, so deadlines and "this week"
-   * stay current. Call it only when DEMO_MODE=true (BatchCron checks): it wipes every table.
+   * The demo classes (9A / 11A) go back to fresh seed data every night, so one visitor's changes
+   * do not stay for the next; the story is moved forward in whole weeks, so deadlines and "this
+   * week" stay current. Only 9A / 11A and the demo accounts' traces change: the admin's data and
+   * the other classes are never touched (DECISIONS §12, demo v2). BatchCron calls it only when
+   * DEMO_MODE=true.
    */
   public async resetDemo(now = new Date()) {
-    const password = this.config.get('SEED_PASSWORD', { infer: true });
-    if (!password) throw new Error('SEED_PASSWORD is not set');
     // Its own short connection: the seed writes columns that PrismaService hides
     const client = createSeedClient(
       this.config.get('DATABASE_URL', { infer: true }),
     );
     try {
-      return await seedDemo(client, { password, demoMode: true, shiftTo: now });
+      return await resetDemoClasses(client, { shiftTo: now });
     } finally {
       await client.$disconnect();
     }

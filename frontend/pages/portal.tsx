@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { useQuery, useReactiveVar } from '@apollo/client/react';
 import { Alert, Box, Button, Card, Stack, Typography } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
-import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import CoPresentOutlinedIcon from '@mui/icons-material/CoPresentOutlined';
@@ -33,11 +32,11 @@ export const getStaticProps = withTranslations(['landing']);
 /** Page container width: the usual 1200–1300 px for a marketing page on wide screens */
 const CONTAINER = 1300;
 
+// No admin demo (DECISIONS §12, demo v2): the admin console holds the school's real content
 const DEMOS: { role: Role; icon: SvgIconComponent }[] = [
   { role: 'STUDENT', icon: SchoolOutlinedIcon },
   { role: 'PARENT', icon: FamilyRestroomOutlinedIcon },
   { role: 'TEACHER', icon: CoPresentOutlinedIcon },
-  { role: 'ADMIN', icon: AdminPanelSettingsOutlinedIcon },
 ];
 
 const FEATURES: { key: string; icon: SvgIconComponent }[] = [

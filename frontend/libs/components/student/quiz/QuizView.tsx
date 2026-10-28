@@ -83,6 +83,8 @@ export function QuizView({ data }: { data: StudentAssignmentQuery }) {
   const run = async (action: 'start' | 'submit') => {
     setConfirm(null);
     setError(null);
+    // A demo retake starts over: forget the last "submitted" answer of this page
+    if (action === 'start') submitState.reset();
     try {
       if (action === 'start') await start({ variables: { assignmentId: a.id } });
       else await submit({ variables: { assignmentId: a.id } });
@@ -140,6 +142,15 @@ export function QuizView({ data }: { data: StudentAssignmentQuery }) {
             <CloudDoneOutlinedIcon sx={{ fontSize: 40, color: 'secondary.main' }} />
             <Typography sx={{ mt: 1, fontWeight: 600 }}>{t('quiz.submittedTitle')}</Typography>
             <Typography sx={{ mt: 0.5, color: 'text.secondary', fontSize: '0.875rem' }}>{t('quiz.submittedBody')}</Typography>
+            {/* Demo students may take an open quiz again (the server says so with canStart) */}
+            {quiz.canStart && !submitState.data && (
+              <Box sx={{ mt: 2 }}>
+                <Button variant="outlined" disabled={startState.loading} onClick={() => setConfirm('start')}>
+                  {t('quiz.retake')}
+                </Button>
+                <Typography sx={{ mt: 1, color: 'text.secondary', fontSize: '0.75rem' }}>{t('quiz.retakeHint')}</Typography>
+              </Box>
+            )}
           </Card>
         )
       ) : published && sub?.score != null ? (

@@ -121,7 +121,7 @@ export class TutorService {
     return {
       enabled: this.llm !== null,
       used: await this.limits.used(user.id),
-      limit: this.limits.limit,
+      limit: this.limits.limitFor(user),
       quizActive: await this.hasOpenQuiz(user.id),
     };
   }
@@ -232,7 +232,7 @@ export class TutorService {
       });
     }
     await this.limits.assertBudget();
-    await this.limits.reserve(user.id);
+    await this.limits.reserve(user);
     return {
       user,
       llm: this.llm,

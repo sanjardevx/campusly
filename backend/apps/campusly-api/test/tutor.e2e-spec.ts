@@ -313,7 +313,7 @@ describe('AI Study Tutor: index, SSE chat, levels, rules, limits, isolation (e2e
     expect(res.data!.tutorStatus).toEqual({
       enabled: true,
       used: 0,
-      limit: app.get(TutorLimitsService).limit,
+      limit: app.get(TutorLimitsService).limitFor({ isDemo: false }),
       quizActive: false,
     });
   });
@@ -498,7 +498,10 @@ describe('AI Study Tutor: index, SSE chat, levels, rules, limits, isolation (e2e
   });
 
   it('stops at the daily limit and when the school budget is used up', async () => {
-    await redis.set(questionsKey(id.sA), app.get(TutorLimitsService).limit);
+    await redis.set(
+      questionsKey(id.sA),
+      app.get(TutorLimitsService).limitFor({ isDemo: false }),
+    );
     const limited = await chat(
       { action: 'ASK', courseId: course.A, text: 'one more' },
       'sA',

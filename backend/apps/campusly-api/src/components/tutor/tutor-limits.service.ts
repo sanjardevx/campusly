@@ -24,7 +24,8 @@ const MICRO = 1_000_000;
 
 /**
  * The tutor's two limits (DECISIONS §14), in Redis because every request checks them:
- * - per student: TUTOR_DAILY_LIMIT requests a day (env, default 20) (INCR is atomic, so two tabs cannot both
+ * - per student: TUTOR_DAILY_LIMIT requests a day (env, default 20; a demo account TUTOR_DEMO_DAILY_LIMIT,
+ *   default 5) (INCR is atomic, so two tabs cannot both
  *   take the last one);
  * - per school: TUTOR_DAILY_BUDGET_USD of model spend a day, so a bug or a busy day cannot
  *   run up the AWS bill. A request already running may finish over it; the next one waits.
@@ -33,13 +34,21 @@ const MICRO = 1_000_000;
 @Injectable()
 export class TutorLimitsService {
   /** Requests per student per day */
-  public readonly limit: number;
+  private readonly limit: number;
+  /** The same for a demo account, which every visitor of the public demo shares */
+  private readonly demoLimit: number;
 
   constructor(
     private readonly redis: RedisService,
     config: ConfigService<Env, true>,
   ) {
     this.limit = config.get('TUTOR_DAILY_LIMIT', { infer: true });
+    this.demoLimit = config.get('TUTOR_DEMO_DAILY_LIMIT', { infer: true });
+  }
+
+  /** Today's request limit of this student */
+  public limitFor(user: { isDemo: boolean }): number {
+    return user.isDemo ? this.demoLimit : this.limit;
   }
 
   private day(now = new Date()) {
@@ -57,11 +66,11 @@ export class TutorLimitsService {
   }
 
   /** Takes one of today's requests, or refuses when none are left */
-  public async reserve(studentId: string): Promise<number> {
-    const key = this.questionKey(studentId);
+  public async reserve(user: { id: string; isDemo: boolean }): Promise<number> {
+    const key = this.questionKey(user.id);
     const used = await this.redis.incr(key);
     if (used === 1) await this.redis.expire(key, TTL_SEC);
-    if (used > this.limit) {
+    if (used > this.limitFor(user)) {
       await this.redis.decr(key);
       throw new HttpException(
         {

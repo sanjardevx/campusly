@@ -323,10 +323,17 @@ interface SeededCourse {
   topics: string[];
 }
 
+type School = Pick<
+  Awaited<ReturnType<typeof seedSchool>>,
+  'yearId' | 'subjects' | 'groups'
+>;
+type SeedUsers = Awaited<ReturnType<typeof seedUsers>>;
+
 /** Every class takes every subject of its level: ~184 whole-class courses, 8 weeks each */
 async function seedCourses(
-  school: Awaited<ReturnType<typeof seedSchool>>,
-  users: Awaited<ReturnType<typeof seedUsers>>,
+  school: School,
+  users: SeedUsers,
+  classes: string[] = CLASSES,
 ) {
   const byGroup = new Map<string, string[]>();
   for (const s of Object.values(users.students)) {
@@ -344,7 +351,7 @@ async function seedCourses(
     progress: [] as Prisma.LessonProgressCreateManyInput[],
   };
 
-  for (const group of CLASSES) {
+  for (const group of classes) {
     const band = bandOf(gradeOf(group));
     for (const subject of SUBJECTS_BY_BAND[band]) {
       const title = `${subject} · ${group}`;
@@ -498,10 +505,7 @@ const PUBLISHED_UNTIL = '2026-10-01';
 const roundHalf = (n: number, max: number) =>
   Math.min(max, Math.max(0, Math.round(n * 2) / 2));
 
-async function seedAssignments(
-  courses: SeededCourse[],
-  users: Awaited<ReturnType<typeof seedUsers>>,
-) {
+async function seedAssignments(courses: SeededCourse[], users: SeedUsers) {
   // A stable "ability" per student (a rough bell curve around 78 %), so the same student is
   // strong or weak in every assignment
   const ability: Record<string, number> = {};
@@ -705,10 +709,7 @@ async function seedAssignments(
 const AZIZ_EXCUSED = ['2026-09-18', '2026-10-02'];
 
 /** One session per lesson day since the start of week 1; ~93 % present overall */
-async function seedAttendance(
-  courses: SeededCourse[],
-  users: Awaited<ReturnType<typeof seedUsers>>,
-) {
+async function seedAttendance(courses: SeededCourse[], users: SeedUsers) {
   const aziz = users.students['26100042'].id;
   const sessions: Prisma.ClassSessionCreateManyInput[] = [];
   const records: Prisma.AttendanceRecordCreateManyInput[] = [];
@@ -770,13 +771,19 @@ async function seedAttendance(
   );
 }
 
+/**
+ * The design's announcements, then one note per other course. `withSchool` false (the partial
+ * reset): only the given courses' announcements, the school-wide ones belong to the admin.
+ */
 async function seedAnnouncements(
   courses: SeededCourse[],
-  users: Awaited<ReturnType<typeof seedUsers>>,
+  users: SeedUsers,
+  withSchool = true,
 ) {
+  // undefined: the course is not part of this run (the partial reset rewrites 9A / 11A only)
   const course = (title: string) =>
-    courses.find((c) => `${c.subject} · ${c.group}` === title)!;
-  const items = [
+    courses.find((c) => `${c.subject} · ${c.group}` === title)?.id;
+  const story = [
     {
       courseId: null,
       authorId: users.adminId,
@@ -796,7 +803,7 @@ async function seedAnnouncements(
       at: '2026-10-15',
     },
     {
-      courseId: course('Algebra · 9A').id,
+      courseId: course('Algebra · 9A'),
       authorId: users.teachers.Karimova,
       title: 'Quiz 4: Discriminant on Saturday',
       body: 'Review weeks 5–6. Calculators are not allowed.',
@@ -805,7 +812,7 @@ async function seedAnnouncements(
       at: '2026-10-16',
     },
     {
-      courseId: course('Algebra · 9B').id,
+      courseId: course('Algebra · 9B'),
       authorId: users.teachers.Karimova,
       title: 'Homework 6 hints',
       body: 'Start with the discriminant before solving each equation.',
@@ -814,7 +821,7 @@ async function seedAnnouncements(
       at: '2026-10-14',
     },
     {
-      courseId: course('English · 9A').id,
+      courseId: course('English · 9A'),
       authorId: users.teachers.Smith,
       title: 'Bring Animal Farm to class',
       body: 'We will discuss chapters 4–6 on Tuesday.',
@@ -823,7 +830,7 @@ async function seedAnnouncements(
       at: '2026-10-13',
     },
     {
-      courseId: course('Physics · 9A').id,
+      courseId: course('Physics · 9A'),
       authorId: users.teachers.Aliyev,
       title: 'Lab Protocol 4 deadline extended',
       body: 'You can submit Lab Protocol 4 until Friday with full credit.',
@@ -832,6 +839,12 @@ async function seedAnnouncements(
       at: '2026-10-15',
     },
   ];
+
+  const items = story
+    .filter(
+      (a) => a.courseId !== undefined && (withSchool || a.courseId !== null),
+    )
+    .map((a) => ({ ...a, courseId: a.courseId ?? null }));
 
   // Every other course gets one note from its teacher (the courses above keep the design's ones)
   const notes = [
@@ -937,10 +950,7 @@ async function seedAnnouncements(
 // ──────────────────────────────── 7. Q&A ────────────────────────────────
 
 /** Course Q&A threads from the Stitch Q&A screens: two unanswered ones fill the teacher's inbox */
-async function seedQuestions(
-  courses: SeededCourse[],
-  users: Awaited<ReturnType<typeof seedUsers>>,
-) {
+async function seedQuestions(courses: SeededCourse[], users: SeedUsers) {
   const course = (title: string) =>
     courses.find((c) => `${c.subject} · ${c.group}` === title)!;
   const student = (loginId: string) => users.students[loginId].id;
@@ -1176,6 +1186,178 @@ async function seedQuestions(
       },
     });
   }
+}
+
+// ─────────────────────────── partial nightly reset ───────────────────────────
+
+/** The classes that belong to the demo (DECISIONS §12, demo v2): the nightly reset rewrites them */
+export const DEMO_CLASSES = ['9A', '11A'];
+
+/** The current year's school structure and courses of the demo classes, read from the database */
+async function loadSchool() {
+  const year = await prisma.academicYear.findFirst({
+    where: { isCurrent: true },
+  });
+  if (!year)
+    throw new Error('No current academic year: run the full seed first');
+  const groups: Record<string, string> = {};
+  for (const g of await prisma.group.findMany({
+    where: { academicYearId: year.id, name: { in: DEMO_CLASSES } },
+  })) {
+    groups[g.name] = g.id;
+  }
+  const missing = DEMO_CLASSES.filter((name) => !groups[name]);
+  if (missing.length)
+    throw new Error(`Demo classes missing: ${missing.join(', ')}`);
+  const subjects: Record<string, string> = {};
+  for (const sub of await prisma.subject.findMany())
+    subjects[sub.name] = sub.id;
+  const courses = await prisma.course.findMany({
+    where: { academicYearId: year.id, groupId: { in: Object.values(groups) } },
+    select: { id: true },
+  });
+  return {
+    yearId: year.id,
+    groups,
+    subjects,
+    courseIds: courses.map((c) => c.id),
+  };
+}
+
+/**
+ * The people the demo classes need, as the full seed would have returned them: their students
+ * (current members), the teachers of the seeded timetable (found by login ID) and the admin.
+ */
+async function loadUsers(
+  groups: Record<string, string>,
+): Promise<SeedUsers & { demoIds: string[] }> {
+  const admin = await prisma.user.findFirst({
+    where: { role: 'ADMIN' },
+    orderBy: { loginId: 'asc' },
+  });
+  const teacherRows = await prisma.user.findMany({
+    where: { role: 'TEACHER' },
+    select: { id: true, loginId: true, lastName: true },
+  });
+  const byLogin = new Map(teacherRows.map((t) => [t.loginId, t.id]));
+  const teachers: Record<string, string> = {};
+  for (const t of teacherRows) teachers[t.lastName] = t.id;
+  const teacherOf = new Map<string, string>();
+  for (const t of generateTeachers()) {
+    const id = byLogin.get(t.loginId);
+    if (!id)
+      throw new Error(
+        `Teacher ${t.loginId} is missing: run the full seed first`,
+      );
+    for (const course of t.courses) teacherOf.set(course, id);
+  }
+  const groupName = new Map(
+    Object.entries(groups).map(([name, id]) => [id, name]),
+  );
+  const members = await prisma.groupMember.findMany({
+    where: { groupId: { in: Object.values(groups) }, leftAt: null },
+    select: { groupId: true, student: { select: { id: true, loginId: true } } },
+  });
+  const students: Record<string, { id: string; group: string }> = {};
+  for (const m of members) {
+    students[m.student.loginId] = {
+      id: m.student.id,
+      group: groupName.get(m.groupId)!,
+    };
+  }
+  const demo = await prisma.user.findMany({
+    where: { isDemo: true },
+    select: { id: true },
+  });
+  return {
+    adminId: admin?.id ?? '',
+    teachers,
+    teacherOf,
+    students,
+    demoIds: demo.map((u) => u.id),
+  };
+}
+
+/**
+ * Everything of the demo classes' courses, child rows first (foreign keys), plus what the demo
+ * accounts left anywhere else (reads, tutor chats, notifications, their audit rows). This is the
+ * one place rows are really deleted: demo data is rebuilt every night, nothing in it is a record.
+ */
+async function deleteDemoData(courseIds: string[], demoIds: string[]) {
+  const inCourses = { courseId: { in: courseIds } };
+  const ofAssignment = { assignment: inCourses };
+  await prisma.quizAnswer.deleteMany({ where: { attempt: ofAssignment } });
+  await prisma.quizAttempt.deleteMany({ where: ofAssignment });
+  await prisma.submissionFile.deleteMany({
+    where: { attempt: { submission: ofAssignment } },
+  });
+  await prisma.submissionComment.deleteMany({
+    where: { submission: ofAssignment },
+  });
+  await prisma.submissionAttempt.deleteMany({
+    where: { submission: ofAssignment },
+  });
+  await prisma.submission.deleteMany({ where: ofAssignment });
+  await prisma.assignmentFile.deleteMany({ where: ofAssignment });
+  await prisma.quizQuestion.deleteMany({ where: ofAssignment });
+  await prisma.documentChunk.deleteMany({ where: inCourses });
+  const tutor = { OR: [inCourses, { studentId: { in: demoIds } }] };
+  await prisma.tutorMessage.deleteMany({ where: { conversation: tutor } });
+  await prisma.tutorConversation.deleteMany({ where: tutor });
+  await prisma.courseAnswer.deleteMany({
+    where: { OR: [{ question: inCourses }, { authorId: { in: demoIds } }] },
+  });
+  await prisma.courseQuestion.deleteMany({ where: inCourses });
+  await prisma.periodGrade.deleteMany({ where: inCourses });
+  await prisma.attendanceRecord.deleteMany({ where: { session: inCourses } });
+  await prisma.classSession.deleteMany({ where: inCourses });
+  const ofLesson = { lesson: { module: inCourses } };
+  await prisma.lessonProgress.deleteMany({ where: ofLesson });
+  await prisma.lessonResource.deleteMany({ where: ofLesson });
+  await prisma.announcementRead.deleteMany({
+    where: { OR: [{ announcement: inCourses }, { userId: { in: demoIds } }] },
+  });
+  await prisma.announcementFile.deleteMany({
+    where: { announcement: inCourses },
+  });
+  await prisma.announcement.deleteMany({ where: inCourses });
+  await prisma.assignment.deleteMany({ where: inCourses });
+  await prisma.lesson.deleteMany({ where: { module: inCourses } });
+  await prisma.module.deleteMany({ where: inCourses });
+  await prisma.gradeCategory.deleteMany({ where: inCourses });
+  await prisma.enrollment.deleteMany({ where: inCourses });
+  await prisma.courseTeacher.deleteMany({ where: inCourses });
+  await prisma.course.deleteMany({ where: { id: { in: courseIds } } });
+  await prisma.notification.deleteMany({ where: { userId: { in: demoIds } } });
+  await prisma.auditLog.deleteMany({ where: { actorId: { in: demoIds } } });
+}
+
+/**
+ * The nightly demo reset (DECISIONS §12, demo v2): only 9A / 11A and the demo accounts' traces
+ * are rewritten from the seed, moved to the current week. The admin's data (users, classes,
+ * settings, calendar, website, uploads) and the other 20 classes are never touched. One
+ * transaction: a failed reset leaves yesterday's demo as it was.
+ */
+export async function resetDemoClasses(
+  client: SeedClient,
+  options: { shiftTo: Date },
+) {
+  startRun(weekShiftMs(options.shiftTo));
+  return client.$transaction(
+    async (tx) => {
+      prisma = tx as unknown as SeedClient;
+      const school = await loadSchool();
+      const users = await loadUsers(school.groups);
+      await deleteDemoData(school.courseIds, users.demoIds);
+      const courses = await seedCourses(school, users, DEMO_CLASSES);
+      await seedAssignments(courses, users);
+      await seedAttendance(courses, users);
+      await seedAnnouncements(courses, users, false);
+      await seedQuestions(courses, users);
+      return { shiftedWeeks: shiftedWeeks(), courses: courses.length };
+    },
+    { timeout: 120_000, maxWait: 10_000 },
+  );
 }
 
 // ───────────────────────────── summary ─────────────────────────────
