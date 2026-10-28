@@ -1220,6 +1220,187 @@ async function seedAnnouncements(
   });
 }
 
+// ──────────────────────────────── 7. Q&A ────────────────────────────────
+
+/** Course Q&A threads from the Stitch Q&A screens: two unanswered ones fill the teacher's inbox */
+async function seedQuestions(
+  courses: SeededCourse[],
+  users: Awaited<ReturnType<typeof seedUsers>>,
+) {
+  const course = (title: string) =>
+    courses.find((c) => `${c.subject} · ${c.group}` === title)!;
+  const student = (loginId: string) => users.students[loginId].id;
+  const lesson = async (courseId: string, title: string) =>
+    (
+      await prisma.lesson.findFirstOrThrow({
+        where: { title, module: { courseId } },
+        select: { id: true },
+      })
+    ).id;
+  const assignment = async (courseId: string, prefix: string) =>
+    (
+      await prisma.assignment.findFirstOrThrow({
+        where: { courseId, title: { startsWith: prefix } },
+        select: { id: true },
+      })
+    ).id;
+
+  const algebra = course('Algebra · 9A');
+  const physics = course('Physics · 9A');
+  const karimova = users.teachers.Karimova;
+  type Reply = { by: string; staff?: true; body: string; at: string };
+  const items: {
+    courseId: string;
+    by: string;
+    title: string;
+    body: string;
+    at: string;
+    lessonId?: string;
+    assignmentId?: string;
+    isPrivate?: true;
+    isPinned?: true;
+    resolved?: true;
+    replies: Reply[];
+  }[] = [
+    {
+      courseId: algebra.id,
+      by: student('26100032'),
+      title: 'How is the quarter grade calculated?',
+      body: 'Do quizzes count more than homework?',
+      at: '2026-09-12 16:20',
+      isPinned: true,
+      resolved: true,
+      replies: [
+        {
+          by: karimova,
+          staff: true,
+          body: 'Homework 30%, quizzes 30%, exams 40%. Each category is the average of its scores, and the Grades page shows your running total.',
+          at: '2026-09-12 18:05',
+        },
+        { by: student('26100055'), body: 'Thank you!', at: '2026-09-12 19:10' },
+      ],
+    },
+    {
+      courseId: algebra.id,
+      by: student('26100089'),
+      title: 'What does the discriminant tell us?',
+      body: 'Does a negative discriminant only mean no real roots, or does it also tell anything about the graph?',
+      at: '2026-10-12 15:40',
+      lessonId: await lesson(algebra.id, 'The Discriminant'),
+      replies: [
+        {
+          by: student('26100055'),
+          body: 'If it is negative, the parabola never touches the x-axis.',
+          at: '2026-10-12 17:00',
+        },
+        {
+          by: karimova,
+          staff: true,
+          body: 'Exactly: D < 0 means the graph does not cross the x-axis. D = 0 means it touches it once (the vertex is on the axis).',
+          at: '2026-10-12 19:30',
+        },
+      ],
+    },
+    {
+      courseId: algebra.id,
+      by: student('26100042'),
+      title: 'Question about my Quiz 3 score',
+      body: 'I got 9/10 — which question did I lose the point on?',
+      at: '2026-10-07 18:15',
+      isPrivate: true,
+      resolved: true,
+      replies: [
+        {
+          by: karimova,
+          staff: true,
+          body: 'Question 8: the roots were right, but the answer needed both of them. Good work overall!',
+          at: '2026-10-08 09:10',
+        },
+      ],
+    },
+    {
+      courseId: algebra.id,
+      by: student('26100055'),
+      title: 'Can we use a calculator on Quiz 4?',
+      body: 'Will scientific calculators be allowed, or should we do everything by hand?',
+      at: '2026-10-16 17:30',
+      replies: [
+        {
+          by: karimova,
+          staff: true,
+          body: 'No calculators on Quiz 4 — the numbers are small on purpose.',
+          at: '2026-10-16 18:00',
+        },
+      ],
+    },
+    {
+      courseId: algebra.id,
+      by: student('26100042'),
+      title: 'Problem 7 — why is the last factor (x + 3)?',
+      body: 'In step 4 I factored x²(x + 2) − 9(x + 2) and got (x + 2)(x² − 9). Why does the answer key end with (x − 3)(x + 3)? Did I miss a step?',
+      at: '2026-10-16 19:40',
+      assignmentId: await assignment(algebra.id, 'Homework 5'),
+      replies: [
+        {
+          by: student('26100055'),
+          body: 'x² − 9 is a difference of squares, so you can split it again.',
+          at: '2026-10-16 20:05',
+        },
+      ],
+    },
+    {
+      courseId: algebra.id,
+      by: student('26100104'),
+      title: 'Is synthetic division the same as long division?',
+      body: 'Can we use synthetic division on the test, or do we have to write out every step of long division?',
+      at: '2026-10-17 08:10',
+      lessonId: await lesson(algebra.id, 'Factoring Higher Degree Polynomials'),
+      replies: [],
+    },
+    {
+      courseId: physics.id,
+      by: student('26100118'),
+      title: 'Lab 4: do we include air resistance?',
+      body: 'The block moves slowly, so I think we can ignore it — is that right?',
+      at: '2026-10-16 16:45',
+      replies: [],
+    },
+  ];
+
+  /** "2026-10-16 19:40" → that moment in Tashkent (moved by the week shift) */
+  const at = (value: string) => {
+    const [date, time] = value.split(' ');
+    return tashkent(date, time);
+  };
+  for (const item of items) {
+    const staffReply = item.replies.find((r) => r.staff);
+    const lastReply = item.replies.at(-1);
+    await prisma.courseQuestion.create({
+      data: {
+        courseId: item.courseId,
+        authorId: item.by,
+        lessonId: item.lessonId,
+        assignmentId: item.assignmentId,
+        title: item.title,
+        body: item.body,
+        isPrivate: item.isPrivate ?? false,
+        isPinned: item.isPinned ?? false,
+        answeredAt: staffReply ? at(staffReply.at) : null,
+        resolvedAt: item.resolved && lastReply ? at(lastReply.at) : null,
+        createdAt: at(item.at),
+        answers: {
+          create: item.replies.map((r) => ({
+            authorId: r.by,
+            body: r.body,
+            isStaff: r.staff ?? false,
+            createdAt: at(r.at),
+          })),
+        },
+      },
+    });
+  }
+}
+
 // ───────────────────────────── summary ─────────────────────────────
 
 /** Rows per non-empty table, for the summary */
@@ -1260,6 +1441,7 @@ export async function seedDemo(client: SeedClient, options: SeedDemoOptions) {
   await seedAssignments(courses, users);
   await seedAttendance(courses, users);
   await seedAnnouncements(courses, users);
+  await seedQuestions(courses, users);
   await seedSite(prisma, {
     adminId: users.adminId,
     day,

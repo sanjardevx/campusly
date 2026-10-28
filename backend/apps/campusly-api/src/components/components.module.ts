@@ -11,6 +11,7 @@ import { GroupModule } from './group/group.module';
 import { MediaModule } from './media/media.module';
 import { OverviewModule } from './overview/overview.module';
 import { ProgressModule } from './progress/progress.module';
+import { QuestionModule } from './question/question.module';
 import { SchoolModule } from './school/school.module';
 import { SiteModule } from './site/site.module';
 import { TelegramModule } from './telegram/telegram.module';
@@ -32,6 +33,7 @@ import { UserModule } from './user/user.module';
     MediaModule,
     OverviewModule,
     ProgressModule,
+    QuestionModule,
     SchoolModule,
     SiteModule,
     TelegramModule,

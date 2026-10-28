@@ -79,6 +79,21 @@ input AnnouncementsInquiry {
   unreadOnly: Boolean
 }
 
+input AnswerQuestionInput {
+  body: String!
+  questionId: String!
+  resolve: Boolean
+}
+
+input AskQuestionInput {
+  assignmentId: String
+  body: String
+  courseId: String!
+  isPrivate: Boolean
+  lessonId: String
+  title: String!
+}
+
 type Assignment {
   acceptedFileTypes: [String!]!
   allowLate: Boolean!
@@ -323,6 +338,16 @@ type Course {
   title: String!
 }
 
+type CourseAnswer {
+  authorName: String!
+  authorRole: Role!
+  body: String!
+  createdAt: DateTime!
+  id: String!
+  isMine: Boolean!
+  isStaff: Boolean!
+}
+
 type CourseAttendance {
   courseId: String!
   date: String!
@@ -371,6 +396,52 @@ type CourseProgress {
   courseId: String!
   lessons: [LessonState!]!
   progress: Int
+}
+
+type CourseQuestion {
+  assignmentId: String
+  assignmentTitle: String
+  authorLoginId: String
+  authorName: String!
+  body: String!
+  courseId: String!
+  courseTitle: String!
+  createdAt: DateTime!
+  id: String!
+  isAnswered: Boolean!
+  isMine: Boolean!
+  isPinned: Boolean!
+  isPrivate: Boolean!
+  isResolved: Boolean!
+  lessonId: String
+  lessonTitle: String
+  replies: Int!
+  staffReplies: Int!
+  title: String!
+}
+
+type CourseQuestionThread {
+  answers: [CourseAnswer!]!
+  canModerate: Boolean!
+  canReply: Boolean!
+  question: CourseQuestion!
+}
+
+type CourseQuestions {
+  all: Int!
+  answered: Int!
+  list: [CourseQuestion!]!
+  mine: Int!
+  total: Int!
+  unanswered: Int!
+}
+
+input CourseQuestionsInquiry {
+  courseId: String
+  limit: Int
+  page: Int
+  search: String
+  tab: QuestionTab
 }
 
 enum CourseStatus {
@@ -862,6 +933,7 @@ input MoveStudentInput {
 
 type Mutation {
   addSubmissionComment(input: AddSubmissionCommentInput!): Submission!
+  answerQuestion(input: AnswerQuestionInput!): CourseQuestionThread!
   archiveAnnouncement(id: String!): Announcement!
   archiveSchoolEvent(id: String!): SchoolEvent!
   archiveSiteHonorStudent(id: String!): SiteHonorStudentAdmin!
@@ -870,6 +942,7 @@ type Mutation {
   archiveSitePerson(id: String!): SitePersonAdmin!
   archiveSitePost(id: String!): SitePostAdmin!
   archiveSiteProgram(id: String!): SiteProgramAdmin!
+  askQuestion(input: AskQuestionInput!): CourseQuestion!
   blockUser(userId: String!): Boolean!
   changePassword(input: ChangePasswordInput!): AccessToken!
   completeLesson(lessonId: String!): LessonProgress!
@@ -893,6 +966,8 @@ type Mutation {
   createUpload(input: CreateUploadInput!): UploadTicket!
   giveZeroToMissing(assignmentId: String!): Int!
   gradeSubmission(input: GradeSubmissionInput!): Submission!
+  hideAnswer(id: String!): CourseQuestionThread!
+  hideQuestion(id: String!): Boolean!
   importStudents(csv: String!, skipErrors: Boolean! = false): ImportResult!
   linkParent(input: ParentInput!, studentId: String!): LoginSlip!
   logRecordExport(input: RecordExportInput!): Boolean!
@@ -929,6 +1004,8 @@ type Mutation {
   setLessonFile(input: SetLessonFileInput!): Lesson!
   setLessonVideo(input: SetLessonVideoInput!): Lesson!
   setPeriodFinalScore(input: SetPeriodFinalScoreInput!): PeriodGradeRow!
+  setQuestionPinned(id: String!, pinned: Boolean!): CourseQuestionThread!
+  setQuestionResolved(id: String!, resolved: Boolean!): CourseQuestionThread!
   setQuizQuestions(input: SetQuizQuestionsInput!): QuizEditor!
   setSiteHonorStudentVisible(id: String!, showOnSite: Boolean!): SiteHonorStudentAdmin!
   setSiteMockTestSeats(id: String!, takenSeats: Int!): SiteMockTestAdmin!
@@ -1160,6 +1237,8 @@ type Query {
   courseGrades(courseId: String!, periodId: String!): [StudentGrade!]!
   coursePeriodGrades(courseId: String!, periodId: String!): [PeriodGradeRow!]!
   courseProgress(courseId: String!, studentId: String): CourseProgress!
+  courseQuestion(id: String!): CourseQuestionThread!
+  courseQuestions(input: CourseQuestionsInquiry): CourseQuestions!
   courses(filter: CoursesFilter): [Course!]!
   currentAcademicYear: AcademicYear
   dashboardCalendar(month: String!): [CalendarEvent!]!
@@ -1192,6 +1271,13 @@ type Query {
   tutorConversations: [TutorConversation!]!
   tutorStatus: TutorStatus!
   users(input: UsersInquiry!): Users!
+}
+
+enum QuestionTab {
+  ALL
+  ANSWERED
+  MINE
+  UNANSWERED
 }
 
 type QuizEditor {

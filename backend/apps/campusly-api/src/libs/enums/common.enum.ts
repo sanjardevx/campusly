@@ -38,6 +38,8 @@ export enum ErrorCode {
   TUTOR_OFF = 'TUTOR_OFF',
   /** The model call failed; the request was not counted */
   TUTOR_FAILED = 'TUTOR_FAILED',
+  /** A private question cannot be pinned as FAQ (the class would see it) */
+  QUESTION_PRIVATE = 'QUESTION_PRIVATE',
   /** The home page slider already has 5 posts */
   SITE_CAROUSEL_FULL = 'SITE_CAROUSEL_FULL',
   /** The picture is not a finished website upload (createSiteUpload → confirmUpload) */

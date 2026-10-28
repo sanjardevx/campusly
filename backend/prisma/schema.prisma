@@ -103,6 +103,8 @@ model User {
   notifications         Notification[]      @relation("Notifications")
   auditLogs             AuditLog[]          @relation("AuditActor")
   schoolEventsCreated   SchoolEvent[]       @relation("SchoolEventsCreated")
+  questionsAsked        CourseQuestion[]    @relation("QuestionsAsked")
+  questionAnswers       CourseAnswer[]      @relation("QuestionAnswers")
 
   @@index([role, status])
   @@map("users")
@@ -469,6 +471,7 @@ model Course {
   announcements      Announcement[]
   documentChunks     DocumentChunk[]
   tutorConversations TutorConversation[]
+  courseQuestions    CourseQuestion[]
 
   @@index([groupId])
   @@index([subjectId])
@@ -551,6 +554,7 @@ model Lesson {
   sessions           ClassSession[]
   documentChunks     DocumentChunk[]
   tutorConversations TutorConversation[]
+  courseQuestions    CourseQuestion[]
 
   @@index([moduleId, order])
   @@map("lessons")
@@ -710,6 +714,7 @@ model Assignment {
   attempts           QuizAttempt[]
   documentChunks     DocumentChunk[]
   tutorConversations TutorConversation[]
+  courseQuestions    CourseQuestion[]
 
   @@index([courseId, dueAt])
   @@index([moduleId])
@@ -1147,6 +1152,65 @@ model TutorMessage {
 
   @@index([conversationId, createdAt])
   @@map("tutor_messages")
+}
+
+// ─────────────────────────────────── Q&A ───────────────────────────────────
+// DECISIONS §14 (day 21). A student asks under a course, optionally about one lesson or
+// assignment; the course's teachers and classmates reply. Private = only the author and the
+// course's staff see it. Staff hide a question or a reply with status ARCHIVED (audited).
+// Parents never see Q&A.
+
+model CourseQuestion {
+  id           String       @id @default(uuid(7)) @db.Uuid
+  courseId     String       @db.Uuid
+  authorId     String       @db.Uuid
+  /// What it is about (both null = the course in general)
+  lessonId     String?      @db.Uuid
+  assignmentId String?      @db.Uuid
+  title        String
+  /// Optional details
+  body         String       @default("")
+  isPrivate    Boolean      @default(false)
+  /// "Pinned as FAQ" by a teacher; a private question cannot be pinned
+  isPinned     Boolean      @default(false)
+  /// The first reply of a teacher or admin; null (and not resolved) = "Unanswered"
+  answeredAt   DateTime?    @db.Timestamptz(3)
+  resolvedAt   DateTime?    @db.Timestamptz(3)
+  /// ARCHIVED = hidden by a teacher: nobody sees it, the row stays (no hard deletes)
+  status       RecordStatus @default(ACTIVE)
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @db.Timestamptz(3)
+
+  course     Course         @relation(fields: [courseId], references: [id])
+  author     User           @relation("QuestionsAsked", fields: [authorId], references: [id])
+  lesson     Lesson?        @relation(fields: [lessonId], references: [id])
+  assignment Assignment?    @relation(fields: [assignmentId], references: [id])
+  answers    CourseAnswer[]
+
+  @@index([courseId, status, createdAt])
+  @@index([authorId])
+  @@index([lessonId])
+  @@index([assignmentId])
+  @@map("course_questions")
+}
+
+model CourseAnswer {
+  id         String       @id @default(uuid(7)) @db.Uuid
+  questionId String       @db.Uuid
+  authorId   String       @db.Uuid
+  body       String
+  /// The author was a teacher or admin when they wrote it (highlighted as "Instructor")
+  isStaff    Boolean      @default(false)
+  /// ARCHIVED = hidden by a teacher
+  status     RecordStatus @default(ACTIVE)
+  createdAt  DateTime     @default(now()) @db.Timestamptz(3)
+
+  question CourseQuestion @relation(fields: [questionId], references: [id])
+  author   User           @relation("QuestionAnswers", fields: [authorId], references: [id])
+
+  @@index([questionId, createdAt])
+  @@index([authorId])
+  @@map("course_answers")
 }
 
 // ─────────────────────────────── Public website CMS ───────────────────────────────

@@ -212,6 +212,42 @@ export class AccessPolicy {
     }
   }
 
+  /**
+   * Prisma `where` for Q&A lists (DECISIONS §14). Staff: every visible question of their courses.
+   * Students: their non-draft courses, and a private question only when they asked it.
+   * Parents never see Q&A (the resolver refuses them; this is the second lock).
+   */
+  public questionScope(user: AuthUser): Prisma.CourseQuestionWhereInput {
+    switch (user.role) {
+      case 'ADMIN':
+      case 'TEACHER':
+        return { status: 'ACTIVE', course: this.courseScope(user) };
+      case 'STUDENT':
+        return {
+          status: 'ACTIVE',
+          course: {
+            AND: [this.courseScope(user), { status: { not: 'DRAFT' } }],
+          },
+          OR: [{ isPrivate: false }, { authorId: user.id }],
+        };
+      case 'PARENT':
+        return { id: { in: [] } };
+    }
+  }
+
+  /**
+   * One question: outside the viewer's scope it "does not exist" (404), also a classmate's
+   * private one. Returns the question so the caller does not load it again.
+   */
+  public async assertCanViewQuestion(user: AuthUser, questionId: string) {
+    const question = await this.prismaService.courseQuestion.findFirst({
+      where: { AND: [{ id: questionId }, this.questionScope(user)] },
+      include: { course: { select: { status: true } } },
+    });
+    if (!question) throw notFound('Question not found');
+    return question;
+  }
+
   // ───────────────────────── helpers ─────────────────────────
 
   private async canViewCourse(

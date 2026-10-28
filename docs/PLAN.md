@@ -303,7 +303,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 
 ## Day 21 (L) — Q&A, calendar, finish
 
-- [ ] Q&A: a student asks under a lesson, the teacher answers (`CourseQuestion`); the teacher dashboard card goes live.
+- [x] Q&A: a student asks under a lesson, the teacher answers (`CourseQuestion`); the teacher dashboard card goes live.
 - [ ] Calendar page for students and parents (the `studentCalendar` API already exists).
 - [ ] AI tutor live: buy the Anthropic API key ($5 prepaid, auto-reload off) → test call → SSM `ANTHROPIC_API_KEY` + `TUTOR_PROVIDER=anthropic` together → deploy → smoke-test the tutor on campusly.uz (deploy README §14).
 - [ ] Bug fixes; final smoke test of all 4 roles.
