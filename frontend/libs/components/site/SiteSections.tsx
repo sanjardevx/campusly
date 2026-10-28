@@ -27,7 +27,7 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { useReducedMotion } from '@/libs/components/dashboard/motion';
 import { EASE, HOVER, Reveal, hoverLift, hoverZoom, useScrollDraw } from './motion';
-import { SITE, type SiteData, containerSx, eyebrowSx, scrollToId, sectionTitleSx } from './tokens';
+import { SITE, type SiteData, containerSx, eyebrowSx, scrollToId, sectionTitleSx, swipeRowSx } from './tokens';
 
 /** The site green as a gradient for the icon tiles and the photo panel (the developer's reference) */
 const FRESH = { from: '#4FA383', to: SITE.spruce } as const;
@@ -59,7 +59,7 @@ function CenteredHeader({ title, subtitle, eyebrow }: { title: string; subtitle?
 
 // ───────────────────────── Why choose (Part A) ─────────────────────────
 
-/** Stitch Part A "Why choose Campusly School?": four soft panels, 2 × 2 (one column on phones) */
+/** Stitch Part A "Why choose Campusly School?": four soft panels, 2 × 2 (a swipe row on phones) */
 export function SiteWhy() {
   const { t } = useTranslation('site');
   const panels: { key: string; icon: SvgIconComponent; list?: boolean }[] = [
@@ -71,10 +71,10 @@ export function SiteWhy() {
   return (
     <Box component="section" sx={{ ...containerSx, py: { xs: 8, md: 10 } }}>
       <CenteredHeader title={t('why.title')} subtitle={t('why.subtitle')} />
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+      <Box sx={swipeRowSx({ md: '1fr 1fr' })}>
         {panels.map(({ key, icon: Icon, list }, i) => (
-          <Reveal key={key} delay={i * 80} sx={{ bgcolor: SITE.soft, borderRadius: '10px', p: 4 }}>
-            <Box sx={{ ...iconTile(56, '12px'), mb: 3 }}>
+          <Reveal key={key} delay={i * 80} sx={{ bgcolor: SITE.soft, borderRadius: '10px', p: { xs: 3, md: 4 } }}>
+            <Box sx={{ ...iconTile(56, '12px'), mb: { xs: 2, md: 3 } }}>
               <Icon />
             </Box>
             <Typography component="h3" sx={{ fontSize: '1.25rem', fontWeight: 700, color: SITE.heading, mb: list ? 2 : 1.5 }}>
@@ -126,7 +126,7 @@ const TRIANGLES = `url("data:image/svg+xml,${encodeURIComponent(
  * cards, a green panel with a student whose head rises above it, five cards. The photo is a
  * Stitch-made lookalike of the reference pose (no other school's logo), its background cut out
  * with macOS Vision, so the panel's pattern shows around the student.
- * Phones show the photo first, then one column of cards.
+ * Phones show a smaller photo first, then the cards as small tiles, two per row.
  */
 export function SiteFeatures() {
   const { t } = useTranslation('site');
@@ -137,11 +137,12 @@ export function SiteFeatures() {
       return (
       <Reveal key={key} from={side} delay={i * 70}>
         <Stack
-          direction="row"
+          direction={{ xs: 'column', md: 'row' }}
           sx={{
-            alignItems: 'center',
-            gap: 2.5,
-            p: { xs: 2, md: 2.5 },
+            height: '100%',
+            alignItems: { xs: 'flex-start', md: 'center' },
+            gap: { xs: 1.25, md: 2.5 },
+            p: { xs: 1.75, md: 2.5 },
             borderRadius: '20px',
             bgcolor: '#F6F7F6',
             border: '1px solid #EEF0EE',
@@ -151,25 +152,26 @@ export function SiteFeatures() {
             [HOVER]: { '&:hover': { transform: `translateX(${side === 'left' ? 6 : -6}px)`, bgcolor: '#F1F4F2' }, '&:hover .tile': { transform: 'scale(1.08)' } },
           }}
         >
-          <Box className="tile" sx={iconTile(56, '16px')}>
+          <Box className="tile" sx={{ ...iconTile(56, '16px'), width: { xs: 40, md: 56 }, height: { xs: 40, md: 56 }, borderRadius: { xs: '12px', md: '16px' }, '& svg': { fontSize: { xs: 20, md: 24 } } }}>
             <Icon />
           </Box>
-          <Typography sx={{ fontSize: { xs: '1rem', md: '1.0625rem' }, fontWeight: 500, color: SITE.heading, lineHeight: 1.45 }}>{t(`features.${key}`)}</Typography>
+          <Typography sx={{ fontSize: { xs: '0.875rem', md: '1.0625rem' }, fontWeight: 500, color: SITE.heading, lineHeight: 1.4 }}>{t(`features.${key}`)}</Typography>
         </Stack>
       </Reveal>
       );
     };
   return (
     <Box component="section" id="facilities" aria-labelledby="facilities-title" sx={{ ...containerSx, py: { xs: 8, md: 10 } }}>
-      <Reveal sx={{ textAlign: 'center', maxWidth: 640, mx: 'auto', mb: { xs: 9, md: 8 } }}>
+      <Reveal sx={{ textAlign: 'center', maxWidth: 640, mx: 'auto', mb: { xs: 7, md: 8 } }}>
         <Typography component="h2" id="facilities-title" sx={{ ...sectionTitleSx, fontWeight: 800, fontSize: { xs: '1.875rem', md: '2.75rem' }, color: SITE.ink }}>
           {t('features.title')}
         </Typography>
         <Typography sx={{ color: SITE.stone500, fontSize: '1.125rem', mt: 1.5 }}>{t('features.subtitle')}</Typography>
       </Reveal>
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 280px 1fr', lg: '1fr 330px 1fr' }, gap: { xs: 2, md: 3 }, alignItems: 'stretch' }}>
-        <Box sx={{ order: { xs: 1, md: 0 }, display: 'grid', gap: 2, alignContent: 'space-between' }}>{FEATURES_LEFT.map(card('left'))}</Box>
-        <Reveal delay={120} sx={{ order: { xs: 0, md: 0 }, position: 'relative', mt: { xs: 6, md: 10 }, minHeight: { xs: 400, md: 0 }, width: { xs: '100%', sm: 360, md: 'auto' }, mx: { xs: 'auto', md: 0 } }}>
+      {/* Phones: the two lists melt into one two-column grid (display: contents), the photo on top */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: '1fr 280px 1fr', lg: '1fr 330px 1fr' }, gap: { xs: 1.5, md: 3 }, alignItems: 'stretch' }}>
+        <Box sx={{ display: { xs: 'contents', md: 'grid' }, gap: 2, alignContent: 'space-between' }}>{FEATURES_LEFT.map(card('left'))}</Box>
+        <Reveal delay={120} sx={{ order: { xs: -1, md: 0 }, gridColumn: { xs: '1 / -1', md: 'auto' }, mb: { xs: 1, md: 0 }, position: 'relative', mt: { xs: 5, md: 10 }, minHeight: { xs: 280, md: 0 }, width: { xs: 260, sm: 300, md: 'auto' }, mx: { xs: 'auto', md: 0 } }}>
           <Box aria-hidden sx={{ position: 'absolute', inset: 0, borderRadius: '32px', backgroundColor: FRESH.to, backgroundImage: `${TRIANGLES}, linear-gradient(160deg, #66BC98, ${FRESH.from} 40%, ${FRESH.to})`, backgroundSize: '120px 120px, cover' }} />
           {/* Clips the sides and the rounded bottom, but not the top: the head rises above the panel */}
           <Box sx={{ position: 'absolute', inset: 0, clipPath: 'inset(-140px 0 0 0 round 0 0 32px 32px)' }}>
@@ -178,7 +180,7 @@ export function SiteFeatures() {
             </Box>
           </Box>
         </Reveal>
-        <Box sx={{ order: { xs: 2, md: 0 }, display: 'grid', gap: 2, alignContent: 'space-between' }}>{FEATURES_RIGHT.map(card('right'))}</Box>
+        <Box sx={{ display: { xs: 'contents', md: 'grid' }, gap: 2, alignContent: 'space-between' }}>{FEATURES_RIGHT.map(card('right'))}</Box>
       </Box>
     </Box>
   );
@@ -200,7 +202,8 @@ function daysText(days: string[], t: (key: string) => string) {
 
 /**
  * Stitch Part B "Programs & clubs": a 3 × 2 grid of horizontal cards (photo 38 %, text), "Included
- * in tuition" and "Ask about schedule →", which takes the visitor to the enquiry form.
+ * in tuition" and "Ask about schedule →", which takes the visitor to the enquiry form. Phones swipe
+ * a row of shorter cards: the photo on top, no description.
  */
 export function SitePrograms({ programs }: { programs: SiteData['programs'] }) {
   const { t } = useTranslation('site');
@@ -214,25 +217,25 @@ export function SitePrograms({ programs }: { programs: SiteData['programs'] }) {
         </Typography>
         <Typography sx={{ color: SITE.neutral500, fontSize: '1rem', mb: 4 }}>{t('programs.subtitle')}</Typography>
       </Reveal>
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+      <Box sx={swipeRowSx({ md: '1fr 1fr' })}>
         {programs.map((p, i) => {
           const thumb = p.photoUrl ?? (p.videoUrl ? youtubeThumb(p.videoUrl) : null);
           const time = p.startTime && p.endTime ? ` · ${p.startTime} – ${p.endTime}` : '';
           return (
             <Reveal key={p.id} delay={(i % 2) * 90}>
             <Stack
-              direction="row"
-              sx={{ bgcolor: '#fff', borderRadius: '10px', border: `1px solid ${SITE.cardBorder}`, overflow: 'hidden', height: { xs: 'auto', sm: 208 }, minHeight: { xs: 176 }, boxShadow: SITE.cardShadow, ...hoverLift, ...hoverZoom('.thumb') }}
+              direction={{ xs: 'column', md: 'row' }}
+              sx={{ bgcolor: '#fff', borderRadius: '10px', border: `1px solid ${SITE.cardBorder}`, overflow: 'hidden', height: { xs: '100%', md: 208 }, boxShadow: SITE.cardShadow, ...hoverLift, ...hoverZoom('.thumb') }}
             >
               <Box
                 component={p.videoUrl ? 'a' : 'div'}
                 {...(p.videoUrl ? { href: p.videoUrl, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${t('programs.video')}: ${p.name}` } : {})}
-                sx={{ width: '38%', flexShrink: 0, bgcolor: SITE.stone100, position: 'relative', overflow: 'hidden', display: 'block' }}
+                sx={{ width: { xs: '100%', md: '38%' }, height: { xs: 132, md: 'auto' }, flexShrink: 0, bgcolor: SITE.stone100, position: 'relative', overflow: 'hidden', display: 'block' }}
               >
                 {thumb && <Box component="img" className="thumb" src={thumb} alt="" sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
                 {p.videoUrl && <PlayCircleFilledRoundedIcon sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: 44, color: 'rgba(255,255,255,0.92)', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }} />}
               </Box>
-              <Stack sx={{ flex: 1, p: 2.5, justifyContent: 'space-between', minWidth: 0 }}>
+              <Stack sx={{ flex: 1, p: { xs: 2, md: 2.5 }, justifyContent: 'space-between', minWidth: 0 }}>
                 <Stack sx={{ gap: 0.5 }}>
                   <Typography component="h3" sx={{ fontSize: '1rem', fontWeight: 700, color: SITE.ink, lineHeight: 1.375 }}>
                     {p.name}
@@ -241,7 +244,7 @@ export function SitePrograms({ programs }: { programs: SiteData['programs'] }) {
                     {[t('programs.grades', { from: p.gradeFrom, to: p.gradeTo }), p.levelNote].filter(Boolean).join(' · ')}
                   </Typography>
                   {p.days.length > 0 && <Typography sx={{ fontSize: '0.75rem', color: SITE.neutral500 }}>{daysText(p.days, t) + time}</Typography>}
-                  <Typography sx={{ fontSize: '0.75rem', color: '#374151', pt: 0.5, display: '-webkit-box', WebkitLineClamp: { xs: 2, sm: 1 }, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.description}</Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: '#374151', pt: 0.5, display: { xs: 'none', md: '-webkit-box' }, WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.description}</Typography>
                 </Stack>
                 <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 1, pt: 1, mt: 1, borderTop: '1px solid #F3F4F6', flexWrap: 'wrap' }}>
                   <Box sx={{ px: 1, py: 0.25, borderRadius: '4px', fontSize: '11px', fontWeight: 600, bgcolor: SITE.tint, color: SITE.spruce }}>{t('programs.included')}</Box>
@@ -266,7 +269,8 @@ const GAP = 2.5;
 
 /**
  * Stitch Part C "Our team": the director's card with the quote, then the team in rows of four
- * with large photos; a shorter last row is centred (the developer's 4 + 3 layout).
+ * with large photos from tablets up; a shorter last row is centred (the developer's 4 + 3 layout).
+ * Phones: a smaller director card (quote cut to four lines) and the team two per row.
  */
 export function SiteTeam({ director, team }: { director: SiteData['director']; team: SiteData['team'] }) {
   const { t } = useTranslation('site');
@@ -287,15 +291,15 @@ export function SiteTeam({ director, team }: { director: SiteData['director']; t
       </Reveal>
       {director && (
         <Reveal sx={{ mb: 3 }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} sx={{ bgcolor: '#fff', borderRadius: '16px', p: 4, border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, alignItems: 'center', gap: 4 }}>
-          <Box sx={{ '& img, & > div': { width: 144, height: 144, boxShadow: SITE.cardShadow, borderWidth: 2 } }}>{portrait(director.photoUrl, 144)}</Box>
+        <Stack direction={{ xs: 'column', md: 'row' }} sx={{ bgcolor: '#fff', borderRadius: '16px', p: { xs: 2.5, md: 4 }, border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, alignItems: 'center', gap: { xs: 2, md: 4 } }}>
+          <Box sx={{ '& img, & > div': { width: { xs: 96, md: 144 }, height: { xs: 96, md: 144 }, boxShadow: SITE.cardShadow, borderWidth: 2 } }}>{portrait(director.photoUrl, 144)}</Box>
           <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
-            <Typography component="h3" sx={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827' }}>
+            <Typography component="h3" sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' }, fontWeight: 700, color: '#111827' }}>
               {director.name}
             </Typography>
-            <Typography sx={{ fontSize: '1rem', fontWeight: 600, color: SITE.spruce, mt: 0.5, mb: 2 }}>{director.role}</Typography>
+            <Typography sx={{ fontSize: { xs: '0.875rem', md: '1rem' }, fontWeight: 600, color: SITE.spruce, mt: 0.5, mb: { xs: 1.5, md: 2 } }}>{director.role}</Typography>
             {director.note && (
-              <Typography component="blockquote" sx={{ m: 0, borderLeft: `2px solid ${SITE.spruce}`, pl: 2, color: SITE.stone700, fontStyle: 'italic', fontSize: '1.125rem', lineHeight: 1.625, textAlign: 'left' }}>
+              <Typography component="blockquote" sx={{ m: 0, borderLeft: `2px solid ${SITE.spruce}`, pl: 2, color: SITE.stone700, fontStyle: 'italic', fontSize: { xs: '0.9375rem', md: '1.125rem' }, lineHeight: 1.625, textAlign: 'left', display: '-webkit-box', WebkitLineClamp: { xs: 4, md: 'none' }, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                 “{director.note}”
               </Typography>
             )}
@@ -303,17 +307,17 @@ export function SiteTeam({ director, team }: { director: SiteData['director']; t
         </Stack>
         </Reveal>
       )}
-      {/* Rows of four; a shorter last row is centred (7 people: 4 + 3) */}
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: GAP }}>
+      {/* Rows of four from tablets up; a shorter last row is centred (7 people: 4 + 3). Phones: two per row */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: { xs: 1.5, md: GAP } }}>
         {team.map((p, i) => (
-          <Reveal key={p.id} delay={(i % 4) * 70} sx={{ width: { xs: '100%', sm: `calc((100% - ${GAP * 8}px) / 2)`, lg: `calc((100% - ${GAP * 3 * 8}px) / 4)` } }}>
-          <Box component="article" sx={{ height: '100%', bgcolor: '#fff', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, ...hoverLift, ...hoverZoom() }}>
+          <Reveal key={p.id} delay={(i % 4) * 70} sx={{ width: { xs: 'calc((100% - 12px) / 2)', md: `calc((100% - ${GAP * 3 * 8}px) / 4)` } }}>
+          <Box component="article" sx={{ height: '100%', bgcolor: '#fff', borderRadius: { xs: '12px', md: '16px' }, overflow: 'hidden', border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, ...hoverLift, ...hoverZoom() }}>
             <Box sx={{ aspectRatio: '1 / 1', bgcolor: SITE.tint, overflow: 'hidden' }}>{p.photoUrl && <Box component="img" src={p.photoUrl} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />}</Box>
-            <Box sx={{ p: 2.5, textAlign: 'center' }}>
-              <Typography component="h4" sx={{ fontWeight: 700, fontSize: '1.0625rem', color: '#111827' }}>
+            <Box sx={{ p: { xs: 1.5, md: 2.5 }, textAlign: 'center' }}>
+              <Typography component="h4" sx={{ fontWeight: 700, fontSize: { xs: '0.9375rem', md: '1.0625rem' }, color: '#111827', lineHeight: 1.3 }}>
                 {p.name}
               </Typography>
-              <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, color: SITE.spruce, mt: 0.25 }}>{p.role}</Typography>
+              <Typography sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' }, fontWeight: 500, color: SITE.spruce, mt: 0.25 }}>{p.role}</Typography>
             </Box>
           </Box>
           </Reveal>
@@ -331,20 +335,20 @@ const STAGES = [
   { key: 'high', image: '/site/stage-high.jpg' },
 ];
 
-/** Stitch Part C "School stages": three photo cards with ages, title and three ticks */
+/** Stitch Part C "School stages": three photo cards with ages, title and three ticks (a swipe row on phones) */
 export function SiteStages() {
   const { t } = useTranslation('site');
   return (
     <Box component="section" id="stages" sx={{ ...containerSx, py: { xs: 6, md: 8 } }}>
       <CenteredHeader title={t('stages.title')} subtitle={t('stages.subtitle')} />
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3 }}>
+      <Box sx={swipeRowSx({ md: 'repeat(3, 1fr)' })}>
         {STAGES.map(({ key, image }, i) => (
           <Reveal key={key} delay={i * 90}>
           <Box sx={{ height: '100%', bgcolor: '#fff', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(231,229,228,0.8)', boxShadow: SITE.cardShadow, ...hoverLift, ...hoverZoom() }}>
             <Box sx={{ overflow: 'hidden' }}>
               <Box component="img" src={image} alt="" sx={{ width: '100%', aspectRatio: '16 / 10', objectFit: 'cover', display: 'block' }} />
             </Box>
-            <Box sx={{ p: 3 }}>
+            <Box sx={{ p: { xs: 2.25, md: 3 } }}>
               <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: SITE.stone500 }}>{t(`stages.${key}.ages`)}</Typography>
               <Typography component="h3" sx={{ fontSize: '1.25rem', fontWeight: 700, color: '#111827', mt: 0.5, mb: 2 }}>
                 {t(`stages.${key}.title`)}
@@ -410,7 +414,7 @@ export function SiteAdmission() {
                 position: 'relative',
                 width: { xs: '100%', md: `calc(50% - ${LANE / 2}px)` },
                 alignSelf: { md: left ? 'flex-start' : 'flex-end' },
-                mt: { xs: i ? 3 : 0, md: i ? `-${OVERLAP}px` : 0 },
+                mt: { xs: i ? 2 : 0, md: i ? `-${OVERLAP}px` : 0 },
                 pl: { xs: 5, md: 0 },
               }}
             >
@@ -424,7 +428,7 @@ export function SiteAdmission() {
                 sx={{
                   position: 'absolute',
                   zIndex: 1,
-                  top: { xs: 30, md: '48%' },
+                  top: { xs: 26, md: '48%' },
                   width: DOT,
                   height: DOT,
                   mt: `-${DOT / 2}px`,
@@ -466,14 +470,15 @@ export function SiteAdmission() {
                   '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
                 }}
               >
-              <Box sx={{ minHeight: { md: 232 }, bgcolor: '#F8F9FA', border: '1px solid #EEF0EE', borderRadius: '24px', p: { xs: 2.5, md: 2.75 }, ...hoverLift }}>
-                <Box sx={{ ...iconTile(52, '14px'), mb: 1.5 }}>
-                  <Icon sx={{ fontSize: 26 }} />
+              <Box sx={{ minHeight: { md: 232 }, bgcolor: '#F8F9FA', border: '1px solid #EEF0EE', borderRadius: { xs: '18px', md: '24px' }, p: { xs: 2, md: 2.75 }, ...hoverLift }}>
+                <Box sx={{ ...iconTile(52, '14px'), width: { xs: 40, md: 52 }, height: { xs: 40, md: 52 }, mb: { xs: 1, md: 1.5 } }}>
+                  <Icon sx={{ fontSize: { xs: 22, md: 26 } }} />
                 </Box>
-                <Typography component="h3" sx={{ fontSize: { xs: '1.25rem', md: '1.375rem' }, fontWeight: 600, color: SITE.ink, letterSpacing: '-0.01em', lineHeight: 1.3 }}>
+                <Typography component="h3" sx={{ fontSize: { xs: '1.0625rem', md: '1.375rem' }, fontWeight: 600, color: SITE.ink, letterSpacing: '-0.01em', lineHeight: 1.3 }}>
                   {String(n).padStart(2, '0')}. {t(`admission.step${n}.title`)}
                 </Typography>
-                <Typography sx={{ fontSize: '1rem', color: SITE.stone500, mt: 0.75, lineHeight: 1.5 }}>{t(`admission.step${n}.body`)}</Typography>
+                {/* Phones: two lines are enough to say what the step is */}
+                <Typography sx={{ fontSize: { xs: '0.875rem', md: '1rem' }, color: SITE.stone500, mt: 0.75, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: { xs: 2, md: 'none' }, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t(`admission.step${n}.body`)}</Typography>
               </Box>
               </Box>
               </Reveal>

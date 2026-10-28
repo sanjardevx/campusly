@@ -63,6 +63,30 @@ export const sectionTitleSx = {
 /** Centred page column with Tailwind's px-6 */
 export const containerSx = { maxWidth: SITE.container, mx: 'auto', px: { xs: 2, sm: 3 } } as const;
 
+/**
+ * A list of cards that phones swipe sideways (CSS scroll snap, no JS) and wider screens show as a
+ * grid. The next card peeks in at the edge, so the row reads as "more →"; the row runs to the
+ * screen edges (negative margin = the container padding) and snaps to the padding.
+ */
+export const swipeRowSx = (columns: Record<string, string>, gap = 3) =>
+  ({
+    display: { xs: 'flex', md: 'grid' },
+    gridTemplateColumns: columns,
+    gap,
+    overflowX: { xs: 'auto', md: 'visible' },
+    scrollSnapType: { xs: 'x mandatory', md: 'none' },
+    overscrollBehaviorX: 'contain',
+    mx: { xs: -2, sm: -3, md: 0 },
+    px: { xs: 2, sm: 3, md: 0 },
+    scrollPaddingInline: { xs: '16px', sm: '24px' },
+    // Room for the cards' shadows inside the scroller
+    py: { xs: 1, md: 0 },
+    my: { xs: -1, md: 0 },
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
+    '& > *': { flex: { xs: '0 0 84%', sm: '0 0 46%' }, minWidth: 0, scrollSnapAlign: 'start' },
+  }) as const;
+
 /** Scroll smoothly to a section (through Lenis when it runs); reduced motion jumps */
 export function scrollToId(id: string) {
   const el = document.getElementById(id);

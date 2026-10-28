@@ -11,7 +11,7 @@ import { useTranslation } from 'next-i18next/pages';
 import type { SiteCourseCategory } from '@/libs/gql/graphql';
 import { clock, totalText, youtubeThumb, youtubeWatch } from '@/libs/youtube';
 import { EASE, Reveal, hoverLift, hoverZoom } from './motion';
-import { SITE, type SiteData, containerSx, eyebrowSx, sectionTitleSx } from './tokens';
+import { SITE, type SiteData, containerSx, eyebrowSx, sectionTitleSx, swipeRowSx } from './tokens';
 
 type MockTest = SiteData['mockTests'][number];
 type OpenCourse = SiteData['openCourses'][number];
@@ -58,7 +58,7 @@ export function SiteMockTests({ tests }: { tests: MockTest[] }) {
   return (
     <Box component="section" id="mock-tests" aria-labelledby="mock-tests-title" sx={{ ...containerSx, py: { xs: 6, md: 8 } }}>
       <SectionHeader id="mock-tests" eyebrow={t('mock.eyebrow')} title={t('mock.title')} subtitle={t('mock.subtitle')} />
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+      <Box sx={swipeRowSx({ md: '1fr 1fr' })}>
         {tests.map((m, i) => {
           const full = m.seatsLeft === 0;
           return (
@@ -70,10 +70,10 @@ export function SiteMockTests({ tests }: { tests: MockTest[] }) {
                 </Box>
                 <Typography sx={{ fontSize: { xs: '1.375rem', sm: '1.75rem' }, fontWeight: 800, color: SITE.spruce, letterSpacing: '-0.02em', whiteSpace: 'nowrap' }}>{priceText(m.price)}</Typography>
               </Stack>
-              <Typography component="h3" sx={{ fontSize: '1.375rem', fontWeight: 700, color: SITE.ink, lineHeight: 1.3 }}>
+              <Typography component="h3" sx={{ fontSize: { xs: '1.125rem', sm: '1.375rem' }, fontWeight: 700, color: SITE.ink, lineHeight: 1.3 }}>
                 {m.title}
               </Typography>
-              <Typography sx={{ fontSize: '0.875rem', color: SITE.neutral500, mt: 0.5 }}>{m.included}</Typography>
+              <Typography sx={{ fontSize: '0.875rem', color: SITE.neutral500, mt: 0.5, display: '-webkit-box', WebkitLineClamp: { xs: 2, md: 'none' }, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{m.included}</Typography>
               <Stack sx={{ gap: 1, mt: 2.5, fontSize: '0.9375rem', color: SITE.stone700 }}>
                 <Stack direction="row" sx={{ gap: 1.25, alignItems: 'center' }}>
                   <CalendarTodayRoundedIcon sx={{ fontSize: 20, color: SITE.spruce }} />
@@ -154,14 +154,13 @@ export function SiteOpenCourses({ courses }: { courses: OpenCourse[] }) {
         key={current}
         role="tabpanel"
         sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(4, 1fr)' },
-          gap: 2.5,
+          ...swipeRowSx({ md: '1fr 1fr', lg: 'repeat(4, 1fr)' }, 2.5),
           ...(switched && {
             '@keyframes courseIn': { from: { opacity: 0, transform: 'translateY(14px)' } },
-            '& > *': { animation: `courseIn 500ms ${EASE} both` },
+            // Merged with the swipe row's own child rules (one '& > *' key)
+            '& > *': { ...swipeRowSx({})['& > *'], animation: `courseIn 500ms ${EASE} both` },
             ...Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8].map((n) => [`& > *:nth-of-type(${n + 1})`, { animationDelay: `${n * 60}ms` }])),
-            '@media (prefers-reduced-motion: reduce)': { '& > *': { animation: 'none' } },
+            '@media (prefers-reduced-motion: reduce)': { '& > *': { ...swipeRowSx({})['& > *'], animation: 'none' } },
           }),
         }}
       >

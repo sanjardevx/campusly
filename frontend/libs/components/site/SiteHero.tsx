@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import NextLink from 'next/link';
-import { Box, Button, ButtonBase, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Button, ButtonBase, IconButton, Stack, Typography, useMediaQuery } from '@mui/material';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import { useTranslation } from 'next-i18next/pages';
@@ -11,6 +11,9 @@ import { SITE, type SiteData, containerSx, scrollToId } from './tokens';
 /** Hero photos (Stitch placeholders until the school's own; frontend/public/site) */
 const SLIDES = ['/site/hero-campus.jpg', '/site/hero-open-day.jpg', '/site/stage-high.jpg', '/site/stage-middle.jpg'];
 const SLIDE_MS = 4500;
+/** Phones show the first two photos only (less to download on mobile data) */
+const PHONE_SLIDES = 2;
+const noop = () => () => {};
 
 const outlineBtn = {
   borderRadius: '8px',
@@ -35,19 +38,28 @@ const solidBtn = {
  * transparent top bar, the pill, the headline and two buttons, dots + pause) and the numbers card
  * that overlaps its bottom edge. Phones (Part A Mobile): compact "Sign in" / "Enquire" in the bar
  * and the two hero buttons stacked full width.
+ *
+ * Only the first photo is in the first HTML; the others are added after the page loads (two on a
+ * phone, all four on wider screens), so they never hold up the first paint.
  */
 export function SiteHero({ stats }: { stats: SiteData['stats'] }) {
   const { t } = useTranslation('site');
   const reduced = useReducedMotion();
   const [slide, setSlide] = useState(0);
   const [paused, setPaused] = useState(false);
+  // false on the server and the first render (same HTML), the real value right after
+  const phone = useMediaQuery('(max-width: 599.95px)');
+  // false in the server HTML and while hydrating, true right after: the extra photos come later
+  const loaded = useSyncExternalStore(noop, () => true, () => false);
+  const count = phone ? PHONE_SLIDES : SLIDES.length;
+  const current = slide % count;
 
   // Reduced motion: no automatic slides (the dots still work)
   useEffect(() => {
     if (paused || reduced) return;
-    const timer = window.setInterval(() => setSlide((s) => (s + 1) % SLIDES.length), SLIDE_MS);
+    const timer = window.setInterval(() => setSlide((s) => (s + 1) % count), SLIDE_MS);
     return () => window.clearInterval(timer);
-  }, [paused, reduced]);
+  }, [paused, reduced, count]);
 
   const numbers = [
     { value: stats.students, label: t('stats.students') },
@@ -60,14 +72,14 @@ export function SiteHero({ stats }: { stats: SiteData['stats'] }) {
   return (
     <>
       <Box component="section" sx={{ position: 'relative', minHeight: { xs: '90vh', md: '85vh' }, overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        {SLIDES.map((src, i) => (
+        {SLIDES.slice(0, loaded ? count : 1).map((src, i) => (
           <Box
             key={src}
             component="img"
             src={src}
             alt=""
             aria-hidden
-            sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', opacity: i === slide ? 1 : 0, transition: reduced ? 'none' : 'opacity 1200ms ease' }}
+            sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', opacity: i === current ? 1 : 0, transition: reduced ? 'none' : 'opacity 1200ms ease' }}
           />
         ))}
         {/* Green scrim, strongest on the left where the text is */}
@@ -94,8 +106,8 @@ export function SiteHero({ stats }: { stats: SiteData['stats'] }) {
 
         {/* Slide dots + pause */}
         <Stack direction="row" sx={{ position: 'relative', zIndex: 2, px: { xs: 2, sm: 4, lg: 8 }, pb: { xs: 10, md: 10 }, alignItems: 'center', gap: 1 }}>
-          {SLIDES.map((src, i) => (
-            <ButtonBase key={src} onClick={() => setSlide(i)} aria-label={t('hero.slide', { n: i + 1 })} aria-current={i === slide} sx={{ width: i === slide ? 24 : 8, height: 8, borderRadius: 999, bgcolor: i === slide ? '#fff' : 'rgba(255,255,255,0.4)', transition: reduced ? 'none' : 'width 300ms ease, background-color 300ms ease' }} />
+          {SLIDES.slice(0, count).map((src, i) => (
+            <ButtonBase key={src} onClick={() => setSlide(i)} aria-label={t('hero.slide', { n: i + 1 })} aria-current={i === current} sx={{ width: i === current ? 24 : 8, height: 8, borderRadius: 999, bgcolor: i === current ? '#fff' : 'rgba(255,255,255,0.4)', transition: reduced ? 'none' : 'width 300ms ease, background-color 300ms ease' }} />
           ))}
           <IconButton onClick={() => setPaused((p) => !p)} aria-label={paused ? t('hero.play') : t('hero.pause')} sx={{ ml: 1, width: 28, height: 28, border: '1px solid rgba(255,255,255,0.4)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.15)' } }}>
             {paused ? <PlayArrowRoundedIcon sx={{ fontSize: 16 }} /> : <PauseRoundedIcon sx={{ fontSize: 16 }} />}
