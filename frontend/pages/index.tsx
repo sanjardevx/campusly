@@ -88,7 +88,9 @@ export default function SiteHome({ site }: { site: SiteData }) {
       </Head>
       <SmoothScroll />
       <SiteNavbar sections={sections} />
-      <Box sx={{ bgcolor: SITE.canvas, color: SITE.text, minHeight: '100vh' }}>
+      {/* clip, not hidden: cards waiting to slide in from the side must not widen the page (a wider
+          page also stretches the fixed top bar off a phone screen); clip keeps sticky children working */}
+      <Box sx={{ bgcolor: SITE.canvas, color: SITE.text, minHeight: '100vh', overflowX: 'clip' }}>
         <SiteHero stats={site.stats} />
         <Box component="main">
           <SiteNews posts={site.posts} />
