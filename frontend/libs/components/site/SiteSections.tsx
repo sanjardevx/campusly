@@ -369,7 +369,10 @@ export function SiteStages() {
 // ───────────────────────── Admission process (Part C) ─────────────────────────
 
 const STEP_ICONS: SvgIconComponent[] = [LocationOnOutlinedIcon, ForumOutlinedIcon, GroupsOutlinedIcon, EditNoteOutlinedIcon, PsychologyOutlinedIcon, VerifiedOutlinedIcon];
-const dashed = '2px dashed #CBD2DC';
+/** Line thickness and the dashed pattern (longer dashes than a CSS dashed border can draw) */
+const LINE = 4;
+const DOT = 22;
+const dashes = (direction: 'bottom' | 'right') => `repeating-linear-gradient(to ${direction}, #CBD2DC 0 12px, transparent 12px 20px)`;
 /** The lane for the centre line: a short dashed arm on each side (the developer's reference) */
 const LANE = 140;
 /** Card width on wide screens; the list is centred, so the arms stay short */
@@ -381,8 +384,10 @@ const OVERLAP = 56;
  * "Admission process" laid out like the developer's reference (Jahon School), sizes measured on
  * it: cards with the icon on top and "01. Title", alternating left and right with a wide lane for
  * the dashed centre line. Each card starts a little above the end of the previous one, so the
- * steps read as a zig-zag; a dashed arm joins the card to its dot on the line. Phones get one
- * column on a line at the left.
+ * steps read as a zig-zag; a dashed arm joins the card to its dot on the line. While scrolling,
+ * the green line grows down the middle; when it reaches a step, that step's dot turns green, its
+ * arm fills from the line out to the card and the card, faded until then, comes to life. Phones
+ * get one column on a line at the left.
  */
 export function SiteAdmission() {
   const { t } = useTranslation('site');
@@ -391,9 +396,9 @@ export function SiteAdmission() {
     <Box component="section" id="admissions" sx={{ ...containerSx, py: { xs: 6, md: 10 } }}>
       <CenteredHeader title={t('admission.title')} subtitle={t('admission.subtitle')} />
       <Box component="ol" sx={{ position: 'relative', listStyle: 'none', m: 0, p: 0, mx: 'auto', maxWidth: { md: CARD_W * 2 + LANE }, display: 'flex', flexDirection: 'column' }}>
-        <Box aria-hidden sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 15, md: '50%' }, borderLeft: dashed }} />
+        <Box aria-hidden sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 16, md: '50%' }, width: LINE, ml: `-${LINE / 2}px`, backgroundImage: dashes('bottom') }} />
         {/* The same line in green, growing as the visitor scrolls through the steps */}
-        <Box ref={drawn} aria-hidden sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 15, md: '50%' }, width: 2, bgcolor: '#4FA383', borderRadius: 1, transformOrigin: 'top' }} />
+        <Box ref={drawn} aria-hidden sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 16, md: '50%' }, width: LINE, ml: `-${LINE / 2}px`, bgcolor: FRESH.from, borderRadius: LINE / 2, transformOrigin: 'top' }} />
         {STEP_ICONS.map((Icon, i) => {
           const left = i % 2 === 0;
           const n = i + 1;
@@ -411,9 +416,56 @@ export function SiteAdmission() {
             >
               {/* The dot on the centre line and the dashed arm to the card */}
               {/* Centred with margins, not a transform: the reveal scales it in */}
-              <Reveal from="scale" delay={250} aria-hidden sx={{ position: 'absolute', zIndex: 1, top: { xs: 30, md: '48%' }, width: 18, height: 18, mt: '-9px', ml: '-9px', borderRadius: '50%', bgcolor: '#D5DBE3', border: '3px solid #fff', boxShadow: '0 0 0 1px #D5DBE3', left: { xs: 16, md: left ? `calc(100% + ${LANE / 2 + 1}px)` : `-${LANE / 2 - 1}px` } }} />
-              <Box aria-hidden sx={{ display: { xs: 'none', md: 'block' }, position: 'absolute', top: '48%', width: LANE / 2 - 10, borderTop: dashed, ...(left ? { right: -(LANE / 2 - 10) } : { left: -(LANE / 2 - 10) }) }} />
+              <Reveal
+                from="scale"
+                delay={250}
+                aria-hidden
+                data-reach
+                sx={{
+                  position: 'absolute',
+                  zIndex: 1,
+                  top: { xs: 30, md: '48%' },
+                  width: DOT,
+                  height: DOT,
+                  mt: `-${DOT / 2}px`,
+                  ml: `-${DOT / 2}px`,
+                  borderRadius: '50%',
+                  bgcolor: '#D5DBE3',
+                  border: '3px solid #fff',
+                  boxShadow: '0 0 0 1px #D5DBE3',
+                  left: { xs: 16, md: left ? `calc(100% + ${LANE / 2}px)` : `-${LANE / 2}px` },
+                  transition: 'background-color 300ms ease, box-shadow 300ms ease',
+                  '&[data-reached]': { bgcolor: FRESH.from, boxShadow: `0 0 0 1px ${FRESH.from}, 0 0 0 6px rgba(79,163,131,0.18)` },
+                }}
+              />
+              <Box aria-hidden sx={{ display: { xs: 'none', md: 'block' }, position: 'absolute', top: '48%', height: LINE, mt: `-${LINE / 2}px`, width: LANE / 2 - DOT / 2, backgroundImage: dashes('right'), ...(left ? { right: -(LANE / 2 - DOT / 2) } : { left: -(LANE / 2 - DOT / 2) }) }}>
+                {/* The green fill, growing from the line towards the card */}
+                <Box
+                  data-reach
+                  sx={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: LINE / 2,
+                    bgcolor: FRESH.from,
+                    transformOrigin: left ? 'right' : 'left',
+                    transform: 'scaleX(0)',
+                    transition: `transform 500ms ${EASE}`,
+                    '&[data-reached]': { transform: 'scaleX(1)' },
+                    '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+                  }}
+                />
+              </Box>
               <Reveal from={left ? 'left' : 'right'}>
+              {/* Faded until the green line reaches the step, then it comes to life */}
+              <Box
+                data-reach
+                sx={{
+                  transition: `opacity 600ms ease, filter 600ms ease, transform 700ms ${EASE}`,
+                  // Only with JS and motion (the boot class), so a page without JS never stays faded
+                  '.motion-ok &:not([data-reached])': { opacity: 0.55, filter: 'grayscale(0.85)', transform: 'scale(0.97)' },
+                  '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+                }}
+              >
               <Box sx={{ minHeight: { md: 232 }, bgcolor: '#F8F9FA', border: '1px solid #EEF0EE', borderRadius: '24px', p: { xs: 2.5, md: 2.75 }, ...hoverLift }}>
                 <Box sx={{ ...iconTile(52, '14px'), mb: 1.5 }}>
                   <Icon sx={{ fontSize: 26 }} />
@@ -422,6 +474,7 @@ export function SiteAdmission() {
                   {String(n).padStart(2, '0')}. {t(`admission.step${n}.title`)}
                 </Typography>
                 <Typography sx={{ fontSize: '1rem', color: SITE.stone500, mt: 0.75, lineHeight: 1.5 }}>{t(`admission.step${n}.body`)}</Typography>
+              </Box>
               </Box>
               </Reveal>
             </Box>

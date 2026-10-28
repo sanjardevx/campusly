@@ -270,20 +270,33 @@ export function Typewriter({ text, speed = 34, startDelay = 250 }: { text: strin
 /**
  * A vertical line that grows with the scroll through its parent (the admission timeline): 0 when
  * the parent's top reaches 60 % of the screen, full when its bottom does. Written straight to the
- * element's transform on animation frames, so scrolling re-renders nothing. Reduced motion: full.
+ * element's transform on animation frames, so scrolling re-renders nothing. Elements inside the
+ * parent marked `data-reach` get `data-reached` once the line has passed their middle (and lose it
+ * when the visitor scrolls back up), so they can light up too. Reduced motion: full, all reached.
  */
 export function useScrollDraw<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   useEffect(() => {
     const el = ref.current;
     const track = el?.parentElement;
-    if (!el || !track || reducedMotion()) return;
+    if (!el || !track) return;
+    const marks = [...track.querySelectorAll<HTMLElement>('[data-reach]')];
+    if (reducedMotion()) {
+      marks.forEach((m) => (m.dataset.reached = 'true'));
+      return;
+    }
     let frame = 0;
     const update = () => {
       frame = 0;
       const r = track.getBoundingClientRect();
       const progress = Math.min(1, Math.max(0, (window.innerHeight * 0.6 - r.top) / r.height));
       el.style.transform = `scaleY(${progress})`;
+      const lineEnd = r.top + progress * r.height;
+      marks.forEach((m) => {
+        const box = m.getBoundingClientRect();
+        if (box.top + box.height / 2 <= lineEnd) m.dataset.reached = 'true';
+        else delete m.dataset.reached;
+      });
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
