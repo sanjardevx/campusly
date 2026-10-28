@@ -9,6 +9,7 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'next-i18next/pages';
 import { logOut } from '@/libs/auth';
+import { whileSigningOut } from '@/libs/auth/navigation';
 import type { SessionUser } from '@/libs/auth/api';
 
 export const initialsOf = (u: { firstName: string; lastName: string }) =>
@@ -65,9 +66,12 @@ export function AccountItems({ user, onDone }: { user: SessionUser; onDone: () =
 
   const signOut = async () => {
     onDone();
-    await logOut(client);
     const staff = user.role === 'TEACHER' || user.role === 'ADMIN';
-    await router.replace(staff ? '/login/teacher' : '/login');
+    // The page's role guard waits: this redirect goes to a clean sign-in page (no ?next=)
+    await whileSigningOut(async () => {
+      await logOut(client);
+      await router.replace(staff ? '/login/teacher' : '/login');
+    });
   };
 
   // A fragment would break MUI Menu's keyboard focus, so the items are returned as an array

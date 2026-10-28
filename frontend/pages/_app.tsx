@@ -9,6 +9,8 @@ import { appWithTranslation } from "next-i18next/pages";
 import { useApollo } from "@/apollo/client";
 import { restoreSession } from "@/libs/auth";
 import { installAuthDebug } from "@/libs/auth/debug";
+// The Back listener of the role guard must exist before the first Back (side effect import)
+import "@/libs/auth/navigation";
 import { theme } from "@/libs/theme";
 import type { NextPageWithLayout } from "@/libs/types/page";
 import i18nConfig from "../next-i18next.config.js";

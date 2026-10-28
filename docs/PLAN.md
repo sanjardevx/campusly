@@ -333,7 +333,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [x] Demo accounts may write inside 9A / 11A; demo students may retake quizzes and resubmit homework; a small daily tutor limit for demo accounts; upload, password change, Telegram and admin stay blocked.
 - [x] ADMIN removed from the demo login (API input + frontend).
 - [x] e2e: the reset leaves admin rows and other classes untouched; a demo account cannot write outside 9A / 11A; blocked actions refuse.
-- [ ] Prod switch: one last full seed → the developer changes the `simon` password → from then on admin content persists.
+- [x] Prod switch: one last full seed → the developer changes the `simon` password → from then on admin content persists.
 
 **Developer:** change the admin password after the switch; enter real content (news etc.) only after it.
 
