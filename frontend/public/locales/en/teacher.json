@@ -65,11 +65,6 @@
       "gradebook": "Gradebook",
       "attendance": "Attendance"
     },
-    "questions": {
-      "title": "Unanswered questions",
-      "soon": "Coming soon",
-      "body": "Students’ questions about lessons will appear here once course Q&A is switched on."
-    },
     "deadlines": {
       "title": "Upcoming deadlines",
       "empty": "Nothing due in the next two weeks.",

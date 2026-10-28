@@ -15,6 +15,7 @@ import { LESSON_VIDEO, STUDENT_FILE_URL } from '@/apollo/student/query';
 import { MarkdownText } from '@/libs/components/MarkdownText';
 import { studentHref } from '@/libs/components/student/home/due';
 import { STITCH, SoftPill, enter, pressSx } from '@/libs/components/student/home/parts';
+import { QaLink } from '@/libs/components/student/homework/HomeworkView';
 import { fileType, formatSize } from '@/libs/components/teacher/course/model';
 import type { StudentLessonQuery } from '@/libs/gql/graphql';
 import { VideoPlayer, clock } from './VideoPlayer';
@@ -26,7 +27,7 @@ const cardSx = { borderRadius: '12px', borderColor: STITCH.outline, boxShadow: S
 
 /**
  * Stitch "Lesson: Quadratic Equations (Compact View)": the lesson in the main column, the Study
- * Tutor as a coming-soon card beside it (DECISIONS §10). A phone gets the same blocks stacked.
+ * Tutor card beside it with the Q&A link (DECISIONS §10, §14). A phone gets the same blocks stacked.
  */
 export function LessonView({ data, lessonId, desktop, refetch }: { data: Data; lessonId: string; desktop: boolean; refetch: () => void }) {
   const { t } = useTranslation('student');
@@ -80,6 +81,7 @@ export function LessonView({ data, lessonId, desktop, refetch }: { data: Data; l
       {lesson.type === 'FILE' && lesson.file && <Materials file={lesson.file} />}
 
       <Footer lesson={lesson} prev={prev} next={next} done={done} courseId={course.id} onDone={refetch} desktop={desktop} />
+      {!desktop && <QaLink href={studentHref.questions(course.id, { lesson: lesson.id })} label={t('lesson.qa')} />}
     </Stack>
   );
 
@@ -322,6 +324,9 @@ function TutorCard({ courseId, lessonId }: { courseId: string; lessonId: string 
       >
         {t('lesson.tutor.ask')}
       </Button>
+      <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: STITCH.outlineSoft }}>
+        <QaLink href={studentHref.questions(courseId, { lesson: lessonId })} label={t('lesson.qa')} />
+      </Box>
     </Card>
   );
 }

@@ -1,0 +1,108 @@
+{
+  "title": "Q&A",
+  "courseTitle": "Q&A · {{course}}",
+  "studentSubtitle": "Ask your teacher. Questions are visible to your class unless you make them private.",
+  "teacherSubtitle": "Questions from your students",
+  "ask": "Ask a question",
+  "notFound": "This course does not exist or you are not enrolled in it.",
+  "tabs": {
+    "ALL": "All",
+    "MINE": "My questions",
+    "ANSWERED": "Answered",
+    "UNANSWERED": "Unanswered"
+  },
+  "course": "Course",
+  "allCourses": "All my courses ({{count}})",
+  "search": "Search questions…",
+  "noResults": "No questions match your search.",
+  "noCourses": "You have no active courses yet.",
+  "loadMore": "Load more",
+  "empty": {
+    "ALL": "No questions yet. Be the first to ask.",
+    "MINE": "You have not asked anything yet.",
+    "ANSWERED": "No answered questions yet.",
+    "staffUNANSWERED": "All caught up: every question has an answer.",
+    "staffANSWERED": "No answered questions yet.",
+    "staffALL": "Your students have not asked anything yet."
+  },
+  "faq": "Pinned as FAQ",
+  "faqTag": "FAQ",
+  "private": "Private",
+  "you": "You",
+  "status": {
+    "answered": "Answered",
+    "waiting": "Waiting for teacher",
+    "unanswered": "Unanswered",
+    "resolved": "Resolved"
+  },
+  "replies_one": "{{count}} reply",
+  "replies_other": "{{count}} replies",
+  "from": {
+    "teacher": "teacher",
+    "classmate": "classmate"
+  },
+  "about": {
+    "lesson": "Lesson: {{title}}"
+  },
+  "drawer": {
+    "title": "Ask a question",
+    "questionTitle": "Title",
+    "titleHint": "e.g. Is synthetic division the same as long division?",
+    "about": "About",
+    "general": "The course in general",
+    "assignments": "Assignments",
+    "aboutHint": "Linking to a lesson or assignment helps your teacher answer faster.",
+    "details": "Details",
+    "optional": "Optional",
+    "detailsHint": "What did you try? Where did you get stuck?",
+    "private": "Private — only my teacher can see this",
+    "privateHint": "Classmates won't see your question or any reply to it.",
+    "respect": "Be respectful. Your teacher and classmates can reply.",
+    "cancel": "Cancel",
+    "post": "Post question"
+  },
+  "thread": {
+    "back": "Back to all questions",
+    "visible": "Visible to class",
+    "private": "Only the author and teachers",
+    "id": "ID {{id}}",
+    "sorted": "Oldest first",
+    "noReplies": "No replies yet.",
+    "instructor": "Instructor",
+    "classmate": "Classmate",
+    "yourAnswer": "Your answer",
+    "yourReply": "Your reply",
+    "highlighted": "Answers from teachers are highlighted for students",
+    "placeholderStaff": "Write your answer…",
+    "placeholder": "Write a reply…",
+    "resolveAfter": "Mark as resolved after posting",
+    "postAnswer": "Post answer",
+    "postReply": "Post reply",
+    "pin": "Pin as FAQ",
+    "unpin": "Unpin",
+    "pinPrivate": "A private question cannot be pinned",
+    "resolve": "Mark as resolved",
+    "reopen": "Reopen",
+    "hide": "Hide question",
+    "hideReply": "Hide",
+    "hideReplyTitle": "Hide reply",
+    "hideConfirm": "Hide this question for everyone? It stays in the activity log.",
+    "hideReplyConfirm": "Hide this reply for everyone? It stays in the activity log.",
+    "hideButton": "Hide",
+    "archived": "This course is archived: replies are closed.",
+    "notFound": "This question does not exist or you cannot see it."
+  },
+  "card": {
+    "title": "Unanswered questions",
+    "all": "Open Q&A",
+    "empty": "No unanswered questions. Nice work!"
+  },
+  "time": {
+    "today": "Today, {{time}}",
+    "yesterday": "Yesterday",
+    "daysAgo_one": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago",
+    "weeksAgo_one": "{{count}} week ago",
+    "weeksAgo_other": "{{count}} weeks ago"
+  }
+}

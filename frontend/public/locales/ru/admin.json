@@ -771,6 +771,12 @@
       "announcement": {
         "archive": "Архивировал объявление"
       },
+      "question": {
+        "hide": "Скрыл вопрос"
+      },
+      "answer": {
+        "hide": "Скрыл ответ"
+      },
       "submission": {
         "grade": "Оценил работу",
         "return": "Вернул работу"

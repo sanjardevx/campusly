@@ -1,0 +1,108 @@
+{
+  "title": "Savol-javob",
+  "courseTitle": "Savol-javob · {{course}}",
+  "studentSubtitle": "O‘qituvchingizdan so‘rang. Savollarni sinfdoshlar ham ko‘radi, agar shaxsiy qilmasangiz.",
+  "teacherSubtitle": "O‘quvchilaringiz savollari",
+  "ask": "Savol berish",
+  "notFound": "Bu kurs topilmadi yoki siz unga yozilmagansiz.",
+  "tabs": {
+    "ALL": "Barchasi",
+    "MINE": "Mening savollarim",
+    "ANSWERED": "Javob berilgan",
+    "UNANSWERED": "Javobsiz"
+  },
+  "course": "Kurs",
+  "allCourses": "Barcha kurslarim ({{count}})",
+  "search": "Savollarni qidirish…",
+  "noResults": "Qidiruvga mos savol yo‘q.",
+  "noCourses": "Sizda hali faol kurs yo‘q.",
+  "loadMore": "Yana yuklash",
+  "empty": {
+    "ALL": "Hali savol yo‘q. Birinchi bo‘lib so‘rang.",
+    "MINE": "Siz hali savol bermagansiz.",
+    "ANSWERED": "Hali javob berilgan savol yo‘q.",
+    "staffUNANSWERED": "Hammasi tayyor: har bir savolga javob berilgan.",
+    "staffANSWERED": "Hali javob berilgan savol yo‘q.",
+    "staffALL": "O‘quvchilaringiz hali savol bermagan."
+  },
+  "faq": "FAQ sifatida mahkamlangan",
+  "faqTag": "FAQ",
+  "private": "Shaxsiy",
+  "you": "Siz",
+  "status": {
+    "answered": "Javob berilgan",
+    "waiting": "O‘qituvchi javobini kutmoqda",
+    "unanswered": "Javobsiz",
+    "resolved": "Hal qilingan"
+  },
+  "replies_one": "{{count}} ta javob",
+  "replies_other": "{{count}} ta javob",
+  "from": {
+    "teacher": "o‘qituvchi",
+    "classmate": "sinfdosh"
+  },
+  "about": {
+    "lesson": "Dars: {{title}}"
+  },
+  "drawer": {
+    "title": "Savol berish",
+    "questionTitle": "Sarlavha",
+    "titleHint": "Masalan: sintetik bo‘lish uzun bo‘lish bilan bir xilmi?",
+    "about": "Mavzu",
+    "general": "Kurs bo‘yicha umumiy savol",
+    "assignments": "Topshiriqlar",
+    "aboutHint": "Dars yoki topshiriqni tanlasangiz, o‘qituvchi tezroq javob beradi.",
+    "details": "Batafsil",
+    "optional": "Ixtiyoriy",
+    "detailsHint": "Nimani sinab ko‘rdingiz? Qayerda to‘xtab qoldingiz?",
+    "private": "Shaxsiy — faqat o‘qituvchim ko‘radi",
+    "privateHint": "Sinfdoshlar savolingizni ham, javoblarni ham ko‘rmaydi.",
+    "respect": "Hurmat bilan yozing. O‘qituvchi va sinfdoshlar javob bera oladi.",
+    "cancel": "Bekor qilish",
+    "post": "Savolni yuborish"
+  },
+  "thread": {
+    "back": "Barcha savollarga qaytish",
+    "visible": "Sinfga ko‘rinadi",
+    "private": "Faqat muallif va o‘qituvchilar",
+    "id": "ID {{id}}",
+    "sorted": "Eskisi birinchi",
+    "noReplies": "Hali javob yo‘q.",
+    "instructor": "O‘qituvchi",
+    "classmate": "Sinfdosh",
+    "yourAnswer": "Sizning javobingiz",
+    "yourReply": "Javobingiz",
+    "highlighted": "O‘qituvchi javoblari o‘quvchilarga ajratib ko‘rsatiladi",
+    "placeholderStaff": "Javobingizni yozing…",
+    "placeholder": "Javob yozing…",
+    "resolveAfter": "Yuborgach hal qilingan deb belgilash",
+    "postAnswer": "Javobni yuborish",
+    "postReply": "Javob yuborish",
+    "pin": "FAQ sifatida mahkamlash",
+    "unpin": "Mahkamlashni olib tashlash",
+    "pinPrivate": "Shaxsiy savolni mahkamlab bo‘lmaydi",
+    "resolve": "Hal qilingan deb belgilash",
+    "reopen": "Qayta ochish",
+    "hide": "Savolni yashirish",
+    "hideReply": "Yashirish",
+    "hideReplyTitle": "Javobni yashirish",
+    "hideConfirm": "Bu savol hamma uchun yashirilsinmi? U faoliyat jurnalida qoladi.",
+    "hideReplyConfirm": "Bu javob hamma uchun yashirilsinmi? U faoliyat jurnalida qoladi.",
+    "hideButton": "Yashirish",
+    "archived": "Bu kurs arxivlangan: javob yozib bo‘lmaydi.",
+    "notFound": "Bu savol topilmadi yoki uni ko‘ra olmaysiz."
+  },
+  "card": {
+    "title": "Javobsiz savollar",
+    "all": "Savol-javobni ochish",
+    "empty": "Javobsiz savol yo‘q. Barakalla!"
+  },
+  "time": {
+    "today": "Bugun, {{time}}",
+    "yesterday": "Kecha",
+    "daysAgo_one": "{{count}} kun oldin",
+    "daysAgo_other": "{{count}} kun oldin",
+    "weeksAgo_one": "{{count}} hafta oldin",
+    "weeksAgo_other": "{{count}} hafta oldin"
+  }
+}

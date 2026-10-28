@@ -749,6 +749,12 @@
       "announcement": {
         "archive": "Archived an announcement"
       },
+      "question": {
+        "hide": "Hid a question"
+      },
+      "answer": {
+        "hide": "Hid a reply"
+      },
       "submission": {
         "grade": "Graded a submission",
         "return": "Returned a submission"

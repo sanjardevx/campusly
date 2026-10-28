@@ -104,6 +104,7 @@
       "assignments": "Assignments"
     },
     "announcements": "Announcements",
+    "qa": "Q&A",
     "current": "Current week",
     "earlier": "Other weeks",
     "done": "{{done}}/{{total}} done",
@@ -160,6 +161,7 @@
     "duration": "Duration: {{time}}",
     "taughtBy": "Taught by",
     "overview": "Lesson overview",
+    "qa": "Ask your teacher about this lesson",
     "materials": "Attached materials",
     "materialsHint": "Notes and files for this lesson.",
     "download": "Download",
@@ -284,7 +286,6 @@
     },
     "tutor": "Ask Study Tutor for a hint",
     "qa": "Ask a question in Q&A",
-    "soon": "Coming soon",
     "notFound": "This assignment is not available."
   },
   "grades": {

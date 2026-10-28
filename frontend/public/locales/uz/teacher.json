@@ -65,11 +65,6 @@
       "gradebook": "Jurnal",
       "attendance": "Davomat"
     },
-    "questions": {
-      "title": "Javobsiz savollar",
-      "soon": "Tez orada",
-      "body": "Kurs savol-javobi yoqilgach, o‘quvchilarning darslar bo‘yicha savollari shu yerda chiqadi."
-    },
     "deadlines": {
       "title": "Yaqin muddatlar",
       "empty": "Keyingi ikki haftada muddat yo‘q.",

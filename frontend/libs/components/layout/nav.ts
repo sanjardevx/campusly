@@ -6,6 +6,7 @@ import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined
 import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -40,8 +41,8 @@ export interface NavSection {
 }
 
 /**
- * The menus of the Stitch dashboards, MVP pages only. Later-phase items (Calendar, Q&A, the website
- * CMS) come back with their features (DECISIONS §14). The AI Study Tutor page is built ahead (UI only).
+ * The menus of the Stitch dashboards. Later-phase items come back with their features (DECISIONS §14):
+ * Q&A (teachers; students ask inside a course) on day 21. The AI Study Tutor page was built ahead.
  */
 export const NAV: Record<Role, NavSection[]> = {
   STUDENT: [
@@ -64,6 +65,8 @@ export const NAV: Record<Role, NavSection[]> = {
         { key: 'gradebook', href: '/teacher/gradebook', icon: AutoStoriesOutlinedIcon, day: 11 },
         { key: 'attendance', href: '/teacher/attendance', icon: HowToRegOutlinedIcon, day: 11 },
         { key: 'announcements', href: '/teacher/announcements', icon: CampaignOutlinedIcon, day: 11 },
+        // Phones: the bar keeps five places, Q&A opens from "More"
+        { key: 'questions', href: '/teacher/questions', icon: ForumOutlinedIcon, day: 21, tab: false },
       ],
     },
   ],

@@ -49,6 +49,8 @@ const ACTION_GROUPS: Record<string, string[]> = {
     'course.setStudents',
     'course.gradeCategories',
     'announcement.archive',
+    'question.hide',
+    'answer.hide',
   ],
   grades: [
     'submission.grade',

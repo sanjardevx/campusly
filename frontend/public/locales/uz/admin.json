@@ -749,6 +749,12 @@
       "announcement": {
         "archive": "E’lonni arxivladi"
       },
+      "question": {
+        "hide": "Savolni yashirdi"
+      },
+      "answer": {
+        "hide": "Javobni yashirdi"
+      },
       "submission": {
         "grade": "Topshiriqni baholadi",
         "return": "Topshiriqni qaytardi"

@@ -97,6 +97,7 @@
       "assignments": "과제"
     },
     "announcements": "공지사항",
+    "qa": "Q&A",
     "current": "이번 주",
     "earlier": "다른 주차",
     "done": "{{done}}/{{total}} 완료",
@@ -152,6 +153,7 @@
     "duration": "길이: {{time}}",
     "taughtBy": "담당",
     "overview": "수업 개요",
+    "qa": "이 수업에 대해 선생님께 질문하기",
     "materials": "첨부 자료",
     "materialsHint": "이 수업의 파일입니다.",
     "download": "다운로드",
@@ -271,7 +273,6 @@
     },
     "tutor": "Study Tutor에게 힌트 요청",
     "qa": "Q&A에 질문하기",
-    "soon": "곧 제공",
     "notFound": "이 과제를 볼 수 없습니다."
   },
   "grades": {

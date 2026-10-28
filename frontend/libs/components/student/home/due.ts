@@ -41,4 +41,7 @@ export const studentHref = {
   course: (courseId: string) => `/student/courses/${courseId}`,
   lesson: (courseId: string, lessonId: string) => `/student/courses/${courseId}/lessons/${lessonId}`,
   assignment: (courseId: string, assignmentId: string) => `/student/courses/${courseId}/assignments/${assignmentId}`,
+  /** The course Q&A; `about` opens the "Ask a question" drawer with that lesson / assignment picked */
+  questions: (courseId: string, about?: { lesson: string } | { assignment: string } | 'ask') =>
+    `/student/courses/${courseId}/questions${about === 'ask' ? '?ask=1' : about && 'lesson' in about ? `?lesson=${about.lesson}` : about ? `?assignment=${about.assignment}` : ''}`,
 };

@@ -104,6 +104,7 @@
       "assignments": "Topshiriqlar"
     },
     "announcements": "E’lonlar",
+    "qa": "Savol-javob",
     "current": "Joriy hafta",
     "earlier": "Boshqa haftalar",
     "done": "{{done}}/{{total}} bajarildi",
@@ -160,6 +161,7 @@
     "duration": "Davomiyligi: {{time}}",
     "taughtBy": "O‘qituvchi",
     "overview": "Dars haqida",
+    "qa": "Bu dars bo‘yicha o‘qituvchidan so‘rash",
     "materials": "Materiallar",
     "materialsHint": "Bu darsga oid fayllar.",
     "download": "Yuklab olish",
@@ -284,7 +286,6 @@
     },
     "tutor": "Study Tutor'dan maslahat so‘rash",
     "qa": "Q&A'da savol berish",
-    "soon": "Tez orada",
     "notFound": "Bu topshiriq mavjud emas."
   },
   "grades": {

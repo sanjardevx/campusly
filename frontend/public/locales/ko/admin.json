@@ -738,6 +738,12 @@
       "announcement": {
         "archive": "공지 보관"
       },
+      "question": {
+        "hide": "질문 숨김"
+      },
+      "answer": {
+        "hide": "답글 숨김"
+      },
       "submission": {
         "grade": "제출물 채점",
         "return": "제출물 반환"

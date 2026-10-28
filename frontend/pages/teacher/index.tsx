@@ -8,14 +8,14 @@ import { layoutFor } from '@/libs/components/layout';
 import { AttendanceToday } from '@/libs/components/teacher/dashboard/AttendanceToday';
 import { MyCourses } from '@/libs/components/teacher/dashboard/MyCourses';
 import { NeedsGrading } from '@/libs/components/teacher/dashboard/NeedsGrading';
-import { QuestionsSoon } from '@/libs/components/teacher/dashboard/QuestionsSoon';
 import { RecentAnnouncements } from '@/libs/components/teacher/dashboard/RecentAnnouncements';
+import { UnansweredQuestions } from '@/libs/components/teacher/dashboard/UnansweredQuestions';
 import { UpcomingDeadlines } from '@/libs/components/teacher/dashboard/UpcomingDeadlines';
 import { formatDate } from '@/libs/i18n/format';
 import { withTranslations } from '@/libs/i18n/server';
 import type { NextPageWithLayout } from '@/libs/types/page';
 
-export const getStaticProps = withTranslations(['teacher']);
+export const getStaticProps = withTranslations(['teacher', 'qa']);
 
 /** Morning until 12, afternoon until 18, then evening (the teacher's own clock) */
 const partOfDay = (hour: number) => (hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening');
@@ -23,7 +23,7 @@ const partOfDay = (hour: number) => (hour < 12 ? 'morning' : hour < 18 ? 'aftern
 /**
  * Teacher home: Stitch "Campusly — Teacher Dashboard". One query; the server limits everything
  * to the teacher's own courses. Without a timetable, "Today's classes" becomes "Attendance today"
- * (DECISIONS §10); the Q&A card waits for its phase.
+ * (DECISIONS §10). The Q&A card loads its own list (courseQuestions).
  */
 const DashboardPage: NextPageWithLayout = () => {
   const { t } = useTranslation('teacher');
@@ -65,7 +65,7 @@ const DashboardPage: NextPageWithLayout = () => {
           <MyCourses courses={dashboard.courses} index={2} />
         </Stack>
         <Stack spacing={3} sx={{ minWidth: 0 }}>
-          <QuestionsSoon index={3} />
+          <UnansweredQuestions index={3} />
           <UpcomingDeadlines items={dashboard.deadlines} index={4} />
           <RecentAnnouncements items={dashboard.announcements} index={5} />
         </Stack>

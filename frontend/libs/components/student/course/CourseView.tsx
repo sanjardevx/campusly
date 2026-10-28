@@ -7,13 +7,18 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
 import { useTranslation } from 'next-i18next/pages';
+import { studentHref } from '@/libs/components/student/home/due';
 import { ProgressBar, STITCH, SoftPill, enter, pressSx } from '@/libs/components/student/home/parts';
 import { dayRange } from '@/libs/components/teacher/course/model';
 import type { StudentCourseQuery } from '@/libs/gql/graphql';
 import { arrangeWeeks, isDone, revealOpened, rowsOf, topicOf, type Row, type StudentWeek } from './model';
 import { useRowView, type RowView } from './useRowView';
+
+/** "Q&A" and "Announcements" next to the tabs */
+const linkSx = { display: 'inline-flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary', '&:hover': { color: STITCH.ink } };
 
 /** Stitch "Algebra · Grade 9A (eCampus View)" on a wide screen (DECISIONS §10) */
 export function CourseView({ data }: { data: StudentCourseQuery }) {
@@ -108,10 +113,16 @@ export function CourseView({ data }: { data: StudentCourseQuery }) {
               }
             />
           </Tabs>
-          <Link component={NextLink} href="/student/announcements" underline="none" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary', '&:hover': { color: STITCH.ink } }}>
-            <CampaignOutlinedIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
-            {t('course.announcements')}
-          </Link>
+          <Stack direction="row" sx={{ gap: 2.5 }}>
+            <Link component={NextLink} href={studentHref.questions(course.id)} underline="none" sx={linkSx}>
+              <ForumOutlinedIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
+              {t('course.qa')}
+            </Link>
+            <Link component={NextLink} href="/student/announcements" underline="none" sx={linkSx}>
+              <CampaignOutlinedIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
+              {t('course.announcements')}
+            </Link>
+          </Stack>
         </Stack>
       </Stack>
 

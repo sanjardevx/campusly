@@ -62,11 +62,6 @@
       "gradebook": "성적부",
       "attendance": "출석"
     },
-    "questions": {
-      "title": "답변 대기 질문",
-      "soon": "준비 중",
-      "body": "강좌 Q&A가 켜지면 수업에 대한 학생들의 질문이 여기에 표시됩니다."
-    },
     "deadlines": {
       "title": "다가오는 마감",
       "empty": "앞으로 2주 동안 마감이 없습니다.",

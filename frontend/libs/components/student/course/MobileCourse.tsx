@@ -1,7 +1,10 @@
 import { useRef, useState } from 'react';
-import { Box, ButtonBase, Collapse, Stack, Tab, Tabs, Typography } from '@mui/material';
+import NextLink from 'next/link';
+import { Box, Button, ButtonBase, Collapse, Stack, Tab, Tabs, Typography } from '@mui/material';
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import { useTranslation } from 'next-i18next/pages';
+import { studentHref } from '@/libs/components/student/home/due';
 import { Heading, TapRow } from '@/libs/components/student/home/MobileHome';
 import { ProgressBar, STITCH, SoftPill } from '@/libs/components/student/home/parts';
 import type { StudentCourseQuery } from '@/libs/gql/graphql';
@@ -23,9 +26,14 @@ export function MobileCourse({ data }: { data: StudentCourseQuery }) {
   return (
     <Stack spacing={2.5}>
       <Box sx={{ px: 0.5 }}>
-        <Typography component="h1" sx={{ fontSize: '1.375rem', fontWeight: 600, letterSpacing: '-0.015em', color: STITCH.ink }}>
-          {course.title}
-        </Typography>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
+          <Typography component="h1" sx={{ fontSize: '1.375rem', fontWeight: 600, letterSpacing: '-0.015em', color: STITCH.ink }}>
+            {course.title}
+          </Typography>
+          <Button component={NextLink} href={studentHref.questions(course.id)} size="small" startIcon={<ForumOutlinedIcon />} sx={{ color: 'secondary.main', fontWeight: 600, flexShrink: 0 }}>
+            {t('course.qa')}
+          </Button>
+        </Stack>
         {owner && (
           <Typography sx={{ fontSize: '0.8125rem', color: 'text.secondary' }}>
             {owner.firstName} {owner.lastName}

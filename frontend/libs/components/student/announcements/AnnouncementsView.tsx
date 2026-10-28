@@ -5,7 +5,6 @@ import { Alert, Box, Button, ButtonBase, Card, CircularProgress, Collapse, Input
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import DoneAllRoundedIcon from '@mui/icons-material/DoneAllRounded';
 import ExpandLessRoundedIcon from '@mui/icons-material/ExpandLessRounded';
-import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'next-i18next/pages';
@@ -13,7 +12,8 @@ import { MARK_ALL_ANNOUNCEMENTS_READ, MARK_ANNOUNCEMENT_READ } from '@/apollo/st
 import { STUDENT_ANNOUNCEMENTS } from '@/apollo/student/query';
 import { MarkdownText } from '@/libs/components/MarkdownText';
 import { STITCH, SegmentedTabs, enter, liftSx, pressSx } from '@/libs/components/student/home/parts';
-import { FileChip, Soon } from '@/libs/components/student/homework/HomeworkView';
+import { studentHref } from '@/libs/components/student/home/due';
+import { FileChip, QaLink } from '@/libs/components/student/homework/HomeworkView';
 import { errorCode } from '@/libs/errors';
 import type { StudentAnnouncementsQuery } from '@/libs/gql/graphql';
 import { useErrorText } from '@/libs/i18n';
@@ -262,7 +262,7 @@ function AnnouncementCard({ item, index, open, onToggle, locale }: { item: Item;
             </Stack>
           )}
           <Stack direction="row" sx={{ mt: 2, pt: 1.5, borderTop: 1, borderColor: STITCH.outline, justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
-            <Soon icon={<ForumOutlinedIcon />} label={t('announcements.ask')} />
+            {item.courseId ? <QaLink href={studentHref.questions(item.courseId, 'ask')} label={t('announcements.ask')} /> : <span />}
             <Button size="small" color="inherit" endIcon={<ExpandLessRoundedIcon />} onClick={onToggle} sx={{ ...pressSx, color: 'text.secondary', fontWeight: 600 }}>
               {t('announcements.collapse')}
             </Button>

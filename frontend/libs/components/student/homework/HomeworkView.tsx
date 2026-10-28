@@ -201,6 +201,7 @@ export function HomeworkView({ data, refetch }: { data: Data; refetch: () => Pro
           key={user ? `${user.id}.${a.id}` : a.id}
           assignmentId={a.id}
           tutorHref={a.tutorMode === 'OFF' ? null : `/student/tutor?course=${a.courseId}&topic=assignment:${a.id}`}
+          qaHref={studentHref.questions(a.courseId, { assignment: a.id })}
           draftKey={user ? `campusly.homework.${user.id}.${a.id}` : null}
           accept={a.acceptedFileTypes.map((x) => MIME_BY_EXTENSION[x]).filter(Boolean)}
           hint={t('homework.upload.hint', { types, size: formatSize(limitBytes), max: MAX_FILES })}
@@ -263,7 +264,7 @@ export function HomeworkView({ data, refetch }: { data: Data; refetch: () => Pro
             )}
           </Box>
           <Box sx={{ px: { xs: 2, md: 3 }, py: 1.5 }}>
-            <Soon icon={<ForumOutlinedIcon />} label={t('homework.qa')} />
+            <QaLink href={studentHref.questions(a.courseId, { assignment: a.id })} label={t('homework.qa')} />
           </Box>
         </Card>
       )}
@@ -311,15 +312,13 @@ export function FileChip({ assetId, url, name, mimeType, size }: { assetId?: str
   );
 }
 
-/** A disabled "coming soon" link (Q&A waits for its phase) */
-export function Soon({ icon, label }: { icon: ReactNode; label: string }) {
-  const { t } = useTranslation('student');
+/** "Ask a question in Q&A": opens the course Q&A, the drawer already about this assignment / lesson */
+export function QaLink({ href, label }: { href: string; label: string }) {
   return (
-    <Stack direction="row" aria-disabled sx={{ alignItems: 'center', gap: 1, color: 'text.disabled', '& svg': { fontSize: 18 } }}>
-      {icon}
-      <Typography sx={{ fontSize: '0.84375rem', fontWeight: 500 }}>{label}</Typography>
-      <SoftPill tone="neutral">{t('homework.soon')}</SoftPill>
-    </Stack>
+    <Link component={NextLink} href={href} underline="hover" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, fontSize: '0.84375rem', fontWeight: 600, color: 'secondary.main', '& svg': { fontSize: 18 } }}>
+      <ForumOutlinedIcon />
+      {label}
+    </Link>
   );
 }
 
@@ -382,6 +381,7 @@ interface Pending {
 function SubmitPanel({
   assignmentId,
   tutorHref,
+  qaHref,
   draftKey,
   accept,
   hint,
@@ -392,6 +392,7 @@ function SubmitPanel({
   assignmentId: string;
   /** null: the teacher turned the tutor off for this assignment */
   tutorHref: string | null;
+  qaHref: string;
   draftKey: string | null;
   accept: string[];
   hint: string;
@@ -584,14 +585,15 @@ function SubmitPanel({
         {error && <Alert severity="error">{error}</Alert>}
 
         <Stack direction={{ xs: 'column-reverse', sm: 'row' }} sx={{ pt: 2, borderTop: 1, borderColor: STITCH.outlineSoft, justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 2 }}>
-          {tutorHref ? (
-            <Link component={NextLink} href={tutorHref} underline="hover" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, fontSize: '0.84375rem', fontWeight: 600, color: 'secondary.main', '& svg': { fontSize: 18 } }}>
-              <SmartToyOutlinedIcon />
-              {t('homework.tutor')}
-            </Link>
-          ) : (
-            <span />
-          )}
+          <Stack sx={{ gap: 1, alignItems: 'flex-start' }}>
+            {tutorHref && (
+              <Link component={NextLink} href={tutorHref} underline="hover" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, fontSize: '0.84375rem', fontWeight: 600, color: 'secondary.main', '& svg': { fontSize: 18 } }}>
+                <SmartToyOutlinedIcon />
+                {t('homework.tutor')}
+              </Link>
+            )}
+            <QaLink href={qaHref} label={t('homework.qa')} />
+          </Stack>
           <Stack direction="row" sx={{ gap: 1.5, justifyContent: 'flex-end' }}>
             {onCancel && (
               <Button onClick={onCancel} sx={{ ...pressSx, color: 'text.secondary' }}>
