@@ -138,7 +138,8 @@ function DesktopShell({ user, desktop, children }: { user: SessionUser; desktop:
           </IconButton>
         )}
         {/* Breadcrumb: menu item, then what the page says it shows (Users / Students) */}
-        <Typography component="h1" sx={{ fontSize: '1rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+        {/* minWidth 0 + ellipsis: a long crumb ("… › Homework 5: … › Aziz Karimov") never pushes the user menu off screen */}
+        <Typography component="h1" sx={{ fontSize: '1rem', fontWeight: 600, whiteSpace: 'nowrap', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {current && crumb ? (
             <>
               <Box component="span" sx={{ color: 'text.secondary', fontWeight: 500 }}>
@@ -160,7 +161,7 @@ function DesktopShell({ user, desktop, children }: { user: SessionUser; desktop:
             <ChildSwitcher />
           </Box>
         )}
-        <Stack direction="row" spacing={1} sx={{ ml: 'auto', alignItems: 'center' }}>
+        <Stack direction="row" spacing={1} sx={{ ml: 'auto', pl: 2, alignItems: 'center', flexShrink: 0 }}>
           {user.role === 'ADMIN' && (
             <Box sx={{ display: { xs: 'none', md: 'block' } }}>
               <YearPill />
