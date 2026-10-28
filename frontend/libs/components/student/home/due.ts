@@ -26,6 +26,12 @@ export function formatDueAt(dueAt: string, locale = 'en'): string {
   return `${local} (${school} ${SCHOOL_TIMEZONE.split('/').pop()})`;
 }
 
+/** Today in the school's timezone ("2026-10-23"): business dates follow the school (DECISIONS §12) */
+export const schoolToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: SCHOOL_TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+
+/** "23:59": the time of day at school (the calendar groups work by its school day) */
+export const schoolTime = (iso: string) => clock(new Date(iso), SCHOOL_TIMEZONE);
+
 /** The deadline as the school sees it ("Oct 24, 11:59 PM"), for lines that already say "Tashkent time" */
 export function formatInSchool(iso: string, locale = 'en'): string {
   const at = new Date(iso);

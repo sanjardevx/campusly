@@ -54,8 +54,8 @@ export const STUDENT_OVERVIEW = graphql(`
 
 /** Student calendar: school dates + the student's own due work (month: "YYYY-MM") */
 export const STUDENT_CALENDAR = graphql(`
-  query StudentCalendar($month: String!) {
-    studentCalendar(month: $month) {
+  query StudentCalendar($month: String!, $studentId: String) {
+    studentCalendar(month: $month, studentId: $studentId) {
       id
       kind
       title
@@ -64,6 +64,9 @@ export const STUDENT_CALENDAR = graphql(`
       note
       courseId
       assignmentId
+      assignmentType
+      dueAt
+      submissionStatus
     }
   }
 `);

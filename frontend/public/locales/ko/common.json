@@ -24,6 +24,7 @@
   "nav": {
     "home": "홈",
     "courses": "내 강좌",
+    "calendar": "캘린더",
     "grades": "성적",
     "announcements": "공지사항",
     "questions": "Q&A",
@@ -54,7 +55,8 @@
       "grades": "성적",
       "announcements": "공지",
       "overview": "홈",
-      "attendance": "출결"
+      "attendance": "출결",
+      "calendar": "캘린더"
     },
     "tutor": "AI 학습 튜터",
     "activity": "활동 기록"

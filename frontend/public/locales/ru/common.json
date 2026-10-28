@@ -24,6 +24,7 @@
   "nav": {
     "home": "Главная",
     "courses": "Мои курсы",
+    "calendar": "Календарь",
     "grades": "Оценки",
     "announcements": "Объявления",
     "questions": "Вопросы",
@@ -54,7 +55,8 @@
       "grades": "Оценки",
       "announcements": "Новости",
       "overview": "Главная",
-      "attendance": "Явка"
+      "attendance": "Явка",
+      "calendar": "Календарь"
     },
     "tutor": "ИИ-помощник",
     "activity": "Журнал действий"

@@ -261,13 +261,16 @@ input AuditLogsInquiry {
 
 type CalendarEvent {
   assignmentId: String
+  assignmentType: AssignmentType
   courseId: String
+  dueAt: DateTime
   endsOn: String!
   id: String!
   kind: CalendarEventKind!
   note: String
   schoolEventId: String
   startsOn: String!
+  submissionStatus: SubmissionStatus
   title: String!
 }
 

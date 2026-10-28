@@ -1,0 +1,115 @@
+{
+  "title": "캘린더",
+  "today": "오늘",
+  "tomorrow": "내일",
+  "previousMonth": "이전 달",
+  "nextMonth": "다음 달",
+  "previousWeek": "이전 주",
+  "nextWeek": "다음 주",
+  "course": "강좌",
+  "allCourses": "모든 강좌",
+  "filter": "필터",
+  "filters": {
+    "ALL": "전체",
+    "HOMEWORK": "숙제",
+    "QUIZ": "퀴즈",
+    "EXAM": "시험",
+    "SCHOOL": "학교 일정"
+  },
+  "empty": "이번 달에는 예정된 일정이 없습니다.",
+  "emptyFrom": "이날부터 월말까지 예정된 일정이 없습니다.",
+  "showEarlier": "지난 날짜 보기 ({{count}})",
+  "hasEvents": "일정 있음",
+  "monthShort": {
+    "1": "1월",
+    "2": "2월",
+    "3": "3월",
+    "4": "4월",
+    "5": "5월",
+    "6": "6월",
+    "7": "7월",
+    "8": "8월",
+    "9": "9월",
+    "10": "10월",
+    "11": "11월",
+    "12": "12월"
+  },
+  "weekday": {
+    "1": "월",
+    "2": "화",
+    "3": "수",
+    "4": "목",
+    "5": "금",
+    "6": "토",
+    "7": "일"
+  },
+  "dayLabel": "{{month}} {{day}}일 ({{weekday}})",
+  "items_other": "{{count}}개",
+  "glance": {
+    "title": "{{month}} 한눈에 보기",
+    "pending": "제출할 과제",
+    "upcoming": "다가오는 퀴즈·시험",
+    "done": "제출 완료"
+  },
+  "legend": {
+    "HOLIDAY": "휴일·방학",
+    "EVENT": "학교 행사",
+    "DEADLINE": "마감·과제",
+    "START": "시작"
+  },
+  "status": {
+    "SUBMITTED": "제출됨",
+    "LATE": "늦게 제출됨",
+    "GRADED": "채점됨",
+    "RETURNED": "재제출 요청",
+    "MISSING": "미제출",
+    "OVERDUE": "기한 지남",
+    "NOT_SUBMITTED": "미제출",
+    "NOT_STARTED": "시작 전",
+    "UPCOMING": "예정",
+    "DONE": "완료"
+  },
+  "type": {
+    "HOMEWORK": "숙제",
+    "QUIZ": "퀴즈",
+    "EXAM": "시험"
+  },
+  "kind": {
+    "HOLIDAY": "휴일",
+    "EVENT": "행사",
+    "DEADLINE": "마감",
+    "START": "시작",
+    "TERM_START": "학기",
+    "TERM_END": "학기"
+  },
+  "inClass": "수업 중",
+  "due": "마감 {{time}}",
+  "wholeSchool": "전교",
+  "month": {
+    "1": "1월",
+    "2": "2월",
+    "3": "3월",
+    "4": "4월",
+    "5": "5월",
+    "6": "6월",
+    "7": "7월",
+    "8": "8월",
+    "9": "9월",
+    "10": "10월",
+    "11": "11월",
+    "12": "12월"
+  },
+  "day": {
+    "1": "월",
+    "2": "화",
+    "3": "수",
+    "4": "목",
+    "5": "금",
+    "6": "토",
+    "7": "일"
+  },
+  "term": {
+    "TERM_START": "{{name}} 시작",
+    "TERM_END": "{{name}} 종료"
+  }
+}

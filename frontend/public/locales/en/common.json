@@ -24,6 +24,7 @@
   "nav": {
     "home": "Home",
     "courses": "My Courses",
+    "calendar": "Calendar",
     "grades": "Grades",
     "announcements": "Announcements",
     "questions": "Q&A",
@@ -54,7 +55,8 @@
       "grades": "Grades",
       "announcements": "News",
       "overview": "Home",
-      "attendance": "Attendance"
+      "attendance": "Attendance",
+      "calendar": "Calendar"
     },
     "tutor": "AI Study Tutor",
     "activity": "Activity log"

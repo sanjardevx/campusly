@@ -8,12 +8,11 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useTranslation } from 'next-i18next/pages';
 import { STUDENT_CALENDAR } from '@/apollo/student/query';
-import { daysOf, isoDay, monthGrid, shiftMonth } from '@/libs/components/dashboard/calendar';
-import { EASE_OUT } from '@/libs/components/dashboard/motion';
-import { SCHOOL_TIMEZONE } from '@/libs/config';
+import { MonthGrid } from '@/libs/components/calendar/MonthGrid';
+import { daysOf, shiftMonth } from '@/libs/components/dashboard/calendar';
 import type { StudentCalendarQuery, StudentOverviewQuery } from '@/libs/gql/graphql';
 import { viz } from '@/libs/viz';
-import { formatDueAt, studentHref } from './due';
+import { formatDueAt, schoolToday, studentHref } from './due';
 import { STITCH, SoftPill, enter, pressSx } from './parts';
 
 type CalendarEvent = StudentCalendarQuery['studentCalendar'][number];
@@ -82,16 +81,10 @@ const LEGEND = ['HOLIDAY', 'EVENT', 'DEADLINE', 'START'] as const;
 const UPCOMING = 4;
 
 // Month change and day list: opacity only. They are clicked often, so no movement, and the month
-// fade starts at 0.4 (a fast double click restarts it without a flash to blank)
-const crossfade = keyframes`
-  from { opacity: 0.4; }
-`;
 const fadeIn = keyframes`
   from { opacity: 0; }
 `;
 
-/** Today in the school's timezone ("2026-10-23"): business dates follow the school (DECISIONS §12) */
-const schoolToday = () => new Intl.DateTimeFormat('en-CA', { timeZone: SCHOOL_TIMEZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 
 /**
  * Read-only month calendar (DECISIONS §10): the school's dates (holidays, events, deadlines, starts,
@@ -138,65 +131,16 @@ export function StudentCalendar({ index }: { index: number }) {
         </Stack>
       }
     >
-      {/* key = month: the grid crossfades instead of snapping when the month changes */}
-      <Box
-        key={month}
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr)',
-          rowGap: 0.5,
-          textAlign: 'center',
-          animation: `${crossfade} 150ms ${EASE_OUT}`,
-          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-        }}
-      >
-        {[1, 2, 3, 4, 5, 6, 7].map((d) => (
-          <Typography key={d} sx={{ fontSize: '0.6875rem', fontWeight: 600, color: 'text.secondary', py: 0.5 }}>
-            {t(`home.calendar.day.${d}`)}
-          </Typography>
-        ))}
-        {monthGrid(y, m).map((day, i) => {
-          if (!day) return <Box key={`blank-${i}`} />;
-          const iso = isoDay(y, m, day);
-          const dots = [...new Set((byDay.get(iso) ?? []).map((e) => viz.calendar[e.kind]))].slice(0, 3);
-          const isSelected = iso === selected;
-          const isToday = iso === today;
-          return (
-            <ButtonBase
-              key={iso}
-              onClick={() => setSelected(iso)}
-              aria-pressed={isSelected}
-              aria-label={`${day} ${monthName(m)}${dots.length ? `, ${t('home.calendar.hasEvents')}` : ''}`}
-              sx={{
-                mx: 'auto',
-                width: 36,
-                height: 40,
-                borderRadius: '10px',
-                flexDirection: 'column',
-                gap: '3px',
-                fontSize: '0.8125rem',
-                fontWeight: isToday || isSelected ? 700 : 500,
-                fontVariantNumeric: 'tabular-nums',
-                color: isSelected ? '#fff' : isToday ? STITCH.ink : 'text.primary',
-                bgcolor: isSelected ? STITCH.ink : 'transparent',
-                outline: isToday && !isSelected ? '1.5px solid' : 'none',
-                outlineColor: STITCH.ink,
-                transition: `background-color 150ms, color 150ms, transform 150ms ${EASE_OUT}`,
-                '&:hover': { bgcolor: isSelected ? STITCH.ink : STITCH.surfaceContainer },
-                '&:active': { transform: 'scale(0.95)' },
-                '@media (prefers-reduced-motion: reduce)': { '&:active': { transform: 'none' } },
-              }}
-            >
-              {day}
-              <Box sx={{ display: 'flex', gap: '2px', height: 4 }}>
-                {dots.map((color) => (
-                  <Box key={color} sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: isSelected ? '#fff' : color }} />
-                ))}
-              </Box>
-            </ButtonBase>
-          );
-        })}
-      </Box>
+      <MonthGrid
+        year={y}
+        month={m}
+        dotsOf={(day) => (byDay.get(day) ?? []).map((e) => viz.calendar[e.kind])}
+        selected={selected}
+        today={today}
+        onSelect={setSelected}
+        dayName={(d) => t(`home.calendar.day.${d}`)}
+        dayLabel={(day, has) => `${day} ${monthName(m)}${has ? `, ${t('home.calendar.hasEvents')}` : ''}`}
+      />
 
       {/* Legend: the dot colours are never the only clue; due work is a deadline */}
       <Stack direction="row" sx={{ mt: 1.5, flexWrap: 'wrap', columnGap: 1.5, rowGap: 0.5, justifyContent: 'center' }}>

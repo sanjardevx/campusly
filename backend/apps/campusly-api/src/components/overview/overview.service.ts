@@ -13,6 +13,10 @@ import {
 import { CalendarEvent } from '../../libs/dto/dashboard/dashboard';
 import { CalendarEventKind } from '../../libs/enums/dashboard.enum';
 import { AnnouncementService } from '../announcement/announcement.service';
+import {
+  hidesGrades,
+  visibleSubmissionStatus,
+} from '../assignment/submission.service';
 import { summarizeAttendance } from '../attendance/attendance.service';
 import { AccessPolicy } from '../auth/policies/access.policy';
 import { DashboardService } from '../dashboard/dashboard.service';
@@ -365,7 +369,8 @@ export class OverviewService {
 
   /**
    * The student's month (month: "YYYY-MM"): the school calendar (holidays, events, term dates, the
-   * same rows admins see) plus the due days of the student's own published assignments.
+   * same rows admins see) plus the due days of the student's own published assignments, each with
+   * its type, due time and the student's submission status (the calendar page).
    */
   public async getStudentCalendar(
     user: AuthUser,
@@ -393,11 +398,26 @@ export class OverviewService {
         },
       },
       orderBy: [{ dueAt: 'asc' }, { title: 'asc' }],
-      include: { course: { select: { title: true } } },
+      include: {
+        course: { select: { title: true } },
+        // This student's hand-in: its status, and whether the last attempt was late
+        submissions: {
+          where: { studentId: id },
+          select: {
+            status: true,
+            attempts: {
+              orderBy: { number: 'desc' },
+              take: 1,
+              select: { isLate: true },
+            },
+          },
+        },
+      },
     });
 
     const due: CalendarEvent[] = assignments.map((a) => {
       const day = todayInZone(timezone, a.dueAt!);
+      const sub = a.submissions[0];
       return {
         id: a.id,
         kind: CalendarEventKind.ASSIGNMENT,
@@ -408,6 +428,16 @@ export class OverviewService {
         schoolEventId: null,
         courseId: a.courseId,
         assignmentId: a.id,
+        assignmentType: a.type,
+        dueAt: a.dueAt,
+        // The same rule as every submission the API returns: no "graded" before publishing
+        submissionStatus: sub
+          ? visibleSubmissionStatus(
+              sub.status,
+              sub.attempts[0],
+              hidesGrades(user, a.gradesPublishedAt),
+            )
+          : null,
       };
     });
     return [...school, ...due].sort((a, b) =>

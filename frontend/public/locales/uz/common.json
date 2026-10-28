@@ -24,6 +24,7 @@
   "nav": {
     "home": "Bosh sahifa",
     "courses": "Kurslarim",
+    "calendar": "Kalendar",
     "grades": "Baholar",
     "announcements": "E’lonlar",
     "questions": "Savol-javob",
@@ -54,7 +55,8 @@
       "grades": "Baholar",
       "announcements": "E’lonlar",
       "overview": "Asosiy",
-      "attendance": "Davomat"
+      "attendance": "Davomat",
+      "calendar": "Kalendar"
     },
     "tutor": "AI o'quv yordamchisi",
     "activity": "Faollik jurnali"

@@ -8,6 +8,7 @@ import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import FolderOpenOutlinedIcon from '@mui/icons-material/FolderOpenOutlined';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
+import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
@@ -42,7 +43,7 @@ export interface NavSection {
 
 /**
  * The menus of the Stitch dashboards. Later-phase items come back with their features (DECISIONS §14):
- * Q&A (teachers; students ask inside a course) on day 21. The AI Study Tutor page was built ahead.
+ * Q&A (teachers; students ask inside a course) and the student / parent calendar on day 21. The AI Study Tutor page was built ahead.
  */
 export const NAV: Record<Role, NavSection[]> = {
   STUDENT: [
@@ -50,6 +51,7 @@ export const NAV: Record<Role, NavSection[]> = {
       items: [
         { key: 'home', href: '/student', icon: HomeOutlinedIcon, day: 12 },
         { key: 'courses', href: '/student/courses', icon: MenuBookOutlinedIcon, day: 12 },
+        { key: 'calendar', href: '/student/calendar', icon: EventOutlinedIcon, day: 21 },
         { key: 'grades', href: '/student/grades', icon: AssessmentOutlinedIcon, day: 12 },
         // The UI is ready; the answers come with the AI tutor phase (DECISIONS §14)
         { key: 'tutor', href: '/student/tutor', icon: PsychologyOutlinedIcon, tab: false },
@@ -76,6 +78,7 @@ export const NAV: Record<Role, NavSection[]> = {
         { key: 'overview', href: '/parent', icon: DashboardOutlinedIcon, day: 13 },
         { key: 'grades', href: '/parent/grades', icon: SchoolOutlinedIcon, day: 13 },
         { key: 'attendance', href: '/parent/attendance', icon: CalendarMonthOutlinedIcon, day: 13 },
+        { key: 'calendar', href: '/parent/calendar', icon: EventOutlinedIcon, day: 21 },
         { key: 'announcements', href: '/parent/announcements', icon: CampaignOutlinedIcon, day: 13 },
       ],
     },

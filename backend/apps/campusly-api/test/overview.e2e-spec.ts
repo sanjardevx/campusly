@@ -506,6 +506,48 @@ describe('studentOverview and myChildren (e2e)', () => {
     }
   });
 
+  it('studentCalendar: type, due time and the visible submission status (never graded before publishing)', async () => {
+    const QUERY = `query($m: String!, $s: String) { studentCalendar(month: $m, studentId: $s) {
+      title assignmentType dueAt submissionStatus } }`;
+    type Row = {
+      title: string;
+      assignmentType: string | null;
+      dueAt: string | null;
+      submissionStatus: string | null;
+    };
+    const rowOf = async (as: Key, title: string, daysFromNow: number) => {
+      const month = todayInZone(
+        'Asia/Tashkent',
+        new Date(Date.now() + daysFromNow * DAY),
+      ).slice(0, 7);
+      const body = await gql<{ studentCalendar: Row[] }>(
+        QUERY,
+        { m: month, s: as === 'sA' ? undefined : id.sA },
+        as,
+      );
+      return body.data!.studentCalendar.find((r) => r.title === title);
+    };
+
+    expect(await rowOf('sA', 'Due in 3 days', 3)).toMatchObject({
+      assignmentType: 'HOMEWORK',
+      submissionStatus: 'SUBMITTED',
+    });
+    expect((await rowOf('sA', 'Due in 3 days', 3))!.dueAt).not.toBeNull();
+    expect((await rowOf('sA', 'Due tomorrow', 1))!.submissionStatus).toBeNull();
+    expect((await rowOf('sA', 'Graded yesterday', -1))!.submissionStatus).toBe(
+      'GRADED',
+    );
+    // Graded but not published: the student and the parent do not learn it was graded
+    for (const as of ['sA', 'pA'] as const) {
+      expect(
+        (await rowOf(as, 'Graded, not published', -2))!.submissionStatus,
+      ).not.toBe('GRADED');
+    }
+    expect(
+      (await rowOf('admin', 'Graded, not published', -2))!.submissionStatus,
+    ).toBe('GRADED');
+  });
+
   it('studentCalendar: a parent sees the chosen child’s deadlines only', async () => {
     const sB = (await calendar('pA', id.sB)).filter(
       (r) => r.kind === 'ASSIGNMENT',

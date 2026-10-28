@@ -1,0 +1,116 @@
+{
+  "title": "Calendar",
+  "today": "Today",
+  "tomorrow": "Tomorrow",
+  "previousMonth": "Previous month",
+  "nextMonth": "Next month",
+  "previousWeek": "Previous week",
+  "nextWeek": "Next week",
+  "course": "Course",
+  "allCourses": "All courses",
+  "filter": "Filter",
+  "filters": {
+    "ALL": "All",
+    "HOMEWORK": "Homework",
+    "QUIZ": "Quizzes",
+    "EXAM": "Exams",
+    "SCHOOL": "School dates"
+  },
+  "empty": "Nothing planned this month.",
+  "emptyFrom": "Nothing planned from this day to the end of the month.",
+  "showEarlier": "Show earlier days ({{count}})",
+  "hasEvents": "has events",
+  "monthShort": {
+    "1": "Jan",
+    "2": "Feb",
+    "3": "Mar",
+    "4": "Apr",
+    "5": "May",
+    "6": "Jun",
+    "7": "Jul",
+    "8": "Aug",
+    "9": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dec"
+  },
+  "weekday": {
+    "1": "Mon",
+    "2": "Tue",
+    "3": "Wed",
+    "4": "Thu",
+    "5": "Fri",
+    "6": "Sat",
+    "7": "Sun"
+  },
+  "dayLabel": "{{weekday}}, {{month}} {{day}}",
+  "items_one": "{{count}} item",
+  "items_other": "{{count}} items",
+  "glance": {
+    "title": "{{month}} at a glance",
+    "pending": "Still to hand in",
+    "upcoming": "Quizzes and exams ahead",
+    "done": "Handed in"
+  },
+  "legend": {
+    "HOLIDAY": "Holiday",
+    "EVENT": "School event",
+    "DEADLINE": "Deadline or due work",
+    "START": "Start"
+  },
+  "status": {
+    "SUBMITTED": "Submitted",
+    "LATE": "Submitted late",
+    "GRADED": "Graded",
+    "RETURNED": "Returned for redo",
+    "MISSING": "Missing",
+    "OVERDUE": "Overdue",
+    "NOT_SUBMITTED": "Not submitted",
+    "NOT_STARTED": "Not started",
+    "UPCOMING": "Upcoming",
+    "DONE": "Done"
+  },
+  "type": {
+    "HOMEWORK": "Homework",
+    "QUIZ": "Quiz",
+    "EXAM": "Exam"
+  },
+  "kind": {
+    "HOLIDAY": "Holiday",
+    "EVENT": "Event",
+    "DEADLINE": "Deadline",
+    "START": "Start",
+    "TERM_START": "Term",
+    "TERM_END": "Term"
+  },
+  "inClass": "In class",
+  "due": "Due {{time}}",
+  "wholeSchool": "Whole school",
+  "month": {
+    "1": "January",
+    "2": "February",
+    "3": "March",
+    "4": "April",
+    "5": "May",
+    "6": "June",
+    "7": "July",
+    "8": "August",
+    "9": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
+  },
+  "day": {
+    "1": "Mo",
+    "2": "Tu",
+    "3": "We",
+    "4": "Th",
+    "5": "Fr",
+    "6": "Sa",
+    "7": "Su"
+  },
+  "term": {
+    "TERM_START": "{{name}} starts",
+    "TERM_END": "{{name}} ends"
+  }
+}

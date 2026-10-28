@@ -1,4 +1,5 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { AssignmentType, SubmissionStatus } from '../../enums/assignment.enum';
 import {
   AttentionPriority,
   CalendarEventKind,
@@ -197,4 +198,19 @@ export class CalendarEvent {
 
   @Field(() => String, { nullable: true })
   assignmentId: string | null;
+
+  /** ASSIGNMENT only: Homework / Quiz / Exam (the calendar page's filter and tag) */
+  @Field(() => AssignmentType, { nullable: true })
+  assignmentType?: AssignmentType | null;
+
+  /** ASSIGNMENT only: the exact due moment (startsOn is its day in the school timezone) */
+  @Field(() => Date, { nullable: true })
+  dueAt?: Date | null;
+
+  /**
+   * ASSIGNMENT only: the student's own submission status (null = nothing handed in yet).
+   * Students and parents never see GRADED / MISSING before the grades are published.
+   */
+  @Field(() => SubmissionStatus, { nullable: true })
+  submissionStatus?: SubmissionStatus | null;
 }
