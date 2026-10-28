@@ -209,20 +209,22 @@ function SubmissionView() {
                     )}
                   </Stack>
                 )}
-                {/* The browser's own PDF viewer brings pages and zoom; images are shown as they are */}
-                <Box sx={{ bgcolor: '#E9EFEA', p: { xs: 1, sm: 2 }, display: 'flex', justifyContent: 'center' }}>
-                  {file?.url && file.mimeType === 'application/pdf' ? (
-                    <Box component="iframe" src={file.url} title={file.originalName} sx={{ width: '100%', height: { xs: 480, md: 820 }, border: 0, bgcolor: 'background.paper', borderRadius: 0.5 }} />
-                  ) : file?.url && file.mimeType.startsWith('image/') ? (
-                    <Box component="img" src={file.url} alt={file.originalName} sx={{ maxWidth: '100%', maxHeight: 820, bgcolor: 'background.paper', borderRadius: 0.5 }} />
-                  ) : file ? (
-                    <Typography color="text.secondary" sx={{ py: 6 }}>
-                      {t('grading.noPreview', { type: fileType(file.mimeType) })}
-                    </Typography>
-                  ) : null}
-                </Box>
+                {/* The browser's own PDF viewer brings pages and zoom; images are shown as they are. A text-only answer has no viewer (no empty grey band). */}
+                {file && (
+                  <Box sx={{ bgcolor: '#E9EFEA', p: { xs: 1, sm: 2 }, display: 'flex', justifyContent: 'center' }}>
+                    {file.url && file.mimeType === 'application/pdf' ? (
+                      <Box component="iframe" src={file.url} title={file.originalName} sx={{ width: '100%', height: { xs: 480, md: 820 }, border: 0, bgcolor: 'background.paper', borderRadius: 0.5 }} />
+                    ) : file.url && file.mimeType.startsWith('image/') ? (
+                      <Box component="img" src={file.url} alt={file.originalName} sx={{ maxWidth: '100%', maxHeight: 820, bgcolor: 'background.paper', borderRadius: 0.5 }} />
+                    ) : (
+                      <Typography color="text.secondary" sx={{ py: 6 }}>
+                        {t('grading.noPreview', { type: fileType(file.mimeType) })}
+                      </Typography>
+                    )}
+                  </Box>
+                )}
                 {view.last.text && (
-                  <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+                  <Box sx={{ p: 2, borderTop: file ? 1 : 0, borderColor: 'divider' }}>
                     <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary', mb: 0.5 }}>{t('grading.answerText')}</Typography>
                     <Typography sx={{ whiteSpace: 'pre-wrap', fontSize: '0.875rem' }}>{view.last.text}</Typography>
                   </Box>
