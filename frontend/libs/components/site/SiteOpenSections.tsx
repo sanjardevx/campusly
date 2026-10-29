@@ -11,6 +11,7 @@ import { useTranslation } from 'next-i18next/pages';
 import type { SiteCourseCategory } from '@/libs/gql/graphql';
 import { clock, totalText, youtubeThumb, youtubeWatch } from '@/libs/youtube';
 import { EASE, Reveal, hoverLift, hoverZoom } from './motion';
+import { phonesOf, telHref } from '@/libs/phones';
 import { SITE, type SiteData, containerSx, eyebrowSx, sectionTitleSx, swipeRowSx } from './tokens';
 
 type MockTest = SiteData['mockTests'][number];
@@ -37,7 +38,6 @@ function SectionHeader({ id, eyebrow, title, subtitle, aside }: { id: string; ey
 }
 
 /** "+998 71 200 34 44" → "tel:+998712003444" */
-const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 const priceText = (price: number) => `${new Intl.NumberFormat('en-US').format(price)} UZS`;
 /** "2026-11-07" → "Sat, Nov 7" in the visitor's language */
 function examDay(date: string, locale: string) {
@@ -92,9 +92,9 @@ export function SiteMockTests({ tests }: { tests: MockTest[] }) {
                       {m.contactName && <Typography sx={{ fontWeight: 700, color: SITE.ink }}>{m.contactName}</Typography>}
                       {m.contactRole && <Typography sx={{ fontSize: '0.875rem', color: SITE.stone500 }}>{m.contactRole}</Typography>}
                     </Box>
-                    {m.contactPhone && (
-                      <Button href={telHref(m.contactPhone)} startIcon={<CallRoundedIcon />} aria-label={t('mock.call', { phone: m.contactPhone })} sx={{ px: 2, py: 0.75, borderRadius: 2, bgcolor: SITE.soft, color: SITE.spruce, fontWeight: 600, textTransform: 'none', whiteSpace: 'nowrap', '&:hover': { bgcolor: SITE.tint } }}>
-                        {m.contactPhone}
+                    {phonesOf(m.contactPhone)[0] && (
+                      <Button href={telHref(phonesOf(m.contactPhone)[0])} startIcon={<CallRoundedIcon />} aria-label={t('mock.call', { phone: phonesOf(m.contactPhone)[0] })} sx={{ px: 2, py: 0.75, borderRadius: 2, bgcolor: SITE.soft, color: SITE.spruce, fontWeight: 600, textTransform: 'none', whiteSpace: 'nowrap', '&:hover': { bgcolor: SITE.tint } }}>
+                        {phonesOf(m.contactPhone)[0]}
                       </Button>
                     )}
                   </Stack>

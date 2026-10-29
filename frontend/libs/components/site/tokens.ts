@@ -31,6 +31,23 @@ export const SITE = {
   container: 1152,
 } as const;
 
+/**
+ * Icon tile colours of the public site (DECISIONS §13, "Public site icons"): a gradient per hue with
+ * a white glyph, picked by meaning (safety and campus green, health rose, learning violet …).
+ * White passes 3:1 on both ends of every gradient. The site's own palette, not the portal's.
+ */
+export const SITE_TONES = {
+  green: { from: '#4FA383', to: '#2F7A63' },
+  teal: { from: '#1A9890', to: '#0F766E' },
+  sky: { from: '#2290C8', to: '#0B6FA8' },
+  blue: { from: '#4A7FE6', to: '#1E56C8' },
+  violet: { from: '#8466E6', to: '#5B3FCF' },
+  rose: { from: '#E35A7A', to: '#C2304F' },
+  orange: { from: '#D9722A', to: '#A94C08' },
+} as const;
+
+export type SiteTone = keyof typeof SITE_TONES;
+
 export type SiteData = SiteHomeQuery['siteHome'];
 
 /** "Oct 24, 2026" for a calendar date (noon, so no timezone can move it to another day) */

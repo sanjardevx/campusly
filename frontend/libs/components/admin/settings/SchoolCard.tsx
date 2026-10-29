@@ -15,7 +15,8 @@ const ZONES: string[] = (Intl as unknown as { supportedValuesOf?: (k: string) =>
 ];
 
 // The same checks as the server DTO
-const PHONE = /^[+\d\s()-]*$/;
+// Several numbers may be separated by commas (the site shows each one)
+const PHONE = /^[+\d\s(),-]*$/;
 const CHANNEL = /^https:\/\/t\.me\/[A-Za-z0-9_]{5,32}$/;
 /** Telegram bot usernames end with "bot" */
 const BOT = /^https:\/\/t\.me\/[A-Za-z0-9_]{2,29}[Bb][Oo][Tt]$/;
@@ -36,7 +37,7 @@ export function SchoolCard({ settings }: { settings: Settings }) {
   const { editing, busy, saved, error, save, onEdit, onCancel } = useSettingsSave(() => setForm(initial));
   const set = (patch: Partial<typeof form>) => setForm({ ...form, ...patch });
 
-  const phoneOk = PHONE.test(form.phone) && form.phone.length <= 30;
+  const phoneOk = PHONE.test(form.phone) && form.phone.length <= 60;
   const channelOk = form.channel === '' || CHANNEL.test(form.channel);
   const botOk = form.bot === '' || BOT.test(form.bot);
   const valid =

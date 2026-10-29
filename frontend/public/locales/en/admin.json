@@ -338,7 +338,7 @@
       "contactTitle": "Contact for students and parents",
       "contactHint": "Phone and hours are shown on the sign-in page under “Forgot password?” and on login slips. Leave empty to hide.",
       "phone": "Office phone",
-      "phoneHint": "e.g. +998 71 200 00 00",
+      "phoneHint": "e.g. +998 71 200 00 00 (several: separate with commas)",
       "phoneBad": "Digits, spaces, +, - and ( ) only",
       "hours": "Office hours",
       "hoursHint": "e.g. Mon–Fri 9:00–17:00",

@@ -227,6 +227,15 @@ describe('School settings, years, periods (e2e)', () => {
         telegramUrl: null,
       });
 
+      // Several numbers, comma-separated: the site shows each one
+      const two = await gql<{ updateSchoolSettings: { contactPhone: string } }>(
+        CONTACT,
+        { i: { contactPhone: '+998 93 890 03 26, +82 10 4393 0340' } },
+      );
+      expect(two.data!.updateSchoolSettings.contactPhone).toBe(
+        '+998 93 890 03 26, +82 10 4393 0340',
+      );
+
       for (const bad of [
         { telegramUrl: 'https://evil.example/login' }, // a link on the login page must not lead elsewhere
         { telegramBotUrl: 'https://t.me/campusly_school' }, // a channel, not a bot

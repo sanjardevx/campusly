@@ -2,42 +2,44 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Box, ButtonBase, Collapse, Link, Stack, Typography } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
-import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
+import AltRouteOutlinedIcon from '@mui/icons-material/AltRouteOutlined';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import ComputerOutlinedIcon from '@mui/icons-material/ComputerOutlined';
 import DirectionsCarOutlinedIcon from '@mui/icons-material/DirectionsCarOutlined';
 import DevicesOutlinedIcon from '@mui/icons-material/DevicesOutlined';
+import DirectionsSubwayOutlinedIcon from '@mui/icons-material/DirectionsSubwayOutlined';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
-import ExtensionOutlinedIcon from '@mui/icons-material/ExtensionOutlined';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import HistoryEduOutlinedIcon from '@mui/icons-material/HistoryEduOutlined';
+import InterestsOutlinedIcon from '@mui/icons-material/InterestsOutlined';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import LocalLibraryOutlinedIcon from '@mui/icons-material/LocalLibraryOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import MedicalServicesOutlinedIcon from '@mui/icons-material/MedicalServicesOutlined';
-import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import ParkOutlinedIcon from '@mui/icons-material/ParkOutlined';
 import PlayCircleFilledRoundedIcon from '@mui/icons-material/PlayCircleFilledRounded';
 import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
-import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import SportsSoccerOutlinedIcon from '@mui/icons-material/SportsSoccerOutlined';
-import SubwayOutlinedIcon from '@mui/icons-material/SubwayOutlined';
-import TerminalOutlinedIcon from '@mui/icons-material/TerminalOutlined';
+import TourOutlinedIcon from '@mui/icons-material/TourOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
-import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { useReducedMotion } from '@/libs/components/dashboard/motion';
 import { EASE, HOVER, Reveal, hoverLift, hoverZoom, useScrollDraw } from './motion';
-import { SITE, type SiteData, containerSx, eyebrowSx, scrollToId, sectionTitleSx, swipeRowSx } from './tokens';
+import { SITE, SITE_TONES, type SiteData, type SiteTone, containerSx, eyebrowSx, scrollToId, sectionTitleSx, swipeRowSx } from './tokens';
 
 /** The site green as a gradient for the icon tiles and the photo panel (the developer's reference) */
 const FRESH = { from: '#4FA383', to: SITE.spruce } as const;
 
-const iconTile = (size: number, radius: string) => ({
+/** A white glyph on its meaning's gradient (SITE_TONES); the soft shadow takes the same hue */
+const iconTile = (size: number, radius: string, tone: SiteTone = 'green') => ({
   width: size,
   height: size,
   borderRadius: radius,
-  background: `linear-gradient(145deg, ${FRESH.from}, ${FRESH.to})`,
-  boxShadow: '0 8px 16px -8px rgba(47,122,99,0.55), inset 0 1px 0 rgba(255,255,255,0.25)',
+  background: `linear-gradient(145deg, ${SITE_TONES[tone].from}, ${SITE_TONES[tone].to})`,
+  boxShadow: `0 8px 16px -8px ${SITE_TONES[tone].to}8C, inset 0 1px 0 rgba(255,255,255,0.25)`,
   color: '#fff',
   display: 'flex',
   alignItems: 'center',
@@ -62,19 +64,20 @@ function CenteredHeader({ title, subtitle, eyebrow }: { title: string; subtitle?
 /** Stitch Part A "Why choose Campusly School?": four soft panels, 2 × 2 (a swipe row on phones) */
 export function SiteWhy() {
   const { t } = useTranslation('site');
-  const panels: { key: string; icon: SvgIconComponent; list?: boolean }[] = [
-    { key: 'tech', icon: DevicesOutlinedIcon, list: true },
-    { key: 'tracks', icon: SchoolOutlinedIcon },
-    { key: 'languages', icon: TranslateOutlinedIcon },
-    { key: 'mentors', icon: GroupsOutlinedIcon },
+  const panels: { key: string; icon: SvgIconComponent; tone: SiteTone; list?: boolean }[] = [
+    { key: 'tech', icon: DevicesOutlinedIcon, tone: 'blue', list: true },
+    // STEM or humanities from grade 9: two paths
+    { key: 'tracks', icon: AltRouteOutlinedIcon, tone: 'violet' },
+    { key: 'languages', icon: TranslateOutlinedIcon, tone: 'sky' },
+    { key: 'mentors', icon: GroupsOutlinedIcon, tone: 'orange' },
   ];
   return (
     <Box component="section" sx={{ ...containerSx, py: { xs: 8, md: 10 } }}>
       <CenteredHeader title={t('why.title')} subtitle={t('why.subtitle')} />
       <Box sx={swipeRowSx({ md: '1fr 1fr' })}>
-        {panels.map(({ key, icon: Icon, list }, i) => (
+        {panels.map(({ key, icon: Icon, tone, list }, i) => (
           <Reveal key={key} delay={i * 80} sx={{ bgcolor: SITE.soft, borderRadius: '10px', p: { xs: 3, md: 4 } }}>
-            <Box sx={{ ...iconTile(56, '12px'), mb: { xs: 2, md: 3 } }}>
+            <Box sx={{ ...iconTile(56, '12px', tone), mb: { xs: 2, md: 3 } }}>
               <Icon />
             </Box>
             <Typography component="h3" sx={{ fontSize: '1.25rem', fontWeight: 700, color: SITE.heading, mb: list ? 2 : 1.5 }}>
@@ -101,19 +104,22 @@ export function SiteWhy() {
 
 // ───────────────────────── Facilities (day 20) ─────────────────────────
 
-const FEATURES_LEFT: { key: string; icon: SvgIconComponent }[] = [
-  { key: 'tech', icon: ExtensionOutlinedIcon },
-  { key: 'sports', icon: SportsSoccerOutlinedIcon },
-  { key: 'reading', icon: MenuBookOutlinedIcon },
-  { key: 'clubs', icon: TerminalOutlinedIcon },
-  { key: 'safe', icon: VerifiedUserOutlinedIcon },
+type Feature = { key: string; icon: SvgIconComponent; tone: SiteTone };
+
+// Icons by meaning: a laptop for the tech school, shapes for clubs, a tree for the green campus
+const FEATURES_LEFT: Feature[] = [
+  { key: 'tech', icon: ComputerOutlinedIcon, tone: 'blue' },
+  { key: 'sports', icon: SportsSoccerOutlinedIcon, tone: 'teal' },
+  { key: 'reading', icon: LocalLibraryOutlinedIcon, tone: 'violet' },
+  { key: 'clubs', icon: InterestsOutlinedIcon, tone: 'orange' },
+  { key: 'safe', icon: VerifiedUserOutlinedIcon, tone: 'green' },
 ];
-const FEATURES_RIGHT: { key: string; icon: SvgIconComponent }[] = [
-  { key: 'parking', icon: DirectionsCarOutlinedIcon },
-  { key: 'meals', icon: RestaurantOutlinedIcon },
-  { key: 'medical', icon: MedicalServicesOutlinedIcon },
-  { key: 'metro', icon: SubwayOutlinedIcon },
-  { key: 'campus', icon: AccountBalanceOutlinedIcon },
+const FEATURES_RIGHT: Feature[] = [
+  { key: 'parking', icon: DirectionsCarOutlinedIcon, tone: 'sky' },
+  { key: 'meals', icon: RestaurantOutlinedIcon, tone: 'orange' },
+  { key: 'medical', icon: MedicalServicesOutlinedIcon, tone: 'rose' },
+  { key: 'metro', icon: DirectionsSubwayOutlinedIcon, tone: 'blue' },
+  { key: 'campus', icon: ParkOutlinedIcon, tone: 'green' },
 ];
 
 /** Soft "play" triangles on the photo panel, like the reference's pattern */
@@ -133,7 +139,7 @@ export function SiteFeatures() {
   // Cards slide in from their side and lean towards the photo under the mouse
   const card =
     (side: 'left' | 'right') =>
-    function FeatureCard({ key, icon: Icon }: { key: string; icon: SvgIconComponent }, i: number) {
+    function FeatureCard({ key, icon: Icon, tone }: Feature, i: number) {
       return (
       <Reveal key={key} from={side} delay={i * 70}>
         <Stack
@@ -152,7 +158,7 @@ export function SiteFeatures() {
             [HOVER]: { '&:hover': { transform: `translateX(${side === 'left' ? 6 : -6}px)`, bgcolor: '#F1F4F2' }, '&:hover .tile': { transform: 'scale(1.08)' } },
           }}
         >
-          <Box className="tile" sx={{ ...iconTile(56, '16px'), width: { xs: 40, md: 56 }, height: { xs: 40, md: 56 }, borderRadius: { xs: '12px', md: '16px' }, '& svg': { fontSize: { xs: 20, md: 24 } } }}>
+          <Box className="tile" sx={{ ...iconTile(56, '16px', tone), width: { xs: 40, md: 56 }, height: { xs: 40, md: 56 }, borderRadius: { xs: '12px', md: '16px' }, '& svg': { fontSize: { xs: 20, md: 24 } } }}>
             <Icon />
           </Box>
           <Typography sx={{ fontSize: { xs: '0.875rem', md: '1.0625rem' }, fontWeight: 500, color: SITE.heading, lineHeight: 1.4 }}>{t(`features.${key}`)}</Typography>
@@ -372,7 +378,15 @@ export function SiteStages() {
 
 // ───────────────────────── Admission process (Part C) ─────────────────────────
 
-const STEP_ICONS: SvgIconComponent[] = [LocationOnOutlinedIcon, ForumOutlinedIcon, GroupsOutlinedIcon, EditNoteOutlinedIcon, PsychologyOutlinedIcon, VerifiedOutlinedIcon];
+/** Visit → tour → parent interview → placement test → psychologist → signing the contract */
+const STEPS: { icon: SvgIconComponent; tone: SiteTone }[] = [
+  { icon: LocationOnOutlinedIcon, tone: 'sky' },
+  { icon: TourOutlinedIcon, tone: 'teal' },
+  { icon: ForumOutlinedIcon, tone: 'blue' },
+  { icon: EditNoteOutlinedIcon, tone: 'violet' },
+  { icon: PsychologyOutlinedIcon, tone: 'rose' },
+  { icon: HistoryEduOutlinedIcon, tone: 'green' },
+];
 /** Line thickness and the dashed pattern (longer dashes than a CSS dashed border can draw) */
 const LINE = 4;
 const DOT = 22;
@@ -403,7 +417,7 @@ export function SiteAdmission() {
         <Box aria-hidden sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 16, md: '50%' }, width: LINE, ml: `-${LINE / 2}px`, backgroundImage: dashes('bottom') }} />
         {/* The same line in green, growing as the visitor scrolls through the steps */}
         <Box ref={drawn} aria-hidden sx={{ position: 'absolute', top: 0, bottom: 0, left: { xs: 16, md: '50%' }, width: LINE, ml: `-${LINE / 2}px`, bgcolor: FRESH.from, borderRadius: LINE / 2, transformOrigin: 'top' }} />
-        {STEP_ICONS.map((Icon, i) => {
+        {STEPS.map(({ icon: Icon, tone }, i) => {
           const left = i % 2 === 0;
           const n = i + 1;
           return (
@@ -471,7 +485,7 @@ export function SiteAdmission() {
                 }}
               >
               <Box sx={{ minHeight: { md: 232 }, bgcolor: '#F8F9FA', border: '1px solid #EEF0EE', borderRadius: { xs: '18px', md: '24px' }, p: { xs: 2, md: 2.75 }, ...hoverLift }}>
-                <Box sx={{ ...iconTile(52, '14px'), width: { xs: 40, md: 52 }, height: { xs: 40, md: 52 }, mb: { xs: 1, md: 1.5 } }}>
+                <Box sx={{ ...iconTile(52, '14px', tone), width: { xs: 40, md: 52 }, height: { xs: 40, md: 52 }, mb: { xs: 1, md: 1.5 } }}>
                   <Icon sx={{ fontSize: { xs: 22, md: 26 } }} />
                 </Box>
                 <Typography component="h3" sx={{ fontSize: { xs: '1.0625rem', md: '1.375rem' }, fontWeight: 600, color: SITE.ink, letterSpacing: '-0.01em', lineHeight: 1.3 }}>

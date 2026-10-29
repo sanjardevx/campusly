@@ -12,6 +12,7 @@ import { errorCode } from '@/libs/errors';
 import type { SiteLocale } from '@/libs/gql/graphql';
 import { useErrorText } from '@/libs/i18n';
 import { Reveal } from './motion';
+import { phonesOf, telHref } from '@/libs/phones';
 import { SITE, type SiteData, containerSx, eyebrowSx } from './tokens';
 
 const INTERESTS = ['STANDARD', 'STEM', 'KOREAN', 'IELTS'] as const;
@@ -92,12 +93,12 @@ export function SiteEnquiry({ contact }: { contact: SiteData['contact'] }) {
           </Box>
           {(contact.phone || contact.officeHours) && (
             <Box sx={{ bgcolor: SITE.tint, borderRadius: '12px', p: 2.5, border: '1px solid rgba(47,122,99,0.15)' }}>
-              {contact.phone && (
-                <Stack component="a" href={`tel:${contact.phone.replace(/[^\d+]/g, '')}`} direction="row" sx={{ alignItems: 'center', gap: 1, fontSize: '1.25rem', fontWeight: 700, color: SITE.spruce, textDecoration: 'none' }}>
+              {phonesOf(contact.phone).map((phone, i) => (
+                <Stack key={phone} component="a" href={telHref(phone)} direction="row" sx={{ alignItems: 'center', gap: 1, mt: i ? 0.75 : 0, fontSize: '1.25rem', fontWeight: 700, color: SITE.spruce, textDecoration: 'none' }}>
                   <PhoneOutlinedIcon />
-                  {contact.phone}
+                  {phone}
                 </Stack>
-              )}
+              ))}
               {contact.officeHours && (
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mt: 1, fontSize: '0.875rem', color: SITE.stone700 }}>
                   <ScheduleOutlinedIcon sx={{ fontSize: 18, color: SITE.spruce }} />

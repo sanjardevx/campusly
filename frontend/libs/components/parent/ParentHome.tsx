@@ -16,6 +16,7 @@ import { MarkBadge } from '@/libs/components/MarkBadge';
 import { formatInSchool } from '@/libs/components/student/home/due';
 import { STITCH, SoftPill } from '@/libs/components/student/home/parts';
 import type { ParentHomeQuery } from '@/libs/gql/graphql';
+import { phonesOf, telHref } from '@/libs/phones';
 import { viz } from '@/libs/viz';
 
 type Home = ParentHomeQuery;
@@ -263,7 +264,8 @@ function SectionHead({ eyebrow, title, action }: { eyebrow: string; title: strin
 function OfficeHotline() {
   const { t } = useTranslation('parent');
   const { data } = useQuery(SCHOOL_SETTINGS);
-  const phone = data?.schoolSettings.contactPhone;
+  // The first number when Settings holds several
+  const phone = phonesOf(data?.schoolSettings.contactPhone)[0];
   if (!phone) return null;
   return (
     <Stack direction="row" sx={{ mt: 1.5, px: 1.5, py: 1.25, borderRadius: 2, bgcolor: '#F1F2EE', alignItems: 'center', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap' }}>
@@ -274,7 +276,7 @@ function OfficeHotline() {
           {data?.schoolSettings.officeHours ? ` · ${data.schoolSettings.officeHours}` : ''}
         </Typography>
       </Stack>
-      <Link href={`tel:${phone.replace(/[^\d+]/g, '')}`} underline="hover" sx={{ fontSize: '0.875rem', fontWeight: 700, color: 'text.primary', fontVariantNumeric: 'tabular-nums' }}>
+      <Link href={telHref(phone)} underline="hover" sx={{ fontSize: '0.875rem', fontWeight: 700, color: 'text.primary', fontVariantNumeric: 'tabular-nums' }}>
         {phone}
       </Link>
     </Stack>

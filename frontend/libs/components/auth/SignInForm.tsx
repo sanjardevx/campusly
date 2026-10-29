@@ -11,6 +11,7 @@ import { errorCode } from '@/libs/errors';
 import { useErrorText } from '@/libs/i18n';
 import { FormField } from './FormField';
 import { PhonePrefix } from '@/libs/components/PhonePrefix';
+import { phonesOf, telHref } from '@/libs/phones';
 import { PasswordInput } from './PasswordInput';
 
 export type SignInMode = 'student' | 'parent' | 'staff';
@@ -117,9 +118,10 @@ export function SignInForm({ mode }: { mode: SignInMode }) {
           {t('signIn.forgotHint')}
           {(school?.contactPhone || school?.officeHours) && (
             <Typography variant="body2" sx={{ mt: 0.75, fontWeight: 600 }}>
-              {school.contactPhone && (
-                <Link href={`tel:${school.contactPhone.replace(/[^\d+]/g, '')}`} underline="hover">
-                  {t('signIn.forgotCall', { phone: school.contactPhone })}
+              {/* The first number when Settings holds several */}
+              {phonesOf(school.contactPhone)[0] && (
+                <Link href={telHref(phonesOf(school.contactPhone)[0])} underline="hover">
+                  {t('signIn.forgotCall', { phone: phonesOf(school.contactPhone)[0] })}
                 </Link>
               )}
               {school.contactPhone && school.officeHours && ' · '}

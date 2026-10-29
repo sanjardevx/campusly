@@ -12,13 +12,26 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import { useTranslation } from 'next-i18next/pages';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
 import { DEMO_MODE } from '@/libs/config';
-import { SITE, type SiteData, containerSx } from './tokens';
+import { phonesOf, telHref } from '@/libs/phones';
+import { SITE, SITE_TONES, type SiteData, containerSx } from './tokens';
 
 const headSx = { fontSize: '0.875rem', fontWeight: 600, color: '#111827', mb: 2, letterSpacing: '0.025em', textTransform: 'uppercase' } as const;
 
-function Social({ href, icon, label }: { href: string | null | undefined; icon: ReactNode; label: string }) {
+/**
+ * Brand colours, footer only: the glyph in the brand colour on its soft tint, the tile filled with
+ * the brand (Instagram: its gradient) and a white glyph on hover. Logos, so the label beside each
+ * one carries the meaning.
+ */
+const BRANDS = {
+  telegram: { color: '#26A5E4', tint: '#E6F5FC', fill: '#26A5E4' },
+  instagram: { color: '#E4405F', tint: '#FDEBEF', fill: 'linear-gradient(45deg, #F58529, #DD2A7B 50%, #8134AF)' },
+  youtube: { color: '#FF0000', tint: '#FFE9E9', fill: '#FF0000' },
+} as const;
+
+function Social({ href, brand, icon, label }: { href: string | null | undefined; brand: keyof typeof BRANDS; icon: ReactNode; label: string }) {
+  const b = BRANDS[brand];
   const tile = (
-    <Box className="tile" sx={{ width: 32, height: 32, borderRadius: '8px', bgcolor: SITE.stone100, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 150ms ease', '& svg': { fontSize: 16 } }}>
+    <Box className="tile" sx={{ width: 32, height: 32, borderRadius: '8px', bgcolor: b.tint, color: b.color, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 150ms ease, color 150ms ease', '& svg': { fontSize: 18 } }}>
       {icon}
     </Box>
   );
@@ -32,7 +45,7 @@ function Social({ href, icon, label }: { href: string | null | undefined; icon: 
     );
   }
   return (
-    <Link href={href} target="_blank" rel="noopener noreferrer" underline="none" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, fontSize: '0.875rem', color: SITE.stone600, '&:hover': { color: SITE.spruce, '& .tile': { bgcolor: SITE.tint } } }}>
+    <Link href={href} target="_blank" rel="noopener noreferrer" underline="none" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1.5, fontSize: '0.875rem', color: SITE.stone600, '&:hover': { color: SITE.ink, '& .tile': { background: b.fill, color: '#fff' } } }}>
       {tile}
       {label}
     </Link>
@@ -52,7 +65,7 @@ function PortalLink({ href, label }: { href: string; label: string }) {
 export function SiteFooter({ contact }: { contact: SiteData['contact'] }) {
   const { t } = useTranslation('site');
   return (
-    <Box component="footer" sx={{ bgcolor: '#fff', borderTop: `1px solid ${SITE.stone200}`, pt: 8, pb: 6 }}>
+    <Box component="footer" sx={{ bgcolor: '#fff', borderTop: `1px solid ${SITE.stone200}`, pt: 8, pb: 4 }}>
       <Box sx={containerSx}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: { xs: 5, lg: 8 } }}>
           <Box>
@@ -63,19 +76,19 @@ export function SiteFooter({ contact }: { contact: SiteData['contact'] }) {
             {contact.address && <Typography sx={{ fontSize: '0.875rem', color: SITE.stone600, mb: 0.5, lineHeight: 1.625 }}>{contact.address}</Typography>}
             {contact.metro && (
               <Stack direction="row" sx={{ alignItems: 'center', gap: 0.75, fontSize: '0.875rem', color: SITE.stone500, mb: 1.5 }}>
-                <DirectionsSubwayOutlinedIcon sx={{ fontSize: 16, color: SITE.spruce }} />
+                <DirectionsSubwayOutlinedIcon sx={{ fontSize: 16, color: SITE_TONES.blue.to }} />
                 {contact.metro}
               </Stack>
             )}
-            {contact.phone && (
-              <Stack component="a" href={`tel:${contact.phone.replace(/[^\d+]/g, '')}`} direction="row" sx={{ alignItems: 'center', gap: 0.75, fontSize: '0.875rem', fontWeight: 600, color: '#111827', mb: 0.5, textDecoration: 'none' }}>
-                <CallOutlinedIcon sx={{ fontSize: 16, color: SITE.stone500 }} />
-                {contact.phone}
+            {phonesOf(contact.phone).map((phone) => (
+              <Stack key={phone} component="a" href={telHref(phone)} direction="row" sx={{ alignItems: 'center', gap: 0.75, fontSize: '0.875rem', fontWeight: 600, color: '#111827', mb: 0.5, textDecoration: 'none' }}>
+                <CallOutlinedIcon sx={{ fontSize: 16, color: SITE.spruce }} />
+                {phone}
               </Stack>
-            )}
+            ))}
             {contact.email && (
               <Link href={`mailto:${contact.email}`} underline="hover" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, fontSize: '0.875rem', fontWeight: 500, color: SITE.spruce }}>
-                <MailOutlineRoundedIcon sx={{ fontSize: 16 }} />
+                <MailOutlineRoundedIcon sx={{ fontSize: 16, color: SITE_TONES.orange.to }} />
                 {contact.email}
               </Link>
             )}
@@ -85,9 +98,9 @@ export function SiteFooter({ contact }: { contact: SiteData['contact'] }) {
               {t('footer.followUs')}
             </Typography>
             <Stack sx={{ gap: 1.5, alignItems: 'flex-start' }}>
-              <Social href={contact.telegramUrl} icon={<TelegramIcon />} label={t('footer.telegram')} />
-              <Social href={contact.instagramUrl} icon={<InstagramIcon />} label={t('footer.instagram')} />
-              <Social href={contact.youtubeUrl} icon={<YouTubeIcon />} label={t('footer.youtube')} />
+              <Social href={contact.telegramUrl} brand="telegram" icon={<TelegramIcon />} label={t('footer.telegram')} />
+              <Social href={contact.instagramUrl} brand="instagram" icon={<InstagramIcon />} label={t('footer.instagram')} />
+              <Social href={contact.youtubeUrl} brand="youtube" icon={<YouTubeIcon />} label={t('footer.youtube')} />
             </Stack>
           </Box>
           <Box>
@@ -101,18 +114,18 @@ export function SiteFooter({ contact }: { contact: SiteData['contact'] }) {
             </Stack>
           </Box>
         </Box>
-        <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ borderTop: `1px solid ${SITE.stone100}`, mt: 6, pt: 4, justifyContent: 'space-between', alignItems: 'center', gap: 2, fontSize: '0.75rem', color: SITE.stone500 }}>
-          <span>{t('footer.rights', { year: new Date().getFullYear(), school: contact.schoolName })}</span>
+        <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ borderTop: `1px solid ${SITE.stone100}`, mt: 5, pt: 3, justifyContent: 'space-between', alignItems: 'center', gap: 2, fontSize: '0.75rem', color: SITE.stone500 }}>
+          {/* The copyright and, right under it, the one disclaimer (DECISIONS §12): everyone here is invented */}
+          <Stack sx={{ gap: 0.5, textAlign: { xs: 'center', sm: 'left' } }}>
+            <span>{t('footer.rights', { year: new Date().getFullYear(), school: contact.schoolName })}</span>
+            <span>{t('footer.fictional')}</span>
+          </Stack>
           <Stack direction="row" sx={{ alignItems: 'center', gap: 2 }}>
             {/* The site is in four languages; on phones the top bar has no room for the switcher */}
             <LanguageSwitcher />
             <span>{t('footer.city')}</span>
           </Stack>
         </Stack>
-        {/* The one disclaimer (DECISIONS §12): every person and record in Campusly is invented */}
-        <Typography sx={{ mt: 2, fontSize: '0.75rem', color: SITE.stone500, textAlign: { xs: 'center', sm: 'left' } }}>
-          {t('footer.fictional')}
-        </Typography>
       </Box>
     </Box>
   );

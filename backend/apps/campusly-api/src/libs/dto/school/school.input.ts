@@ -82,13 +82,14 @@ export class UpdateSchoolSettingsInput {
   @Max(100)
   defaultExamWeight?: number;
 
-  /** "" clears it. Digits, spaces, +, -, ( ) only */
+  /** "" clears it. Digits, spaces, +, -, ( ) only; several numbers separated by commas */
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
-  @MaxLength(30)
-  @Matches(/^[+\d\s()-]*$/, {
-    message: 'contactPhone may only contain digits, spaces, +, -, ( )',
+  @MaxLength(60)
+  @Matches(/^[+\d\s(),-]*$/, {
+    message:
+      'contactPhone may only contain digits, spaces, +, -, ( ) and commas',
   })
   contactPhone?: string;
 

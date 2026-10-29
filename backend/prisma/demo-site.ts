@@ -24,11 +24,11 @@ export interface SiteSeedHelpers {
 
 /** The website part of the school settings (footer, numbers strip) */
 export const SITE_SETTINGS = {
-  contactPhone: '+998 71 200 00 00',
+  contactPhone: '+998 93 890 03 26, +82 10 4393 0340',
   officeHours: 'Mon–Fri · 08:30–17:30',
   siteAddress: '12 Academic Street, Chilanzar, Tashkent',
   siteMetro: 'Nearest metro: Chilanzar, 5 min walk',
-  siteEmail: 'admissions@campusly.uz',
+  siteEmail: 'campusly.aws@gmail.com',
   foundedYear: 2014,
 };
 
