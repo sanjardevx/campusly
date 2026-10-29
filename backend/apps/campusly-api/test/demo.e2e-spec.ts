@@ -119,12 +119,13 @@ describe('Demo login (e2e)', () => {
     const res = await demo('STUDENT').expect(200);
     const body = res.body as {
       accessToken: string;
-      user: { loginId: string; mustChangePassword: boolean };
+      user: { loginId: string; mustChangePassword: boolean; isDemo: boolean };
       tempPasswordWarning?: unknown;
     };
     expect(body.user).toMatchObject({
       loginId: 'e2e-demo-student',
       mustChangePassword: false,
+      isDemo: true,
     });
     expect(body.tempPasswordWarning).toBeUndefined();
     const cookie = (res.headers['set-cookie'] as unknown as string[]).find(

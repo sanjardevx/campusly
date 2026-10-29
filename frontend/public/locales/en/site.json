@@ -5,6 +5,7 @@
   },
   "nav": {
     "portal": "Campusly Portal",
+    "liveDemo": "Live demo",
     "signIn": "Sign in",
     "enquire": "Enquire now",
     "enquireShort": "Enquire",
@@ -25,7 +26,8 @@
     "subtitle": "International standards, personal attention, and strong English and Korean.",
     "pause": "Pause slideshow",
     "play": "Play slideshow",
-    "slide": "Show photo {{n}}"
+    "slide": "Show photo {{n}}",
+    "demo": "Live demo: student, parent or teacher — no password"
   },
   "stats": {
     "students": "students",

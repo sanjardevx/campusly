@@ -27,6 +27,7 @@ import {
 import { AuditAction } from '../../libs/enums/audit.enum';
 import { AuditService } from '../audit/audit.service';
 import { consumeOneTimeToken } from './one-time-token';
+import { DemoLoginInput } from '../../libs/dto/auth/demo-login.input';
 import { LoginInput } from '../../libs/dto/auth/login.input';
 import { ErrorCode } from '../../libs/enums/common.enum';
 import { Role } from '../../libs/enums/user.enum';
@@ -139,7 +140,7 @@ export class AuthService {
    * role, no password. Off unless DEMO_MODE=true (then it "does not exist": 404). Limited per IP.
    */
   public async demoLogin(
-    role: Role,
+    input: DemoLoginInput,
     client: ClientInfo,
   ): Promise<SignInResult> {
     if (!this.config.get('DEMO_MODE', { infer: true })) {
@@ -163,7 +164,18 @@ export class AuthService {
     }
 
     const user = await this.prismaService.user.findFirst({
-      where: { role, isDemo: true, status: 'ACTIVE' },
+      where: {
+        role: input.role,
+        isDemo: true,
+        status: 'ACTIVE',
+        // Student 9A or 11A: the demo student who is in that class now
+        ...(input.role === Role.STUDENT &&
+          input.className && {
+            groupMemberships: {
+              some: { leftAt: null, group: { name: input.className } },
+            },
+          }),
+      },
       orderBy: { loginId: 'asc' },
     });
     if (!user) {
@@ -393,6 +405,7 @@ export class AuthService {
         lastName: user.lastName,
         mustChangePassword: user.mustChangePassword,
         className: await this.currentClass(user),
+        isDemo: user.isDemo,
       },
       ...(tempPasswordWarning && { tempPasswordWarning }),
     };

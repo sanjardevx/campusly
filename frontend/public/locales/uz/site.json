@@ -5,6 +5,7 @@
   },
   "nav": {
     "portal": "Campusly portali",
+    "liveDemo": "Jonli demo",
     "signIn": "Kirish",
     "enquire": "Ariza qoldirish",
     "enquireShort": "Ariza",
@@ -25,7 +26,8 @@
     "subtitle": "Xalqaro standartlar, shaxsiy e’tibor hamda kuchli ingliz va koreys tillari.",
     "pause": "Slayd-shouni to‘xtatish",
     "play": "Slayd-shouni davom ettirish",
-    "slide": "{{n}}-suratni ko‘rsatish"
+    "slide": "{{n}}-suratni ko‘rsatish",
+    "demo": "Jonli demo: o‘quvchi, ota-ona yoki o‘qituvchi — parolsiz"
   },
   "stats": {
     "students": "o‘quvchi",

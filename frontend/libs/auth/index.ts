@@ -44,9 +44,9 @@ export async function logIn(
   return result.user;
 }
 
-/** "Demo login" on the landing page: same session as a real sign-in, no password typed */
-export async function logInDemo(role: Role): Promise<SessionUser> {
-  const result = await demoRequest(role);
+/** "Live demo": same session as a real sign-in, no password typed */
+export async function logInDemo(role: Role, className?: string): Promise<SessionUser> {
+  const result = await demoRequest(role, className);
   applyAuthResult(result);
   pendingPassword = null;
   return result.user;

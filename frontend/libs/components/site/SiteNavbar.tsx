@@ -4,9 +4,11 @@ import { Box, Button, ButtonBase, Drawer, IconButton, Stack, Typography } from '
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import LoginRoundedIcon from '@mui/icons-material/LoginRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import PlayCircleOutlineRoundedIcon from '@mui/icons-material/PlayCircleOutlineRounded';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
+import { DEMO_MODE } from '@/libs/config';
 import { EASE, scrollToTop } from './motion';
 import { SITE, scrollToId } from './tokens';
 
@@ -126,7 +128,7 @@ export function SiteNavbar({ sections }: { sections: NavSection[] }) {
           </Box>
           <Button
             component={NextLink}
-            href="/portal"
+            href="/login"
             variant="outlined"
             startIcon={<LoginRoundedIcon sx={{ fontSize: 18 }} />}
             sx={{ display: { xs: 'none', md: 'inline-flex' }, borderRadius: '8px', px: 2.25, py: 1, fontSize: '0.875rem', fontWeight: 500, textTransform: 'none', color: 'inherit', borderColor: solid ? SITE.spruce : 'rgba(255,255,255,0.9)', '&:hover': { borderColor: solid ? SITE.spruceHover : '#fff', bgcolor: solid ? SITE.soft : 'rgba(255,255,255,0.1)' } }}
@@ -173,9 +175,14 @@ export function SiteNavbar({ sections }: { sections: NavSection[] }) {
           <Box sx={{ alignSelf: 'flex-start' }}>
             <LanguageSwitcher />
           </Box>
-          <Button component={NextLink} href="/portal" variant="outlined" startIcon={<LoginRoundedIcon />} sx={{ borderRadius: '10px', py: 1.25, textTransform: 'none', fontWeight: 600, color: SITE.spruce, borderColor: SITE.spruce }}>
+          <Button component={NextLink} href="/login" variant="outlined" startIcon={<LoginRoundedIcon />} sx={{ borderRadius: '10px', py: 1.25, textTransform: 'none', fontWeight: 600, color: SITE.spruce, borderColor: SITE.spruce }}>
             {t('nav.portal')}
           </Button>
+          {DEMO_MODE && (
+            <Button component={NextLink} href="/login#demo" variant="outlined" startIcon={<PlayCircleOutlineRoundedIcon />} sx={{ borderRadius: '10px', py: 1.25, textTransform: 'none', fontWeight: 600, color: SITE.spruce, borderColor: SITE.spruce }}>
+              {t('nav.liveDemo')}
+            </Button>
+          )}
           <Button onClick={() => go('enquire')} variant="contained" disableElevation sx={{ borderRadius: '10px', py: 1.25, textTransform: 'none', fontWeight: 700, bgcolor: SITE.spruce, '&:hover': { bgcolor: SITE.spruceHover } }}>
             {t('nav.enquire')}
           </Button>

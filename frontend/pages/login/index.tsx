@@ -9,9 +9,12 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import FamilyRestroomOutlinedIcon from '@mui/icons-material/FamilyRestroomOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { sessionReadyVar, userVar } from '@/apollo/store';
+import { demoFromQuery } from '@/libs/auth/demo';
 import { afterSignIn } from '@/libs/auth/routes';
 import { AuthLayout } from '@/libs/components/auth/AuthLayout';
+import { LiveDemo } from '@/libs/components/auth/LiveDemo';
 import { SignInForm } from '@/libs/components/auth/SignInForm';
+import { DEMO_MODE } from '@/libs/config';
 import { withTranslations } from '@/libs/i18n/server';
 
 export const getStaticProps = withTranslations(['auth']);
@@ -28,8 +31,11 @@ export default function StudentParentSignIn() {
 
   // Already signed in (silent refresh): straight to the right home
   useEffect(() => {
-    // Same target as the form: the form and this effect both react to the new user, so they must agree
-    if (ready && user) void router.replace(afterSignIn(user, router.query.next));
+    // Same target as the form: the form and this effect both react to the new user, so they must agree.
+    // A ?demo= link is LiveDemo's: it swaps the session for that demo account itself
+    if (ready && user && !(DEMO_MODE && demoFromQuery(router.query.demo))) {
+      void router.replace(afterSignIn(user, router.query.next));
+    }
   }, [ready, user, router]);
 
   return (
@@ -92,6 +98,8 @@ export default function StudentParentSignIn() {
 
       {/* key: switching the tab starts a clean form */}
       <SignInForm key={mode} mode={mode} />
+
+      {DEMO_MODE && <LiveDemo />}
 
       <Stack
         direction="row"

@@ -61,8 +61,8 @@ export const getStaticProps: GetStaticProps<{ site: SiteData }> = async (ctx) =>
 /**
  * The public school website at / (DECISIONS §14, day 19), built from the Stitch "Campusly Public"
  * landing (Part A, B, C — desktop and mobile). Static content comes from the `site` translations;
- * news, programs, team, numbers and contact from the CMS through `siteHome`. The portal's own front
- * door moved to /portal. Mock tests, Open Courses and Honor Students follow Programs (day 20).
+ * news, programs, team, numbers and contact from the CMS through `siteHome`. "Portal" leads to the
+ * sign-in page (/portal redirects there since day 24, with the live demo). Mock tests, Open Courses and Honor Students follow Programs (day 20).
  */
 export default function SiteHome({ site }: { site: SiteData }) {
   const { t } = useTranslation('site');

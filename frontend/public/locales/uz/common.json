@@ -92,5 +92,59 @@
     "manageYears": "Sozlamalarda boshqarish",
     "noPeriod": "Bugun davr yo‘q",
     "telegram": "Telegram’ni ulash"
+  },
+  "demo": {
+    "title": "Jonli demo",
+    "subtitle": "Bir bosish, parolsiz. To‘qima maktab, har kecha qayta tiklanadi.",
+    "or": "yoki",
+    "opening": "Ochilmoqda…",
+    "note": "Demoda parolni o‘zgartirish, foydalanuvchilarni boshqarish va fayl yuklash o‘chirilgan.",
+    "teacherLink": "Shunchaki ko‘rmoqchimisiz? O‘qituvchi demosini oching",
+    "entry": {
+      "student9a": {
+        "name": "O‘quvchi · 9A",
+        "text": "Aziz: darslar, uy vazifalari, testlar"
+      },
+      "student11a": {
+        "name": "O‘quvchi · 11A",
+        "text": "Madina: bitiruv yili, AI tutor"
+      },
+      "parent": {
+        "name": "Ota-ona",
+        "text": "Farrux: ikki farzandning o‘zlashtirishi"
+      },
+      "teacher": {
+        "name": "O‘qituvchi",
+        "text": "Nilufar: baholash va davomat"
+      }
+    },
+    "bar": {
+      "label": "Jonli demo",
+      "as": "{{who}} sifatida ko‘ryapsiz",
+      "reset": "Har kecha tiklanadi",
+      "try": "Nimani sinash mumkin",
+      "switch": "Rolni almashtirish",
+      "exit": "Demodan chiqish"
+    },
+    "try": {
+      "STUDENT": {
+        "t1": "Shu haftaning testini yeching (qayta yechish mumkin)",
+        "t2": "Uy vazifasini topshiring va kurs sahifasida ko‘ring",
+        "t3": "Savol-javobda sinfga savol bering",
+        "t4": "Baholar va kalendarni ko‘ring"
+      },
+      "PARENT": {
+        "t1": "Aziz (9A) va Madina (11A) orasida almashing",
+        "t2": "E’lon qilingan baholar va topshirilmagan ishlarni ko‘ring",
+        "t3": "Oylik davomatni oching",
+        "t4": "Maktab e’lonlarini o‘qing"
+      },
+      "TEACHER": {
+        "t1": "Topshiriqni baholang va baholarni e’lon qiling",
+        "t2": "Bugungi dars davomatini belgilang",
+        "t3": "Savol-javobda o‘quvchiga javob bering",
+        "t4": "9A yoki 11A ga e’lon joylang"
+      }
+    }
   }
 }

@@ -11,6 +11,8 @@ export interface SessionUser {
   mustChangePassword: boolean;
   /** Students: the current class ("9A"), for "Grade 9A · ID …" in the top bar */
   className: string | null;
+  /** A demo account: the portal shows the demo bar */
+  isDemo: boolean;
 }
 
 export interface AuthResult {
@@ -58,8 +60,9 @@ async function post<T>(path: string, body?: object): Promise<T> {
 export const loginRequest = (loginId: string, password: string) =>
   post<AuthResult>('login', { loginId, password });
 
-/** Landing page "Demo login": the server picks the demo account of that role */
-export const demoRequest = (role: Role) => post<AuthResult>('demo', { role });
+/** "Live demo": the server picks the demo account of that role (students: of that class) */
+export const demoRequest = (role: Role, className?: string) =>
+  post<AuthResult>('demo', { role, className });
 
 export const refreshRequest = () => post<AuthResult>('refresh');
 

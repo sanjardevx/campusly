@@ -34,6 +34,8 @@ export interface AuthResult {
     mustChangePassword: boolean;
     /** Students: the current class ("9A") for the top bar; null for other roles */
     className: string | null;
+    /** A demo account: the portal shows the demo bar */
+    isDemo: boolean;
   };
   /** Shown as a banner while a temporary password is in use */
   tempPasswordWarning?: { usesLeft: number; expiresAt: string };

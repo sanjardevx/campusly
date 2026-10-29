@@ -26,6 +26,7 @@ import { TempPasswordBanner } from '@/libs/components/TempPasswordBanner';
 import type { Role } from '@/libs/gql/graphql';
 import { tokens } from '@/libs/theme';
 import { ChildSwitcher } from './ChildSwitcher';
+import { DemoBar } from './DemoBar';
 import { GlassTabBar } from './GlassTabBar';
 import { SPRING, useTapFirstIndex } from './motion';
 import { NAV, useActiveItem, useNavHref, type NavItem } from './nav';
@@ -180,6 +181,9 @@ function DesktopShell({ user, desktop, children }: { user: SessionUser; desktop:
 
       <Box component="main" sx={{ ml: desktop ? `${SIDEBAR}px` : 0, pt: `${TOPBAR}px` }}>
         <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 2, md: 4 }, py: { xs: 3, md: 4 } }}>
+          <Box sx={{ mb: 2, '&:empty': { display: 'none' } }}>
+            <DemoBar user={user} />
+          </Box>
           {user.role === 'PARENT' && (
             <Box sx={{ display: { xs: 'block', lg: 'none' }, mb: 2 }}>
               <ChildSwitcher />
@@ -404,6 +408,9 @@ function PhoneShell({ user, children }: { user: SessionUser; children: ReactNode
       </Box>
 
       <Box component="main" sx={{ px: 2, pt: 2 }}>
+        <Box sx={{ mb: 2, '&:empty': { display: 'none' } }}>
+          <DemoBar user={user} />
+        </Box>
         {user.role === 'PARENT' && (
           <Box sx={{ mb: 2, overflowX: 'auto' }}>
             <ChildSwitcher />

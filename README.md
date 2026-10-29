@@ -24,6 +24,8 @@ pnpm dev                             # web: http://localhost:3001
 
 Every seeded account uses the password you set in `SEED_PASSWORD` (`backend/.env`). It is never stored in git.
 
+On the live site the demo accounts open without a password: **Live demo** on the sign-in page (`/login#demo`), or a direct link such as `/login?demo=teacher` (`student9a`, `student11a`, `parent`, `teacher`).
+
 | Role | Login ID | Name | Notes |
 |---|---|---|---|
 | Admin | `simon` | Simon | A normal admin (not a demo account) |

@@ -6,12 +6,14 @@ import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CalendarViewWeekOutlinedIcon from '@mui/icons-material/CalendarViewWeekOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
+import PlayCircleOutlineRoundedIcon from '@mui/icons-material/PlayCircleOutlineRounded';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { sessionReadyVar, userVar } from '@/apollo/store';
 import { afterSignIn } from '@/libs/auth/routes';
 import { AuthLayout } from '@/libs/components/auth/AuthLayout';
 import { SignInForm } from '@/libs/components/auth/SignInForm';
+import { DEMO_MODE } from '@/libs/config';
 import { withTranslations } from '@/libs/i18n/server';
 
 export const getStaticProps = withTranslations(['auth']);
@@ -51,6 +53,13 @@ export default function TeacherSignIn() {
       </Box>
 
       <SignInForm mode="staff" />
+
+      {/* The teacher demo is on the main sign-in page with the other three */}
+      {DEMO_MODE && (
+        <Link component={NextLink} href="/login?demo=teacher" underline="hover" sx={{ mt: 2.5, display: 'inline-flex', alignItems: 'center', gap: 0.5, fontSize: '0.875rem', fontWeight: 600 }}>
+          <PlayCircleOutlineRoundedIcon sx={{ fontSize: 18 }} /> {t('demo.teacherLink', { ns: 'common' })}
+        </Link>
+      )}
 
       <Stack
         direction="row"

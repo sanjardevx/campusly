@@ -50,10 +50,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<AuthResult> {
     this.assertTrustedOrigin(req);
-    const signIn = await this.authService.demoLogin(
-      input.role,
-      this.client(req),
-    );
+    const signIn = await this.authService.demoLogin(input, this.client(req));
     return this.respond(res, signIn);
   }
 

@@ -12,6 +12,7 @@ import {
 import { AppModule } from '../src/app.module';
 import { setupApp } from '../src/app.setup';
 import { PrismaService } from '../src/database/prisma.service';
+import { RedisService } from '../src/database/redis.service';
 
 // Needs Docker Postgres + Redis. Runs the FULL seed first (it wipes the database, like
 // `pnpm prisma db seed`), then checks the partial nightly reset and the demo rules of
@@ -112,6 +113,41 @@ describe('Full school seed, partial demo reset and demo rules (e2e)', () => {
         'Geometry · 9A',
       ].sort(),
     );
+  });
+
+  it('demo login picks the demo student of the class: 9A Aziz, 11A Madina; other classes are 400', async () => {
+    // DEMO_MODE on for this test only (the real .env keeps it off)
+    const config = app.get<{ get(key: string): unknown }>(ConfigService);
+    const get = config.get.bind(config);
+    const spy = jest
+      .spyOn(config, 'get')
+      .mockImplementation((key) => (key === 'DEMO_MODE' ? true : get(key)));
+    const demo = (body: object) =>
+      request(app.getHttpServer()).post('/auth/demo').send(body);
+    const user = (res: request.Response) =>
+      (res.body as { user: { loginId: string; className: string } }).user;
+    try {
+      const ninth = await demo({ role: 'STUDENT', className: '9A' }).expect(
+        200,
+      );
+      expect(user(ninth)).toMatchObject({
+        loginId: '26100042',
+        className: '9A',
+      });
+      const eleventh = await demo({ role: 'STUDENT', className: '11A' }).expect(
+        200,
+      );
+      expect(user(eleventh)).toMatchObject({
+        loginId: '26100043',
+        className: '11A',
+      });
+      await demo({ role: 'STUDENT', className: '9B' }).expect(400);
+    } finally {
+      spy.mockRestore();
+      const redis = app.get(RedisService);
+      const keys = await redis.keys('demo:ip:*');
+      if (keys.length) await redis.del(...keys);
+    }
   });
 
   it('demo accounts write only inside 9A / 11A: the rest of the school is NOT_FOUND', async () => {

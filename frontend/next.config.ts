@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/**/*": ["./public/locales/**/*"],
   },
+  // The portal's old front door: one entrance now, the sign-in page with the live demo (day 24)
+  async redirects() {
+    return [{ source: "/portal", destination: "/login", permanent: false }];
+  },
 };
 
 export default nextConfig;

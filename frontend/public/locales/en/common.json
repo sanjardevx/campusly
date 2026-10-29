@@ -92,5 +92,59 @@
     "manageYears": "Manage in Settings",
     "noPeriod": "No period today",
     "telegram": "Connect Telegram"
+  },
+  "demo": {
+    "title": "Live demo",
+    "subtitle": "One click, no password. A made-up school that resets every night.",
+    "or": "or",
+    "opening": "Opening…",
+    "note": "Changing passwords, managing users and uploading files are off in the demo.",
+    "teacherLink": "Just looking? Open the teacher demo",
+    "entry": {
+      "student9a": {
+        "name": "Student · 9A",
+        "text": "Aziz: lessons, homework, quizzes"
+      },
+      "student11a": {
+        "name": "Student · 11A",
+        "text": "Madina: exam year, AI tutor"
+      },
+      "parent": {
+        "name": "Parent",
+        "text": "Farrukh: both children's progress"
+      },
+      "teacher": {
+        "name": "Teacher",
+        "text": "Nilufar: grading and attendance"
+      }
+    },
+    "bar": {
+      "label": "Live demo",
+      "as": "Viewing as {{who}}",
+      "reset": "Resets every night",
+      "try": "What to try",
+      "switch": "Switch role",
+      "exit": "Exit demo"
+    },
+    "try": {
+      "STUDENT": {
+        "t1": "Take this week's quiz (you can take it again)",
+        "t2": "Hand in a homework and see it on the course page",
+        "t3": "Ask your class a question in Q&A",
+        "t4": "Check grades and the calendar"
+      },
+      "PARENT": {
+        "t1": "Switch between Aziz (9A) and Madina (11A)",
+        "t2": "See published grades and missing work",
+        "t3": "Open attendance for the month",
+        "t4": "Read the school announcements"
+      },
+      "TEACHER": {
+        "t1": "Grade a hand-in and publish the grades",
+        "t2": "Take attendance for today's lesson",
+        "t3": "Answer a student's question in Q&A",
+        "t4": "Post an announcement to 9A or 11A"
+      }
+    }
   }
 }

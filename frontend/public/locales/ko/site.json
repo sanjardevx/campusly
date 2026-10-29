@@ -5,6 +5,7 @@
   },
   "nav": {
     "portal": "Campusly 포털",
+    "liveDemo": "라이브 데모",
     "signIn": "로그인",
     "enquire": "입학 문의",
     "enquireShort": "문의",
@@ -25,7 +26,8 @@
     "subtitle": "국제 기준의 교육, 세심한 관심, 그리고 탄탄한 영어와 한국어.",
     "pause": "슬라이드 일시정지",
     "play": "슬라이드 재생",
-    "slide": "{{n}}번째 사진 보기"
+    "slide": "{{n}}번째 사진 보기",
+    "demo": "라이브 데모: 학생, 학부모, 교사 — 비밀번호 없이"
   },
   "stats": {
     "students": "학생",

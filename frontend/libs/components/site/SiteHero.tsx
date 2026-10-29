@@ -1,10 +1,12 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import NextLink from 'next/link';
-import { Box, Button, ButtonBase, IconButton, Stack, Typography, useMediaQuery } from '@mui/material';
+import { Box, Button, ButtonBase, IconButton, Link, Stack, Typography, useMediaQuery } from '@mui/material';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import PlayCircleOutlineRoundedIcon from '@mui/icons-material/PlayCircleOutlineRounded';
 import { useTranslation } from 'next-i18next/pages';
 import { useReducedMotion } from '@/libs/components/dashboard/motion';
+import { DEMO_MODE } from '@/libs/config';
 import { CountUp, Typewriter } from './motion';
 import { SITE, type SiteData, containerSx, scrollToId } from './tokens';
 
@@ -98,10 +100,16 @@ export function SiteHero({ stats }: { stats: SiteData['stats'] }) {
             <Button onClick={() => scrollToId('enquire')} variant="contained" disableElevation sx={{ ...solidBtn, px: 3.5, py: 1.5, fontSize: '1rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
               {t('nav.enquire')}
             </Button>
-            <Button component={NextLink} href="/portal" variant="outlined" sx={{ ...outlineBtn, px: 3, py: 1.5, fontSize: '1rem' }}>
+            <Button component={NextLink} href="/login" variant="outlined" sx={{ ...outlineBtn, px: 3, py: 1.5, fontSize: '1rem' }}>
               {t('nav.portal')} →
             </Button>
           </Stack>
+          {DEMO_MODE && (
+            <Link component={NextLink} href="/login#demo" underline="hover" sx={{ mt: 2.5, display: 'inline-flex', alignItems: 'center', gap: 0.75, color: '#fff', fontSize: '0.9375rem', fontWeight: 600 }}>
+              <PlayCircleOutlineRoundedIcon sx={{ fontSize: 20 }} />
+              {t('hero.demo')}
+            </Link>
+          )}
         </Box>
 
         {/* Slide dots + pause */}
