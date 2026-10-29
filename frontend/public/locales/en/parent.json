@@ -26,7 +26,6 @@
       "grade": "Grade",
       "missing_one": "{{count}} missing",
       "missing_other": "{{count}} missing",
-      "mark": "· {{mark}}",
       "notFinal": "Not final",
       "empty": "No courses this quarter.",
       "noPeriod": "The school year has not started yet."

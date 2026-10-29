@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Box, ButtonBase, Stack, Typography } from '@mui/material';
 import { keyframes } from '@mui/material/styles';
+import { progressBar } from '@/libs/accent';
 import { EASE_OUT, fadeUp } from '@/libs/components/dashboard/motion';
 
 /**
@@ -82,7 +83,8 @@ export function ProgressBar({ value, label, index = 0 }: { value: number; label:
         sx={{
           height: '100%',
           borderRadius: 999,
-          bgcolor: STITCH.ink,
+          // Curriculum progress by band, never red (DECISIONS §13 Accents); the % is printed beside it
+          bgcolor: progressBar(value),
           transform: `scaleX(${value / 100})`,
           transformOrigin: 'left',
           animation: `${fill} 600ms ${EASE_OUT} both`,

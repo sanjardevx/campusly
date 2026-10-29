@@ -12,6 +12,7 @@ import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { SCHOOL_SETTINGS } from '@/apollo/app/query';
 import { fadeUp, useCountUp } from '@/libs/components/dashboard/motion';
+import { MarkBadge } from '@/libs/components/MarkBadge';
 import { formatInSchool } from '@/libs/components/student/home/due';
 import { STITCH, SoftPill } from '@/libs/components/student/home/parts';
 import type { ParentHomeQuery } from '@/libs/gql/graphql';
@@ -153,13 +154,13 @@ export function ParentHome({ data, child }: { data: Home; child: string }) {
                       {c.teacherName ?? '—'}
                     </Box>
                     <Box component="td" sx={{ textAlign: 'right !important', whiteSpace: 'nowrap' }}>
-                      <Typography component="span" sx={{ fontSize: '1.0625rem', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: c.mark != null && c.mark <= 3 ? 'warning.dark' : 'text.primary' }}>
+                      <Typography component="span" sx={{ fontSize: '1.0625rem', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: 'text.primary' }}>
                         {pct(c.percent)}
                       </Typography>
                       {c.mark != null && (
-                        <Typography component="span" sx={{ ml: 0.75, fontSize: '0.8125rem', fontWeight: 600, color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
-                          {t('home.grades.mark', { mark: c.mark })}
-                        </Typography>
+                        <Box component="span" sx={{ ml: 0.75 }}>
+                          <MarkBadge mark={c.mark} />
+                        </Box>
                       )}
                       {c.percent != null && !c.isFinal && <Typography sx={{ fontSize: '0.6875rem', color: 'text.disabled' }}>{t('home.grades.notFinal')}</Typography>}
                     </Box>

@@ -32,7 +32,6 @@
       "missing_few": "{{count}} не сдано",
       "missing_many": "{{count}} не сдано",
       "missing_other": "{{count}} не сдано",
-      "mark": "· {{mark}}",
       "notFinal": "Не итоговая",
       "empty": "В этой четверти нет курсов.",
       "noPeriod": "Учебный год ещё не начался."

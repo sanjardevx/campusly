@@ -2,12 +2,15 @@ import type { ReactNode } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { Box, ButtonBase, Link, Stack, Typography } from '@mui/material';
+import type { SvgIconComponent } from '@mui/icons-material';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
 import { useTranslation } from 'next-i18next/pages';
+import { type Kind, workKind } from '@/libs/accent';
+import { KindIcon } from '@/libs/components/KindIcon';
 import type { StudentOverviewQuery } from '@/libs/gql/graphql';
 import { daysUntil, formatDueAt, studentHref } from './due';
 import { STITCH, SoftPill, enter, pressSx } from './parts';
-import { LESSON_ICON, WORK_ICON } from './ThisWeek';
+import { LESSON_ICON } from './ThisWeek';
 
 type Overview = StudentOverviewQuery['studentOverview'];
 
@@ -27,7 +30,7 @@ export function Heading({ title, aside }: { title: string; aside?: ReactNode }) 
 }
 
 /** One tappable white row: icon tile, title, a muted line, an optional pill (the whole row is the link) */
-export function TapRow({ href, icon, title, detail, pill, index }: { href: string; icon: ReactNode; title: string; detail: string; pill?: ReactNode; index: number }) {
+export function TapRow({ href, kind, icon, title, detail, pill, index }: { href: string; kind: Kind; icon?: SvgIconComponent; title: string; detail: string; pill?: ReactNode; index: number }) {
   return (
     <ButtonBase
       component={NextLink}
@@ -45,9 +48,7 @@ export function TapRow({ href, icon, title, detail, pill, index }: { href: strin
         ...enter(index),
       }}
     >
-      <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: STITCH.surfaceContainer, color: 'secondary.main', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, '& svg': { fontSize: 20 } }}>
-        {icon}
-      </Box>
+      <KindIcon kind={kind} icon={icon} />
       <Box sx={{ minWidth: 0, flex: 1 }}>
         <Typography noWrap sx={{ fontSize: '0.9375rem', fontWeight: 600 }}>
           {title}
@@ -97,13 +98,12 @@ export function MobileHome({ overview }: { overview: Overview }) {
           <Heading title={t('home.todo.title')} aside={<SoftPill tone="peach">{overdue.length}</SoftPill>} />
           <Stack spacing={1}>
             {overdue.map((w, i) => {
-              const Icon = WORK_ICON[w.type];
               return (
                 <TapRow
                   key={w.assignmentId}
                   index={i}
                   href={studentHref.assignment(w.courseId, w.assignmentId)}
-                  icon={<Icon />}
+                  kind={workKind(w.type)}
                   title={w.title}
                   detail={`${w.courseTitle} · ${t('home.todo.wasDue', { date: formatDueAt(w.dueAt, locale) })}`}
                 />
@@ -123,21 +123,21 @@ export function MobileHome({ overview }: { overview: Overview }) {
               <TapRow
                 index={overdue.length}
                 href={studentHref.lesson(lesson.courseId, lesson.lessonId)}
-                icon={<LessonIcon />}
+                kind="lesson"
+                icon={LessonIcon}
                 title={lesson.title}
                 detail={`${lesson.subjectName} · ${t('home.thisWeek.continue')}`}
                 pill={lesson.percent != null ? <SoftPill tone="mint">{lesson.percent}%</SoftPill> : <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />}
               />
             )}
             {week.map((w, i) => {
-              const Icon = WORK_ICON[w.type];
               const days = daysUntil(w.dueAt);
               return (
                 <TapRow
                   key={w.assignmentId}
                   index={weekStart + i}
                   href={studentHref.assignment(w.courseId, w.assignmentId)}
-                  icon={<Icon />}
+                  kind={workKind(w.type)}
                   title={w.title}
                   detail={w.courseTitle}
                   pill={<SoftPill tone={days <= 2 ? 'peach' : 'neutral'}>{dueLabel(w.dueAt)}</SoftPill>}

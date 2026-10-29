@@ -98,7 +98,7 @@ function RowStack({ rows, courseId, empty }: { rows: Row[]; courseId: string; em
     <Stack spacing={1}>
       {rows.map((row, i) => {
         const v = view(row);
-        return <TapRow key={v.key} index={i} href={v.action.href} icon={<v.Icon />} title={v.title} detail={v.meta} pill={<SoftPill tone={v.pill.tone}>{v.pill.label}</SoftPill>} />;
+        return <TapRow key={v.key} index={i} href={v.action.href} kind={v.kind} icon={v.icon} title={v.title} detail={v.meta} pill={<SoftPill tone={v.pill.tone}>{v.pill.label}</SoftPill>} />;
       })}
     </Stack>
   );

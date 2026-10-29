@@ -10,6 +10,7 @@ import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import RadioButtonUncheckedRoundedIcon from '@mui/icons-material/RadioButtonUncheckedRounded';
 import { useTranslation } from 'next-i18next/pages';
+import { KindIcon } from '@/libs/components/KindIcon';
 import { studentHref } from '@/libs/components/student/home/due';
 import { ProgressBar, STITCH, SoftPill, enter, pressSx } from '@/libs/components/student/home/parts';
 import { dayRange } from '@/libs/components/teacher/course/model';
@@ -232,9 +233,7 @@ function RowLine({ v }: { v: RowView }) {
       }}
     >
       <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, minWidth: 0 }}>
-        <Box sx={{ color: v.accent ? 'secondary.main' : STITCH.onSurfaceVariant, display: 'flex', flexShrink: 0, '& svg': { fontSize: 22 } }}>
-          <v.Icon />
-        </Box>
+        <KindIcon kind={v.kind} icon={v.icon} size={32} />
         <Stack direction="row" sx={{ alignItems: 'center', gap: 1.25, minWidth: 0, flexWrap: 'wrap' }}>
           <Typography noWrap sx={{ fontSize: '1rem', fontWeight: 500 }}>
             {v.title}

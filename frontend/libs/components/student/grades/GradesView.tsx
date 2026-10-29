@@ -9,6 +9,7 @@ import { useTranslation } from 'next-i18next/pages';
 import { MY_PERIOD_GRADES } from '@/apollo/student/query';
 import { formatInSchool, studentHref } from '@/libs/components/student/home/due';
 import { STITCH, SegmentedTabs, SoftPill, enter, pressSx } from '@/libs/components/student/home/parts';
+import { MarkBadge } from '@/libs/components/MarkBadge';
 import type { GradeItemState, MyGradesQuery } from '@/libs/gql/graphql';
 
 type Grades = MyGradesQuery['myGrades'];
@@ -50,11 +51,7 @@ function GradeCell({ percent, mark, isFinal, align = 'right' }: { percent: numbe
     <Stack sx={{ alignItems: align === 'right' ? 'flex-end' : 'flex-start', gap: 0.25 }}>
       <Stack direction="row" sx={{ alignItems: 'baseline', gap: 0.75 }}>
         <Typography sx={{ fontSize: '1rem', fontWeight: 600, color: STITCH.ink, fontVariantNumeric: 'tabular-nums' }}>{pct(percent)}</Typography>
-        {mark != null && (
-          <Box component="span" sx={{ minWidth: 22, px: 0.75, borderRadius: 1, bgcolor: STITCH.surfaceContainer, fontSize: '0.75rem', fontWeight: 700, textAlign: 'center', color: STITCH.ink }}>
-            {mark}
-          </Box>
-        )}
+        {mark != null && <MarkBadge mark={mark} />}
       </Stack>
       {!isFinal && percent != null && <Typography sx={{ fontSize: '0.6875rem', fontWeight: 600, color: 'text.secondary' }}>{t('grades.notFinal')}</Typography>}
     </Stack>

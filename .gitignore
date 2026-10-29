@@ -159,3 +159,6 @@ docs/journal/
 
 # Agent handoff notes: kept locally, not in the repo
 docs/HANDOFF.md
+
+# macOS Finder files
+.DS_Store

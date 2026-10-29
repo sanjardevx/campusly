@@ -12,6 +12,7 @@ import { daysOf, isoDay, shiftMonth } from '@/libs/components/dashboard/calendar
 import { schoolTime, schoolToday, studentHref } from '@/libs/components/student/home/due';
 import { STITCH, SoftPill, enter, pressSx } from '@/libs/components/student/home/parts';
 import type { StudentCalendarQuery } from '@/libs/gql/graphql';
+import { KIND, accent, workKind } from '@/libs/accent';
 import { viz } from '@/libs/viz';
 import { MonthGrid } from './MonthGrid';
 
@@ -476,6 +477,7 @@ function AgendaCard({ event: e, linkWork }: { event: Event; linkWork: boolean })
   const work = e.kind === 'ASSIGNMENT';
   const term = e.kind === 'TERM_START' || e.kind === 'TERM_END';
   const tag = work ? t(`type.${e.assignmentType ?? 'HOMEWORK'}`) : t(`kind.${e.kind}`);
+  const workTone = accent[KIND[workKind(e.assignmentType ?? 'HOMEWORK')].tone];
   const title = term ? t(`term.${e.kind}`, { name: e.title }) : e.title;
   const range = (from: string, to: string) => {
     const a = partsOf(from);
@@ -490,7 +492,21 @@ function AgendaCard({ event: e, linkWork }: { event: Event; linkWork: boolean })
     <>
       <Box
         component="span"
-        sx={{ flexShrink: 0, px: 1, py: 0.25, borderRadius: 1, border: 1, borderColor: viz.calendar[e.kind], color: 'text.primary', fontSize: '0.75rem', fontWeight: 600, whiteSpace: 'nowrap' }}
+        sx={{
+          flexShrink: 0,
+          px: 1,
+          py: 0.25,
+          borderRadius: 1,
+          border: 1,
+          fontSize: '0.75rem',
+          fontWeight: 600,
+          whiteSpace: 'nowrap',
+          // Work in its kind colour (Stitch calendar: homework blue, quiz violet, exam rose);
+          // school dates keep the outline of their dot colour
+          ...(work
+            ? { borderColor: 'transparent', bgcolor: workTone.bg, color: workTone.fg }
+            : { borderColor: viz.calendar[e.kind], color: 'text.primary' }),
+        }}
       >
         {tag}
       </Box>

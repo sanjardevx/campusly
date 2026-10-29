@@ -1,8 +1,9 @@
-import type { ComponentType } from 'react';
+import type { SvgIconComponent } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next/pages';
 import { daysUntil, formatDueAt, studentHref } from '@/libs/components/student/home/due';
-import { LESSON_ICON, WORK_ICON } from '@/libs/components/student/home/ThisWeek';
+import { type Kind, workKind } from '@/libs/accent';
+import { LESSON_ICON } from '@/libs/components/student/home/ThisWeek';
 import { fileType, formatSize } from '@/libs/components/teacher/course/model';
 import type { Row } from './model';
 
@@ -11,9 +12,9 @@ type Tone = 'mint' | 'peach' | 'neutral';
 /** What a row shows, the same on the desktop week card and the phone list */
 export interface RowView {
   key: string;
-  Icon: ComponentType;
-  /** The play / lesson icon in sage, assignments in the muted colour (Stitch) */
-  accent: boolean;
+  /** Colour and default icon from the kind map; lessons pick their icon by content */
+  kind: Kind;
+  icon?: SvgIconComponent;
   title: string;
   meta: string;
   /** Due soon or overdue: the meta line turns ochre (time-sensitive, DECISIONS §13) */
@@ -40,8 +41,8 @@ export function useRowView(courseId: string) {
       const watching = lesson.type === 'VIDEO' && status === 'IN_PROGRESS';
       return {
         key: lesson.id,
-        Icon: LESSON_ICON[lesson.type],
-        accent: true,
+        kind: 'lesson',
+        icon: LESSON_ICON[lesson.type],
         title: lesson.title,
         meta,
         urgent: false,
@@ -75,8 +76,7 @@ export function useRowView(courseId: string) {
 
     return {
       key: a.id,
-      Icon: WORK_ICON[a.type],
-      accent: false,
+      kind: workKind(a.type),
       title: a.title,
       meta: a.dueAt ? t('course.dueAt', { date: formatDueAt(a.dueAt, locale) }) : t('course.noDue'),
       urgent,

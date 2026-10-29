@@ -26,7 +26,6 @@
       "grade": "Baho",
       "missing_one": "{{count}} ta topshirilmagan",
       "missing_other": "{{count}} ta topshirilmagan",
-      "mark": "· {{mark}}",
       "notFinal": "Yakuniy emas",
       "empty": "Bu chorakda kurs yo'q.",
       "noPeriod": "O'quv yili hali boshlanmagan."

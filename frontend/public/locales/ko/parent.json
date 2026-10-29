@@ -23,7 +23,6 @@
       "teacher": "담당 교사",
       "grade": "성적",
       "missing_other": "미제출 {{count}}개",
-      "mark": "· {{mark}}",
       "notFinal": "확정 전",
       "empty": "이번 분기에 과목이 없습니다.",
       "noPeriod": "학년도가 아직 시작되지 않았습니다."

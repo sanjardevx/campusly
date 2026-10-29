@@ -18,6 +18,7 @@ import { useTranslation } from 'next-i18next/pages';
 import { STUDENT_TUTOR_TOPICS } from '@/apollo/student/query';
 import { useErrorText } from '@/libs/i18n';
 import { STITCH, SoftPill, pressSx } from '@/libs/components/student/home/parts';
+import { KindIcon } from '@/libs/components/KindIcon';
 import { HELP_LEVELS, useTutor, type Tutor, type TutorConversation, type TutorMessage, type TutorTopic } from './useTutor';
 
 type Course = { id: string; title: string };
@@ -363,9 +364,7 @@ function Welcome({ onPick }: { onPick: (text: string) => void }) {
   const examples = ['start', 'stuck', 'check'] as const;
   return (
     <Stack sx={{ alignItems: 'center', textAlign: 'center', py: { xs: 2, md: 5 }, gap: 1.5 }}>
-      <Box sx={{ width: 52, height: 52, borderRadius: '14px', display: 'grid', placeItems: 'center', bgcolor: STITCH.surfaceContainer, color: 'primary.main' }}>
-        <PsychologyOutlinedIcon />
-      </Box>
+      <KindIcon kind="tutor" size={52} />
       <Typography sx={{ fontWeight: 700, fontSize: '1.125rem' }}>{t('tutor.welcome.title')}</Typography>
       <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary', maxWidth: 420 }}>{t('tutor.welcome.body')}</Typography>
       <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 1, mt: 1 }}>

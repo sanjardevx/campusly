@@ -2,15 +2,14 @@ import type { ReactNode } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { Box, Button, Card, Stack, Typography } from '@mui/material';
-import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
-import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import type { SvgIconComponent } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined';
-import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import { useTranslation } from 'next-i18next/pages';
+import { KIND, type Kind, workKind } from '@/libs/accent';
+import { KindIcon } from '@/libs/components/KindIcon';
 import type { StudentOverviewQuery } from '@/libs/gql/graphql';
 import { daysUntil, formatDueAt, studentHref } from './due';
 import { STITCH, SectionTitle, SoftPill, enter, liftSx, stretchedSx } from './parts';
@@ -22,11 +21,11 @@ type Work = Overview['upcoming'][number];
 /** Stitch shows a short list; the rest is one click away in the courses */
 const MAX_ROWS = 5;
 
-export const LESSON_ICON = { VIDEO: PlayCircleOutlineIcon, READING: ArticleOutlinedIcon, FILE: DescriptionOutlinedIcon, LINK: LinkOutlinedIcon };
-export const WORK_ICON = { HOMEWORK: AssignmentOutlinedIcon, QUIZ: TimerOutlinedIcon, EXAM: EventNoteOutlinedIcon };
+/** A lesson's icon by its content (all in the lesson colour); work types use the kind map (libs/accent.ts) */
+export const LESSON_ICON = { VIDEO: PlayCircleOutlineIcon, READING: KIND.lesson.icon, FILE: DescriptionOutlinedIcon, LINK: LinkOutlinedIcon };
 
 /** One Stitch row: icon tile, title + pill, a muted line, the action on the right */
-function Row({ icon, accent, title, pill, detail, action, index }: { icon: ReactNode; accent?: boolean; title: string; pill?: ReactNode; detail: string; action: ReactNode; index: number }) {
+function Row({ kind, icon, title, pill, detail, action, index }: { kind: Kind; icon?: SvgIconComponent; title: string; pill?: ReactNode; detail: string; action: ReactNode; index: number }) {
   return (
     <Card
       variant="outlined"
@@ -49,22 +48,7 @@ function Row({ icon, accent, title, pill, detail, action, index }: { icon: React
       }}
     >
       <Stack direction="row" sx={{ alignItems: 'center', gap: 1.5, minWidth: 0 }}>
-        <Box
-          sx={{
-            width: 36,
-            height: 36,
-            borderRadius: 2,
-            bgcolor: STITCH.surfaceContainer,
-            color: accent ? 'secondary.main' : STITCH.onSurfaceVariant,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            '& svg': { fontSize: 20 },
-          }}
-        >
-          {icon}
-        </Box>
+        <KindIcon kind={kind} icon={icon} />
         <Box sx={{ minWidth: 0 }}>
           <Stack direction="row" sx={{ alignItems: 'center', columnGap: 1, rowGap: 0.5, flexWrap: 'wrap' }}>
             <Typography component="h3" sx={{ fontSize: '1rem', lineHeight: '1.5rem', fontWeight: 600 }}>
@@ -128,8 +112,8 @@ export function ThisWeek({ lessons, upcoming, index }: { lessons: Lesson[]; upco
           {lesson && LessonIcon && (
             <Row
               index={index + 1}
-              accent
-              icon={<LessonIcon />}
+              kind="lesson"
+              icon={LessonIcon}
               title={lesson.title}
               pill={lesson.percent != null && <SoftPill tone="mint">{t('home.thisWeek.watched', { percent: lesson.percent })}</SoftPill>}
               detail={[lesson.subjectName, minutes && t('home.thisWeek.minutes', { count: minutes })].filter(Boolean).join(' · ')}
@@ -147,13 +131,12 @@ export function ThisWeek({ lessons, upcoming, index }: { lessons: Lesson[]; upco
             />
           )}
           {work.map((w, i) => {
-            const Icon = WORK_ICON[w.type];
             const when = formatDueAt(w.dueAt, locale);
             return (
               <Row
                 key={w.assignmentId}
                 index={index + 2 + i}
-                icon={<Icon />}
+                kind={workKind(w.type)}
                 title={w.title}
                 pill={duePill(w)}
                 detail={`${w.courseTitle} · ${t('home.thisWeek.dueAt', { date: when })}`}
