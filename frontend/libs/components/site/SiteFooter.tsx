@@ -11,6 +11,7 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import { useTranslation } from 'next-i18next/pages';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
+import { DEMO_MODE } from '@/libs/config';
 import { SITE, type SiteData, containerSx } from './tokens';
 
 const headSx = { fontSize: '0.875rem', fontWeight: 600, color: '#111827', mb: 2, letterSpacing: '0.025em', textTransform: 'uppercase' } as const;
@@ -96,6 +97,7 @@ export function SiteFooter({ contact }: { contact: SiteData['contact'] }) {
             <Stack sx={{ gap: 1.5 }}>
               <PortalLink href="/login" label={t('footer.studentSignIn')} />
               <PortalLink href="/login/teacher" label={t('footer.teacherSignIn')} />
+              {DEMO_MODE && <PortalLink href="/login#demo" label={t('nav.liveDemo')} />}
             </Stack>
           </Box>
         </Box>
@@ -107,6 +109,10 @@ export function SiteFooter({ contact }: { contact: SiteData['contact'] }) {
             <span>{t('footer.city')}</span>
           </Stack>
         </Stack>
+        {/* The one disclaimer (DECISIONS §12): every person and record in Campusly is invented */}
+        <Typography sx={{ mt: 2, fontSize: '0.75rem', color: SITE.stone500, textAlign: { xs: 'center', sm: 'left' } }}>
+          {t('footer.fictional')}
+        </Typography>
       </Box>
     </Box>
   );

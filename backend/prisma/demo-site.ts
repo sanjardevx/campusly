@@ -32,8 +32,317 @@ export const SITE_SETTINGS = {
   foundedYear: 2014,
 };
 
+export interface ProgramSeed {
+  category: 'LANGUAGE' | 'SPORTS' | 'IT' | 'ARTS' | 'READING' | 'OTHER';
+  /** A picture under frontend/public/site (placeholders until the school uploads its own) */
+  photo: string;
+  name: Text;
+  grades: [number, number];
+  levelNote: Text;
+  days: string[];
+  time: [string, string];
+  description: Text;
+  room?: string;
+  teachers?: string[];
+  showOnSite?: boolean;
+}
+
+/** One SiteProgram row; `teamIds` maps "Our team" last names to their ids */
+export const programData = (
+  p: ProgramSeed,
+  order: number,
+  teamIds: Map<string, string>,
+  updatedById: string | null,
+) => ({
+  order,
+  category: p.category,
+  name: p.name,
+  gradeFrom: p.grades[0],
+  gradeTo: p.grades[1],
+  levelNote: p.levelNote,
+  days: p.days,
+  startTime: p.time[0],
+  endTime: p.time[1],
+  room: p.room ?? null,
+  teacherIds: (p.teachers ?? []).flatMap((name) => teamIds.get(name) ?? []),
+  description: p.description,
+  photoPath: `/site/${p.photo}.jpg`,
+  showOnSite: p.showOnSite ?? true,
+  updatedById,
+});
+
+/**
+ * Programs & clubs, in their site order (the home page shows the first 6 that are on the site).
+ * IELTS, SAT, TOPIK, IT and sport lead (DECISIONS §12): they are site programs, not portal courses.
+ * `teachers` are "Our team" last names. Also read by prisma/add-programs.ts, which adds the
+ * missing ones to a database that is never seeded again (prod).
+ */
+export const SITE_PROGRAMS: ProgramSeed[] = [
+  {
+    category: 'LANGUAGE',
+    photo: 'news-ielts',
+    name: t(
+      'IELTS Preparation',
+      'IELTSga tayyorlov',
+      'Подготовка к IELTS',
+      'IELTS 대비',
+    ),
+    grades: [9, 11],
+    levelNote: t(
+      'Band 5.5 → 7.0+',
+      'Ball 5.5 → 7.0+',
+      'Балл 5.5 → 7.0+',
+      '밴드 5.5 → 7.0+',
+    ),
+    days: ['TUE', 'THU'],
+    time: ['16:00', '17:30'],
+    description: t(
+      'All four skills, timed practice tests and mock speaking interviews.',
+      'To‘rt ko‘nikma, vaqtli sinov testlari va og‘zaki nutq sinov suhbatlari.',
+      'Все четыре навыка, тесты на время и пробные устные собеседования.',
+      '4개 영역, 시간 제한 모의고사, 스피킹 모의 인터뷰.',
+    ),
+    room: 'Room 115',
+    teachers: ['Smith', 'Rahimov'],
+  },
+  {
+    category: 'OTHER',
+    photo: 'news-olympiad',
+    name: t(
+      'SAT Preparation',
+      'SATga tayyorlov',
+      'Подготовка к SAT',
+      'SAT 대비',
+    ),
+    grades: [10, 11],
+    levelNote: t(
+      'Math, Reading & Writing',
+      'Matematika, o‘qish va yozish',
+      'Математика, чтение и письмо',
+      '수학, 읽기·쓰기',
+    ),
+    days: ['MON', 'WED'],
+    time: ['16:00', '17:30'],
+    description: t(
+      'Digital SAT strategy, weekly practice sections and score reviews.',
+      'Digital SAT strategiyasi, haftalik mashq bo‘limlari va natijalar tahlili.',
+      'Стратегия Digital SAT, еженедельные практические секции и разбор баллов.',
+      '디지털 SAT 전략, 주간 실전 섹션, 점수 분석.',
+    ),
+    room: 'Room 301',
+    teachers: ['Rahimov'],
+  },
+  {
+    category: 'LANGUAGE',
+    photo: 'program-korean',
+    name: t(
+      'Korean Language (TOPIK prep)',
+      'Koreys tili (TOPIKga tayyorlov)',
+      'Корейский язык (подготовка к TOPIK)',
+      '한국어 (TOPIK 대비)',
+    ),
+    grades: [7, 11],
+    levelNote: t(
+      'Beginner → TOPIK II',
+      'Boshlang‘ich → TOPIK II',
+      'С нуля → TOPIK II',
+      '초급 → TOPIK II',
+    ),
+    days: ['MON', 'THU'],
+    time: ['15:30', '17:00'],
+    description: t(
+      'Speaking, reading and TOPIK practice in small groups.',
+      'Kichik guruhlarda nutq, o‘qish va TOPIK mashqlari.',
+      'Разговор, чтение и практика TOPIK в малых группах.',
+      '소그룹으로 진행하는 말하기, 읽기, TOPIK 연습.',
+    ),
+    room: 'Room 204',
+    teachers: ['Park'],
+  },
+  {
+    category: 'IT',
+    photo: 'program-it',
+    name: t(
+      'IT & Coding Club',
+      'IT va dasturlash to‘garagi',
+      'Клуб IT и программирования',
+      'IT·코딩 클럽',
+    ),
+    grades: [6, 11],
+    levelNote: t(
+      'Python, Web & Robotics',
+      'Python, veb va robototexnika',
+      'Python, веб и робототехника',
+      '파이썬, 웹, 로보틱스',
+    ),
+    days: ['WED', 'SAT'],
+    time: ['14:30', '16:30'],
+    description: t(
+      'Hands-on microcontrollers, software design and hackathons.',
+      'Mikrokontrollerlar bilan amaliyot, dastur loyihalash va xakatonlar.',
+      'Практика с микроконтроллерами, проектирование программ и хакатоны.',
+      '마이크로컨트롤러 실습, 소프트웨어 설계, 해커톤.',
+    ),
+    room: 'IT lab',
+  },
+  {
+    category: 'SPORTS',
+    photo: 'program-taekwondo',
+    name: t(
+      'Taekwondo Club',
+      'Taekvondo to‘garagi',
+      'Секция тхэквондо',
+      '태권도 클럽',
+    ),
+    grades: [1, 8],
+    levelNote: t(
+      'All belt divisions',
+      'Barcha kamar darajalari',
+      'Все пояса',
+      '모든 띠 등급',
+    ),
+    days: ['MON', 'WED', 'FRI'],
+    time: ['16:00', '17:30'],
+    description: t(
+      'Olympic sparring, discipline drills and certified belt grading.',
+      'Olimpiya sparringi, intizom mashqlari va rasmiy kamar attestatsiyasi.',
+      'Олимпийский спарринг, дисциплина и официальная аттестация на пояса.',
+      '올림픽 겨루기, 규율 훈련, 공인 승급 심사.',
+    ),
+    room: 'Sports hall',
+    teachers: ['Rashidov'],
+  },
+  {
+    category: 'LANGUAGE',
+    photo: 'program-english',
+    name: t(
+      'English with native teachers',
+      'Ona tilida so‘zlashuvchi ustozlar bilan ingliz tili',
+      'Английский с носителями языка',
+      '원어민 교사와 함께하는 영어',
+    ),
+    grades: [5, 11],
+    levelNote: t(
+      'Intermediate → Fluent (IELTS)',
+      'O‘rta → Erkin (IELTS)',
+      'Средний → свободный (IELTS)',
+      '중급 → 유창함 (IELTS)',
+    ),
+    days: ['TUE', 'FRI'],
+    time: ['15:30', '17:00'],
+    description: t(
+      'Debate club, academic writing and spoken fluency workshops.',
+      'Munozara klubi, akademik yozuv va og‘zaki nutq mashg‘ulotlari.',
+      'Дебатный клуб, академическое письмо и практика устной речи.',
+      '토론 클럽, 학술 글쓰기, 말하기 유창성 워크숍.',
+    ),
+    room: 'Room 112',
+    teachers: ['Smith'],
+  },
+  {
+    category: 'ARTS',
+    photo: 'program-art',
+    name: t(
+      'Art Studio',
+      'San’at studiyasi',
+      'Художественная студия',
+      '미술 스튜디오',
+    ),
+    grades: [1, 7],
+    levelNote: t(
+      'Drawing & watercolour',
+      'Rasm va akvarel',
+      'Рисунок и акварель',
+      '드로잉·수채화',
+    ),
+    days: ['TUE', 'THU'],
+    time: ['15:00', '16:30'],
+    description: t(
+      'Academic drawing, watercolour techniques and a yearly exhibition.',
+      'Akademik rasm, akvarel texnikasi va yillik ko‘rgazma.',
+      'Академический рисунок, техники акварели и ежегодная выставка.',
+      '아카데믹 드로잉, 수채화 기법, 연례 전시회.',
+    ),
+    room: 'Art studio',
+    teachers: ['Yusupova'],
+  },
+  {
+    category: 'READING',
+    photo: 'program-reading',
+    name: t(
+      'Reading Club',
+      'Kitobxonlar klubi',
+      'Читательский клуб',
+      '독서 클럽',
+    ),
+    grades: [1, 5],
+    levelNote: t(
+      'Literature & comprehension',
+      'Adabiyot va matnni tushunish',
+      'Литература и понимание текста',
+      '문학과 독해',
+    ),
+    days: ['MON', 'FRI'],
+    time: ['14:00', '15:30'],
+    description: t(
+      'Reading circles, book talks and storytelling games.',
+      'Kitob o‘qish davralari, kitob muhokamalari va hikoya o‘yinlari.',
+      'Читательские кружки, обсуждение книг и игры в истории.',
+      '독서 모임, 책 이야기, 스토리텔링 게임.',
+    ),
+    room: 'Library',
+  },
+  {
+    category: 'SPORTS',
+    photo: 'program-chess',
+    name: t('Chess Club', 'Shaxmat to‘garagi', 'Шахматный клуб', '체스 클럽'),
+    grades: [5, 11],
+    levelNote: t(
+      'From first moves to tournaments',
+      'Birinchi yurishlardan turnirlargacha',
+      'От первых ходов до турниров',
+      '첫수부터 대회까지',
+    ),
+    days: ['TUE', 'THU'],
+    time: ['15:30', '17:00'],
+    description: t(
+      'Openings, tactics and school tournaments every term.',
+      'Debyutlar, taktika va har chorakda maktab turnirlari.',
+      'Дебюты, тактика и школьные турниры каждую четверть.',
+      '오프닝, 전술, 매 학기 교내 대회.',
+    ),
+    showOnSite: false,
+  },
+  {
+    category: 'SPORTS',
+    photo: 'program-football',
+    name: t(
+      'Football Club',
+      'Futbol to‘garagi',
+      'Футбольная секция',
+      '축구 클럽',
+    ),
+    grades: [7, 11],
+    levelNote: t(
+      'Boys and girls teams',
+      'O‘g‘il va qiz bolalar jamoalari',
+      'Команды мальчиков и девочек',
+      '남녀 팀',
+    ),
+    days: ['WED', 'FRI'],
+    time: ['16:00', '17:30'],
+    description: t(
+      'Training twice a week and the city school league.',
+      'Haftada ikki marta mashg‘ulot va shahar maktablar ligasi.',
+      'Тренировки дважды в неделю и городская школьная лига.',
+      '주 2회 훈련과 시 학교 리그.',
+    ),
+    showOnSite: false,
+  },
+];
+
 export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
-  // ───────────── Our team (first: programs name their teachers) ─────────────
+  // ───────────── Our team (first: programs and mock tests name their teachers) ─────────────
   const person = async (
     order: number,
     firstName: string,
@@ -98,7 +407,7 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
       '교직 경력 12년',
     ),
   );
-  const smith = await person(
+  await person(
     3,
     'John',
     'Smith',
@@ -134,7 +443,7 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
       'TOPIK 시험관',
     ),
   );
-  const rashidov = await person(
+  await person(
     5,
     'Bekzod',
     'Rashidov',
@@ -152,7 +461,7 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
       '검은 띠 4단',
     ),
   );
-  const yusupova = await person(
+  await person(
     6,
     'Malika',
     'Yusupova',
@@ -185,239 +494,15 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
   );
 
   // ───────────── Programs & clubs ─────────────
-  const program = (
-    order: number,
-    category: 'LANGUAGE' | 'SPORTS' | 'IT' | 'ARTS' | 'READING' | 'OTHER',
-    photo: string,
-    name: Text,
-    grades: [number, number],
-    levelNote: Text,
-    days: string[],
-    time: [string, string],
-    description: Text,
-    extra: { room?: string; teacherIds?: string[]; showOnSite?: boolean } = {},
-  ) =>
-    prisma.siteProgram.create({
-      data: {
-        order,
-        category,
-        name,
-        gradeFrom: grades[0],
-        gradeTo: grades[1],
-        levelNote,
-        days,
-        startTime: time[0],
-        endTime: time[1],
-        room: extra.room ?? null,
-        teacherIds: extra.teacherIds ?? [],
-        description,
-        photoPath: `/site/${photo}.jpg`,
-        showOnSite: extra.showOnSite ?? true,
-        updatedById: h.adminId,
-      },
-    });
-
-  await program(
-    1,
-    'LANGUAGE',
-    'program-korean',
-    t(
-      'Korean Language (TOPIK prep)',
-      'Koreys tili (TOPIKga tayyorlov)',
-      'Корейский язык (подготовка к TOPIK)',
-      '한국어 (TOPIK 대비)',
+  const team = await prisma.sitePerson.findMany({
+    select: { id: true, lastName: true },
+  });
+  const teamIds = new Map(team.map((m) => [m.lastName, m.id]));
+  await prisma.siteProgram.createMany({
+    data: SITE_PROGRAMS.map((p, i) =>
+      programData(p, i + 1, teamIds, h.adminId),
     ),
-    [7, 11],
-    t(
-      'Beginner → TOPIK II',
-      'Boshlang‘ich → TOPIK II',
-      'С нуля → TOPIK II',
-      '초급 → TOPIK II',
-    ),
-    ['MON', 'THU'],
-    ['15:30', '17:00'],
-    t(
-      'Speaking, reading and TOPIK practice in small groups.',
-      'Kichik guruhlarda nutq, o‘qish va TOPIK mashqlari.',
-      'Разговор, чтение и практика TOPIK в малых группах.',
-      '소그룹으로 진행하는 말하기, 읽기, TOPIK 연습.',
-    ),
-    { room: 'Room 204', teacherIds: [park] },
-  );
-  await program(
-    2,
-    'LANGUAGE',
-    'program-english',
-    t(
-      'English with native teachers',
-      'Ona tilida so‘zlashuvchi ustozlar bilan ingliz tili',
-      'Английский с носителями языка',
-      '원어민 교사와 함께하는 영어',
-    ),
-    [5, 11],
-    t(
-      'Intermediate → Fluent (IELTS)',
-      'O‘rta → Erkin (IELTS)',
-      'Средний → свободный (IELTS)',
-      '중급 → 유창함 (IELTS)',
-    ),
-    ['TUE', 'FRI'],
-    ['15:30', '17:00'],
-    t(
-      'Debate club, academic writing and spoken fluency workshops.',
-      'Munozara klubi, akademik yozuv va og‘zaki nutq mashg‘ulotlari.',
-      'Дебатный клуб, академическое письмо и практика устной речи.',
-      '토론 클럽, 학술 글쓰기, 말하기 유창성 워크숍.',
-    ),
-    { room: 'Room 112', teacherIds: [smith] },
-  );
-  await program(
-    3,
-    'SPORTS',
-    'program-taekwondo',
-    t(
-      'Taekwondo Club',
-      'Taekvondo to‘garagi',
-      'Секция тхэквондо',
-      '태권도 클럽',
-    ),
-    [1, 8],
-    t(
-      'All belt divisions',
-      'Barcha kamar darajalari',
-      'Все пояса',
-      '모든 띠 등급',
-    ),
-    ['MON', 'WED', 'FRI'],
-    ['16:00', '17:30'],
-    t(
-      'Olympic sparring, discipline drills and certified belt grading.',
-      'Olimpiya sparringi, intizom mashqlari va rasmiy kamar attestatsiyasi.',
-      'Олимпийский спарринг, дисциплина и официальная аттестация на пояса.',
-      '올림픽 겨루기, 규율 훈련, 공인 승급 심사.',
-    ),
-    { room: 'Sports hall', teacherIds: [rashidov] },
-  );
-  await program(
-    4,
-    'IT',
-    'program-it',
-    t(
-      'IT & Coding Club',
-      'IT va dasturlash to‘garagi',
-      'Клуб IT и программирования',
-      'IT·코딩 클럽',
-    ),
-    [6, 11],
-    t(
-      'Python, Web & Robotics',
-      'Python, veb va robototexnika',
-      'Python, веб и робототехника',
-      '파이썬, 웹, 로보틱스',
-    ),
-    ['WED', 'SAT'],
-    ['14:30', '16:30'],
-    t(
-      'Hands-on microcontrollers, software design and hackathons.',
-      'Mikrokontrollerlar bilan amaliyot, dastur loyihalash va xakatonlar.',
-      'Практика с микроконтроллерами, проектирование программ и хакатоны.',
-      '마이크로컨트롤러 실습, 소프트웨어 설계, 해커톤.',
-    ),
-    { room: 'IT lab' },
-  );
-  await program(
-    5,
-    'ARTS',
-    'program-art',
-    t(
-      'Art Studio',
-      'San’at studiyasi',
-      'Художественная студия',
-      '미술 스튜디오',
-    ),
-    [1, 7],
-    t(
-      'Drawing & watercolour',
-      'Rasm va akvarel',
-      'Рисунок и акварель',
-      '드로잉·수채화',
-    ),
-    ['TUE', 'THU'],
-    ['15:00', '16:30'],
-    t(
-      'Academic drawing, watercolour techniques and a yearly exhibition.',
-      'Akademik rasm, akvarel texnikasi va yillik ko‘rgazma.',
-      'Академический рисунок, техники акварели и ежегодная выставка.',
-      '아카데믹 드로잉, 수채화 기법, 연례 전시회.',
-    ),
-    { room: 'Art studio', teacherIds: [yusupova] },
-  );
-  await program(
-    6,
-    'READING',
-    'program-reading',
-    t('Reading Club', 'Kitobxonlar klubi', 'Читательский клуб', '독서 클럽'),
-    [1, 5],
-    t(
-      'Literature & comprehension',
-      'Adabiyot va matnni tushunish',
-      'Литература и понимание текста',
-      '문학과 독해',
-    ),
-    ['MON', 'FRI'],
-    ['14:00', '15:30'],
-    t(
-      'Reading circles, book talks and storytelling games.',
-      'Kitob o‘qish davralari, kitob muhokamalari va hikoya o‘yinlari.',
-      'Читательские кружки, обсуждение книг и игры в истории.',
-      '독서 모임, 책 이야기, 스토리텔링 게임.',
-    ),
-    { room: 'Library' },
-  );
-  await program(
-    7,
-    'SPORTS',
-    'program-chess',
-    t('Chess Club', 'Shaxmat to‘garagi', 'Шахматный клуб', '체스 클럽'),
-    [5, 11],
-    t(
-      'From first moves to tournaments',
-      'Birinchi yurishlardan turnirlargacha',
-      'От первых ходов до турниров',
-      '첫수부터 대회까지',
-    ),
-    ['TUE', 'THU'],
-    ['15:30', '17:00'],
-    t(
-      'Openings, tactics and school tournaments every term.',
-      'Debyutlar, taktika va har chorakda maktab turnirlari.',
-      'Дебюты, тактика и школьные турниры каждую четверть.',
-      '오프닝, 전술, 매 학기 교내 대회.',
-    ),
-    { showOnSite: false },
-  );
-  await program(
-    8,
-    'SPORTS',
-    'program-football',
-    t('Football Club', 'Futbol to‘garagi', 'Футбольная секция', '축구 클럽'),
-    [7, 11],
-    t(
-      'Boys and girls teams',
-      'O‘g‘il va qiz bolalar jamoalari',
-      'Команды мальчиков и девочек',
-      '남녀 팀',
-    ),
-    ['WED', 'FRI'],
-    ['16:00', '17:30'],
-    t(
-      'Training twice a week and the city school league.',
-      'Haftada ikki marta mashg‘ulot va shahar maktablar ligasi.',
-      'Тренировки дважды в неделю и городская школьная лига.',
-      '주 2회 훈련과 시 학교 리그.',
-    ),
-    { showOnSite: false },
-  );
+  });
 
   // ───────────── News & Events ─────────────
   const post = (data: {

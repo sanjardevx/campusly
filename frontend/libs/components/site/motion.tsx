@@ -177,7 +177,8 @@ export function CountUp({ value, duration = 1400 }: { value: number; duration?: 
       const start = performance.now();
       el.textContent = '0';
       const tick = (now: number) => {
-        const t = Math.min(1, (now - start) / duration);
+        // The first frame's timestamp can be a little before `start`: never count below 0
+        const t = Math.min(1, Math.max(0, (now - start) / duration));
         el.textContent = String(Math.round(value * (1 - (1 - t) ** 4)));
         if (t < 1) frame = requestAnimationFrame(tick);
       };
