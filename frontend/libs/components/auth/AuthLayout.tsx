@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import Head from 'next/head';
-import { Box, Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
+import NorthEastIcon from '@mui/icons-material/NorthEast';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
@@ -139,17 +140,21 @@ export function AuthLayout({ portal, features, title, children, dense = false }:
             </Typography>
           </Stack>
 
-          <Typography
+          <Stack
+            direction="row"
             sx={{
-              display: { xs: 'none', md: 'block' },
+              display: { xs: 'none', md: 'flex' },
               pt: 3,
               borderTop: '1px solid rgba(255,255,255,0.1)',
+              justifyContent: 'space-between',
+              gap: 2,
               fontSize: '0.75rem',
               color: 'rgba(255,255,255,0.6)',
             }}
           >
-            {t('portal.footer', { year: new Date().getFullYear() })}
-          </Typography>
+            <span>{t('portal.footer', { year: new Date().getFullYear() })}</span>
+            <SiteLink color="rgba(255,255,255,0.85)" />
+          </Stack>
         </Box>
 
         <Box
@@ -171,13 +176,25 @@ export function AuthLayout({ portal, features, title, children, dense = false }:
             {children}
           </Box>
           {/* Phones: the small footer of the Stitch mobile screen */}
-          <Typography
-            sx={{ display: { xs: 'block', md: 'none' }, textAlign: 'center', py: 3, mt: 'auto', fontSize: '0.75rem', color: '#707975' }}
+          <Stack
+            sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 0.75, py: 3, mt: 'auto', fontSize: '0.75rem', color: '#707975' }}
           >
-            {t('portal.footer', { year: new Date().getFullYear() })}
-          </Typography>
+            <SiteLink color="primary.main" />
+            <span>{t('portal.footer', { year: new Date().getFullYear() })}</span>
+          </Stack>
         </Box>
       </Box>
     </>
+  );
+}
+
+/** "School website ↗": the public site in a new tab (the shells have the same link) */
+function SiteLink({ color }: { color: string }) {
+  const { t } = useTranslation('common');
+  return (
+    <Link href="/" target="_blank" rel="noopener" underline="hover" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 600, color }}>
+      {t('shell.viewPublicSite')}
+      <NorthEastIcon sx={{ fontSize: 14 }} />
+    </Link>
   );
 }

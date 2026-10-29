@@ -13,7 +13,7 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { useTheme, type SxProps, type Theme } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
 import NorthEastIcon from '@mui/icons-material/NorthEast';
 import SchoolIcon from '@mui/icons-material/School';
@@ -312,20 +312,7 @@ function Sidebar({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
         </Box>
       </Box>
 
-      <Box sx={{ mx: -2, mb: -2, px: 3, py: 2, borderTop: role === 'ADMIN' ? 1 : 0, borderColor: 'divider' }}>
-        {role === 'ADMIN' && (
-          // The public site comes with the landing page (day 13); it opens in a new tab
-          <Link
-            component={NextLink}
-            href="/"
-            target="_blank"
-            underline="hover"
-            sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 500, mb: 0.75 }}
-          >
-            {t('shell.viewPublicSite')}
-            <NorthEastIcon sx={{ fontSize: 14 }} />
-          </Link>
-        )}
+      <Box sx={{ mx: -2, mb: -2, px: 3, py: 2, borderTop: 1, borderColor: 'divider' }}>
         <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
           {t('shell.footer', {
             portal,
@@ -333,6 +320,8 @@ function Sidebar({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
             year: (data?.currentAcademicYear?.name ?? '').replace('–', '\u2060–\u2060'),
           })}
         </Typography>
+        {/* Every role: the school's public website, in a new tab (the phone bar has it under "More") */}
+        <PublicSiteLink sx={{ mt: 0.75 }} />
       </Box>
     </Stack>
   );
@@ -424,5 +413,22 @@ function PhoneShell({ user, children }: { user: SessionUser; children: ReactNode
 
       <GlassTabBar user={user} items={items} />
     </Box>
+  );
+}
+
+/** "School website ↗": the public site at / in a new tab */
+export function PublicSiteLink({ sx }: { sx?: SxProps<Theme> }) {
+  const { t } = useTranslation('common');
+  return (
+    <Link
+      href="/"
+      target="_blank"
+      rel="noopener"
+      underline="hover"
+      sx={[{ display: 'inline-flex', alignItems: 'center', gap: 0.5, fontSize: '0.75rem', fontWeight: 500 }, ...(Array.isArray(sx) ? sx : [sx])]}
+    >
+      {t('shell.viewPublicSite')}
+      <NorthEastIcon sx={{ fontSize: 14 }} />
+    </Link>
   );
 }

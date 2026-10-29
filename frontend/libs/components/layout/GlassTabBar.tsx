@@ -2,6 +2,8 @@ import { useState } from 'react';
 import NextLink from 'next/link';
 import { Box, ButtonBase, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
+import NorthEastIcon from '@mui/icons-material/NorthEast';
 import { useTranslation } from 'next-i18next/pages';
 import type { SessionUser } from '@/libs/auth/api';
 import { tokens } from '@/libs/theme';
@@ -134,6 +136,15 @@ export function GlassTabBar({ user, items: all }: { user: SessionUser; items: Na
           );
         })}
         {extra.length > 0 && <Divider />}
+        {/* The school's public website, in a new tab (the desktop sidebar shows it under the year) */}
+        <MenuItem component="a" href="/" target="_blank" rel="noopener" onClick={() => setAnchor(null)}>
+          <ListItemIcon>
+            <LanguageOutlinedIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('shell.viewPublicSite')}</ListItemText>
+          <NorthEastIcon sx={{ fontSize: 14, ml: 1, color: 'text.secondary' }} />
+        </MenuItem>
+        <Divider />
         <AccountItems user={user} onDone={() => setAnchor(null)} />
       </Menu>
     </Box>
