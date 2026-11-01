@@ -10,8 +10,8 @@ import { DEMO_MODE } from '@/libs/config';
 import { CountUp, Typewriter } from './motion';
 import { SITE, type SiteData, containerSx, scrollToId } from './tokens';
 
-/** Hero photos (Stitch placeholders until the school's own; frontend/public/site) */
-const SLIDES = ['/site/hero-campus.jpg', '/site/hero-open-day.jpg', '/site/stage-high.jpg', '/site/stage-middle.jpg'];
+/** Hero photos (frontend/public/site) */
+const SLIDES = ['/site/hero-campus.jpg', '/site/hero-open-day.jpg', '/site/stage-high.jpg', '/site/hero-lab.jpg'];
 const SLIDE_MS = 4500;
 /** Phones show the first two photos only (less to download on mobile data) */
 const PHONE_SLIDES = 2;

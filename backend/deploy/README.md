@@ -162,10 +162,10 @@ The seed **empties every table** first, so it refuses any non-local database unl
 
 **Switch to demo v2 (day 23, once):** after the deploy, run the seed command above one last time, then sign in at `campusly.uz/login/teacher` as `simon` with the `SEED_PASSWORD` from SSM (`aws ssm get-parameter --name /campusly/prod/SEED_PASSWORD --with-decryption --query Parameter.Value --output text`) and change the password right away (account menu → Change password). From then on `simon` is a normal admin: uploads, users and website content persist; `SEED_PASSWORD` is only read when a full seed runs.
 
-**Seed content added later** (prod is never seeded again): `prisma/add-programs.ts` adds the seed's Programs & clubs that prod does not have yet (matched by the English name, at the end of the list; it changes, deletes and brings back nothing, and a second run adds nothing). After a deploy:
+**Seed content added later** (prod is never seeded again): `prisma/update-site-content.ts` adds the seed's Programs & clubs that prod does not have yet (matched by the English name, at the end of the list; it deletes and brings back nothing, and a second run adds nothing). It also moves IELTS and SAT off the news photos they borrowed makes every honor medal gold and puts the right students on the honor photos, so run it right after that deploy, not later. After a deploy:
 
 ```bash
-docker compose -f docker-compose.prod.yml run --rm tools pnpm tsx prisma/add-programs.ts
+docker compose -f docker-compose.prod.yml run --rm tools pnpm tsx prisma/update-site-content.ts
 ```
 
 Then, as the admin, drag the new programs into place under Website → Programs (the home page shows the first 6 on the site).

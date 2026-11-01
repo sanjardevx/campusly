@@ -1,7 +1,8 @@
 // Demo content of the public website (day 19): News & Events, Programs & clubs, Our team;
 // day 20: Mock tests, Open Courses (real YouTube videos), Honor Students (seeded students).
 // Text the visitor reads is in four languages (DECISIONS §14); names, rooms and times are not.
-// Pictures are the Stitch placeholders under frontend/public/site until the school uploads its own.
+// Pictures live under frontend/public/site (real photos since day 24; some are still Stitch's);
+// an upload in the CMS replaces the path.
 import type { PrismaClient } from '../generated/prisma/client';
 
 type Text = { en: string; uz: string; ru: string; ko: string };
@@ -30,6 +31,17 @@ export const SITE_SETTINGS = {
   siteMetro: 'Nearest metro: Chilanzar, 5 min walk',
   siteEmail: 'campusly.aws@gmail.com',
   foundedYear: 2014,
+};
+
+/**
+ * Who is on each honor photo (`/site/honor-<key>.jpg`), by login ID: a student of the right gender
+ * from grades 9–11. Also read by prisma/update-site-content.ts.
+ */
+export const HONOR_STUDENTS = {
+  gold: '26100318', // Sherzod Aliyev, 11B: boxing
+  silver: '26100272', // Temur Habibullayev, 10A: mathematics
+  chess: '26100269', // Doniyor Sobirov, 9B: chess
+  ielts: '26100325', // Malika Valiyeva, 11B: IELTS
 };
 
 export interface ProgramSeed {
@@ -74,13 +86,13 @@ export const programData = (
 /**
  * Programs & clubs, in their site order (the home page shows the first 6 that are on the site).
  * IELTS, SAT, TOPIK, IT and sport lead (DECISIONS §12): they are site programs, not portal courses.
- * `teachers` are "Our team" last names. Also read by prisma/add-programs.ts, which adds the
+ * `teachers` are "Our team" last names. Also read by prisma/update-site-content.ts, which adds the
  * missing ones to a database that is never seeded again (prod).
  */
 export const SITE_PROGRAMS: ProgramSeed[] = [
   {
     category: 'LANGUAGE',
-    photo: 'news-ielts',
+    photo: 'program-ielts',
     name: t(
       'IELTS Preparation',
       'IELTSga tayyorlov',
@@ -107,7 +119,7 @@ export const SITE_PROGRAMS: ProgramSeed[] = [
   },
   {
     category: 'OTHER',
-    photo: 'news-olympiad',
+    photo: 'program-sat',
     name: t(
       'SAT Preparation',
       'SATga tayyorlov',
@@ -1037,7 +1049,7 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
   const maths = t('Mathematics', 'Matematika', 'Математика', '수학');
   await honor(
     1,
-    '26100118',
+    HONOR_STUDENTS.gold,
     { place: 1 },
     t('Boxing', 'Boks', 'Бокс', '복싱'),
     t(
@@ -1057,8 +1069,8 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
   );
   await honor(
     2,
-    '26100055',
-    { place: 2 },
+    HONOR_STUDENTS.silver,
+    { place: 1 },
     maths,
     t(
       'International Math Olympiad 2026',
@@ -1077,8 +1089,8 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
   );
   await honor(
     3,
-    '26100089',
-    { place: 3 },
+    HONOR_STUDENTS.chess,
+    { place: 1 },
     t('Chess', 'Shaxmat', 'Шахматы', '체스'),
     t(
       'Asian School Chess Cup 2026',
@@ -1097,7 +1109,7 @@ export async function seedSite(prisma: PrismaClient, h: SiteSeedHelpers) {
   );
   await honor(
     4,
-    '26100032',
+    HONOR_STUDENTS.ielts,
     { score: 'IELTS 8.0' },
     t('IELTS Academic', 'IELTS Academic', 'IELTS Academic', 'IELTS Academic'),
     t(

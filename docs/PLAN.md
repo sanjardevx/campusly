@@ -345,7 +345,7 @@ When the user says **"start day N"**: read this file and DECISIONS.md, then foll
 - [x] Demo bar: role switcher + "what to try" list.
 - [x] Programs: IELTS, SAT, TOPIK, IT, Sport (4 languages) — public site only, the portal does not change.
 - [x] Footer disclaimer: "Campusly is a portfolio project; the school and its people are fictional."
-- [ ] The developer's photos → WebP + alt text, in the seed (they survive any future full seed).
+- [x] The developer's photos in `frontend/public/site`, as JPG under the same names (prod rows point at those paths and prod is not seeded again).
 
 **Developer:** photos folder outside the repo (e.g. `~/DEVELOPMENT/DEVEX/campusly-photos/`), with consent for any real people.
 

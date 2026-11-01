@@ -237,15 +237,15 @@ function CourseDialog({ course, onClose }: { course: OpenCourse | null; onClose:
 
 // ───────────────────────── Honor Students (Part B) ─────────────────────────
 
-/** Gold, silver and bronze dots on the photo (Stitch) */
+/** Gold, silver and bronze dots on the photo (Stitch); an exam result counts as gold */
 const MEDAL_DOT: Record<number, string> = { 1: '#D4A017', 2: '#9AA3AE', 3: '#C2703D' };
 /** Four cards first; "See all honor students →" shows the rest */
 const FIRST_HONORS = 4;
 
 /**
- * Stitch Part B "Honor Students": portrait cards with a medal dot (or the exam score), the name
- * — first name and the last name's initial, only with the parents' consent (server) — class and
- * subject, and the place in the competition.
+ * Stitch Part B "Honor Students": cards with the whole photo (3:2), a medal dot (and the score for
+ * an exam), the name — first name and the last name's initial, only with the parents' consent
+ * (server) — class and subject, and the place in the competition.
  */
 export function SiteHonorStudents({ honors }: { honors: Honor[] }) {
   const { t } = useTranslation('site');
@@ -257,24 +257,21 @@ export function SiteHonorStudents({ honors }: { honors: Honor[] }) {
       <SectionHeader id="honor-students" eyebrow={t('honor.eyebrow')} title={t('honor.title')} />
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', lg: 'repeat(4, 1fr)' }, gap: { xs: 1.5, sm: 2.5 } }}>
         {shown.map((h, i) => {
-          const medal = h.resultType === 'MEDAL' && h.place ? MEDAL_DOT[h.place] : null;
+          const place = h.resultType === 'MEDAL' && h.place ? h.place : null;
           return (
             <Reveal key={h.id} delay={(i % 4) * 80}>
             <Box component="article" sx={{ ...cardSx, height: '100%', overflow: 'hidden', ...hoverLift, ...hoverZoom('.photo') }}>
-              <Box sx={{ position: 'relative', aspectRatio: '3 / 4', bgcolor: SITE.soft, overflow: 'hidden' }}>
+              <Box sx={{ position: 'relative', aspectRatio: '3 / 2', bgcolor: SITE.soft, overflow: 'hidden' }}>
                 {h.photoUrl ? (
                   <Box component="img" className="photo" src={h.photoUrl} alt="" loading="lazy" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
                   <MilitaryTechRoundedIcon sx={{ position: 'absolute', inset: 0, m: 'auto', fontSize: 64, color: SITE.stone400 }} />
                 )}
-                {medal ? (
-                  <Reveal from="scale" delay={350 + (i % 4) * 80} role="img" aria-label={t(`honor.medal${h.place}`)} sx={{ position: 'absolute', top: 12, right: 12, width: 28, height: 28, borderRadius: '50%', bgcolor: medal, boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }} />
-                ) : (
-                  h.score && (
-                    <Reveal from="scale" delay={350 + (i % 4) * 80} sx={{ position: 'absolute', top: 12, right: 12, px: 1, py: 0.25, borderRadius: 999, bgcolor: SITE.spruce, color: '#fff', fontSize: '0.75rem', fontWeight: 700 }}>
-                      {h.score}
-                    </Reveal>
-                  )
+                <Reveal from="scale" delay={350 + (i % 4) * 80} role="img" aria-label={t(`honor.medal${place ?? 1}`)} sx={{ position: 'absolute', top: 12, right: 12, width: 28, height: 28, borderRadius: '50%', bgcolor: MEDAL_DOT[place ?? 1], boxShadow: '0 2px 6px rgba(0,0,0,0.25)' }} />
+                {!place && h.score && (
+                  <Reveal from="scale" delay={350 + (i % 4) * 80} sx={{ position: 'absolute', top: 12, left: 12, px: 1, py: 0.25, borderRadius: 999, bgcolor: SITE.spruce, color: '#fff', fontSize: '0.75rem', fontWeight: 700 }}>
+                    {h.score}
+                  </Reveal>
                 )}
               </Box>
               <Box sx={{ p: { xs: 1.5, sm: 2.5 } }}>
@@ -282,7 +279,7 @@ export function SiteHonorStudents({ honors }: { honors: Honor[] }) {
                   {h.name}
                 </Typography>
                 <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: SITE.spruce, mt: 0.25 }}>{[h.className, h.subject].filter(Boolean).join(' · ')}</Typography>
-                <Typography sx={{ fontSize: '0.875rem', color: SITE.stone500, mt: 0.75, lineHeight: 1.4 }}>{medal ? t('honor.placeLine', { place: t(`honor.place${h.place}`), competition: h.competition }) : h.competition}</Typography>
+                <Typography sx={{ fontSize: '0.875rem', color: SITE.stone500, mt: 0.75, lineHeight: 1.4 }}>{place ? t('honor.placeLine', { place: t(`honor.place${place}`), competition: h.competition }) : h.competition}</Typography>
               </Box>
             </Box>
             </Reveal>
