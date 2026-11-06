@@ -4,7 +4,6 @@ import { useQuery, useReactiveVar } from '@apollo/client/react';
 import {
   Box,
   ButtonBase,
-  CircularProgress,
   Divider,
   Drawer,
   IconButton,
@@ -21,7 +20,7 @@ import { CURRENT_YEAR } from '@/apollo/app/query';
 import { crumbVar } from '@/apollo/store';
 import type { SessionUser } from '@/libs/auth/api';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
-import { Logo } from '@/libs/components/Logo';
+import { Logo, LogoMark } from '@/libs/components/Logo';
 import { TempPasswordBanner } from '@/libs/components/TempPasswordBanner';
 import type { Role } from '@/libs/gql/graphql';
 import { tokens } from '@/libs/theme';
@@ -49,12 +48,26 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
   const user = useRoleGuard(role);
   const theme = useTheme();
   const desktop = useMediaQuery(theme.breakpoints.up('md'));
+  const { t } = useTranslation('common');
 
-  // Session not restored yet, or a redirect is on its way: nothing protected is rendered
+  // Session not restored yet, or a redirect is on its way: nothing protected is rendered.
+  // The logo's arch breathes slowly instead of a spinner (it stands still with reduced motion).
   if (!user) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'grid', placeItems: 'center', bgcolor: 'background.default' }}>
-        <CircularProgress size={28} />
+        <Box
+          role="status"
+          aria-label={t('shell.loading')}
+          sx={{
+            width: 64,
+            height: 64,
+            animation: 'logoBreath 1.6s ease-in-out infinite',
+            '@keyframes logoBreath': { '0%, 100%': { opacity: 0.4, transform: 'scale(0.96)' }, '50%': { opacity: 1, transform: 'scale(1)' } },
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+          }}
+        >
+          <LogoMark />
+        </Box>
       </Box>
     );
   }
@@ -362,11 +375,16 @@ function PhoneShell({ user, children }: { user: SessionUser; children: ReactNode
     <Box sx={{ minHeight: '100vh', bgcolor: canvasOf(user.role), pb: 12 }}>
       <Box component="header" sx={{ bgcolor: 'primary.main', color: '#fff', px: 2.5, pt: 3, pb: 3 }}>
         <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-          <Typography
-            sx={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.6 }}
-          >
-            {t('shell.portal.' + user.role)}
-          </Typography>
+          <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
+            <Box sx={{ width: 26, height: 26 }}>
+              <LogoMark tone="light" />
+            </Box>
+            <Typography
+              sx={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', opacity: 0.6 }}
+            >
+              {t('shell.portal.' + user.role)}
+            </Typography>
+          </Stack>
           <Stack direction="row" sx={{ alignItems: 'center', color: '#fff', '& .MuiIconButton-root': { color: '#fff' } }}>
             <LanguageSwitcher tone="light" />
             {announcements && <NotificationBell href={navHref(announcements.href)} />}

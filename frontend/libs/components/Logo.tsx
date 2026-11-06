@@ -9,6 +9,9 @@ import { Lora } from 'next/font/google';
  */
 const lora = Lora({ subsets: ['latin'], weight: '500', display: 'swap' });
 
+/** The logo's serif, for the few brand moments that echo it (the big number on the error pages) */
+export const LOGO_FONT = lora.style.fontFamily;
+
 const TONES = {
   // The mark's gold is decorative; the line under the name uses a darker gold that passes 4.5:1
   brand: { main: '#1F4E43', gold: '#C59A3E', text: '#7A5C1E' },
@@ -62,7 +65,7 @@ export function Logo({ tone = 'brand', size = 18, subtitle = 'School · Tashkent
       <Box sx={{ width: '2.2em', height: '2.2em', flexShrink: 0 }}>
         <LogoMark tone={tone} />
       </Box>
-      <Box sx={{ fontFamily: lora.style.fontFamily, textAlign: 'left', whiteSpace: 'nowrap' }}>
+      <Box sx={{ fontFamily: LOGO_FONT, textAlign: 'left', whiteSpace: 'nowrap' }}>
         <Box component="span" sx={{ display: 'block', fontWeight: 500, letterSpacing: '0.22em', textTransform: 'uppercase' }}>
           Campusly
         </Box>

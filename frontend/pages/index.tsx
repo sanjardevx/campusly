@@ -14,7 +14,7 @@ import { SiteHonorStudents, SiteMockTests, SiteOpenCourses } from '@/libs/compon
 import { SmoothScroll } from '@/libs/components/site/motion';
 import { SiteAdmission, SiteFaq, SiteFeatures, SitePrograms, SiteStages, SiteTeam, SiteWhy } from '@/libs/components/site/SiteSections';
 import { SITE, type SiteData } from '@/libs/components/site/tokens';
-import { API_GRAPHQL_URL } from '@/libs/config';
+import { API_GRAPHQL_URL, SITE_URL } from '@/libs/config';
 import type { SiteHomeQuery, SiteLocale } from '@/libs/gql/graphql';
 import { withTranslations } from '@/libs/i18n/server';
 
@@ -84,7 +84,7 @@ export default function SiteHome({ site }: { site: SiteData }) {
         <meta name="description" content={t('meta.description')} />
         <meta property="og:title" content={t('meta.title')} />
         <meta property="og:description" content={t('meta.description')} />
-        <meta property="og:image" content="/site/hero-campus.jpg" />
+        <meta property="og:url" content={SITE_URL} />
       </Head>
       <SmoothScroll />
       <SiteNavbar sections={sections} />

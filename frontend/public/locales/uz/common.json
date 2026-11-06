@@ -146,5 +146,17 @@
         "t4": "9A yoki 11A ga e’lon joylang"
       }
     }
+  },
+  "errorPage": {
+    "notFound": {
+      "title": "Bunday sahifa yo‘q",
+      "text": "Havola eskirgan yoki xato yozilgan bo‘lishi mumkin. Keling, ortga qaytamiz."
+    },
+    "server": {
+      "title": "Nimadir xato ketdi",
+      "text": "Muammo bizda, sizda emas. Birozdan keyin qayta urinib ko‘ring."
+    },
+    "home": "Bosh sahifaga",
+    "signIn": "Portalga kirish"
   }
 }
