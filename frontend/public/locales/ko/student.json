@@ -83,6 +83,11 @@
       "empty": "밀린 과제가 없습니다. 잘했어요!",
       "wasDue": "마감일 {{date}}",
       "submit": "제출"
+    },
+    "upNext": {
+      "title": "다음 할 일",
+      "overdue": "기한 지남",
+      "all": "전체 보기 ({{total}})"
     }
   },
   "course": {

@@ -56,7 +56,8 @@
       "announcements": "공지",
       "overview": "홈",
       "attendance": "출결",
-      "calendar": "캘린더"
+      "calendar": "캘린더",
+      "tutor": "AI 튜터"
     },
     "tutor": "AI 학습 튜터",
     "activity": "활동 기록"

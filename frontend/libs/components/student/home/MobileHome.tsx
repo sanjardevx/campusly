@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import NextLink from 'next/link';
-import { useRouter } from 'next/router';
 import { Box, ButtonBase, Link, Stack, Typography } from '@mui/material';
 import type { SvgIconComponent } from '@mui/icons-material';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
@@ -8,7 +7,7 @@ import { useTranslation } from 'next-i18next/pages';
 import { type Kind, workKind } from '@/libs/accent';
 import { KindIcon } from '@/libs/components/KindIcon';
 import type { StudentOverviewQuery } from '@/libs/gql/graphql';
-import { daysUntil, formatDueAt, studentHref } from './due';
+import { daysUntil, studentHref } from './due';
 import { STITCH, SoftPill, enter, pressSx } from './parts';
 import { LESSON_ICON } from './ThisWeek';
 
@@ -63,87 +62,90 @@ export function TapRow({ href, kind, icon, title, detail, pill, index }: { href:
 }
 
 /**
- * Student home on a phone (DECISIONS §10): Stitch "Mobile Home" kept simple — a status line, overdue
- * work, this week's short list and the course list. The calendar stays on the wide screen.
+ * Student home on a phone (DECISIONS §10): Stitch "Mobile Home" kept simple — the week, one "Up next"
+ * list (overdue work first, then the lesson to continue and this week's work, three rows at most;
+ * the rest is in the calendar) and the course list.
  */
 export function MobileHome({ overview }: { overview: Overview }) {
   const { t } = useTranslation('student');
-  const { locale } = useRouter();
   const { period, overdue, courses } = overview;
   const pending = overview.upcoming.filter((u) => !u.isDone);
   const lesson = overview.continueLessons[0];
-  const week = pending.slice(0, MAX_ROWS - (lesson ? 1 : 0));
+  const total = overdue.length + pending.length;
 
   const dueLabel = (dueAt: string) => {
     const days = daysUntil(dueAt);
     return days <= 0 ? t('home.thisWeek.dueToday') : days === 1 ? t('home.thisWeek.dueTomorrow') : t('home.thisWeek.dueIn', { count: days });
   };
 
-  // Entrance order down the page: overdue, the lesson, this week, then the courses
+  // The most urgent first: work past its deadline, the lesson in progress, then the week by date
   const LessonIcon = lesson && LESSON_ICON[lesson.type];
-  const weekStart = overdue.length + (lesson ? 1 : 0);
-  const coursesStart = weekStart + week.length;
+  const rows: { key: string; row: Omit<Parameters<typeof TapRow>[0], 'index'> }[] = [
+    ...overdue.map((w) => ({
+      key: w.assignmentId,
+      row: {
+        href: studentHref.assignment(w.courseId, w.assignmentId),
+        kind: workKind(w.type),
+        title: w.title,
+        detail: w.courseTitle,
+        pill: <SoftPill tone="peach">{t('home.upNext.overdue')}</SoftPill>,
+      },
+    })),
+    ...(lesson && LessonIcon
+      ? [
+          {
+            key: lesson.lessonId,
+            row: {
+              href: studentHref.lesson(lesson.courseId, lesson.lessonId),
+              kind: 'lesson' as const,
+              icon: LessonIcon,
+              title: lesson.title,
+              detail: `${lesson.subjectName} · ${t('home.thisWeek.continue')}`,
+              pill: lesson.percent != null ? <SoftPill tone="mint">{lesson.percent}%</SoftPill> : <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />,
+            },
+          },
+        ]
+      : []),
+    ...pending.map((w) => ({
+      key: w.assignmentId,
+      row: {
+        href: studentHref.assignment(w.courseId, w.assignmentId),
+        kind: workKind(w.type),
+        title: w.title,
+        detail: w.courseTitle,
+        pill: <SoftPill tone={daysUntil(w.dueAt) <= 2 ? 'peach' : 'neutral'}>{dueLabel(w.dueAt)}</SoftPill>,
+      },
+    })),
+  ].slice(0, MAX_ROWS);
+  const coursesStart = rows.length;
 
   return (
     <Stack spacing={3}>
-      {/* The name is in the spruce header already: one status line instead of the greeting */}
-      <Typography sx={{ px: 0.5, fontSize: '0.8125rem', color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
-        {[period && `${period.name} · ${t('home.week', { week: period.week })}`, pending.length > 0 ? t('home.dueThisWeek', { count: pending.length }) : t('home.nothingDue')]
-          .filter(Boolean)
-          .join(' · ')}
-      </Typography>
-
-      {overdue.length > 0 && (
-        <Box component="section">
-          <Heading title={t('home.todo.title')} aside={<SoftPill tone="peach">{overdue.length}</SoftPill>} />
-          <Stack spacing={1}>
-            {overdue.map((w, i) => {
-              return (
-                <TapRow
-                  key={w.assignmentId}
-                  index={i}
-                  href={studentHref.assignment(w.courseId, w.assignmentId)}
-                  kind={workKind(w.type)}
-                  title={w.title}
-                  detail={`${w.courseTitle} · ${t('home.todo.wasDue', { date: formatDueAt(w.dueAt, locale) })}`}
-                />
-              );
-            })}
-          </Stack>
+      {/* The name is in the spruce header already: only the week here */}
+      {period && (
+        <Box sx={{ px: 0.5 }}>
+          <SoftPill tone="neutral">{`${period.name} · ${t('home.week', { week: period.week })}`}</SoftPill>
         </Box>
       )}
 
       <Box component="section">
-        <Heading title={t('home.thisWeek.title')} aside={pending.length > 0 && <SoftPill tone="neutral">{t('home.thisWeek.pending', { count: pending.length })}</SoftPill>} />
-        {!lesson && week.length === 0 ? (
+        <Heading
+          title={t('home.upNext.title')}
+          aside={
+            total > 0 && (
+              <Link component={NextLink} href="/student/calendar" underline="none" sx={{ fontSize: '0.8125rem', fontWeight: 600, color: 'secondary.main' }}>
+                {t('home.upNext.all', { total })}
+              </Link>
+            )
+          }
+        />
+        {rows.length === 0 ? (
           <Typography sx={{ px: 0.5, fontSize: '0.875rem', color: 'text.secondary' }}>{t('home.thisWeek.empty')}</Typography>
         ) : (
           <Stack spacing={1}>
-            {lesson && LessonIcon && (
-              <TapRow
-                index={overdue.length}
-                href={studentHref.lesson(lesson.courseId, lesson.lessonId)}
-                kind="lesson"
-                icon={LessonIcon}
-                title={lesson.title}
-                detail={`${lesson.subjectName} · ${t('home.thisWeek.continue')}`}
-                pill={lesson.percent != null ? <SoftPill tone="mint">{lesson.percent}%</SoftPill> : <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />}
-              />
-            )}
-            {week.map((w, i) => {
-              const days = daysUntil(w.dueAt);
-              return (
-                <TapRow
-                  key={w.assignmentId}
-                  index={weekStart + i}
-                  href={studentHref.assignment(w.courseId, w.assignmentId)}
-                  kind={workKind(w.type)}
-                  title={w.title}
-                  detail={w.courseTitle}
-                  pill={<SoftPill tone={days <= 2 ? 'peach' : 'neutral'}>{dueLabel(w.dueAt)}</SoftPill>}
-                />
-              );
-            })}
+            {rows.map(({ key, row }, i) => (
+              <TapRow key={key} index={i} {...row} />
+            ))}
           </Stack>
         )}
       </Box>

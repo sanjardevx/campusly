@@ -90,6 +90,11 @@
       "empty": "Nothing overdue. Well done!",
       "wasDue": "Was due {{date}}",
       "submit": "Submit"
+    },
+    "upNext": {
+      "title": "Up next",
+      "overdue": "Overdue",
+      "all": "See all ({{total}})"
     }
   },
   "course": {

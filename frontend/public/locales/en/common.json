@@ -56,7 +56,8 @@
       "announcements": "News",
       "overview": "Home",
       "attendance": "Attendance",
-      "calendar": "Calendar"
+      "calendar": "Calendar",
+      "tutor": "AI Tutor"
     },
     "tutor": "AI Study Tutor",
     "activity": "Activity log"

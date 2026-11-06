@@ -90,6 +90,11 @@
       "empty": "Muddati o‘tgan ish yo‘q. Barakalla!",
       "wasDue": "Muddat edi: {{date}}",
       "submit": "Topshirish"
+    },
+    "upNext": {
+      "title": "Navbatdagi",
+      "overdue": "Muddati o‘tgan",
+      "all": "Hammasi ({{total}})"
     }
   },
   "course": {

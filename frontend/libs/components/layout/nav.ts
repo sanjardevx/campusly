@@ -31,7 +31,7 @@ export interface NavItem {
   icon: SvgIconComponent;
   /** The plan day that builds the page (shown on the "coming soon" placeholder); none = later phase */
   day?: number;
-  /** false: not a phone tab (the bar keeps five places) — it opens from the "More" menu instead */
+  /** false: not a phone tab (five places in the bar, "More" included) — it opens from "More" instead */
   tab?: false;
 }
 
@@ -51,11 +51,13 @@ export const NAV: Record<Role, NavSection[]> = {
       items: [
         { key: 'home', href: '/student', icon: HomeOutlinedIcon, day: 12 },
         { key: 'courses', href: '/student/courses', icon: MenuBookOutlinedIcon, day: 12 },
-        { key: 'calendar', href: '/student/calendar', icon: EventOutlinedIcon, day: 21 },
+        // Phones: Home, Courses, Grades, AI Tutor, More. The week's work is on Home and the bell
+        // opens the news, so Calendar and News live under "More"
+        { key: 'calendar', href: '/student/calendar', icon: EventOutlinedIcon, day: 21, tab: false },
         { key: 'grades', href: '/student/grades', icon: AssessmentOutlinedIcon, day: 12 },
         // The UI is ready; the answers come with the AI tutor phase (DECISIONS §14)
-        { key: 'tutor', href: '/student/tutor', icon: PsychologyOutlinedIcon, tab: false },
-        { key: 'announcements', href: '/student/announcements', icon: CampaignOutlinedIcon, day: 12 },
+        { key: 'tutor', href: '/student/tutor', icon: PsychologyOutlinedIcon },
+        { key: 'announcements', href: '/student/announcements', icon: CampaignOutlinedIcon, day: 12, tab: false },
       ],
     },
   ],
@@ -79,7 +81,8 @@ export const NAV: Record<Role, NavSection[]> = {
         { key: 'grades', href: '/parent/grades', icon: SchoolOutlinedIcon, day: 13 },
         { key: 'attendance', href: '/parent/attendance', icon: CalendarMonthOutlinedIcon, day: 13 },
         { key: 'calendar', href: '/parent/calendar', icon: EventOutlinedIcon, day: 21 },
-        { key: 'announcements', href: '/parent/announcements', icon: CampaignOutlinedIcon, day: 13 },
+        // Phones: the bell in the header opens the news, so News lives under "More"
+        { key: 'announcements', href: '/parent/announcements', icon: CampaignOutlinedIcon, day: 13, tab: false },
       ],
     },
   ],
