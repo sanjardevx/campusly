@@ -5,9 +5,9 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import LoginRoundedIcon from '@mui/icons-material/LoginRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import PlayCircleOutlineRoundedIcon from '@mui/icons-material/PlayCircleOutlineRounded';
-import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
+import { Logo } from '@/libs/components/Logo';
 import { DEMO_MODE } from '@/libs/config';
 import { EASE, scrollToTop } from './motion';
 import { SITE, scrollToId } from './tokens';
@@ -89,8 +89,7 @@ export function SiteNavbar({ sections }: { sections: NavSection[] }) {
         }}
       >
         <ButtonBase onClick={scrollToTop} aria-label={t('nav.home')} sx={{ gap: 1.25, borderRadius: 1, color: 'inherit', flexShrink: 0 }}>
-          <SchoolOutlinedIcon sx={{ fontSize: { xs: 26, md: 30 }, color: solid ? SITE.spruce : 'inherit' }} />
-          <Typography sx={{ fontSize: { xs: '1.0625rem', md: '1.25rem' }, fontWeight: 700, letterSpacing: '-0.025em', color: 'inherit' }}>Campusly School</Typography>
+          <Logo tone={solid ? 'brand' : 'light'} size={{ xs: 16, md: 18 }} />
         </ButtonBase>
 
         <Stack component="nav" aria-label={t('nav.sections')} direction="row" sx={{ display: { xs: 'none', lg: 'flex' }, flex: 1, justifyContent: 'center', gap: 0.5 }}>

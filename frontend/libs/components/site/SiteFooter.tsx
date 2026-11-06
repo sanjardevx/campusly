@@ -6,11 +6,11 @@ import CallOutlinedIcon from '@mui/icons-material/CallOutlined';
 import DirectionsSubwayOutlinedIcon from '@mui/icons-material/DirectionsSubwayOutlined';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
-import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import { useTranslation } from 'next-i18next/pages';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
+import { Logo } from '@/libs/components/Logo';
 import { DEMO_MODE } from '@/libs/config';
 import { phonesOf, telHref } from '@/libs/phones';
 import { SITE, SITE_TONES, type SiteData, containerSx } from './tokens';
@@ -69,10 +69,9 @@ export function SiteFooter({ contact }: { contact: SiteData['contact'] }) {
       <Box sx={containerSx}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: { xs: 5, lg: 8 } }}>
           <Box>
-            <Stack direction="row" sx={{ alignItems: 'center', gap: 1, mb: 2 }}>
-              <SchoolOutlinedIcon sx={{ color: SITE.spruce }} />
-              <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: '#111827', letterSpacing: '-0.025em' }}>{contact.schoolName}</Typography>
-            </Stack>
+            <Box sx={{ mb: 2.5 }}>
+              <Logo size={18} />
+            </Box>
             {contact.address && <Typography sx={{ fontSize: '0.875rem', color: SITE.stone600, mb: 0.5, lineHeight: 1.625 }}>{contact.address}</Typography>}
             {contact.metro && (
               <Stack direction="row" sx={{ alignItems: 'center', gap: 0.75, fontSize: '0.875rem', color: SITE.stone500, mb: 1.5 }}>

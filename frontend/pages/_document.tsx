@@ -13,6 +13,11 @@ export default function Document(props: DocumentProps & DocumentHeadTagsProps) {
       <Head>
         {/* Emotion style tags collected during the server render */}
         <DocumentHeadTags {...props} />
+        {/* The logo's arch on a spruce tile (libs/components/Logo.tsx); the .ico for old browsers */}
+        <link rel="icon" href="/favicon.ico" sizes="48x48" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="theme-color" content="#1F4E43" />
         {/* Before the first paint: the public site's headline and numbers start hidden instead of flashing (site/motion.tsx) */}
         <script dangerouslySetInnerHTML={{ __html: MOTION_BOOT }} />
       </Head>

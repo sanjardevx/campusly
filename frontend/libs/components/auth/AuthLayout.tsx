@@ -3,9 +3,9 @@ import Head from 'next/head';
 import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import NorthEastIcon from '@mui/icons-material/NorthEast';
-import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
+import { Logo } from '@/libs/components/Logo';
 
 interface Props {
   /** Which left panel: students & parents, or the teacher portal */
@@ -49,22 +49,7 @@ export function AuthLayout({ portal, features, title, children, dense = false }:
         >
           <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
-            <Box
-              sx={{
-                width: 36,
-                height: 36,
-                borderRadius: { xs: 1.5, md: 2 },
-                border: '1px solid rgba(255,255,255,0.25)',
-                bgcolor: { xs: '#2C4C45', md: 'rgba(255,255,255,0.1)' },
-                display: 'grid',
-                placeItems: 'center',
-              }}
-            >
-              <SchoolOutlinedIcon sx={{ fontSize: 22 }} />
-            </Box>
-            <Typography sx={{ fontSize: { xs: '1.5rem', md: '1.25rem' }, fontWeight: 700, letterSpacing: '-0.01em' }}>
-              Campusly
-            </Typography>
+            <Logo tone="light" size={{ xs: 17, md: 18 }} />
             {portal === 'teacher' && (
               <Chip
                 label={t('portal.teacher.badge')}

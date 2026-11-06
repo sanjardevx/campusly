@@ -16,12 +16,12 @@ import {
 import { useTheme, type SxProps, type Theme } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
 import NorthEastIcon from '@mui/icons-material/NorthEast';
-import SchoolIcon from '@mui/icons-material/School';
 import { useTranslation } from 'next-i18next/pages';
 import { CURRENT_YEAR } from '@/apollo/app/query';
 import { crumbVar } from '@/apollo/store';
 import type { SessionUser } from '@/libs/auth/api';
 import { LanguageSwitcher } from '@/libs/components/LanguageSwitcher';
+import { Logo } from '@/libs/components/Logo';
 import { TempPasswordBanner } from '@/libs/components/TempPasswordBanner';
 import type { Role } from '@/libs/gql/graphql';
 import { tokens } from '@/libs/theme';
@@ -232,23 +232,7 @@ function Sidebar({ role, onNavigate }: { role: Role; onNavigate: () => void }) {
           spacing={1.5}
           sx={{ alignItems: 'center', mx: -2, mt: -2, px: 3, py: 2, mb: 2, borderBottom: 1, borderColor: 'divider' }}
         >
-          <Box
-            sx={{
-              width: 32,
-              height: 32,
-              borderRadius: 2,
-              bgcolor: 'primary.main',
-              color: 'primary.contrastText',
-              display: 'grid',
-              placeItems: 'center',
-            }}
-          >
-            <SchoolIcon sx={{ fontSize: 18 }} />
-          </Box>
-          <Box>
-            <Typography sx={{ fontWeight: 700, lineHeight: 1.2 }}>Campusly</Typography>
-            <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>{portal}</Typography>
-          </Box>
+          <Logo size={16} subtitle={portal} />
         </Stack>
 
         <Box component="nav" sx={{ position: 'relative' }}>
