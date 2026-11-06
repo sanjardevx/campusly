@@ -360,23 +360,17 @@
   "tutor": {
     "title": "AI Study Tutor",
     "subtitle": "Step-by-step hints from your own course materials",
-    "conversations": "Conversations",
-    "items_one": "{{count}} item",
-    "items_other": "{{count}} items",
     "new": "New conversation",
-    "noConversations": "No conversations yet. Start one about a lesson or homework.",
+    "noConversations": "No conversations yet.",
     "group": {
       "today": "Today",
       "earlier": "Earlier"
     },
-    "policyNote": "Socratic mode: hints, not answers. Off during quizzes.",
     "course": "Course",
     "topic": "Topic",
     "anyTopic": "Any topic in this course",
     "assignments": "Assignments",
-    "onlyCourse": "The tutor only uses your course materials.",
     "back": "Back to conversations",
-    "help": "Help",
     "level": {
       "1": "Nudge",
       "2": "Concept hint",
@@ -388,15 +382,13 @@
     "thinking": "The tutor is thinking…",
     "anotherHint": "Show another hint",
     "solved": "I solved it",
-    "attach": "Attach a photo (coming soon)",
     "placeholder": "Ask about your lesson or homework…",
     "send": "Send",
-    "hintsOnly": "Hints only — the tutor won't give final answers. Off during quizzes.",
+    "hintsOnly": "Hints, not final answers",
     "you": "You",
     "name": "AI Study Tutor",
     "welcome": {
       "title": "Stuck on something?",
-      "body": "Pick a course and a lesson or homework, then ask. The tutor answers with questions and hints so you find the answer yourself.",
       "start": "How do I start this problem?",
       "stuck": "I'm stuck on step 2",
       "check": "Can you check my idea?"
@@ -408,9 +400,6 @@
     },
     "sources": {
       "title": "From your course",
-      "subtitle": "Materials the tutor cites in this conversation",
-      "none": "Lessons and files the tutor uses will appear here.",
-      "onlyCourse": "Uses only {{course}} materials from your teacher.",
       "kind": {
         "LESSON": "Lesson",
         "FILE": "File",
@@ -419,10 +408,8 @@
       "page": "Page {{page}}"
     },
     "quota": {
-      "title": "Daily questions",
       "left_one": "{{count}} left today",
-      "left_other": "{{count}} left today",
-      "resets": "Resets every day at 00:00"
+      "left_other": "{{count}} left today"
     }
   },
   "quiz": {

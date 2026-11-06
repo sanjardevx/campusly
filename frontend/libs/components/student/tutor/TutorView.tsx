@@ -1,19 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useQuery } from '@apollo/client/react';
-import { Alert, Box, Button, ButtonBase, Card, IconButton, InputBase, LinearProgress, ListSubheader, MenuItem, Select, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Alert, Box, Button, ButtonBase, IconButton, InputBase, ListSubheader, MenuItem, Select, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import ArrowUpwardRoundedIcon from '@mui/icons-material/ArrowUpwardRounded';
-import AttachFileRoundedIcon from '@mui/icons-material/AttachFileRounded';
-import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
 import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
-import PolicyOutlinedIcon from '@mui/icons-material/PolicyOutlined';
 import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
-import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { STUDENT_TUTOR_TOPICS } from '@/apollo/student/query';
 import { useErrorText } from '@/libs/i18n';
@@ -26,15 +20,15 @@ type Course = { id: string; title: string };
 const time = (iso: string, locale = 'en') => new Date(iso).toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
 
 /**
- * Stitch "AI Study Tutor" (DECISIONS §14, built ahead of the tutor phase): conversations on the left,
- * the chat with course / topic, the four help levels and the "hints only" rule in the middle, the
- * cited course materials and the daily limit on the right. Phones: the list or the chat, one at a time.
+ * AI Study Tutor (DECISIONS §14; Stitch's screen made quieter on purpose): conversations on the left,
+ * the chat on the right. What the tutor is says the page title once; the help level and the cited
+ * materials appear only once there is an answer, and one line under the box has the daily limit.
+ * Phones: the list or the chat, one at a time.
  * Everything goes through useTutor (GraphQL for the lists, POST /tutor/chat for the streamed answer).
  * `?course=` and `?topic=lesson:<id>` open it from a lesson or homework page.
  */
 export function TutorView({ courses }: { courses: Course[] }) {
   const theme = useTheme();
-  const desktop = useMediaQuery(theme.breakpoints.up('lg'));
   const phone = !useMediaQuery(theme.breakpoints.up('md'));
   const { query } = useRouter();
   const tutor = useTutor();
@@ -85,7 +79,7 @@ export function TutorView({ courses }: { courses: Course[] }) {
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: desktop ? '280px minmax(0, 1fr) 280px' : '260px minmax(0, 1fr)',
+        gridTemplateColumns: '260px minmax(0, 1fr)',
         border: 1,
         borderColor: STITCH.outline,
         borderRadius: '16px',
@@ -98,16 +92,11 @@ export function TutorView({ courses }: { courses: Course[] }) {
     >
       <Box sx={{ borderRight: 1, borderColor: STITCH.outline, minHeight: 0 }}>{list}</Box>
       <Box sx={{ minHeight: 0, minWidth: 0 }}>{chat}</Box>
-      {desktop && (
-        <Box sx={{ borderLeft: 1, borderColor: STITCH.outline, minHeight: 0, overflowY: 'auto' }}>
-          <SidePanel tutor={tutor} course={course} />
-        </Box>
-      )}
     </Box>
   );
 }
 
-/** Left column: today's / this week's / older conversations and "New conversation" */
+/** Left column: "New conversation" and today's / earlier conversations */
 function ConversationList({ tutor, onNew, onOpen }: { tutor: Tutor; onNew: () => void; onOpen: (c: TutorConversation) => void }) {
   const { t } = useTranslation('student');
   const { locale } = useRouter();
@@ -120,12 +109,6 @@ function ConversationList({ tutor, onNew, onOpen }: { tutor: Tutor; onNew: () =>
   return (
     <Stack sx={{ height: '100%' }}>
       <Box sx={{ p: 2, pb: 1.5 }}>
-        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline', mb: 1.5 }}>
-          <Typography component="h2" sx={{ fontWeight: 700 }}>
-            {t('tutor.conversations')}
-          </Typography>
-          <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>{t('tutor.items', { count: tutor.conversations.length })}</Typography>
-        </Stack>
         <Button fullWidth variant="outlined" color="inherit" startIcon={<AddRoundedIcon />} onClick={onNew} sx={{ ...pressSx, borderColor: STITCH.outline, fontWeight: 600 }}>
           {t('tutor.new')}
         </Button>
@@ -162,15 +145,11 @@ function ConversationList({ tutor, onNew, onOpen }: { tutor: Tutor; onNew: () =>
           ))
         )}
       </Box>
-      <Stack direction="row" sx={{ gap: 1, alignItems: 'center', p: 1.5, borderTop: 1, borderColor: STITCH.outline, color: 'text.secondary' }}>
-        <PolicyOutlinedIcon sx={{ fontSize: 18 }} />
-        <Typography sx={{ fontSize: '0.75rem' }}>{t('tutor.policyNote')}</Typography>
-      </Stack>
     </Stack>
   );
 }
 
-/** Middle column: course + topic, help levels, messages, hint buttons and the composer */
+/** The chat: course + topic, messages, hint buttons and the composer */
 function ChatPanel({
   tutor,
   courses,
@@ -255,16 +234,10 @@ function ChatPanel({
             </MenuItem>
           ))}
         </Select>
-        <Stack direction="row" sx={{ display: { xs: 'none', xl: 'flex' }, alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
-          <VerifiedUserOutlinedIcon sx={{ fontSize: 16 }} />
-          <Typography sx={{ fontSize: '0.75rem' }}>{t('tutor.onlyCourse')}</Typography>
-        </Stack>
       </Stack>
 
-      <HelpLevels level={tutor.level} />
-
       {/* Messages */}
-      <Box sx={{ flex: 1, overflowY: 'auto', px: { xs: 0, md: 3 }, py: 2 }}>
+      <Box sx={{ flex: 1, overflowY: 'auto', px: { xs: 0, md: 3 }, py: 2, display: 'flex', flexDirection: 'column' }}>
         {!tutor.connected && (
           <Alert severity="info" icon={<PsychologyOutlinedIcon />} sx={{ mb: 2 }}>
             {t('tutor.notConnectedBanner')}
@@ -284,14 +257,22 @@ function ChatPanel({
             ))}
             {tutor.streaming && lastRole !== 'TUTOR' && <Thinking />}
             {tutor.connected && !tutor.streaming && lastRole === 'TUTOR' && (
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                 <Button size="small" variant="outlined" color="inherit" startIcon={<LightbulbOutlinedIcon />} onClick={tutor.nextHint} disabled={tutor.level === 4 || blocked} sx={{ ...pressSx, borderColor: STITCH.outline }}>
                   {t('tutor.anotherHint')}
                 </Button>
                 <Button size="small" variant="outlined" startIcon={<CheckCircleOutlineRoundedIcon />} onClick={tutor.solved} sx={pressSx}>
                   {t('tutor.solved')}
                 </Button>
+                <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary', fontVariantNumeric: 'tabular-nums' }}>
+                  {tutor.level}/{HELP_LEVELS.length} · {t(`tutor.level.${tutor.level}`)}
+                </Typography>
               </Stack>
+            )}
+            {tutor.sources.length > 0 && (
+              <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                {t('tutor.sources.title')}: {tutor.sources.map((s) => (s.page ? `${s.title} (${t('tutor.sources.page', { page: s.page })})` : s.title)).join(', ')}
+              </Typography>
             )}
           </Stack>
         )}
@@ -306,10 +287,6 @@ function ChatPanel({
       {/* Composer */}
       <Box sx={{ p: { xs: 0, md: 2 }, pt: 1.5, borderTop: { md: 1 }, borderColor: { md: STITCH.outline } }}>
         <Stack direction="row" sx={{ alignItems: 'flex-end', gap: 1, p: 1, border: 1, borderColor: '#D1D5CB', borderRadius: 3, bgcolor: '#fff' }}>
-          {/* Photos of written work: later (the tutor reads text only for now) */}
-          <IconButton size="small" disabled aria-label={t('tutor.attach')}>
-            <AttachFileRoundedIcon />
-          </IconButton>
           <InputBase
             multiline
             maxRows={5}
@@ -322,51 +299,32 @@ function ChatPanel({
               }
             }}
             placeholder={t('tutor.placeholder')}
-            sx={{ flex: 1, py: 0.75, fontSize: '0.9375rem' }}
+            sx={{ flex: 1, py: 0.75, pl: 1, fontSize: '0.9375rem' }}
             inputProps={{ maxLength: 2000, 'aria-label': t('tutor.placeholder') }}
           />
           <IconButton onClick={send} disabled={!text.trim() || !course || blocked} aria-label={t('tutor.send')} sx={{ bgcolor: 'primary.main', color: '#fff', borderRadius: 2, '&:hover': { bgcolor: 'primary.dark' }, '&.Mui-disabled': { bgcolor: STITCH.surfaceContainer } }}>
             <ArrowUpwardRoundedIcon />
           </IconButton>
         </Stack>
-        <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center', mt: 1, color: 'text.secondary' }}>
-          <InfoOutlinedIcon sx={{ fontSize: 15 }} />
-          <Typography sx={{ fontSize: '0.75rem' }}>{t('tutor.hintsOnly')}</Typography>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', gap: 1, mt: 1, fontSize: '0.75rem', color: 'text.secondary' }}>
+          <span>{t('tutor.hintsOnly')}</span>
+          <Box component="span" sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
+            {t('tutor.quota.left', { count: left })}
+          </Box>
         </Stack>
       </Box>
     </Stack>
   );
 }
 
-/** "Help progression": the four levels, the current one highlighted (Stitch stepper) */
-function HelpLevels({ level }: { level: number }) {
-  const { t } = useTranslation('student');
-  return (
-    <Stack direction="row" sx={{ alignItems: 'center', gap: 0.75, px: { xs: 0, md: 2 }, py: 1.25, bgcolor: { md: '#F7FAF8' }, borderBottom: { md: 1 }, borderColor: { md: STITCH.outline }, overflowX: 'auto', scrollbarWidth: 'none' }}>
-      <Typography sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'text.secondary', whiteSpace: 'nowrap', mr: 0.5 }}>{t('tutor.help')}</Typography>
-      {HELP_LEVELS.map((l) => {
-        const done = l < level;
-        const active = l === level;
-        return (
-          <Stack key={l} direction="row" sx={{ alignItems: 'center', gap: 0.5, px: 1, py: 0.25, borderRadius: 999, whiteSpace: 'nowrap', fontSize: '0.75rem', fontWeight: active ? 700 : 500, bgcolor: active ? 'primary.main' : done ? STITCH.surfaceContainer : 'transparent', color: active ? '#fff' : done ? 'primary.main' : 'text.secondary', border: 1, borderColor: active ? 'primary.main' : STITCH.outline }}>
-            {done ? <CheckRoundedIcon sx={{ fontSize: 14 }} /> : <span>{l}</span>}
-            {t(`tutor.level.${l}`)}
-          </Stack>
-        );
-      })}
-    </Stack>
-  );
-}
-
-/** Empty chat: what the tutor does, and three ways to start */
+/** Empty chat: three ways to start */
 function Welcome({ onPick }: { onPick: (text: string) => void }) {
   const { t } = useTranslation('student');
   const examples = ['start', 'stuck', 'check'] as const;
   return (
-    <Stack sx={{ alignItems: 'center', textAlign: 'center', py: { xs: 2, md: 5 }, gap: 1.5 }}>
-      <KindIcon kind="tutor" size={52} />
+    <Stack sx={{ alignItems: 'center', textAlign: 'center', my: 'auto', py: 2, gap: 1.5 }}>
+      <KindIcon kind="tutor" size={44} />
       <Typography sx={{ fontWeight: 700, fontSize: '1.125rem' }}>{t('tutor.welcome.title')}</Typography>
-      <Typography sx={{ fontSize: '0.875rem', color: 'text.secondary', maxWidth: 420 }}>{t('tutor.welcome.body')}</Typography>
       <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 1, mt: 1 }}>
         {examples.map((k) => (
           <Button key={k} size="small" variant="outlined" color="inherit" onClick={() => onPick(t(`tutor.welcome.${k}`))} sx={{ ...pressSx, borderColor: STITCH.outline, textTransform: 'none' }}>
@@ -426,54 +384,3 @@ function Message({ message }: { message: TutorMessage }) {
     </Stack>
   );
 }
-
-/** Right column: materials the tutor cited, "only this course's materials", today's limit */
-function SidePanel({ tutor, course }: { tutor: Tutor; course: Course | undefined }) {
-  const { t } = useTranslation('student');
-  const left = tutor.quota.limit - tutor.quota.used;
-  return (
-    <Stack sx={{ p: 2, gap: 2, height: '100%' }}>
-      <Box>
-        <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
-          <AutoStoriesOutlinedIcon sx={{ fontSize: 20, color: 'primary.main' }} />
-          <Typography component="h2" sx={{ fontWeight: 700 }}>
-            {t('tutor.sources.title')}
-          </Typography>
-        </Stack>
-        <Typography sx={{ mt: 0.5, fontSize: '0.75rem', color: 'text.secondary' }}>{t('tutor.sources.subtitle')}</Typography>
-      </Box>
-      {tutor.sources.length === 0 ? (
-        <Card variant="outlined" sx={{ borderRadius: 3, p: 2, borderStyle: 'dashed', borderColor: STITCH.outline, fontSize: '0.8125rem', color: 'text.secondary' }}>
-          {t('tutor.sources.none')}
-        </Card>
-      ) : (
-        tutor.sources.map((s) => (
-          <Card key={`${s.kind}-${s.title}-${s.page}`} variant="outlined" sx={{ borderRadius: 3, p: 1.5, borderColor: STITCH.outline, flexShrink: 0 }}>
-            <SoftPill tone="mint">{t(`tutor.sources.kind.${s.kind}`)}</SoftPill>
-            <Typography sx={{ mt: 1, fontWeight: 600, fontSize: '0.875rem' }}>{s.title}</Typography>
-            {s.page && <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>{t('tutor.sources.page', { page: s.page })}</Typography>}
-          </Card>
-        ))
-      )}
-      {course && (
-        <Stack direction="row" sx={{ gap: 1, p: 1.5, borderRadius: 3, border: 1, borderColor: STITCH.outline, alignItems: 'flex-start' }}>
-          <CheckCircleOutlineRoundedIcon sx={{ fontSize: 18, color: 'primary.main', mt: '1px' }} />
-          <Typography sx={{ fontSize: '0.8125rem', color: 'text.secondary' }}>{t('tutor.sources.onlyCourse', { course: course.title })}</Typography>
-        </Stack>
-      )}
-      <Box sx={{ flex: 1 }} />
-      <Card variant="outlined" sx={{ borderRadius: 3, p: 1.5, borderColor: STITCH.outline }}>
-        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Typography sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'text.secondary' }}>{t('tutor.quota.title')}</Typography>
-          <Typography sx={{ fontSize: '0.8125rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-            {tutor.quota.used} / {tutor.quota.limit}
-          </Typography>
-        </Stack>
-        <Typography sx={{ mt: 0.5, fontWeight: 700, fontSize: '1.125rem' }}>{t('tutor.quota.left', { count: left })}</Typography>
-        <LinearProgress variant="determinate" value={(tutor.quota.used / tutor.quota.limit) * 100} sx={{ mt: 1, height: 6, borderRadius: 999, bgcolor: STITCH.surfaceContainer }} />
-        <Typography sx={{ mt: 1, fontSize: '0.75rem', color: 'text.secondary' }}>{t('tutor.quota.resets')}</Typography>
-      </Card>
-    </Stack>
-  );
-}
-
