@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { weekShiftMs } from '../../../prisma/demo-seed';
+import { schoolDate } from '../../../prisma/seed/clock';
 import { BatchCron } from '../../campusly-batch/src/batch.cron';
 import { TutorIndexService } from '../src/components/tutor/tutor-index.service';
 import { CampuslyBatchService } from '../../campusly-batch/src/campusly-batch.service';
@@ -8,18 +8,13 @@ import type { Env } from '../src/libs/config';
 // No DB needed: it lives with the e2e tests because @nestjs/schedule is ESM-only
 // (the e2e Jest config loads ES modules, the unit config does not).
 
-const WEEK = 7 * 24 * 60 * 60 * 1000;
-
-describe('demo week shift', () => {
+describe('demo "today" (the school date in Tashkent)', () => {
   it.each([
-    ['2026-10-17T00:00:00Z', 0], // the story's own "today" (Saturday)
-    ['2026-10-23T18:00:00Z', 0], // Friday 23:00 in Tashkent: still the same week
-    ['2026-10-23T19:30:00Z', 1], // already Saturday 00:30 in Tashkent
-    ['2026-10-25T22:00:00Z', 1], // 03:00 Tashkent on Monday the 26th
-    ['2026-11-20T21:30:00Z', 5],
-    ['2026-09-01T00:00:00Z', 0], // before the story: never moves back
-  ])('%s → +%i weeks', (now, weeks) => {
-    expect(weekShiftMs(new Date(now))).toBe(weeks * WEEK);
+    ['2026-11-08T18:00:00Z', '2026-11-08'], // Sunday 23:00 in Tashkent
+    ['2026-11-08T19:30:00Z', '2026-11-09'], // already Monday 00:30 in Tashkent
+    ['2026-11-08T22:00:00Z', '2026-11-09'], // 03:00 Tashkent: the nightly reset
+  ])('%s → %s', (now, day) => {
+    expect(schoolDate(new Date(now))).toBe(day);
   });
 });
 
@@ -43,7 +38,7 @@ describe('BatchCron.resetDemo', () => {
 
   it('restores the demo data when DEMO_MODE is on', async () => {
     const { cron, batchService } = setup(true, () =>
-      Promise.resolve({ shiftedWeeks: 1 }),
+      Promise.resolve({ today: '2026-11-09', courses: 19 }),
     );
     await cron.resetDemo();
     expect(batchService.resetDemo).toHaveBeenCalledTimes(1);

@@ -6,6 +6,7 @@
 // the Stitch design stay (Aziz Karimov 26100042 in 9A, teacher Nilufar Karimova …).
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcryptjs';
+import { calculateGrade } from '../apps/campusly-api/src/libs/utils/grade';
 import { type Prisma, PrismaClient } from '../generated/prisma/client';
 import { SITE_SETTINGS, seedSite } from './demo-site';
 import {
@@ -16,18 +17,17 @@ import {
   QUIZ_QUESTIONS,
   SUBJECTS_BY_BAND,
   TOPICS,
+  TOPICS_Q2,
   bandOf,
 } from './seed/curriculum';
 import {
-  TODAY,
   addDays,
   day,
   pick,
   random,
-  shiftedWeeks,
   startRun,
   tashkent,
-  weekShiftMs,
+  today,
   weekday,
 } from './seed/clock';
 import { insertAll, uuidv7 } from './seed/ids';
@@ -39,7 +39,49 @@ import {
   gradeOf,
 } from './seed/people';
 
-export { weekShiftMs };
+// ───────────────────────── the school calendar ─────────────────────────
+// Real dates (DECISIONS §12): the demo follows the real school year. Every run writes the story up
+// to its "today": quarter 1 is over and graded, quarter 2 runs, later weeks are still drafts.
+
+/** Uzbek school year: 4 quarters with holidays in between */
+const QUARTERS = [
+  { start: '2026-09-02', end: '2026-10-31', exam: '2026-10-29' },
+  { start: '2026-11-09', end: '2026-12-27', exam: '2026-12-24' },
+  { start: '2027-01-11', end: '2027-03-20', exam: '2027-03-18' },
+  { start: '2027-03-30', end: '2027-05-25', exam: '2027-05-20' },
+];
+
+const mondays = (from: string, count: number) =>
+  Array.from({ length: count }, (_, i) => addDays(from, 7 * i));
+
+/**
+ * The school weeks that have topics (Mondays), numbered across the year like the API's school
+ * week: quarter 1 is weeks 1–8, quarter 2 weeks 9–15.
+ */
+const WEEKS = [
+  ...mondays('2026-09-07', 8).map((start) => ({ start, quarter: 1 })),
+  ...mondays('2026-11-09', 7).map((start) => ({ start, quarter: 2 })),
+];
+
+/** The weeks this run writes: those of every quarter that has started or starts within a week */
+const seededWeeks = () =>
+  WEEKS.filter((w) => QUARTERS[w.quarter - 1].start <= addDays(today(), 7));
+
+/** Index of the week "today" is in (the last one that has started; 0 before the first) */
+const currentWeek = () =>
+  Math.max(0, seededWeeks().filter((w) => w.start <= today()).length - 1);
+
+/** "2026-12-24" → "December 24" (announcement texts) */
+const longDate = (iso: string) =>
+  new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(day(iso));
+
+/** A quarter's grades are published four days after it ends ("published by November 4") */
+const quarterPublished = (quarter: number) =>
+  today() >= addDays(QUARTERS[quarter - 1].end, 4);
 
 /** A plain client for the seed (the API's PrismaService hides columns the seed writes) */
 export const createSeedClient = (databaseUrl: string) =>
@@ -53,8 +95,8 @@ export interface SeedDemoOptions {
   password: string;
   /** DEMO_MODE=true: flag the demo accounts for "Demo login" */
   demoMode: boolean;
-  /** Move the demo story forward in whole weeks so "today" is close to this day (nightly reset) */
-  shiftTo?: Date;
+  /** The moment the story is written for (default: now); tests pass a fixed one */
+  now?: Date;
 }
 
 // One seed run at a time: seedDemo() sets these, the steps below read them
@@ -95,15 +137,8 @@ async function seedSchool() {
     },
   });
 
-  // Uzbek school year: 4 quarters with holidays in between
-  const quarterDates = [
-    ['2026-09-02', '2026-10-31'],
-    ['2026-11-09', '2026-12-27'],
-    ['2027-01-11', '2027-03-20'],
-    ['2027-03-30', '2027-05-25'],
-  ];
   const quarters = [];
-  for (const [i, [startsAt, endsAt]] of quarterDates.entries()) {
+  for (const [i, { start, end }] of QUARTERS.entries()) {
     quarters.push(
       await prisma.period.create({
         data: {
@@ -111,8 +146,8 @@ async function seedSchool() {
           kind: 'QUARTER',
           name: `Quarter ${i + 1}`,
           order: i + 1,
-          startsAt: day(startsAt),
-          endsAt: day(endsAt),
+          startsAt: day(start),
+          endsAt: day(end),
         },
       }),
     );
@@ -134,7 +169,12 @@ async function seedSchool() {
     })),
   });
 
-  return { yearId: year.id, quarters, subjects, groups };
+  return {
+    yearId: year.id,
+    quarterIds: quarters.map((q) => q.id),
+    subjects,
+    groups,
+  };
 }
 
 // ──────────────────────────── 2. users ────────────────────────────
@@ -296,18 +336,6 @@ async function seedUsers(groups: Record<string, string>) {
 
 // ─────────────────────── 3. courses and lessons ───────────────────────
 
-// 8 weeks of quarter 1 (Mondays)
-const WEEK_STARTS = [
-  '2026-09-07',
-  '2026-09-14',
-  '2026-09-21',
-  '2026-09-28',
-  '2026-10-05',
-  '2026-10-12',
-  '2026-10-19',
-  '2026-10-26',
-];
-
 interface SeededCourse {
   id: string;
   subject: string;
@@ -320,16 +348,17 @@ interface SeededCourse {
   lessonsByWeek: string[][];
   /** module (week) ids, index 0 = week 1 */
   moduleIds: string[];
+  /** topic of every school week (quarters 1 and 2), index 0 = week 1 */
   topics: string[];
 }
 
 type School = Pick<
   Awaited<ReturnType<typeof seedSchool>>,
-  'yearId' | 'subjects' | 'groups'
+  'yearId' | 'quarterIds' | 'subjects' | 'groups'
 >;
 type SeedUsers = Awaited<ReturnType<typeof seedUsers>>;
 
-/** Every class takes every subject of its level: ~184 whole-class courses, 8 weeks each */
+/** Every class takes every subject of its level: ~184 whole-class courses, one week per school week */
 async function seedCourses(
   school: School,
   users: SeedUsers,
@@ -392,14 +421,14 @@ async function seedCourses(
         });
       }
 
-      const topics = TOPICS[band][subject];
+      const topics = [...TOPICS[band][subject], ...TOPICS_Q2[band][subject]];
       const lessonsByWeek: string[][] = [];
       const moduleIds: string[] = [];
-      for (const [w, startsAt] of WEEK_STARTS.entries()) {
+      for (const [w, { start: startsAt }] of seededWeeks().entries()) {
         const topic = topics[w];
         // Weeks that have started (plus next week) are published; later ones are still drafts
         const publishedAt =
-          startsAt <= addDays(TODAY, 7)
+          startsAt <= addDays(today(), 7)
             ? tashkent(addDays(startsAt, -2), '18:00')
             : null;
         const moduleId = uuidv7();
@@ -439,22 +468,19 @@ async function seedCourses(
         );
 
         // Progress only for lessons of weeks that are already over or running
-        if (startsAt <= TODAY) {
+        if (startsAt <= today()) {
           for (const lessonId of lessonIds) {
             for (const studentId of studentIds) {
               const r = random();
               if (r < 0.12) continue; // not opened yet
-              const done = r > 0.3;
+              const doneOn = addDays(startsAt, Math.floor(random() * 4));
+              // Never completed in the future: this week's later days are still to come
+              const done = r > 0.3 && doneOn < today();
               rows.progress.push({
                 studentId,
                 lessonId,
                 status: done ? 'COMPLETED' : 'IN_PROGRESS',
-                completedAt: done
-                  ? tashkent(
-                      addDays(startsAt, Math.floor(random() * 4)),
-                      '19:30',
-                    )
-                  : null,
+                completedAt: done ? tashkent(doneOn, '19:30') : null,
               });
             }
           }
@@ -496,10 +522,15 @@ async function seedCourses(
 
 // ─────────────────────── 4. assignments and grades ───────────────────────
 
-// Quiz n is written at the end of these weeks
-const QUIZ_WEEKS = [2, 4, 5, 7];
-/** Up to this date grades are already published; later ones are graded but still hidden */
-const PUBLISHED_UNTIL = '2026-10-01';
+// Quiz n is written at the end of these school weeks (quarter 1: 1–4, quarter 2: 5–7)
+const QUIZ_WEEKS = [2, 4, 5, 7, 10, 12, 14];
+
+/**
+ * Grades older than a week are published, the newer ones are graded but still hidden. When a
+ * quarter's grades come out, all of its work is published too.
+ */
+const isGradePublished = (due: string, quarter: number) =>
+  due < addDays(today(), -7) || quarterPublished(quarter);
 
 /** Round to 0.5 points, between 0 and max */
 const roundHalf = (n: number, max: number) =>
@@ -522,7 +553,10 @@ async function seedAssignments(courses: SeededCourse[], users: SeedUsers) {
     attempts: [] as Prisma.SubmissionAttemptCreateManyInput[],
     comments: [] as Prisma.SubmissionCommentCreateManyInput[],
   };
+  // Every published score, for the quarter grades
+  const scores: PublishedScore[] = [];
 
+  const weeks = seededWeeks();
   for (const course of courses) {
     const items: {
       type: 'HOMEWORK' | 'QUIZ' | 'EXAM';
@@ -530,43 +564,50 @@ async function seedAssignments(courses: SeededCourse[], users: SeedUsers) {
       due: string;
       maxScore: number;
       week: number;
+      quarter: number;
     }[] = [];
     // Homework n belongs to week n: same topic, due on that week's Saturday
     // (Algebra 9A: "Homework 5: Factoring Higher Degree Polynomials", as in the design)
-    for (let n = 1; n <= 8; n++) {
+    for (const [i, { start, quarter }] of weeks.entries()) {
       items.push({
         type: 'HOMEWORK',
-        title: `Homework ${n}: ${course.topics[n - 1]}`,
-        due: addDays(WEEK_STARTS[n - 1], 5),
+        title: `Homework ${i + 1}: ${course.topics[i]}`,
+        due: addDays(start, 5),
         maxScore: 10,
-        week: n,
+        week: i + 1,
+        quarter,
       });
     }
-    for (let n = 1; n <= 4; n++) {
-      const week = QUIZ_WEEKS[n - 1];
+    for (const [i, week] of QUIZ_WEEKS.entries()) {
+      if (week > weeks.length) break;
       const name =
-        course.subject === 'Algebra' && course.band === 'MIDDLE'
-          ? ALGEBRA_QUIZZES[n - 1]
+        course.subject === 'Algebra' && course.band === 'MIDDLE' && i < 4
+          ? ALGEBRA_QUIZZES[i]
           : course.topics[week - 1];
       items.push({
         type: 'QUIZ',
-        title: `Quiz ${n}: ${name}`,
-        due: addDays(WEEK_STARTS[week - 1], 5),
+        title: `Quiz ${i + 1}: ${name}`,
+        due: addDays(weeks[week - 1].start, 5),
         maxScore: 20,
         week,
+        quarter: weeks[week - 1].quarter,
       });
     }
-    items.push({
-      type: 'EXAM',
-      title: 'Quarter 1 Exam',
-      due: '2026-10-29',
-      maxScore: 100,
-      week: 8,
-    });
+    // One written exam in the last week of every quarter
+    for (const quarter of new Set(weeks.map((w) => w.quarter))) {
+      items.push({
+        type: 'EXAM',
+        title: `Quarter ${quarter} Exam`,
+        due: QUARTERS[quarter - 1].exam,
+        maxScore: 100,
+        week: weeks.filter((w) => w.quarter <= quarter).length,
+        quarter,
+      });
+    }
 
     for (const item of items) {
-      const isPast = item.due < TODAY;
-      const isPublished = item.due <= PUBLISHED_UNTIL;
+      const isPast = item.due < today();
+      const isPublished = isPast && isGradePublished(item.due, item.quarter);
       const assignmentId = uuidv7();
       rows.assignments.push({
         id: assignmentId,
@@ -605,8 +646,33 @@ async function seedAssignments(courses: SeededCourse[], users: SeedUsers) {
         }
       }
 
-      // Exams are offline; future and today's work has no grades yet
-      if (item.type === 'EXAM' || item.due > TODAY) continue;
+      // Future and today's work has no grades yet
+      if (item.due > today()) continue;
+      // The teacher grades about two days after the deadline (never "graded" in the future)
+      const gradingDone = addDays(item.due, 2) < today();
+
+      // Exams are written in class: a mark for everyone, no upload
+      if (item.type === 'EXAM') {
+        if (!isPublished && !gradingDone) continue;
+        for (const studentId of course.studentIds) {
+          const score = roundHalf(
+            item.maxScore * (ability[studentId] + (random() - 0.5) * 0.2),
+            item.maxScore,
+          );
+          rows.submissions.push({
+            assignmentId,
+            studentId,
+            status: 'GRADED',
+            score,
+            gradedById: course.teacherId,
+            gradedAt: tashkent(addDays(item.due, 2), '16:00'),
+          });
+          if (isPublished) {
+            scores.push({ course, studentId, item, score });
+          }
+        }
+        continue;
+      }
 
       for (const studentId of course.studentIds) {
         const isAzizHw5 =
@@ -627,24 +693,31 @@ async function seedAssignments(courses: SeededCourse[], users: SeedUsers) {
               gradedById: course.teacherId,
               gradedAt: tashkent(addDays(item.due, 2), '16:00'),
             });
+            scores.push({ course, studentId, item, score: 0 });
           }
           continue;
         }
 
-        const isLate = r > 0.92 && item.type === 'HOMEWORK';
+        const isLate =
+          r > 0.92 &&
+          item.type === 'HOMEWORK' &&
+          addDays(item.due, 1) < today();
         const submittedAt = isAzizHw5
           ? tashkent(item.due, '21:14')
           : isLate
             ? tashkent(addDays(item.due, 1), '10:20')
             : tashkent(addDays(item.due, -Math.floor(random() * 3)), '20:05');
         // Published items are fully graded; the next ones about 70% (the teacher is still grading)
-        const isGraded = isPast && (isPublished || isAzizHw5 || random() < 0.7);
+        const isGraded =
+          isPast &&
+          (isPublished || isAzizHw5 || (gradingDone && random() < 0.7));
         const score = isAzizHw5
           ? 9
           : roundHalf(
               item.maxScore * (ability[studentId] + (random() - 0.5) * 0.2),
               item.maxScore,
             );
+        if (isPublished) scores.push({ course, studentId, item, score });
 
         const submissionId = uuidv7();
         rows.submissions.push({
@@ -701,6 +774,74 @@ async function seedAssignments(courses: SeededCourse[], users: SeedUsers) {
     prisma.submissionAttempt.createMany({ data }),
   );
   await prisma.submissionComment.createMany({ data: rows.comments });
+  return scores;
+}
+
+interface PublishedScore {
+  course: SeededCourse;
+  studentId: string;
+  item: {
+    type: 'HOMEWORK' | 'QUIZ' | 'EXAM';
+    maxScore: number;
+    quarter: number;
+  };
+  score: number;
+}
+
+/**
+ * The quarter grades of every quarter whose grades are out (DECISIONS §10): each teacher pressed
+ * "Publish quarter grades", so every student has a snapshot of the weighted % from the published
+ * scores, the same math as the gradebook (calculateGrade).
+ */
+async function seedQuarterGrades(
+  school: School,
+  courses: SeededCourse[],
+  scores: PublishedScore[],
+) {
+  const rows: Prisma.PeriodGradeCreateManyInput[] = [];
+  const quarters = [...new Set(seededWeeks().map((w) => w.quarter))].filter(
+    quarterPublished,
+  );
+  for (const quarter of quarters) {
+    const publishedAt = tashkent(
+      addDays(QUARTERS[quarter - 1].end, 4),
+      '17:00',
+    );
+    for (const course of courses) {
+      const categories = [
+        { id: course.categories.HOMEWORK, name: 'Homework', weight: 30 },
+        { id: course.categories.QUIZ, name: 'Quizzes', weight: 30 },
+        { id: course.categories.EXAM, name: 'Exams', weight: 40 },
+      ];
+      const own = scores.filter(
+        (s) => s.course === course && s.item.quarter === quarter,
+      );
+      for (const studentId of course.studentIds) {
+        const { percent } = calculateGrade(
+          categories,
+          own
+            .filter((s) => s.studentId === studentId)
+            .map((s) => ({
+              categoryId: course.categories[s.item.type],
+              score: s.score,
+              maxScore: s.item.maxScore,
+            })),
+          // Only the % is stored; the mark is worked out from the school's thresholds when shown
+          { mark5MinPercent: 86, mark4MinPercent: 71, mark3MinPercent: 56 },
+        );
+        if (percent === null) continue;
+        rows.push({
+          studentId,
+          courseId: course.id,
+          periodId: school.quarterIds[quarter - 1],
+          computedScore: percent,
+          publishedAt,
+          publishedById: course.teacherId,
+        });
+      }
+    }
+  }
+  await insertAll(rows, (data) => prisma.periodGrade.createMany({ data }));
 }
 
 // ─────────────────── 5. attendance and announcements ───────────────────
@@ -708,20 +849,27 @@ async function seedAssignments(courses: SeededCourse[], users: SeedUsers) {
 /** Aziz's two excused absences from the parent dashboard design */
 const AZIZ_EXCUSED = ['2026-09-18', '2026-10-02'];
 
-/** One session per lesson day since the start of week 1; ~93 % present overall */
+/** One session per lesson day of every school week up to yesterday; ~93 % present overall */
 async function seedAttendance(courses: SeededCourse[], users: SeedUsers) {
   const aziz = users.students['26100042'].id;
   const sessions: Prisma.ClassSessionCreateManyInput[] = [];
   const records: Prisma.AttendanceRecordCreateManyInput[] = [];
 
-  for (const course of courses) {
-    const dates: string[] = [];
-    for (let d = WEEK_STARTS[0]; d < TODAY; d = addDays(d, 1)) {
-      if (LESSON_DAYS[course.subject].includes(weekday(d))) dates.push(d);
+  // Monday–Friday of each school week (the holidays between quarters have no lessons)
+  const schoolDays: { date: string; week: number }[] = [];
+  for (const [w, { start }] of seededWeeks().entries()) {
+    for (let i = 0; i < 5; i++) {
+      const date = addDays(start, i);
+      if (date < today()) schoolDays.push({ date, week: w + 1 });
     }
+  }
 
-    for (const [i, date] of dates.entries()) {
-      const week = WEEK_STARTS.filter((w) => w <= date).length; // 1-based week of this date
+  for (const course of courses) {
+    const dates = schoolDays.filter((d) =>
+      LESSON_DAYS[course.subject].includes(weekday(d.date)),
+    );
+
+    for (const [i, { date, week }] of dates.entries()) {
       const sessionId = uuidv7();
       sessions.push({
         id: sessionId,
@@ -783,16 +931,52 @@ async function seedAnnouncements(
   // undefined: the course is not part of this run (the partial reset rewrites 9A / 11A only)
   const course = (title: string) =>
     courses.find((c) => `${c.subject} · ${c.group}` === title)?.id;
-  const story = [
+  const [q1, q2] = QUARTERS;
+  const story: {
+    courseId: string | null | undefined;
+    authorId: string;
+    title: string;
+    body: string;
+    isPinned: boolean;
+    eventDate: string | null;
+    at: string;
+  }[] = [
     {
       courseId: null,
       authorId: users.adminId,
       title: 'Quarter 1 ends on October 31',
       body: 'Quarter grades are published by November 4. The autumn break is November 1–8.',
-      isPinned: true,
+      isPinned: today() <= q1.end,
       eventDate: '2026-10-31',
       at: '2026-10-12',
     },
+    // Once quarter 1 is over: its grades, then the plan of quarter 2
+    ...(quarterPublished(1)
+      ? [
+          {
+            courseId: null,
+            authorId: users.adminId,
+            title: 'Quarter 1 grades are published',
+            body: `Every student and parent can see them on the Grades page. Quarter 2 runs from ${longDate(q2.start)} to ${longDate(q2.end)}.`,
+            isPinned: false,
+            eventDate: null,
+            at: addDays(q1.end, 4),
+          },
+        ]
+      : []),
+    ...(today() >= q2.start
+      ? [
+          {
+            courseId: null,
+            authorId: users.adminId,
+            title: `Quarter 2 exams in the week of ${longDate(addDays(q2.end, -6))}`,
+            body: `Each subject writes its quarter exam in the last week. The winter break starts on ${longDate(addDays(q2.end, 1))}.`,
+            isPinned: true,
+            eventDate: q2.exam,
+            at: q2.start,
+          },
+        ]
+      : []),
     {
       courseId: null,
       authorId: users.adminId,
@@ -846,42 +1030,48 @@ async function seedAnnouncements(
     )
     .map((a) => ({ ...a, courseId: a.courseId ?? null }));
 
-  // Every other course gets one note from its teacher (the courses above keep the design's ones)
+  // Every course gets one recent note from its teacher about the current week
+  const weeks = seededWeeks();
+  const now = currentWeek();
+  const quarter = weeks[now].quarter;
+  const inQuarter = weeks
+    .map((w, i) => ({ ...w, number: i + 1 }))
+    .filter((w) => w.quarter === quarter);
+  const [first, last] = [inQuarter[0].number, inQuarter.at(-1)!.number];
+  const lastDone = Math.max(now, 1); // the latest week whose homework is graded
+  const daysAgo = (n: number) => addDays(today(), -n);
   const notes = [
     (c: SeededCourse) => ({
-      title: 'Quiz 4 next week',
-      body: `Quiz 4 covers “${c.topics[6]}”. Review the practice lessons of weeks 6–7.`,
-      at: '2026-10-16',
+      title: `This week: ${c.topics[now]}`,
+      body: `Read the notes lesson of week ${now + 1} before class and bring your questions.`,
+      at: daysAgo(1),
     }),
     (c: SeededCourse) => ({
       title: 'Bring your notebooks on Monday',
-      body: `We start “${c.topics[6]}”. Please bring your notebook and a pencil.`,
-      at: '2026-10-15',
+      body: `We start “${c.topics[Math.min(now + 1, weeks.length - 1)]}”. Please bring your notebook and a pencil.`,
+      at: daysAgo(2),
     }),
     () => ({
-      title: 'Quarter 1 exam on October 29',
-      body: 'The exam covers weeks 1–7. Week 8 is for review.',
-      at: '2026-10-14',
+      title: `Quarter ${quarter} exam on ${longDate(QUARTERS[quarter - 1].exam)}`,
+      body: `The exam covers weeks ${first}–${last - 1}. Week ${last} is for review.`,
+      at: daysAgo(3),
     }),
     (c: SeededCourse) => ({
-      title: 'Great work on Homework 5',
-      body: `Most of you did very well on “${c.topics[4]}”. Corrections are in your feedback.`,
-      at: '2026-10-13',
+      title: `Great work on Homework ${lastDone}`,
+      body: `Most of you did very well on “${c.topics[lastDone - 1]}”. Corrections are in your feedback.`,
+      at: daysAgo(4),
     }),
   ];
-  const covered = new Set(items.map((a) => a.courseId));
-  courses
-    .filter((c) => !covered.has(c.id))
-    .forEach((c, i) => {
-      const note = notes[i % notes.length](c);
-      items.push({
-        courseId: c.id,
-        authorId: c.teacherId,
-        isPinned: false,
-        eventDate: null,
-        ...note,
-      });
+  courses.forEach((c, i) => {
+    const note = notes[i % notes.length](c);
+    items.push({
+      courseId: c.id,
+      authorId: c.teacherId,
+      isPinned: false,
+      eventDate: null,
+      ...note,
     });
+  });
 
   // About two thirds of the audience has read each one (read receipts on the teacher side)
   const everyone = Object.values(users.students).map((s) => s.id);
@@ -909,7 +1099,7 @@ async function seedAnnouncements(
         reads.push({
           announcementId: id,
           userId,
-          readAt: tashkent(addDays(a.at, 1), '08:30'),
+          readAt: tashkent(a.at, '20:30'),
         });
       }
     }
@@ -929,13 +1119,25 @@ async function seedAnnouncements(
         link: '/student/grades',
         createdAt: tashkent('2026-09-29', '17:00'),
       },
+      // This week's homework of Algebra 9A, sent on the Sunday evening before
       {
         userId: aziz,
         type: 'ASSIGNMENT_DUE',
-        title: 'Homework 7: Rational Root Test is due on Saturday',
+        title: `Homework ${now + 1}: ${courses.find((c) => c.subject === 'Algebra' && c.group === '9A')?.topics[now]} is due on Saturday`,
         link: '/student/todo',
-        createdAt: tashkent('2026-10-17', '08:00'),
+        createdAt: tashkent(addDays(weeks[now].start, -1), '18:00'),
       },
+      ...(quarterPublished(1)
+        ? [
+            {
+              userId: aziz,
+              type: 'GRADE_PUBLISHED' as const,
+              title: 'Quarter 1 grades were published',
+              link: '/student/grades',
+              createdAt: tashkent(addDays(q1.end, 4), '17:00'),
+            },
+          ]
+        : []),
       {
         userId: aziz,
         type: 'ANNOUNCEMENT',
@@ -1107,19 +1309,24 @@ async function seedQuestions(courses: SeededCourse[], users: SeedUsers) {
         'Yes — the practice lesson has extra problems. Bring your questions to class.',
     }),
     () => ({
-      title: 'What will the Quarter 1 exam look like?',
+      title: `What will the Quarter ${quarter} exam look like?`,
       body: 'Will it be like the quizzes or longer problems?',
-      answer:
-        'Like the quizzes, plus two longer problems. Week 8 is for review.',
+      answer: `Like the quizzes, plus two longer problems. Week ${lastWeek} is for review.`,
     }),
   ];
+  // The current week and its quarter's last (review) week
+  const weeks = seededWeeks();
+  const now = currentWeek();
+  const quarter = weeks[now].quarter;
+  const lastWeek = weeks.filter((w) => w.quarter <= quarter).length;
   const story = new Set([algebra.id, physics.id]);
   for (const c of courses) {
     if (c.band === 'PRIMARY' || story.has(c.id) || random() < 0.35) continue;
-    const ask = pick(asks)(c.topics[5]);
+    const ask = pick(asks)(c.topics[now]);
     const by = pick(c.studentIds);
     const classmate = pick(c.studentIds.filter((id) => id !== by));
-    const date = addDays('2026-10-12', Math.floor(random() * 5));
+    // Asked in the last few days, answered the same evening
+    const date = addDays(today(), -1 - Math.floor(random() * 4));
     const r = random();
     const replies: Reply[] =
       r < 0.65
@@ -1128,7 +1335,7 @@ async function seedQuestions(courses: SeededCourse[], users: SeedUsers) {
               by: c.teacherId,
               staff: true,
               body: ask.answer,
-              at: `${addDays(date, 1)} 16:30`,
+              at: `${date} 20:40`,
             },
           ]
         : r < 0.85
@@ -1148,13 +1355,13 @@ async function seedQuestions(courses: SeededCourse[], users: SeedUsers) {
       at: `${date} 18:${String(Math.floor(random() * 50) + 10)}`,
       lessonId: ask.answer.startsWith('Like')
         ? undefined
-        : c.lessonsByWeek[5][0],
+        : c.lessonsByWeek[now][0],
       resolved: r < 0.3 ? true : undefined,
       replies,
     });
   }
 
-  /** "2026-10-16 19:40" → that moment in Tashkent (moved by the week shift) */
+  /** "2026-10-16 19:40" → that moment in Tashkent */
   const at = (value: string) => {
     const [date, time] = value.split(' ');
     return tashkent(date, time);
@@ -1216,8 +1423,15 @@ async function loadSchool() {
     where: { academicYearId: year.id, groupId: { in: Object.values(groups) } },
     select: { id: true },
   });
+  // The admin's quarters (the full seed wrote them with the real dates of QUARTERS)
+  const quarters = await prisma.period.findMany({
+    where: { academicYearId: year.id, kind: 'QUARTER' },
+    orderBy: { order: 'asc' },
+    select: { id: true },
+  });
   return {
     yearId: year.id,
+    quarterIds: quarters.map((q) => q.id),
     groups,
     subjects,
     courseIds: courses.map((c) => c.id),
@@ -1334,15 +1548,15 @@ async function deleteDemoData(courseIds: string[], demoIds: string[]) {
 
 /**
  * The nightly demo reset (DECISIONS §12, demo v2): only 9A / 11A and the demo accounts' traces
- * are rewritten from the seed, moved to the current week. The admin's data (users, classes,
- * settings, calendar, website, uploads) and the other 20 classes are never touched. One
- * transaction: a failed reset leaves yesterday's demo as it was.
+ * are rewritten from the seed, up to the real "today" (new weeks, grades, quarter grades). The
+ * admin's data (users, classes, settings, calendar, website, uploads) and the other 20 classes
+ * are never touched. One transaction: a failed reset leaves yesterday's demo as it was.
  */
 export async function resetDemoClasses(
   client: SeedClient,
-  options: { shiftTo: Date },
+  options: { now: Date },
 ) {
-  startRun(weekShiftMs(options.shiftTo));
+  startRun(options.now);
   return client.$transaction(
     async (tx) => {
       prisma = tx as unknown as SeedClient;
@@ -1350,11 +1564,12 @@ export async function resetDemoClasses(
       const users = await loadUsers(school.groups);
       await deleteDemoData(school.courseIds, users.demoIds);
       const courses = await seedCourses(school, users, DEMO_CLASSES);
-      await seedAssignments(courses, users);
+      const scores = await seedAssignments(courses, users);
+      await seedQuarterGrades(school, courses, scores);
       await seedAttendance(courses, users);
       await seedAnnouncements(courses, users, false);
       await seedQuestions(courses, users);
-      return { shiftedWeeks: shiftedWeeks(), courses: courses.length };
+      return { today: today(), courses: courses.length };
     },
     { timeout: 120_000, maxWait: 10_000 },
   );
@@ -1390,13 +1605,14 @@ export async function seedDemo(client: SeedClient, options: SeedDemoOptions) {
   prisma = client;
   SEED_PASSWORD = options.password;
   DEMO_ACCOUNTS = new Set(options.demoMode ? SHOWCASE_ACCOUNTS : []);
-  startRun(options.shiftTo ? weekShiftMs(options.shiftTo) : 0);
+  startRun(options.now ?? new Date());
 
   await reset();
   const school = await seedSchool();
   const users = await seedUsers(school.groups);
   const courses = await seedCourses(school, users);
-  await seedAssignments(courses, users);
+  const scores = await seedAssignments(courses, users);
+  await seedQuarterGrades(school, courses, scores);
   await seedAttendance(courses, users);
   await seedAnnouncements(courses, users);
   await seedQuestions(courses, users);
@@ -1406,5 +1622,5 @@ export async function seedDemo(client: SeedClient, options: SeedDemoOptions) {
     tashkent,
     students: users.students,
   });
-  return { shiftedWeeks: shiftedWeeks() };
+  return { today: today() };
 }

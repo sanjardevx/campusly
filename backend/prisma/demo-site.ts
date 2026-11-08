@@ -15,9 +15,9 @@ const t = (en: string, uz: string, ru: string, ko: string): Text => ({
 
 export interface SiteSeedHelpers {
   adminId: string;
-  /** Calendar date moved by the demo week shift */
+  /** Calendar date for @db.Date columns */
   day: (iso: string) => Date;
-  /** Tashkent moment moved by the demo week shift */
+  /** A moment in Tashkent time */
   tashkent: (iso: string, time?: string) => Date;
   /** Seeded students by login ID (honor students point at real profiles) */
   students: Record<string, { id: string; group: string }>;

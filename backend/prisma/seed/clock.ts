@@ -1,40 +1,42 @@
-// Time and randomness of one seed run. seedDemo() calls startRun(); every other seed module reads
-// these helpers, so the whole run shares one week shift and one random sequence.
+// Time and randomness of one seed run. seedDemo() / resetDemoClasses() call startRun(); every other
+// seed module reads these helpers, so the whole run shares one "today" and one random sequence.
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
- * "Today" of the demo story. The data is written around this date (string comparisons);
- * day() / tashkent() add the week shift when the nightly reset moves the story forward.
+ * "Today" of this run: the real date in Tashkent (the demo follows the real school calendar).
+ * The data is written around it with string comparisons ("2026-11-09" < "2026-11-14").
  */
-export const TODAY = '2026-10-17';
-
-let shiftMs = 0;
+let todayIso = '';
 let randomState = 2026;
 
-/** A new run: the week shift for this run and the random sequence from its start */
-export function startRun(shift: number) {
-  shiftMs = shift;
+/** The school date (YYYY-MM-DD in Tashkent, UTC+5) of a moment */
+export const schoolDate = (at: Date) =>
+  new Date(at.getTime() + 5 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+/** A new run: its "today" and the random sequence from its start */
+export function startRun(now: Date) {
+  todayIso = schoolDate(now);
   randomState = 2026; // the same "random" data on every run, also in a long-running worker
 }
 
-export const shiftedWeeks = () => shiftMs / (7 * DAY_MS);
+/** The run's "today" (YYYY-MM-DD) */
+export const today = () => todayIso;
 
-/** Calendar date for @db.Date columns (no time, no timezone), moved by the week shift */
-export const day = (iso: string) =>
-  new Date(new Date(`${iso}T00:00:00.000Z`).getTime() + shiftMs);
+/** Calendar date for @db.Date columns (no time, no timezone) */
+export const day = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
 
-/** A moment in Tashkent time (UTC+5), stored as UTC, moved by the week shift */
+/** A moment in Tashkent time (UTC+5), stored as UTC */
 export const tashkent = (iso: string, time = '23:59') =>
-  new Date(new Date(`${iso}T${time}:00+05:00`).getTime() + shiftMs);
+  new Date(`${iso}T${time}:00+05:00`);
 
-/** YYYY-MM-DD of a calendar date plus n days (story dates: not shifted) */
+/** YYYY-MM-DD of a calendar date plus n days */
 export const addDays = (iso: string, n: number) =>
   new Date(new Date(`${iso}T00:00:00.000Z`).getTime() + n * DAY_MS)
     .toISOString()
     .slice(0, 10);
 
-/** 1 = Monday … 7 = Sunday of a story date */
+/** 1 = Monday … 7 = Sunday of a date */
 export const weekday = (iso: string) =>
   ((new Date(`${iso}T00:00:00.000Z`).getUTCDay() + 6) % 7) + 1;
 
@@ -50,14 +52,3 @@ export function random() {
 /** One item of a list, picked by the seeded random */
 export const pick = <T>(list: readonly T[]): T =>
   list[Math.floor(random() * list.length)];
-
-/** Whole weeks from TODAY to `to` in Tashkent: weekdays stay the same (no lessons on Sunday) */
-export function weekShiftMs(to: Date): number {
-  const tashkentToday = new Date(to.getTime() + 5 * 60 * 60 * 1000)
-    .toISOString()
-    .slice(0, 10);
-  const days = Math.round(
-    (Date.parse(tashkentToday) - Date.parse(TODAY)) / DAY_MS,
-  );
-  return Math.max(0, Math.floor(days / 7)) * 7 * DAY_MS;
-}

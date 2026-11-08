@@ -61,10 +61,10 @@ export class CampuslyBatchService {
 
   /**
    * The demo classes (9A / 11A) go back to fresh seed data every night, so one visitor's changes
-   * do not stay for the next; the story is moved forward in whole weeks, so deadlines and "this
-   * week" stay current. Only 9A / 11A and the demo accounts' traces change: the admin's data and
-   * the other classes are never touched (DECISIONS §12, demo v2). BatchCron calls it only when
-   * DEMO_MODE=true.
+   * do not stay for the next; the story is written up to the real "today", so deadlines, "this
+   * week" and the quarter grades stay current. Only 9A / 11A and the demo accounts' traces
+   * change: the admin's data and the other classes are never touched (DECISIONS §12, demo v2).
+   * BatchCron calls it only when DEMO_MODE=true.
    */
   public async resetDemo(now = new Date()) {
     // Its own short connection: the seed writes columns that PrismaService hides
@@ -72,7 +72,7 @@ export class CampuslyBatchService {
       this.config.get('DATABASE_URL', { infer: true }),
     );
     try {
-      return await resetDemoClasses(client, { shiftTo: now });
+      return await resetDemoClasses(client, { now });
     } finally {
       await client.$disconnect();
     }

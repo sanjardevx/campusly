@@ -63,9 +63,9 @@ export class BatchCron implements OnApplicationBootstrap {
     if (!this.config.get('DEMO_MODE', { infer: true })) return;
     const started = Date.now();
     try {
-      const { shiftedWeeks } = await this.batchService.resetDemo();
+      const { today } = await this.batchService.resetDemo();
       this.logger.log(
-        `${BATCH_DEMO_RESET}: demo data restored, +${shiftedWeeks} weeks (${Date.now() - started} ms)`,
+        `${BATCH_DEMO_RESET}: demo data restored up to ${today} (${Date.now() - started} ms)`,
       );
     } catch (err) {
       this.logger.error(`${BATCH_DEMO_RESET} failed: ${errorReason(err)}`);

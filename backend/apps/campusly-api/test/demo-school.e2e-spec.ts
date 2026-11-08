@@ -18,7 +18,8 @@ import { RedisService } from '../src/database/redis.service';
 // `pnpm prisma db seed`), then checks the partial nightly reset and the demo rules of
 // DECISIONS §12 "School data and demo v2" on the real school data.
 const PASSWORD = 'E2e-School-Password-1';
-const WEEK = 7 * 24 * 60 * 60 * 1000;
+const DAY = 24 * 60 * 60 * 1000;
+const WEEK = 7 * DAY;
 
 type Key = 'aziz' | 'classmate' | 'karimova';
 const LOGIN: Record<Key, string> = {
@@ -68,11 +69,11 @@ describe('Full school seed, partial demo reset and demo rules (e2e)', () => {
     client = createSeedClient(
       app.get(ConfigService).getOrThrow<string>('DATABASE_URL'),
     );
-    // The story moved to this week, so this week's quizzes are open
+    // The story is written up to the real "today" (the API checks deadlines with the real clock)
     await seedDemo(client, {
       password: PASSWORD,
       demoMode: true,
-      shiftTo: new Date(),
+      now: new Date(),
     });
     for (const [key, loginId] of Object.entries(LOGIN) as [Key, string][]) {
       const res = await request(app.getHttpServer())
@@ -179,7 +180,16 @@ describe('Full school seed, partial demo reset and demo rules (e2e)', () => {
   });
 
   it('a demo student retakes an open quiz; a normal student keeps one attempt', async () => {
+    // Which quiz is open depends on the calendar: open Quiz 4 now (results not out), whatever today is
     const quiz = await assignmentId('Algebra · 9A', 'Quiz 4');
+    await prisma.assignment.update({
+      where: { id: quiz },
+      data: {
+        publishedAt: new Date(Date.now() - DAY),
+        dueAt: new Date(Date.now() + 3 * DAY),
+        gradesPublishedAt: null,
+      },
+    });
     const START = `mutation($a: String!) { startQuiz(assignmentId: $a) { state canStart } }`;
     const SUBMIT = `mutation($a: String!) { submitQuiz(assignmentId: $a) { state canStart } }`;
     type Quiz = { state: string; canStart: boolean };
@@ -202,7 +212,12 @@ describe('Full school seed, partial demo reset and demo rules (e2e)', () => {
   });
 
   it('a demo student hands in graded (unpublished) homework again; a normal student may not', async () => {
+    // Homework 5 is graded; its grades are hidden again, as in the week after the deadline
     const homework = await assignmentId('Algebra · 9A', 'Homework 5');
+    await prisma.assignment.update({
+      where: { id: homework },
+      data: { gradesPublishedAt: null },
+    });
     const SUBMIT = `mutation($i: SubmitAssignmentInput!) { submitAssignment(input: $i) { attemptsLeft } }`;
     const again = { i: { assignmentId: homework, text: 'Second try' } };
     const aziz = await gql<{ submitAssignment: { attemptsLeft: number } }>(
@@ -250,7 +265,7 @@ describe('Full school seed, partial demo reset and demo rules (e2e)', () => {
     ).toBe('DEMO_READ_ONLY');
   });
 
-  it('the nightly reset rewrites 9A / 11A and the demo traces only, moved to the new week', async () => {
+  it('the nightly reset rewrites 9A / 11A and the demo traces only, up to the new today', async () => {
     const outside = { course: { group: { name: { notIn: DEMO_CLASSES } } } };
     const snapshot = async () => ({
       submissions: await prisma.submission.count({
@@ -308,7 +323,7 @@ describe('Full school seed, partial demo reset and demo rules (e2e)', () => {
 
     // Two weeks later
     const result = await resetDemoClasses(client, {
-      shiftTo: new Date(Date.now() + 2 * WEEK),
+      now: new Date(Date.now() + 2 * WEEK),
     });
     expect(result.courses).toBe(19); // 9A: 10 subjects, 11A: 9
 
@@ -316,7 +331,8 @@ describe('Full school seed, partial demo reset and demo rules (e2e)', () => {
     expect((await lesson('Algebra · 9B')).title).toBe('E2E kept');
     expect((await lesson('Algebra · 9A')).title).not.toBe('E2E reset');
     expect(await weekOne('Algebra · 9B')).toBe(before9B);
-    expect(await weekOne('Algebra · 9A')).toBe(before9A + 2 * WEEK);
+    // The real calendar: week 1 stays where it is, only the data up to "today" is new
+    expect(await weekOne('Algebra · 9A')).toBe(before9A);
     expect(
       await prisma.announcementRead.count({
         where: { announcementId: schoolNote.id, userId: aziz.id },

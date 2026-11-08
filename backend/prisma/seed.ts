@@ -1,5 +1,5 @@
 // Run: pnpm prisma db seed — WIPES all tables, then writes the demo data (prisma/demo-seed.ts).
-// The story stays on its fixed "today" (2026-10-17); only the batch's nightly reset moves it forward.
+// The story is written up to the real "today" (Tashkent), like the batch's nightly reset.
 import 'dotenv/config';
 import { countRows, createSeedClient, seedDemo } from './demo-seed';
 
