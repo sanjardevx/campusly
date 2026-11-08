@@ -100,15 +100,16 @@ jobs:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
           aws-region: eu-central-1
       - name: Run deploy.sh on the box
-        # Pull first, then run the script: the box always runs the deploy.sh of this very commit
-        # (a new or changed script would otherwise run one deploy late, or not exist yet)
+        # Update first, then run the script: the box always runs the deploy.sh of this very commit
+        # (a new or changed script would otherwise run one deploy late, or not exist yet). The box
+        # mirrors develop exactly (fetch + reset), so a rewritten history cannot block a deploy.
         run: |
           command_id=$(aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name AWS-RunShellScript \
             --comment "deploy ${GITHUB_SHA::7}" \
             --timeout-seconds 1800 \
-            --parameters '{"commands":["sudo -iu ubuntu bash -c \"cd ~/campusly && git pull --ff-only && bash backend/deploy/deploy.sh\""]}' \
+            --parameters '{"commands":["sudo -iu ubuntu bash -c \"cd ~/campusly && git fetch origin develop && git reset --hard origin/develop && bash backend/deploy/deploy.sh\""]}' \
             --query Command.CommandId --output text)
           echo "SSM command $command_id"
           # The build takes minutes; poll instead of "aws ssm wait" (it gives up after ~100 s)

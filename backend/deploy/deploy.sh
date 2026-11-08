@@ -10,7 +10,9 @@ COMPOSE=(docker compose -f docker-compose.prod.yml)
 HEALTH_URL=${HEALTH_URL:-https://api.campusly.uz/graphql}
 
 echo "==> Code"
-git pull --ff-only                 # never merges on the server: the box only follows develop
+# The box mirrors develop exactly and never merges: no local changes, a rewritten history is fine
+git fetch origin develop
+git reset --hard origin/develop
 git log -1 --format='    %h %s'
 
 echo "==> Settings (SSM → .env.production)"
