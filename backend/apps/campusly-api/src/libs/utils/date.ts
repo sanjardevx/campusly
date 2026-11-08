@@ -73,19 +73,49 @@ export function weekDays(day: string): string[] {
   );
 }
 
-/**
- * Week number of a period and how many weeks it has (week 1 starts on its first day). In a break
- * after the period the last week is shown, never "week 12 of 10".
- */
-export function periodWeek(startsAt: Date, endsAt: Date, day: string) {
-  const days = (a: Date, b: Date) =>
-    Math.floor((b.getTime() - a.getTime()) / 86_400_000);
-  const weeks = Math.ceil((days(startsAt, endsAt) + 1) / 7);
-  const week = Math.min(
-    weeks,
-    Math.floor(days(startsAt, toDbDate(day)) / 7) + 1,
+interface PeriodDates {
+  startsAt: Date;
+  endsAt: Date;
+}
+
+const WEEK_MS = 7 * 86_400_000;
+
+/** The first Monday on or after a calendar date (a quarter starting on Wednesday: next Monday) */
+function firstMonday(date: Date): Date {
+  const weekday = (date.getUTCDay() + 6) % 7; // 0 = Monday
+  return new Date(date.getTime() + ((7 - weekday) % 7) * 86_400_000);
+}
+
+/** Teaching weeks of a period: one per Monday from its first Monday to its last day */
+const weeksIn = (p: PeriodDates) =>
+  Math.max(
+    1,
+    Math.floor(
+      (p.endsAt.getTime() - firstMonday(p.startsAt).getTime()) / WEEK_MS,
+    ) + 1,
   );
-  return { week, weeks };
+
+/**
+ * The school week of a day (DECISIONS §12): counted across the year, the holidays between periods
+ * left out, so a course's "Week 9" is the year's week 9. A period's week 1 starts on its first
+ * Monday (days before it count as week 1); the weeks of the earlier periods come first. In a
+ * break the period's last week is shown, never "week 12 of 10". `weeks` is the period's last week.
+ */
+export function schoolWeek(
+  yearPeriods: PeriodDates[],
+  period: PeriodDates,
+  day: string,
+) {
+  const before = yearPeriods
+    .filter((p) => p.startsAt < period.startsAt)
+    .reduce((sum, p) => sum + weeksIn(p), 0);
+  const own = weeksIn(period);
+  const passed = Math.floor(
+    (toDbDate(day).getTime() - firstMonday(period.startsAt).getTime()) /
+      WEEK_MS,
+  );
+  const week = Math.min(own, Math.max(1, passed + 1));
+  return { week: before + week, weeks: before + own };
 }
 
 /** "2026-10-31" → "2026-11-01" */

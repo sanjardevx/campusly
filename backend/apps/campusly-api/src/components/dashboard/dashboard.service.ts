@@ -18,7 +18,7 @@ import {
 import {
   fromDbDate,
   startOfDayInZone,
-  periodWeek,
+  schoolWeek,
   toDbDate,
   todayInZone,
   weekDays,
@@ -261,17 +261,19 @@ export class DashboardService {
   }
 
   /**
-   * The leaf period today is in (same rule as the student overview), with its week number.
-   * Public: the teacher dashboard shows the same "Quarter 1 · week 7".
+   * The leaf period today is in (same rule as the student overview), with its school week.
+   * Public: the teacher dashboard shows the same "Quarter 2 · week 9".
    */
   public async currentPeriod(academicYearId: string, today: string) {
     const day = toDbDate(today);
-    const period = await this.prismaService.period.findFirst({
+    // The year's periods that have started: the last one is today's, the others count its weeks
+    const started = await this.prismaService.period.findMany({
       where: { academicYearId, children: { none: {} }, startsAt: { lte: day } },
-      orderBy: { startsAt: 'desc' },
+      orderBy: { startsAt: 'asc' },
     });
+    const period = started.at(-1);
     if (!period) return null;
-    const { week, weeks } = periodWeek(period.startsAt, period.endsAt, today);
+    const { week, weeks } = schoolWeek(started, period, today);
     const view: DashboardPeriod = {
       id: period.id,
       name: period.name,

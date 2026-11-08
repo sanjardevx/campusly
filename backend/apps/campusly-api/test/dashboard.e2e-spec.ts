@@ -230,7 +230,20 @@ describe('Admin dashboard (e2e)', () => {
 
   it('needs attention (attendance only): 60 % this period is HIGH and listed first', async () => {
     const after = await dashboard();
-    if (!after.period) return; // no current period: the rule has nothing to measure
+    // The rule measures the current period up to today: all 5 days must fall inside it (not in a
+    // holiday, not in the first days of a quarter)
+    const day = toDbDate(today);
+    const period = await prisma.period.findFirst({
+      where: {
+        academicYear: { isCurrent: true },
+        children: { none: {} },
+        startsAt: { lte: day },
+      },
+      orderBy: { startsAt: 'desc' },
+    });
+    const fiveDaysAgo = new Date(day.getTime() - 4 * 86_400_000);
+    if (!after.period || !period) return; // no current period: nothing to measure
+    if (period.startsAt > fiveDaysAgo || period.endsAt < day) return;
     expect(after.needsAttention.high).toBe(before.needsAttention.high + 1);
     expect(after.needsAttention.students[0]).toMatchObject({
       loginId: 'e2e-dash-newcomer',

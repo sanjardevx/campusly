@@ -426,8 +426,21 @@ describe('studentOverview and myChildren (e2e)', () => {
       'sA',
     );
     const o = res.data!.studentOverview;
-    // The period started 30 days ago → week 5
-    expect(o.period.week).toBe(5);
+    // School week (DECISIONS §12): every Monday of the earlier quarter, then this quarter's
+    // Mondays up to today (the days before its first Monday count as week 1)
+    const mondays = (from: Date, to: Date) => {
+      let count = 0;
+      for (let d = from.getTime(); d <= to.getTime(); d += DAY) {
+        if (new Date(d).getUTCDay() === 1) count++;
+      }
+      return count;
+    };
+    const today = toDbDate(todayInZone('Asia/Tashkent'));
+    const shift = (days: number) => new Date(today.getTime() + days * DAY);
+    expect(o.period.week).toBe(
+      mondays(shift(-150), shift(-31)) +
+        Math.max(1, mondays(shift(-30), today)),
+    );
     // Still open only: graded, closed (no late work) and handed-in ones are not To Do
     expect(o.overdue).toEqual([{ title: 'Missed, late work allowed' }]);
     // 270 of 600 s; the lesson in the hidden week is not offered

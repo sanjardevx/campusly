@@ -2,6 +2,7 @@ import {
   fromDbDate,
   isValidTimeZone,
   nextDay,
+  schoolWeek,
   startOfDayInZone,
   toDbDate,
   todayInZone,
@@ -95,5 +96,34 @@ describe('weekDays (admin dashboard)', () => {
       '2026-10-30',
     ]);
     expect(weekDays('2026-11-02')[0]).toBe('2026-11-02');
+  });
+});
+
+describe('schoolWeek (across the year, holidays left out)', () => {
+  const quarter = (startsAt: string, endsAt: string) => ({
+    startsAt: toDbDate(startsAt),
+    endsAt: toDbDate(endsAt),
+  });
+  // Quarter 1 starts on a Wednesday: its week 1 is the week of the first Monday (8 weeks)
+  const q1 = quarter('2026-09-02', '2026-10-31');
+  const q2 = quarter('2026-11-09', '2026-12-27');
+  const year = [q1, q2];
+
+  it('quarter 1: the first days and the first Monday are week 1, the last Monday week 8', () => {
+    expect(schoolWeek(year, q1, '2026-09-02')).toEqual({ week: 1, weeks: 8 });
+    expect(schoolWeek(year, q1, '2026-09-07')).toEqual({ week: 1, weeks: 8 });
+    expect(schoolWeek(year, q1, '2026-09-14').week).toBe(2);
+    expect(schoolWeek(year, q1, '2026-10-26').week).toBe(8);
+  });
+
+  it('the autumn break shows the last week, never past the end', () => {
+    expect(schoolWeek(year, q1, '2026-11-05').week).toBe(8);
+  });
+
+  it('quarter 2 goes on from week 9 (7 weeks: up to week 15)', () => {
+    expect(schoolWeek(year, q2, '2026-11-09')).toEqual({ week: 9, weeks: 15 });
+    expect(schoolWeek(year, q2, '2026-11-15').week).toBe(9);
+    expect(schoolWeek(year, q2, '2026-11-16').week).toBe(10);
+    expect(schoolWeek(year, q2, '2026-12-21').week).toBe(15);
   });
 });

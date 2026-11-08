@@ -5,7 +5,7 @@ import { Child, StudentOverview } from '../../libs/dto/overview/overview';
 import type { AuthUser } from '../../libs/types/auth';
 import {
   fromDbDate,
-  periodWeek,
+  schoolWeek,
   startOfDayInZone,
   toDbDate,
   todayInZone,
@@ -303,7 +303,7 @@ export class OverviewService {
         ? {
             id: period.id,
             name: period.name,
-            week: periodWeek(period.startsAt, period.endsAt, today).week,
+            week: period.week,
           }
         : null,
       courses: courseRows,
@@ -473,12 +473,15 @@ export class OverviewService {
     }));
   }
 
-  /** The leaf period today is in; in a break, the latest that has started */
+  /** The leaf period today is in (in a break, the latest that has started), with its school week */
   private async currentPeriod(academicYearId: string, today: string) {
     const day = toDbDate(today);
-    return this.prismaService.period.findFirst({
+    const started = await this.prismaService.period.findMany({
       where: { academicYearId, children: { none: {} }, startsAt: { lte: day } },
-      orderBy: { startsAt: 'desc' },
+      orderBy: { startsAt: 'asc' },
     });
+    const period = started.at(-1);
+    if (!period) return null;
+    return { ...period, week: schoolWeek(started, period, today).week };
   }
 }
