@@ -215,8 +215,11 @@ export const TUTOR_CHUNK = { size: 1200, overlap: 150 };
 export const TUTOR_EMBED_DIMENSIONS = 1024;
 /** Files the batch reads for the index: PDFs up to this size and page count */
 export const TUTOR_PDF_LIMITS = { maxMb: 20, maxPages: 80 };
-/** Sources (re)indexed per batch run; the rest wait for the next run */
-export const TUTOR_INDEX_BATCH = 40;
+/**
+ * Sources (re)indexed per batch run (every 10 minutes); the rest wait for the next run. 150 lets
+ * the demo classes, rebuilt every night, be searchable in about 40 minutes (Titan embeddings are cheap).
+ */
+export const TUTOR_INDEX_BATCH = 150;
 
 // ───────────────────────────── lists ─────────────────────────────
 

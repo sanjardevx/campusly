@@ -17,7 +17,9 @@ export async function streamClaude(
       max_tokens: request.maxTokens,
       system: request.system,
       messages: request.messages,
-      // Short hints, not deep reasoning: low effort keeps the answer fast and cheap
+      // Short hints, not deep reasoning. Haiku 5.5 thinks by default (silently: the student would
+      // wait seconds before the first word), so thinking is off; that needs effort high or lower.
+      thinking: { type: 'disabled' },
       output_config: { effort: 'low' },
     },
     { signal: request.signal },

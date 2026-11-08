@@ -19,6 +19,8 @@ interface Source {
   assignmentId: string | null;
   kind: 'LESSON' | 'ASSIGNMENT' | 'FILE';
   title: string;
+  /** When its lesson / assignment was created: the newest material is indexed first */
+  createdAt: Date;
   /** Text sources carry the text; files are downloaded only when they need indexing */
   text?: string;
   file?: { s3Key: string; size: bigint };
@@ -154,6 +156,7 @@ export class TutorIndexService {
         id: true,
         title: true,
         body: true,
+        createdAt: true,
         module: { select: { courseId: true } },
         resources: {
           where: { asset: pdf },
@@ -173,6 +176,7 @@ export class TutorIndexService {
         courseId: true,
         title: true,
         instructions: true,
+        createdAt: true,
         files: {
           where: { removedAt: null, asset: pdf },
           select: { id: true, asset: { select: fileSelect } },
@@ -183,7 +187,10 @@ export class TutorIndexService {
     const sources: Source[] = [];
     const file = (
       key: string,
-      base: Pick<Source, 'courseId' | 'lessonId' | 'assignmentId'>,
+      base: Pick<
+        Source,
+        'courseId' | 'lessonId' | 'assignmentId' | 'createdAt'
+      >,
       title: string,
       asset: { id: string; s3Key: string | null; size: bigint },
     ) => {
@@ -203,6 +210,7 @@ export class TutorIndexService {
         courseId: lesson.module.courseId,
         lessonId: lesson.id,
         assignmentId: null,
+        createdAt: lesson.createdAt,
       };
       const text = `${lesson.title}\n\n${lesson.body ?? ''}`;
       sources.push({
@@ -223,7 +231,12 @@ export class TutorIndexService {
       }
     }
     for (const a of assignments) {
-      const base = { courseId: a.courseId, lessonId: null, assignmentId: a.id };
+      const base = {
+        courseId: a.courseId,
+        lessonId: null,
+        assignmentId: a.id,
+        createdAt: a.createdAt,
+      };
       const text = `${a.title}\n\n${a.instructions ?? ''}`;
       sources.push({
         key: `assignment:${a.id}`,
@@ -237,6 +250,10 @@ export class TutorIndexService {
         file(`assignment-file:${f.id}`, base, f.asset.originalName, f.asset);
       }
     }
-    return sources;
+    // Newest first: a teacher's new material (and the demo classes rebuilt every night) is
+    // searchable within minutes, while an old backlog waits for the next runs
+    return sources.sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    );
   }
 }

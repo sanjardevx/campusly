@@ -260,6 +260,9 @@ export class TutorService {
     let answered = false;
     let streamed = '';
     let conversationId = chat.conversation?.id;
+    // Timings for the log line at the end (no text of the student or the answer is logged)
+    const started = Date.now();
+    let firstWordAt = 0;
 
     try {
       if (conversationId) {
@@ -305,6 +308,7 @@ export class TutorService {
         course.id,
         [topic.title, question].filter(Boolean).join('\n'),
       );
+      const searchedAt = Date.now();
 
       const result = await llm.streamChat(
         {
@@ -323,11 +327,13 @@ export class TutorService {
         },
         (delta) => {
           answered = true;
+          firstWordAt ||= Date.now();
           streamed += delta;
           emit('delta', { text: delta });
         },
       );
       answered = true;
+      const modelDoneAt = Date.now();
       await this.limits.addCost(llm.name, result);
       const reply = await this.prismaService.tutorMessage.create({
         data: result.refused
@@ -349,6 +355,10 @@ export class TutorService {
         level,
         used: await this.limits.used(user.id),
       });
+      const ms = (at: number) => (at ? at - started : -1);
+      this.logger.log(
+        `Tutor answer (${llm.name}): search ${ms(searchedAt)} ms, first word ${ms(firstWordAt)} ms, model done ${ms(modelDoneAt)} ms, total ${ms(Date.now())} ms, ${result.outputTokens} output tokens`,
+      );
     } catch (err) {
       if (signal.aborted) {
         // The student closed the page: keep the part they already saw
