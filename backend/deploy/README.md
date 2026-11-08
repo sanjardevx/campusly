@@ -176,9 +176,13 @@ Health, on the box and from the Mac:
 curl -s http://<ELASTIC_IP>/graphql -H 'content-type: application/json' \
   -H 'apollo-require-preflight: true' -d '{"query":"{ health { status postgres redis migration } }"}'
 # {"data":{"health":{"status":"ok","postgres":true,"redis":true,"migration":"2026..."}}}
+curl -s https://api.campusly.uz/health
+# {"status":"ok","postgres":true,"redis":true,"migration":"2026..."}  (HTTP 503 when degraded)
 ```
 
-Nightly demo reset: with `DEMO_MODE=true` the batch puts **only the demo classes 9A / 11A and the demo accounts' traces** back at **03:00 Tashkent** (moved to the current week); the admin's data and the other classes are never touched (DECISIONS §12, demo v2). Check the next morning: `docker compose -f docker-compose.prod.yml logs batch | grep BATCH_DEMO_RESET`. The batch reads the new code only after a rebuild: `docker compose -f docker-compose.prod.yml up -d --build`.
+Uptime monitor: UptimeRobot (free), HTTP(s) monitor on `https://api.campusly.uz/health` every 5 minutes; a 503 or no answer sends an email.
+
+Nightly demo reset: with `DEMO_MODE=true` the batch puts **only the demo classes 9A / 11A and the demo accounts' traces** back at **03:00 Tashkent** (written up to the real date: new weeks, grades, quarter grades); the admin's data and the other classes are never touched (DECISIONS §12, demo v2). Check the next morning: `docker compose -f docker-compose.prod.yml logs batch | grep BATCH_DEMO_RESET`. The batch reads the new code only after a rebuild: `docker compose -f docker-compose.prod.yml up -d --build`.
 
 `API_DOMAIN` is the address Caddy serves: `:80` (plain HTTP on the Elastic IP) before the domain worked, `api.campusly.uz` since day 15 — Caddy then gets and renews the Let's Encrypt certificate by itself (HTTP → 308 HTTPS).
 

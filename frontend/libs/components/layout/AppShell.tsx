@@ -1,4 +1,5 @@
 import { forwardRef, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import Head from 'next/head';
 import NextLink from 'next/link';
 import { useQuery, useReactiveVar } from '@apollo/client/react';
 import {
@@ -72,13 +73,30 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
     );
   }
 
-  if (!desktop && PHONE_FIRST.includes(role)) {
-    return <PhoneShell user={user}>{children}</PhoneShell>;
-  }
   return (
-    <DesktopShell user={user} desktop={desktop}>
-      {children}
-    </DesktopShell>
+    <>
+      <PageTitle role={role} />
+      {!desktop && PHONE_FIRST.includes(role) ? (
+        <PhoneShell user={user}>{children}</PhoneShell>
+      ) : (
+        <DesktopShell user={user} desktop={desktop}>
+          {children}
+        </DesktopShell>
+      )}
+    </>
+  );
+}
+
+/** The browser tab: what the page says it shows (a course, a homework) or its menu item, then the brand */
+function PageTitle({ role }: { role: Role }) {
+  const { t } = useTranslation('common');
+  const current = useActiveItem(role);
+  const crumb = useReactiveVar(crumbVar);
+  const page = crumb ?? (current ? t(`nav.${current.key}`) : t(`shell.portal.${role}`));
+  return (
+    <Head>
+      <title>{`${page} · Campusly`}</title>
+    </Head>
   );
 }
 

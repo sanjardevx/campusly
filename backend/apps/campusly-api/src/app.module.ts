@@ -4,7 +4,9 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { AppController } from './app.controller';
 import { AppResolver } from './app.resolver';
+import { AppService } from './app.service';
 import { ComponentsModule } from './components/components.module';
 import { DatabaseModule } from './database/database.module';
 import { Env, validateEnv } from './libs/config';
@@ -37,7 +39,9 @@ import { formatGraphqlError } from './libs/utils/graphql-error';
     DatabaseModule,
     ComponentsModule,
   ],
+  controllers: [AppController],
   providers: [
+    AppService,
     AppResolver,
     { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
   ],
