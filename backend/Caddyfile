@@ -2,7 +2,9 @@
 # A real domain → Caddy gets a Let's Encrypt certificate and redirects HTTP to HTTPS by itself.
 # "http://localhost" → plain HTTP (local test of the prod stack).
 {$API_DOMAIN} {
-	encode zstd gzip
+	# Everything is compressed except the AI tutor's answer stream: each piece goes out at once
+	@compress not path /tutor/chat
+	encode @compress zstd gzip
 	# Caddy sets X-Forwarded-For to the visitor's IP; the API trusts one proxy hop (app.setup.ts)
 	reverse_proxy api:3000
 }

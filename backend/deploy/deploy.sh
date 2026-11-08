@@ -25,6 +25,13 @@ echo "==> Database migrations"
 
 echo "==> Restart api + batch (redis and caddy keep running)"
 "${COMPOSE[@]}" up -d
+# A running Caddy keeps the Caddyfile it started with (git swaps the file for a new one, the bind
+# mount does not follow): when the file on disk differs, recreate Caddy (a second of downtime;
+# the certificates stay in their volume)
+if ! "${COMPOSE[@]}" exec -T caddy cat /etc/caddy/Caddyfile | cmp -s - Caddyfile; then
+  echo "==> Caddyfile changed: recreate caddy"
+  "${COMPOSE[@]}" up -d --force-recreate caddy
+fi
 docker image prune -f >/dev/null   # old image layers would fill the 20 GB disk
 
 echo "==> Health"
