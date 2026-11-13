@@ -13,6 +13,10 @@ Open **[campusly.uz](https://campusly.uz)** → **Campusly Portal** → **Live d
 
 The demo is an invented school with real-looking data: classes, lessons, homework, grades and attendance follow the real school calendar, and everything is reset every night, so feel free to click, submit and grade.
 
+![A student asks the AI tutor for a hint and hands in homework; the teacher grades it](docs/images/campusly-demo.webp)
+
+*30 seconds of the live demo: a student opens this week's homework, gets a hint from the AI tutor, hands in a photo of the solution, and the teacher grades it.*
+
 ## What it does
 
 **For students** — every course organised by school week: lessons with notes, PDFs and videos, homework with file upload, timed quizzes that grade themselves, grades and attendance per quarter, a calendar of what is due, school and course announcements, a place to ask the teacher questions, and an **AI Study Tutor** that gives step-by-step hints (never the final answer) from the course's own material.
@@ -65,7 +69,7 @@ flowchart LR
 | Backend | NestJS 11, GraphQL (Apollo Server, code-first), Prisma 7, PostgreSQL 17 + pgvector, Redis 7, BullMQ |
 | AI | Claude Haiku 5.5 (Anthropic API), Amazon Titan Text Embeddings V2 (Bedrock), retrieval with pgvector |
 | Cloud & DevOps | AWS (EC2, RDS, S3, CloudFront, Bedrock), Docker Compose, Caddy, Vercel, GitHub Actions |
-| Testing | Jest — 75 unit tests and 363 end-to-end tests, including access-isolation tests for every API operation |
+| Testing | Jest — 75 unit tests and 365 end-to-end tests, including access-isolation tests for every API operation; a Playwright smoke test of the live demo |
 
 ## Engineering highlights
 
@@ -95,7 +99,7 @@ pnpm install
 pnpm dev                             # web app on http://localhost:3001
 ```
 
-Backend tests: `pnpm test` (unit) and `pnpm test:e2e` (needs the Docker database). The AI tutor stays off locally unless a provider is configured; `TUTOR_PROVIDER=fake` gives canned answers without any API key.
+Backend tests: `pnpm test` (unit) and `pnpm test:e2e` (needs the Docker database). Frontend: `SMOKE_URL=https://campusly.uz pnpm test:smoke` opens every live-demo role in Chrome. The AI tutor stays off locally unless a provider is configured; `TUTOR_PROVIDER=fake` gives canned answers without any API key.
 
 ## Project structure
 
