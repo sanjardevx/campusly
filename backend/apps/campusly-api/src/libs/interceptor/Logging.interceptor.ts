@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { T } from '../types/common';
 
-// Any key that looks like a secret is replaced before logging (Nestar logged raw req.body)
+// Any key that looks like a secret is replaced before logging (never the raw request body)
 const SECRET_KEY = /password|token|secret|authorization/i;
 
 @Injectable()

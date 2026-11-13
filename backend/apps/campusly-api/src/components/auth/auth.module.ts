@@ -11,7 +11,7 @@ import { AccessPolicy } from './policies/access.policy';
 
 @Module({
   imports: [
-    // Secret from the validated config (Nestar: `${process.env.SECRET_TOKEN}`, 30 days)
+    // Secret from the validated config (never a raw process.env read)
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService<Env, true>) => ({

@@ -9,7 +9,7 @@ import {
 } from '../auth/decorators/auth.decorators';
 import { UserService } from './user.service';
 
-// Thin resolver (Nestar style): guards and arguments here, logic in UserService.
+// Thin resolver: guards and arguments here, logic in UserService.
 // No @UseGuards needed: JwtAuthGuard and RolesGuard are global.
 @Resolver()
 export class UserResolver {

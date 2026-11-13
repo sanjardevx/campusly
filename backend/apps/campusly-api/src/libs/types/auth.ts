@@ -1,6 +1,6 @@
 import type { Role } from '../enums/user.enum';
 
-/** Access token payload: only what every request needs (Nestar put the whole member here) */
+/** Access token payload: only what every request needs (no profile data in the token) */
 export interface JwtPayload {
   /** user id */
   sub: string;

@@ -65,7 +65,7 @@ describe('JwtAuthGuard', () => {
     }
   });
 
-  it('puts the user on req.user (not req.body like Nestar)', async () => {
+  it('puts the user on req.user, not on req.body', async () => {
     const { context, request } = fakeContext(
       controller.closed,
       bearer({ sub: 'u1', role: 'STUDENT', sid: 's1' }),

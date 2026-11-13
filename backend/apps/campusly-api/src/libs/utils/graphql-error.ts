@@ -17,7 +17,7 @@ const CODE_BY_STATUS: Record<number, ErrorCode> = {
 
 /**
  * Shapes every GraphQL error the client receives: a readable message + a stable CODE.
- * Nestar sent only English text (the frontend compared strings), which breaks in 4 languages.
+ * The frontend reads the code, never the text: comparing English strings breaks in 4 languages.
  *
  * `error` is the GraphQLError; the exception our code threw (guard, pipe or service) is in
  * `error.originalError`. Apollo does NOT copy a Nest HttpException body into `extensions`,
@@ -57,7 +57,7 @@ export function formatGraphqlError(
   }
   const isInternal = code === (ErrorCode.INTERNAL_SERVER_ERROR as string);
 
-  // Server log (Nestar used console.log): unexpected errors keep the stack, expected ones are one line
+  // Server log: unexpected errors keep the stack, expected ones are one line
   const path = formatted.path?.join('.') ?? '-';
   if (isInternal) logger.error(`${path}: ${message}`, stackOf(thrown ?? error));
   else logger.warn(`${path}: ${code} - ${message}`);

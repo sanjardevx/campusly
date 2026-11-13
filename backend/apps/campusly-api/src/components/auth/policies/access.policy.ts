@@ -13,7 +13,7 @@ import type { AuthUser } from '../../../libs/types/auth';
 /**
  * Layer 2 of authorization (DECISIONS §8). RolesGuard answers "may this ROLE do this?";
  * AccessPolicy answers "may THIS user touch THIS record?" — always from the database,
- * never from IDs the client sends (that mistake is IDOR, OWASP's #1). Nestar had no such layer.
+ * never from IDs the client sends (that mistake is IDOR, OWASP's #1).
  *
  * No relation at all → 404 (do not even reveal the record exists).
  * Related but the action is not allowed → 403.

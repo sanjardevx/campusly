@@ -1,7 +1,7 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 // Types for every GraphQL operation, made from the backend's schema file (no server needed).
-// Nestar wrote these interfaces by hand in libs/types; here a renamed field breaks the build.
+// No hand-written interfaces: a renamed field on the server breaks the build here.
 const config: CodegenConfig = {
   schema: '../backend/schema.gql',
   documents: ['apollo/**/*.ts', 'pages/**/*.tsx', 'libs/**/*.tsx'],

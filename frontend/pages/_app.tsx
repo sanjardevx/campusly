@@ -52,5 +52,5 @@ function App(props: AppProps & { Component: NextPageWithLayout }) {
   );
 }
 
-// Same as Nestar: translations from getStaticProps reach every page through this wrapper
+// Translations from getStaticProps reach every page through this wrapper
 export default appWithTranslation(App, i18nConfig);

@@ -21,8 +21,8 @@ export interface AuditEntry {
 }
 
 /**
- * "Who changed what" log — the safety net that replaces hard deletes (DECISIONS §5).
- * Nestar had none: after `memberStatus: DELETE` nobody knew who did it.
+ * "Who changed what" log — the safety net that replaces hard deletes (DECISIONS §5):
+ * after a status change it is always clear who did it and when.
  */
 @Injectable()
 export class AuditService {

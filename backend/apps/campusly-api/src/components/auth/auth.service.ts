@@ -103,7 +103,7 @@ export class AuthService {
     );
     if (!user || !isMatch) {
       await this.recordFailure(input.loginId, client.ip);
-      // Same answer for "no such ID" and "wrong password" (Nestar told which one was wrong)
+      // Same answer for "no such ID" and "wrong password": an attacker cannot learn which IDs exist
       throw new UnauthorizedException({
         code: ErrorCode.INVALID_CREDENTIALS,
         message: 'Wrong login ID or password',

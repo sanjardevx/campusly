@@ -49,8 +49,8 @@ export interface PreparedPassword {
 }
 
 /**
- * Accounts are created only by the admin: no public signup (Nestar let users sign up and even pick
- * their own role). Every method runs in one transaction and writes an audit row.
+ * Accounts are created only by the admin: no public signup, so nobody can pick their own role.
+ * Every method runs in one transaction and writes an audit row.
  */
 /** N sign-ins or D days, whichever comes first */
 export interface TempPasswordRule {
@@ -406,7 +406,7 @@ export class UserAdminService {
 
   // ───────────────────────── lists ─────────────────────────
 
-  /** Admin Users page: one role per tab, filters, paging (Nestar "Inquiry" style) */
+  /** Admin Users page: one role per tab, filters, paging */
   public async getUsers(input: UsersInquiry): Promise<Users> {
     const now = new Date();
     const { role, status, groupId, groupIds, passwordState, text } =

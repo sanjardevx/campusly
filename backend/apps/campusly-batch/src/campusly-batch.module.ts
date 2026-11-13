@@ -10,7 +10,7 @@ import { validateEnv } from '../../campusly-api/src/libs/config';
 import { BatchCron } from './batch.cron';
 import { CampuslyBatchService } from './campusly-batch.service';
 
-// Shares the API's env rules, database, storage and tutor-index code (like Nestar's batch imported the API schemas)
+// Shares the API's env rules, database, storage and tutor-index code (one codebase, no copies)
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),

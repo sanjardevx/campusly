@@ -18,7 +18,7 @@ import { getRequest } from './request.util';
 
 /**
  * Global guard (APP_GUARD): every endpoint needs a valid access token unless it is @Public().
- * Nestar put @UseGuards(AuthGuard) on each resolver by hand; forgetting one left it open.
+ * Global, so a new resolver cannot be left open by forgetting a @UseGuards line.
  */
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

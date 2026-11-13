@@ -18,7 +18,7 @@ import { TelegramModule } from './telegram/telegram.module';
 import { TutorModule } from './tutor/tutor.module';
 import { UserModule } from './user/user.module';
 
-// Every feature module is registered here (same as Nestar's ComponentsModule)
+// Every feature module is registered here
 @Module({
   imports: [
     AnnouncementModule,

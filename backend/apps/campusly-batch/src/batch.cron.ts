@@ -15,8 +15,8 @@ export const BATCH_DEMO_RESET = 'BATCH_DEMO_RESET';
 export const BATCH_QUIZ_DEADLINES = 'BATCH_QUIZ_DEADLINES';
 export const BATCH_TUTOR_INDEX = 'BATCH_TUTOR_INDEX';
 
-// Same idea as Nestar's BatchController: the schedule here, the work in the service,
-// and a failing job is logged instead of crashing the worker
+// The schedule here, the work in the service, and a failing job is logged instead of
+// crashing the worker
 @Injectable()
 export class BatchCron implements OnApplicationBootstrap {
   private readonly logger = new Logger('BatchCron');

@@ -40,7 +40,7 @@ const authLink = new SetContextLink(async (prevContext) => {
 });
 
 /**
- * Error codes, never messages (Nestar compared message strings).
+ * Error codes, never messages (a message changes with the language).
  * UNAUTHENTICATED: refresh once and send the same request again; no session → sign in.
  * PASSWORD_CHANGE_REQUIRED: only the "Set a new password" page is allowed.
  */
@@ -79,7 +79,7 @@ function createApolloClient() {
   });
 }
 
-// Same idea as Nestar's initializeApollo: a new client for every server render
+// A new client for every server render
 // (no cache shared between users), one shared client in the browser.
 export function initializeApollo() {
   if (!isBrowser()) return createApolloClient();

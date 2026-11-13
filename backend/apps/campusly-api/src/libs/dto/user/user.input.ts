@@ -154,7 +154,7 @@ export class UsersSearch {
   @IsEnum(PasswordState)
   passwordState?: PasswordState;
 
-  /** Name, login ID or (parents) phone. Plain text, never turned into a regex (Nestar did) */
+  /** Name, login ID or (parents) phone. Plain text, never turned into a regex (no regex injection) */
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
@@ -162,7 +162,7 @@ export class UsersSearch {
   text?: string;
 }
 
-/** Same shape as Nestar's *Inquiry inputs: page + limit + sort + direction + search */
+/** The shape of every list input: page + limit + sort + direction + search */
 @InputType()
 export class UsersInquiry {
   @Field(() => Int)

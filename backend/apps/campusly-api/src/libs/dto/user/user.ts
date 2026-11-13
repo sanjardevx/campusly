@@ -156,7 +156,7 @@ export class TotalCounter {
   total: number;
 }
 
-/** Same shape as Nestar's list results: { list, metaCounter } */
+/** The shape of every list result: { list, metaCounter } */
 @ObjectType()
 export class Users {
   @Field(() => [UserListItem])

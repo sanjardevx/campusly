@@ -10,7 +10,7 @@ export const LANGUAGES = [
 
 /**
  * Backend error code → a sentence in the current language. The UI never shows the server's
- * English message and never compares messages (Nestar did: 'Definer: user has been blocked!').
+ * English message and never compares messages (they change with the language).
  */
 export function useErrorText() {
   const { t } = useTranslation('errors');

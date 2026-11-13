@@ -24,7 +24,7 @@ export function setupApp(app: INestApplication) {
   app.use(helmet({ contentSecurityPolicy: isProduction ? undefined : false }));
   // Reads the httpOnly refresh-token cookie (/auth/*)
   app.use(cookieParser());
-  // Only our frontend may call the API with cookies (Nestar allowed every origin)
+  // Only our frontend may call the API with cookies (not every origin)
   app.enableCors({
     origin: config.get('FRONTEND_URL', { infer: true }),
     credentials: true,

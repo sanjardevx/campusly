@@ -82,7 +82,7 @@ export enum ErrorCode {
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
 }
 
-/** Sort direction for every list (Nestar used 1 / -1 for Mongo) */
+/** Sort direction for every list */
 export enum Direction {
   ASC = 'asc',
   DESC = 'desc',

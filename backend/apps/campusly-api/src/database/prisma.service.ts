@@ -10,7 +10,7 @@ import { Prisma, PrismaClient } from '../../../../generated/prisma/client';
 import type { Env } from '../libs/config';
 import { errorReason } from '../libs/utils/error-reason';
 
-// Sensitive columns are left out of EVERY query result (like Nestar's `select: false`).
+// Sensitive columns are left out of EVERY query result, so they cannot leak by accident.
 // Code that really needs one asks for it explicitly, e.g. login:
 //   this.prismaService.user.findUnique({ where: { loginId }, omit: { passwordHash: false } })
 export const SENSITIVE_OMIT = {
@@ -22,8 +22,7 @@ export const SENSITIVE_OMIT = {
   },
 } satisfies Prisma.GlobalOmitConfig;
 
-// Replaces Nestar's Mongoose connection: inject PrismaService and call
-// this.prismaService.user.findMany(...) instead of this.memberModel.find(...)
+// The one database client: inject PrismaService and call this.prismaService.user.findMany(...)
 @Injectable()
 // The generic makes TypeScript know the omitted fields too: `user.passwordHash` is a compile error
 export class PrismaService
@@ -45,7 +44,7 @@ export class PrismaService
     this.target = `${host}${pathname}`;
   }
 
-  // Like Nestar's "MongoDB is connected": shows the DB state on every start.
+  // Shows the DB state on every start.
   // The API keeps running if the DB is down; `health` then reports "degraded".
   async onModuleInit() {
     try {

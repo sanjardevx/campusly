@@ -12,10 +12,10 @@ export const ROLES = 'roles';
 export const ALLOW_PASSWORD_CHANGE = 'allowPasswordChange';
 export const NOT_FOR_DEMO = 'notForDemo';
 
-/** Open endpoint: no access token needed (login, refresh, health). Replaces Nestar's WithoutGuard. */
+/** Open endpoint: no access token needed (login, refresh, health) */
 export const Public = () => SetMetadata(IS_PUBLIC, true);
 
-/** Only these roles may call the endpoint (same idea as Nestar's @Roles) */
+/** Only these roles may call the endpoint */
 export const Roles = (...roles: Role[]) => SetMetadata(ROLES, roles);
 
 /** Still allowed while the user must set a new password (me, changePassword) */
@@ -26,8 +26,8 @@ export const AllowPasswordChange = () =>
 export const NotForDemo = () => SetMetadata(NOT_FOR_DEMO, true);
 
 /**
- * The signed-in user from req.user (Nestar's @AuthMember read req.body.authMember;
- * the body is client data, so the server's user must not live there).
+ * The signed-in user from req.user, set by the guard. Never from req.body: the body is
+ * client data, so the server's user must not live there.
  */
 export const CurrentUser = createParamDecorator(
   (field: keyof AuthUser | undefined, context: ExecutionContext) => {

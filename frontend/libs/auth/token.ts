@@ -1,8 +1,8 @@
 import { jwtDecode } from 'jwt-decode';
 
 /**
- * The access token lives ONLY in this module variable (DECISIONS §7). Nestar kept it in
- * localStorage, where any injected script can read it with one line. After a page reload the
+ * The access token lives ONLY in this module variable (DECISIONS §7), never in localStorage,
+ * where any injected script can read it with one line. After a page reload the
  * variable is empty and the httpOnly refresh cookie brings a new token (silent refresh).
  */
 let accessToken: string | null = null;

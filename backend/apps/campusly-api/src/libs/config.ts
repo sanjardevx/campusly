@@ -148,7 +148,7 @@ export function validateEnv(config: Record<string, unknown>): Env {
 }
 
 // ───────────────────────────── auth ─────────────────────────────
-// DECISIONS §6–7. Nestar used one 30-day JWT; here the access token is short and the refresh token rotates.
+// DECISIONS §6–7. A short-lived access token and a refresh token that rotates on every use.
 
 export const ACCESS_TOKEN_TTL = '15m';
 export const REFRESH_COOKIE = 'campusly_rt';
@@ -223,16 +223,16 @@ export const TUTOR_INDEX_BATCH = 150;
 
 // ───────────────────────────── lists ─────────────────────────────
 
-/** Columns a user list may be sorted by (like Nestar's availableMemberSorts): nothing else is accepted */
+/** Columns a user list may be sorted by: nothing else is accepted */
 export const USER_SORTS = ['createdAt', 'lastName', 'loginId'] as const;
-/** Page size limit for every list (Nestar had none: limit=1000000 returned the whole collection) */
+/** Page size limit for every list, so one request cannot load a whole table */
 export const MAX_PAGE_SIZE = 100;
 /** Classes in one "grade" filter (a grade has a handful of classes; this only stops abuse) */
 export const MAX_GROUP_FILTER = 50;
 
 // ───────────────────────────── school ─────────────────────────────
 
-/** UI languages (DECISIONS §3): Korean is "ko", not Nestar's "kr" (a country code) */
+/** UI languages (DECISIONS §3): Korean is "ko" (a language code), not "kr" (a country code) */
 export const LOCALES = ['en', 'uz', 'ru', 'ko'] as const;
 
 // ───────────────────────────── import ─────────────────────────────
@@ -248,7 +248,7 @@ export const IMPORT_LIMIT = {
 };
 
 // ───────────────────────────── media ─────────────────────────────
-// DECISIONS §11. Nestar saved uploads on the server disk; here the browser uploads straight to S3.
+// DECISIONS §11. The browser uploads straight to S3; files never pass through or stay on the server.
 
 /** What may be uploaded, by kind: MIME types and the size limit */
 export const UPLOAD_RULES = {
