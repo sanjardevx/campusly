@@ -27,7 +27,7 @@ The demo is an invented school with real-looking data: classes, lessons, homewor
 
 **For the school** — user and class management, school settings and calendar, an activity log, and a built-in editor for the public website: news and events, programs and clubs, the team, mock tests, free open courses, honor students and admission enquiries.
 
-Available in **English, Uzbek, Russian and Korean**, with a Telegram bot for account linking and notifications.
+Available in **English, Uzbek, Russian and Korean**, with a Telegram bot for linking an account and resetting a password.
 
 | Student portal | On a phone | Parent portal |
 |---|---|---|
@@ -42,7 +42,7 @@ flowchart LR
 
   subgraph server ["Backend · Docker Compose on AWS"]
     api["API<br/>NestJS · GraphQL"]
-    batch["Worker<br/>scheduled jobs + queues"]
+    batch["Worker<br/>scheduled jobs"]
     redis[("Redis")]
   end
 
@@ -57,7 +57,7 @@ flowchart LR
   api --> tg["Telegram bot"]
 ```
 
-- **Two backend programs, one codebase:** the API answers the web app; the worker runs scheduled jobs (nightly demo reset, indexing course material for the tutor, closing timed-out quizzes) and queued notifications. Both share one database schema.
+- **Two backend programs, one codebase:** the API answers the web app; the worker runs scheduled jobs (nightly demo reset, indexing course material for the tutor, closing timed-out quizzes, marking abandoned uploads as failed). Both share one database schema.
 - **Web app:** server-rendered public website (rebuilt from the CMS every few minutes) and a client-side portal that talks to the API over GraphQL.
 - **Delivery:** every push runs type checks, linting and the full test suite against a real database; when it passes, the backend deploys itself to AWS and the web app to Vercel.
 
@@ -66,7 +66,7 @@ flowchart LR
 | Layer | Tools |
 |---|---|
 | Frontend | Next.js 16, React 19, TypeScript, MUI 9, Apollo Client 4, GraphQL Codegen, next-i18next |
-| Backend | NestJS 11, GraphQL (Apollo Server, code-first), Prisma 7, PostgreSQL 17 + pgvector, Redis 7, BullMQ |
+| Backend | NestJS 11, GraphQL (Apollo Server, code-first), Prisma 7, PostgreSQL 17 + pgvector, Redis 7, NestJS Schedule (cron) |
 | AI | Claude Haiku 5.5 (Anthropic API), Amazon Titan Text Embeddings V2 (Bedrock), retrieval with pgvector |
 | Cloud & DevOps | AWS (EC2, RDS, S3, CloudFront, Bedrock), Docker Compose, Caddy, Vercel, GitHub Actions |
 | Testing | Jest — 75 unit tests and 365 end-to-end tests, including access-isolation tests for every API operation; a Playwright smoke test of the live demo |
@@ -106,7 +106,7 @@ Backend tests: `pnpm test` (unit) and `pnpm test:e2e` (needs the Docker database
 ```
 backend/
   apps/campusly-api/      GraphQL + REST API (NestJS)
-  apps/campusly-batch/    worker: scheduled jobs and queues
+  apps/campusly-batch/    worker: scheduled jobs
   prisma/                 database schema, migrations, demo-school generator
 frontend/
   pages/                  public website, sign-in, student / teacher / parent / admin portals
