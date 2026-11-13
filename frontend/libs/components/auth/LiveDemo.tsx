@@ -10,6 +10,7 @@ import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import { useTranslation } from 'next-i18next/pages';
 import { sessionReadyVar, userVar } from '@/apollo/store';
 import { DEMO_ENTRIES, type DemoKey, demoFromQuery, useOpenDemo } from '@/libs/auth/demo';
+import { homeFor } from '@/libs/auth/routes';
 import { pressSx } from '@/libs/components/student/home/parts';
 
 const ICONS: Record<DemoKey, SvgIconComponent> = {
@@ -38,6 +39,14 @@ export function LiveDemo() {
     // Someone already signed in (another demo role, say): that session is signed out first
     void open(entry, { switching: !!userVar() });
   }, [router.isReady, ready, router.query.demo, open]);
+
+  // Load the code of the portal homes while the visitor reads the doors, so a click only waits
+  // for the sign-in and the data (production only: Next skips prefetch in dev)
+  useEffect(() => {
+    for (const role of new Set(DEMO_ENTRIES.map((e) => e.role))) {
+      void router.prefetch(homeFor(role));
+    }
+  }, [router]);
 
   return (
     <Box id="demo" sx={{ mt: { xs: 3, md: 4 }, scrollMarginTop: 16 }}>

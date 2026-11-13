@@ -52,6 +52,20 @@ describe('AppResolver (e2e)', () => {
     });
   });
 
+  it('CORS: only the frontend origin, and the browser may cache the preflight for 2 hours', async () => {
+    const res = await request(app.getHttpServer())
+      .options('/graphql')
+      .set('Origin', process.env.FRONTEND_URL ?? '')
+      .set('Access-Control-Request-Method', 'POST')
+      .set('Access-Control-Request-Headers', 'content-type,authorization')
+      .expect(204);
+
+    expect(res.headers['access-control-allow-origin']).toBe(
+      process.env.FRONTEND_URL,
+    );
+    expect(res.headers['access-control-max-age']).toBe('7200');
+  });
+
   it('protected query without a token returns UNAUTHENTICATED (global guard + our error code)', async () => {
     const res = await request(app.getHttpServer())
       .post('/graphql')

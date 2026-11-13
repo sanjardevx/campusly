@@ -28,6 +28,9 @@ export function setupApp(app: INestApplication) {
   app.enableCors({
     origin: config.get('FRONTEND_URL', { infer: true }),
     credentials: true,
+    // The browser keeps the preflight answer for 2 hours (Chrome's cap). Without it every API
+    // call waited for an extra OPTIONS round trip (the default cache is 5 seconds).
+    maxAge: 7200,
   });
   // Unknown DTO fields are stripped, so a client cannot sneak in fields like `role`
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
