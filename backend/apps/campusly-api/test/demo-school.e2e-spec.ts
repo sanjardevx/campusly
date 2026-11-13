@@ -348,4 +348,29 @@ describe('Full school seed, partial demo reset and demo rules (e2e)', () => {
       await prisma.announcement.count({ where: { title: 'E2E demo note' } }),
     ).toBe(0);
   }, 60_000);
+
+  it('the demo teacher always has hand-ins to grade, even in a quarter’s first week', async () => {
+    const waiting = {
+      status: { in: ['SUBMITTED' as const, 'LATE' as const] },
+      assignment: {
+        gradesPublishedAt: null,
+        course: {
+          teachers: { some: { teacher: { loginId: LOGIN.karimova } } },
+        },
+      },
+    };
+    // The demo visitor grades everything that waits…
+    await prisma.submission.updateMany({
+      where: waiting,
+      data: { status: 'GRADED', score: 10 },
+    });
+    expect(await prisma.submission.count({ where: waiting })).toBe(0);
+
+    // …and the next night (Tuesday of quarter 2's first week: quarter 1 is out, this week's
+    // homework is not due yet) there is new work again
+    await resetDemoClasses(client, { now: new Date('2026-11-10T06:00:00Z') });
+    expect(
+      await prisma.submission.count({ where: waiting }),
+    ).toBeGreaterThanOrEqual(3);
+  }, 60_000);
 });

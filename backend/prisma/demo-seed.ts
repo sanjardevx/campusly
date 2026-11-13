@@ -556,6 +556,48 @@ async function seedAssignments(courses: SeededCourse[], users: SeedUsers) {
   // Every published score, for the quarter grades
   const scores: PublishedScore[] = [];
 
+  // The demo teacher (Karimova, 9A / 11A) and the demo students, who hand in their own work
+  const demoTeacher = users.teachers.Karimova;
+  const demoStudents = new Set(
+    ['26100042', '26100043'].map((loginId) => users.students[loginId]?.id),
+  );
+  /**
+   * Two classmates (Algebra 9A) or one (the other courses) handed in this week's homework
+   * early: submitted, not graded. Picked without random(), so the rest of the seed stays the same.
+   */
+  const earlyHandIns = (
+    course: SeededCourse,
+    item: { due: string; week: number },
+    assignmentId: string,
+  ) => {
+    const count = course.subject === 'Algebra' && course.group === '9A' ? 2 : 1;
+    const classmates = course.studentIds.filter((id) => !demoStudents.has(id));
+    for (let k = 0; k < count && k < classmates.length; k++) {
+      const studentId = classmates[(item.week * 3 + k * 7) % classmates.length];
+      // Yesterday or the day before, never before the homework opened (Sunday 18:00)
+      const yesterday = addDays(today(), -1 - k);
+      const opened = addDays(item.due, -6);
+      const submittedAt = tashkent(
+        yesterday > opened ? yesterday : opened,
+        '20:05',
+      );
+      const submissionId = uuidv7();
+      rows.submissions.push({
+        id: submissionId,
+        assignmentId,
+        studentId,
+        status: 'SUBMITTED',
+        submittedAt,
+      });
+      rows.attempts.push({
+        submissionId,
+        number: 1,
+        isLate: false,
+        submittedAt,
+      });
+    }
+  };
+
   const weeks = seededWeeks();
   for (const course of courses) {
     const items: {
@@ -646,8 +688,18 @@ async function seedAssignments(courses: SeededCourse[], users: SeedUsers) {
         }
       }
 
-      // Future and today's work has no grades yet
-      if (item.due > today()) continue;
+      // Future work has no grades yet. The demo teacher always has some early hand-ins of this
+      // week's homework waiting, so "Needs grading" is never empty (even in a quarter's first week)
+      if (item.due > today()) {
+        if (
+          item.type === 'HOMEWORK' &&
+          course.teacherId === demoTeacher &&
+          addDays(item.due, -5) <= today()
+        ) {
+          earlyHandIns(course, item, assignmentId);
+        }
+        continue;
+      }
       // The teacher grades about two days after the deadline (never "graded" in the future)
       const gradingDone = addDays(item.due, 2) < today();
 
