@@ -101,7 +101,7 @@ Push `develop` first (the server clones what is on GitHub). On the box:
 ssh-keygen -t ed25519 -f ~/.ssh/github_deploy -N "" -C "campusly-ec2"
 cat ~/.ssh/github_deploy.pub   # GitHub → repo → Settings → Deploy keys → Add (read-only)
 printf 'Host github.com\n  IdentityFile ~/.ssh/github_deploy\n' >> ~/.ssh/config
-git clone -b develop git@github.com:sanjardev23/campusly.git ~/campusly
+git clone -b develop git@github.com:sanjardevx/campusly.git ~/campusly
 ```
 
 ## 7. RDS Postgres (private, SSL only)
@@ -202,7 +202,7 @@ Vercel's records (`@` A `216.198.79.1`, `www` CNAME `…vercel-dns-017.com`) com
 
 The frontend is not on EC2: Vercel builds `frontend/` from GitHub on every push to `develop` and serves it from its CDN with HTTPS.
 
-Vercel → Add New → Project → import `sanjardev23/campusly` (GitHub sign-in):
+Vercel → Add New → Project → import `sanjardevx/campusly` (GitHub sign-in):
 
 | Setting | Value |
 |---|---|
@@ -231,7 +231,7 @@ One-time setup:
 
 1. **EC2 role** `campusly-ec2` → Add permissions → attach the AWS managed policy **`AmazonSSMManagedInstanceCore`** (the SSM agent, preinstalled on Ubuntu 24.04, then registers the box). Check: Systems Manager → Fleet Manager shows `campusly-api` as *Online* — if it stays offline, the agent tried before the policy existed ("not authorized to perform: ssm:UpdateInstanceInformation") and waits ~25 min to retry: `sudo snap restart amazon-ssm-agent` connects it at once. Test from CloudShell: `aws ssm send-command --instance-ids <id> --document-name AWS-RunShellScript --parameters 'commands=["whoami"]'` → `root`.
 2. **OIDC provider**: IAM → Identity providers → Add → OpenID Connect · URL `https://token.actions.githubusercontent.com` · audience `sts.amazonaws.com`.
-3. **Deploy role** `campusly-github-deploy`: IAM → Roles → Create → *Custom trust policy* = [`iam-github-trust.json`](iam-github-trust.json) (only this repo's `develop` branch may assume it). GitHub sends the subject with immutable IDs, `repo:sanjardev23@107606078/campusly@1420902278:ref:refs/heads/develop`: a deleted and re-created account or repo with the same name gets new IDs, so it cannot take over the role. If the job says "Not authorized to perform sts:AssumeRoleWithWebIdentity", read the real subject in CloudTrail → Event history → `AssumeRoleWithWebIdentity` (AccessDenied) → `userIdentity.principalId` (it ends with `…:sts.amazonaws.com:<sub>`) → inline policy [`iam-github-deploy-policy.json`](iam-github-deploy-policy.json) (send `AWS-RunShellScript` to this one instance, read the result). Replace `ACCOUNT_ID` and `INSTANCE_ID`.
+3. **Deploy role** `campusly-github-deploy`: IAM → Roles → Create → *Custom trust policy* = [`iam-github-trust.json`](iam-github-trust.json) (only this repo's `develop` branch may assume it). GitHub sends the subject with immutable IDs, `repo:sanjardevx@107606078/campusly@1420902278:ref:refs/heads/develop`: a deleted and re-created account or repo with the same name gets new IDs, so it cannot take over the role. If the job says "Not authorized to perform sts:AssumeRoleWithWebIdentity", read the real subject in CloudTrail → Event history → `AssumeRoleWithWebIdentity` (AccessDenied) → `userIdentity.principalId` (it ends with `…:sts.amazonaws.com:<sub>`) → inline policy [`iam-github-deploy-policy.json`](iam-github-deploy-policy.json) (send `AWS-RunShellScript` to this one instance, read the result). Replace `ACCOUNT_ID` and `INSTANCE_ID`.
 4. **GitHub** → repo → Settings → Secrets and variables → Actions → **Variables** (not secrets — they are not secret). Do not add an `environment:` to the job: it changes the OIDC subject and the trust condition would refuse it: `AWS_DEPLOY_ROLE_ARN` = the role ARN, `EC2_INSTANCE_ID` = `i-…`.
 
 Then a push to `develop` shows CI → `deploy` in the Actions tab; the job prints the script's output.
