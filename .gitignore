@@ -165,3 +165,6 @@ docs/HANDOFF.md
 
 # Agent instructions: kept locally, not in the repo
 CLAUDE.md
+
+# Local editor/agent config
+.claude/launch.json

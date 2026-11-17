@@ -1,9 +1,12 @@
 # Campusly
 
+[![CI](https://github.com/sanjardevx/campusly/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/sanjardevx/campusly/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2F7A63.svg)](LICENSE)
 [![Live demo](https://img.shields.io/badge/Live_demo-campusly.uz-1F4E43.svg)](https://campusly.uz)
 
 **A learning platform for a private K-12 school** — one portal for students, teachers and parents, a public school website the school edits itself, and an AI study tutor that helps students with hints from their own course material.
+
+> 🇰🇷 **한국어 요약** — 사립 K-12 학교를 위한 학습 관리 플랫폼(LMS)입니다. 학생·교사·학부모 포털, 학교가 직접 편집하는 공개 웹사이트, 그리고 수업 자료를 근거로 힌트를 주는 AI 튜터(RAG)를 제공합니다. NestJS · GraphQL · PostgreSQL(pgvector) · Next.js로 개발했고, 440개의 자동 테스트를 통과하면 AWS와 Vercel에 자동 배포됩니다.
 
 ![Campusly School website](docs/images/site-home.webp)
 
@@ -114,6 +117,12 @@ frontend/
   public/locales/         en, uz, ru, ko
 docs/                     product and architecture decisions, build plan
 ```
+
+## What I'd do next
+
+- **A parent mobile app** with push notifications for new grades, homework and announcements.
+- **An evaluation set for the AI tutor**, run on every release, to track hint quality, cost and response time.
+- **More than one school** on the same platform, each with its own data, website and settings.
 
 ## License
 
